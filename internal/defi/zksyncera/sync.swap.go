@@ -185,12 +185,12 @@ func (c *Client) SyncSwap(ctx context.Context, req *defi.SyncSwapReq) (*defi.Syn
 	}
 
 	result := &defi.SyncSwapRes{}
-	result.EstimatedGasCost = &defi.EstimatedGasCost{
+	result.ECost = &defi.EstimatedGasCost{
 		GasLimit:    gas,
 		GasPrice:    gasPrice,
 		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas.Uint64()),
 	}
-	result.ApproveTxHash = res.ApproveTx
+	result.ApproveTx = res.ApproveTx
 
 	if req.EstimateOnly {
 		return result, nil
@@ -201,7 +201,7 @@ func (c *Client) SyncSwap(ctx context.Context, req *defi.SyncSwapReq) (*defi.Syn
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.SwapTx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract)
 
 	return result, nil
 }

@@ -1237,6 +1237,9 @@ export interface Task {
 
   /**  */
   zkSwapTask?: ZkSwapTask;
+
+  /**  */
+  traderJoeSwapTask?: TraderJoeSwapTask;
 }
 
 export interface TaskTx {
@@ -1283,6 +1286,23 @@ export interface TestNetBridgeSwapTask {
 
   /**  */
   amount?: string;
+
+  /**  */
+  tx?: TaskTx;
+}
+
+export interface TraderJoeSwapTask {
+  /**  */
+  amount: Amount;
+
+  /**  */
+  network: Network;
+
+  /**  */
+  fromToken: Token;
+
+  /**  */
+  toToken: Token;
 
   /**  */
   tx?: TaskTx;
@@ -1516,7 +1536,8 @@ export enum TaskType {
   'IzumiSwap' = 'IzumiSwap',
   'VeSyncSwap' = 'VeSyncSwap',
   'EzkaliburSwap' = 'EzkaliburSwap',
-  'ZkSwap' = 'ZkSwap'
+  'ZkSwap' = 'ZkSwap',
+  'TraderJoeSwap' = 'TraderJoeSwap'
 }
 
 export enum Token {

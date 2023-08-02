@@ -52,7 +52,7 @@ func (c *EtheriumClient) getBalance(ctx context.Context, req *GetBalanceReq) (*G
 
 	ta, ok := c.Cfg.TokenMap[req.Token]
 	if !ok {
-		return nil, NewErrTokenNotSupported(req.Token)
+		return nil, ErrTokenNotSupportedFn(req.Token)
 	}
 
 	s, err := erc_20.NewStorageCaller(ta, c.Cli)

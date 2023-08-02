@@ -708,7 +708,8 @@
         "IzumiSwap",
         "VeSyncSwap",
         "EzkaliburSwap",
-        "ZkSwap"
+        "ZkSwap",
+        "TraderJoeSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

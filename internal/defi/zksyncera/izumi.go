@@ -23,9 +23,9 @@ import (
 // me USDC -> ETH
 // me ETH -> USDC https://explorer.zksync.io/tx/0x36731ad49420976e96d3a8889a78d5ca3661aeae1cb0f73a28fdaa4794941716
 
-func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error) {
+func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
 
-	result := &defi.DefaultSwapRes{}
+	result := &defi.DefaultRes{}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -41,7 +41,7 @@ func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi
 	if err != nil {
 		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
-	result.ApproveTxHash = tokenLimitChecker.ApproveTx
+	result.ApproveTx = tokenLimitChecker.ApproveTx
 
 	data, err := c.makeIzumiSwapData(ctx, req)
 	if err != nil {
@@ -71,7 +71,7 @@ func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi
 		return nil, fmt.Errorf("Make712Tx: %w", err)
 	}
 
-	result.EstimatedGasCost = estimate
+	result.ECost = estimate
 
 	if req.EstimateOnly {
 		return result, nil
@@ -82,7 +82,7 @@ func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.SwapTx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract)
 
 	return result, nil
 }
@@ -96,12 +96,12 @@ func (c *Client) makeIzumiSwapData(ctx context.Context, req *defi.DefaultSwapReq
 
 	fromTokenAddr, supported := c.Cfg.TokenMap[req.FromToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.FromToken)
+		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
 	}
 
 	toTokenAddr, supported := c.Cfg.TokenMap[req.ToToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.ToToken)
+		return nil, defi.ErrTokenNotSupportedFn(req.ToToken)
 	}
 
 	izumiquotertr, err := izumiquoter.NewStorageCaller(c.Cfg.IZUMI.Quoter, c.Provider)

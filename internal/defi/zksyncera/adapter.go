@@ -52,7 +52,7 @@ func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi
 
 	ta, ok := c.Cfg.TokenMap[req.Token]
 	if !ok {
-		return nil, defi.NewErrTokenNotSupported(req.Token)
+		return nil, defi.ErrTokenNotSupportedFn(req.Token)
 	}
 
 	token, err := erc20.NewIERC20(ta, c.Provider)
@@ -333,4 +333,8 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 	res.Tx = c.NewTx(hash, defi.CodeTransfer)
 
 	return res, nil
+}
+
+func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.DefaultRes, error) {
+	return c.StargateBridge(ctx, req)
 }

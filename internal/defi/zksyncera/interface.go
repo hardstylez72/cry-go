@@ -16,35 +16,35 @@ type LP interface {
 }
 
 type MaverickSwapper interface {
-	MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error)
+	MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
 	defi.Networker
 }
 
 type SpaceFiSwapper interface {
-	SpaceFiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error)
+	SpaceFiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
 	defi.Networker
 }
 type VelocoreSwapper interface {
-	VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error)
+	VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
 	defi.Networker
 }
 
 type IzumiSwapper interface {
-	IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error)
+	IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
 	defi.Networker
 }
 
 type VeSyncSwapper interface {
-	VeSyncSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error)
+	VeSyncSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
 	defi.Networker
 }
 
 type EzkaliburSwapper interface {
-	EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error)
+	EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
 	defi.Networker
 }
 
 type ZkSwapper interface {
-	ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error)
+	ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
 	defi.Networker
 }

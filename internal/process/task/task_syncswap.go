@@ -203,8 +203,8 @@ func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, pro
 	}
 
 	result := &SyncSwapRes{
-		Swap:      swap.SwapTx,
-		Allowance: swap.ApproveTxHash,
+		Swap:      swap.Tx,
+		Allowance: swap.ApproveTx,
 		Swapper:   swapper,
 	}
 
@@ -249,8 +249,8 @@ func EstimateSyncSwapCost(ctx context.Context, profile *halp.Profile, p *v1.Sync
 	}
 
 	if p.FromToken == swapper.GetNetworkToken() {
-		am = ResolveNetworkTokenAmount(b.WEI, swap.EstimatedGasCost.TotalGasWei, am)
+		am = ResolveNetworkTokenAmount(b.WEI, swap.ECost.TotalGasWei, am)
 	}
 
-	return GasStation(swap.EstimatedGasCost, p.Network), nil
+	return GasStation(swap.ECost, p.Network), nil
 }

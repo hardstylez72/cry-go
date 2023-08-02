@@ -70,33 +70,6 @@
           />
         </v-col>
       </v-row>
-      <v-row>
-        <v-checkbox
-          :disabled="disabled"
-          density="compact"
-          focused
-          name="use external addr"
-          v-model="item.useExternalAddr"
-          :label="'use external address'"
-          @input="CheckboxChanged">
-        </v-checkbox>
-      </v-row>
-      <v-row v-if="item.useExternalAddr">
-        <v-col>
-          <div class="mb-5">You can use your address to receive coins <a
-            href="https://www.binance.com/en/my/wallet/account/main/deposit/crypto/">binance</a>
-          </div>
-          <v-text-field
-            ref="withdraw-external-addr-input"
-            density="compact"
-            variant="outlined"
-            label="address to receive coins"
-            :rules="binanceAddrRules()"
-            v-model="item.withdrawAddr"
-            :disabled="disabled"
-          />
-        </v-col>
-      </v-row>
     </v-container>
   </v-card-actions>
 </template>

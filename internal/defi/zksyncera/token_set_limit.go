@@ -84,7 +84,7 @@ type AllowedRes struct {
 func (c *Client) TokenAllowed(ctx context.Context, req *AllowedReq) (*AllowedRes, error) {
 	addr, ok := c.Cfg.TokenMap[req.Token]
 	if !ok {
-		return nil, defi.NewErrTokenNotSupported(req.Token)
+		return nil, defi.ErrTokenNotSupportedFn(req.Token)
 	}
 
 	caller, err := erc_20.NewStorageCaller(addr, c.Provider)
@@ -117,7 +117,7 @@ func (r *ApproveReq) Validate(tm map[v1.Token]common.Address) error {
 
 	_, ok := tm[r.Token]
 	if !ok {
-		return defi.NewErrTokenNotSupported(r.Token)
+		return defi.ErrTokenNotSupportedFn(r.Token)
 	}
 
 	if r.Amount.Cmp(big.NewInt(0)) == 0 {

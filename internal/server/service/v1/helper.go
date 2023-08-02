@@ -14,7 +14,6 @@ import (
 	"github.com/hardstylez72/cry/internal/server/user"
 	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/socks5"
-	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 )
 
@@ -44,64 +43,7 @@ func NewHelperService(
 }
 
 func (s *HelperService) EstimateStargateBridgeFee(ctx context.Context, req *v1.EstimateStargateBridgeFeeRequest) (*v1.EstimateStargateBridgeFeeResponse, error) {
-
-	profile, err := s.profileRepository.GetProfile(ctx, req.ProfileId)
-	if err != nil {
-		e := "error estimating fee"
-		return &v1.EstimateStargateBridgeFeeResponse{
-			Error: &e,
-		}, nil
-	}
-	wallet, err := defi.NewWalletTransactor(string(profile.MmskPk))
-	if err != nil {
-		e := "error estimating fee"
-		return &v1.EstimateStargateBridgeFeeResponse{
-			Error: &e,
-		}, nil
-	}
-
-	userId, err := user.GetUserId(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	stgs, err := s.settingsService.GetSettingsNetwork(ctx, &settings.GetSettingsNetworkRequest{
-		Network: req.From,
-		UserId:  userId,
-	})
-	if err != nil {
-		e := "error estimating fee"
-		return &v1.EstimateStargateBridgeFeeResponse{
-			Error: &e,
-		}, nil
-	}
-	swapper, err := uniclient.NewStargateSwapper(req.From, &uniclient.BaseClientConfig{
-		ProxyString: "",
-		RPCEndpoint: stgs.RpcEndpoint,
-	})
-	if err != nil {
-		e := "error estimating fee"
-		return &v1.EstimateStargateBridgeFeeResponse{
-			Error: &e,
-		}, nil
-	}
-	fee, err := swapper.GetStargateBridgeFee(ctx, &defi.GetStargateBridgeFeeReq{
-		ToChain: req.To,
-		Wallet:  wallet.WalletAddr,
-	})
-	if err != nil {
-		e := "error estimating fee"
-		return &v1.EstimateStargateBridgeFeeResponse{
-			Error: &e,
-		}, nil
-	}
-	return &v1.EstimateStargateBridgeFeeResponse{
-		Wei:   fee.Fee1.Int64(),
-		Usd:   defi.WEIToUSD(fee.Fee1).String(),
-		Eth:   defi.WEIToEther(fee.Fee1).String(),
-		Error: nil,
-	}, nil
-
+	return nil, errors.New("deprecated")
 }
 func (s *HelperService) ValidatePK(ctx context.Context, req *v1.ValidatePKRequest) (*v1.ValidatePKResponse, error) {
 	w, err := defi.NewWalletTransactor(req.Pk)

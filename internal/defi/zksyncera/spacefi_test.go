@@ -12,15 +12,12 @@ import (
 )
 
 func TestSpaceFI(t *testing.T) {
-	r, err := NewMainNetClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
+	c, err := NewMainNetClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
 	assert.NoError(t, err)
-	assert.NotNil(t, r)
+	assert.NotNil(t, c)
+	r := &spaceFiMaker{c}
 
 	ctx := context.Background()
-
-	//data, err := r.makeMaverickSwapData(ctx, v1.Token_USDC, v1.Token_ETH, tests.GetConfig().Wallet, big.NewInt(10*10e5))
-	//assert.NoError(t, err)
-	//println("0x" + common.Bytes2Hex(data))
 
 	t.Run("ETH -> USDC", func(t *testing.T) {
 		//t.Skip()
@@ -35,9 +32,9 @@ func TestSpaceFI(t *testing.T) {
 			Debug:     true,
 		}
 
-		data, err := r.makeSpaceFiSwapData(ctx, req)
+		data, err := r.MakeSwapTx(ctx, req)
 		assert.NoError(t, err)
-		println("have: " + "0x" + common.Bytes2Hex(data))
+		println("have: " + "0x" + common.Bytes2Hex(data.Data))
 		expected := "0x7ff36ab50000000000000000000000000000000000000000000000000000000000d0a69300000000000000000000000000000000000000000000000000000000000000800000000000000000000000004a6e7c137a6691d55693ca3bc7e5c698d9d438150000000000000000000000000000000000000000000000000000000064c314f700000000000000000000000000000000000000000000000000000000000000020000000000000000000000005aea5775959fbc2557cc8789bc1bf90a239d9a910000000000000000000000003355df6d4c9c3035724fd0e3914de96a5a83aaf4"
 		println("want: " + expected)
 	})
@@ -55,9 +52,9 @@ func TestSpaceFI(t *testing.T) {
 			Debug:     true,
 		}
 
-		data, err := r.makeSpaceFiSwapData(ctx, req)
+		data, err := r.MakeSwapTx(ctx, req)
 		assert.NoError(t, err)
-		println("have: " + "0x" + common.Bytes2Hex(data))
+		println("have: " + "0x" + common.Bytes2Hex(data.Data))
 		expected := "0x18cbafe500000000000000000000000000000000000000000000000000000000000f42400000000000000000000000000000000000000000000000000001e3c72cf0d4f000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000004a6e7c137a6691d55693ca3bc7e5c698d9d438150000000000000000000000000000000000000000000000000000000064c31cf700000000000000000000000000000000000000000000000000000000000000020000000000000000000000003355df6d4c9c3035724fd0e3914de96a5a83aaf40000000000000000000000005aea5775959fbc2557cc8789bc1bf90a239d9a91"
 		println("want: " + expected)
 	})

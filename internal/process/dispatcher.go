@@ -150,6 +150,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_ZkSwap:
 		p := t.Task.Task.(*v1.Task_ZkSwapTask).ZkSwapTask
 		return task.EstimateZkSwapCost(ctx, profile, p, nil)
+	case v1.TaskType_TraderJoeSwap:
+		p := t.Task.Task.(*v1.Task_TraderJoeSwapTask).TraderJoeSwapTask
+		return task.EstimateTraderJoeSwapCost(ctx, profile, p, nil)
 	}
 
 	return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")

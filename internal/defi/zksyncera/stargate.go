@@ -1,9 +1,177 @@
 package zksyncera
 
-//func (c *Client) StargateBridge(ctx context.Context) {
-//	// 0x498eff64000000000000000000000000787c09494ec8bcb24dcaf8659e7d5d69979ee50800000000000000000000000000000000000000000000000000000000000000660000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000001a862cb0ab5a0cdf0000000000000000000000000000000000000000000000001a643944441851ed30000000000000000000000004a6e7c137a6691d55693ca3bc7e5c698d9d43815000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000144a6e7c137a6691d55693ca3bc7e5c698d9d438150000000000000000000000000000000000000000000000000000000000000000000000000000000000000022000100000000000000000000000000000000000000000000000000000000000186a0000000000000000000000000000000000000000000000000000000000000
-//	call, _ := startgaterouter.NewStorageCaller()
-//	call.GetAmountAndFees()
-//	tr, _ := startgaterouter.NewStorageTransactor()
-//	tr.SendOFT()
-//}
+import (
+	"context"
+	"math/big"
+
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/router"
+	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/startgatemavrouter"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/pkg/errors"
+	"github.com/zksync-sdk/zksync2-go/accounts"
+)
+
+type stargateBridgeMaker struct {
+	source *Client
+}
+
+func (c *Client) StargateBridge(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.DefaultRes, error) {
+	return c.GenericBridge(ctx, &stargateBridgeMaker{c}, req)
+}
+
+func (m *stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.TxData, error) {
+
+	c := m.source
+
+	contractAddr := common.HexToAddress("0xDAc7479e5F7c01CC59bbF7c1C4EDF5604ADA1FF2")
+
+	wt, err := NewWalletTransactor(req.WalletPK, c.Cfg.networkId)
+	if err != nil {
+		return nil, err
+	}
+
+	fromToken, ok := c.Cfg.TokenMap[req.FromToken]
+	if err != nil {
+		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
+	}
+
+	bps := big.NewInt(0)
+
+	var _oft common.Address                          //+
+	var _dstChainId uint16                           //+
+	var _toAddress []byte                            //+
+	var _amount *big.Int                             //+
+	var _minAmount *big.Int                          //+
+	var _refundAddress common.Address                //+
+	var _zroPaymentAddress common.Address            //+
+	var _adapterParams []byte                        //+
+	var _feeObj startgatemavrouter.IOFTWrapperFeeObj // +
+
+	abis, err := startgatemavrouter.StorageMetaData.GetAbi()
+	if err != nil {
+		return nil, err
+	}
+
+	dist, ok := defi.ChainIdMap[req.ToNetwork]
+	if !ok {
+		return nil, errors.New("network is not supported: " + req.ToNetwork.String())
+	}
+	_oft = fromToken
+	_dstChainId = dist
+	_toAddress = wt.WalletAddr.Bytes()
+	_amount = req.Amount
+	_minAmount = defi.Slippage(req.Amount, defi.SlippagePercent05)
+	_refundAddress = wt.WalletAddr
+	_zroPaymentAddress = ZEROADDR
+	_feeObj = startgatemavrouter.IOFTWrapperFeeObj{
+		CallerBps: bps,
+		Caller:    ZEROADDR,
+		PartnerId: [2]byte{0, 0},
+	}
+
+	adapterParams, err := defi.MakeLayerZeroAdapterParams(1, big.NewInt(100000))
+	if err != nil {
+		return nil, err
+	}
+
+	//_adapterParams = common.Hex2Bytes("0x000100000000000000000000000000000000000000000000000000000000000186a0")
+	_adapterParams = adapterParams
+
+	fee, err := m.GetStargateBridgeFee(ctx, &GetStargateBridgeFeeReq{
+		ToChain:  req.ToNetwork,
+		WalletPK: req.WalletPK,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	value := fee.Fee1
+
+	data, err := abis.Pack(
+		"sendOFT",
+		_oft,
+		_dstChainId,
+		_toAddress,
+		_amount,
+		_minAmount,
+		_refundAddress,
+		_zroPaymentAddress,
+		_adapterParams,
+		_feeObj,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &defi.TxData{
+		Data:         data,
+		Value:        value,
+		ContractAddr: contractAddr,
+	}, nil
+}
+
+type GetStargateBridgeFeeReq struct {
+	ToChain  v1.Network
+	WalletPK string
+}
+
+type GetStargateBridgeFeeRes struct {
+	Fee1 *big.Int
+	Fee2 *big.Int
+}
+
+func (m stargateBridgeMaker) GetStargateBridgeFee(ctx context.Context, req *GetStargateBridgeFeeReq) (*GetStargateBridgeFeeRes, error) {
+
+	c := m.source
+	chainID, err := c.Provider.ChainID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	es, err := accounts.NewEthSignerFromRawPrivateKey(common.Hex2Bytes(req.WalletPK), chainID.Int64())
+	if err != nil {
+		return nil, err
+	}
+
+	w, err := accounts.NewWallet(es, c.Provider)
+	if err != nil {
+		return nil, errors.Wrap(err, "zksync2.NewWallet")
+	}
+
+	provider, err := w.CreateEthereumProvider(c.EthRpc)
+	if err != nil {
+		return nil, errors.Wrap(err, "CreateEthereumProvider")
+	}
+
+	trx, err := router.NewRouterCaller(common.HexToAddress("0x8731d54E9D02c286767d56ac03e8037C07e01e98"), provider.GetClient())
+	if err != nil {
+		return nil, err
+	}
+
+	toAddress := w.GetAddress().Bytes()
+	payload := common.HexToAddress("0").Bytes()
+	distChain, ok := defi.ChainIdMap[req.ToChain]
+	if !ok {
+		return nil, errors.New("invalid chain: " + string(req.ToChain))
+	}
+
+	opt := &bind.CallOpts{
+		Context: ctx,
+	}
+
+	fee1, fee2, err := trx.QuoteLayerZeroFee(opt, distChain, defi.TypeFuncSwap, toAddress, payload, router.IStargateRouterlzTxObj{
+		DstGasForCall:   big.NewInt(0),
+		DstNativeAmount: big.NewInt(0),
+		DstNativeAddr:   []byte{},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &GetStargateBridgeFeeRes{
+		Fee1: fee1,
+		Fee2: fee2,
+	}, nil
+}

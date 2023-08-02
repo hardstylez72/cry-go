@@ -78,6 +78,7 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_VeSyncSwap,
 	v1.TaskType_EzkaliburSwap,
 	v1.TaskType_ZkSwap,
+	v1.TaskType_TraderJoeSwap,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -109,6 +110,7 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_VeSyncSwap:                       &Wrap{Tasker: &VeSyncSwapTask{}},
 	v1.TaskType_EzkaliburSwap:                    &Wrap{Tasker: &EzkaliburSwapTask{}},
 	v1.TaskType_ZkSwap:                           &Wrap{Tasker: &ZkSwapTask{}},
+	v1.TaskType_TraderJoeSwap:                    &Wrap{Tasker: &TraderJoeSwapTask{}},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -246,6 +248,12 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_ZkSwapTask)")
 		}
 		return Marshal(t.ZkSwapTask)
+	case v1.TaskType_TraderJoeSwap:
+		t, ok := m.Task.(*v1.Task_TraderJoeSwapTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_TraderJoeSwapTask)")
+		}
+		return Marshal(t.TraderJoeSwapTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}

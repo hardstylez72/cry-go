@@ -17,8 +17,8 @@ import (
 
 // site USDC -> ETH
 // me USDC -> ETH https://explorer.zksync.io/tx/0xaa2dcfa8280071efa6fa4c7264902bbd5d589d2a9ab3b5b6e313cf903a0e9e18
-func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error) {
-	result := &defi.DefaultSwapRes{}
+func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+	result := &defi.DefaultRes{}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -34,7 +34,7 @@ func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*d
 	if err != nil {
 		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
-	result.ApproveTxHash = tokenLimitChecker.ApproveTx
+	result.ApproveTx = tokenLimitChecker.ApproveTx
 
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
@@ -61,7 +61,7 @@ func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*d
 		return nil, errors.Wrap(err, "Make712Tx")
 	}
 
-	result.EstimatedGasCost = estimate
+	result.ECost = estimate
 
 	if req.EstimateOnly {
 		return result, nil
@@ -72,7 +72,7 @@ func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*d
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.SwapTx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract)
 
 	return result, nil
 }
@@ -89,11 +89,11 @@ func (c *Client) makeVelocoreSwapData(ctx context.Context, req *defi.DefaultSwap
 	}
 	from, supported := c.Cfg.TokenMap[req.FromToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.FromToken)
+		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
 	}
 	to, supported := c.Cfg.TokenMap[req.ToToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.FromToken)
+		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
 	}
 
 	path := []velocorerouter.Routerroute{{

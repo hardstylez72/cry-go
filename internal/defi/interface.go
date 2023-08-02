@@ -26,20 +26,18 @@ type Balancer interface {
 	GetNetworkToken() Token
 }
 
-type SwapRes struct {
-	Tx        *Transaction
-	Allowance *Transaction
-	ECost     *EstimatedGasCost
-}
-
 type StargateSwapper interface {
 	Networker
-	StargateBridgeSwap(ctx context.Context, req *StargateBridgeSwapReq) (*StargateBridgeSwapRes, error)
-	GetStargateBridgeFee(ctx context.Context, req *GetStargateBridgeFeeReq) (*GetStargateBridgeFeeRes, error)
+	StargateBridgeSwap(ctx context.Context, req *DefaultBridgeReq) (*DefaultRes, error)
 }
 type TestNetworkBridgeSwapper interface {
 	Networker
 	TestNetBridgeSwap(ctx context.Context, req *TestNetBridgeSwapReq) (*TestNetBridgeSwapRes, error)
+}
+
+type TraderJoeSwap interface {
+	Networker
+	TraderJoeSwap(ctx context.Context, req *DefaultSwapReq) (*DefaultRes, error)
 }
 
 type OrbiterSwapper interface {
@@ -56,6 +54,12 @@ type Gas struct {
 	GasLimit            big.Int
 	GasPrice            big.Int
 	TotalGas            big.Int
+}
+
+type TxData struct {
+	Data         []byte
+	Value        *big.Int
+	ContractAddr common.Address
 }
 
 func (g *Gas) RuleSet() bool {
@@ -83,16 +87,24 @@ type DefaultSwapReq struct {
 	Debug        bool
 }
 
-type DefaultSwapRes struct {
-	SwapTx           *Transaction
-	ApproveTxHash    *Transaction
-	EstimatedGasCost *EstimatedGasCost
+type DefaultRes struct {
+	Tx        *Transaction
+	ApproveTx *Transaction
+	ECost     *EstimatedGasCost
 }
 
-type SyncSwapRes struct {
-	SwapTx           *Transaction
-	ApproveTxHash    *Transaction
-	EstimatedGasCost *EstimatedGasCost
+type SyncSwapRes = DefaultRes
+
+type DefaultBridgeReq struct {
+	FromNetwork  v1.Network
+	ToNetwork    v1.Network
+	WalletPK     string
+	Amount       *big.Int
+	FromToken    Token
+	ToToken      Token
+	Gas          *Gas
+	EstimateOnly bool
+	Debug        bool
 }
 
 type TxCode = string
@@ -123,6 +135,7 @@ type EstimatedGasCost struct {
 	GasLimit    *big.Int
 	GasPrice    *big.Int
 	TotalGasWei *big.Int
+	L2Fee       *big.Int
 }
 
 type SyncSwapper interface {

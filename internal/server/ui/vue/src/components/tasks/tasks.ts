@@ -44,6 +44,8 @@ import TaskEzkaliburSwap from "@/components/tasks/TaskEzkaliburSwap.vue";
 import MenuTaskEzkaliburSwap from "@/components/tasks/menu/MenuTaskEzkaliburSwap.vue";
 import TaskZkSwap from "@/components/tasks/TaskZkSwap.vue";
 import MenuTaskZkSwap from "@/components/tasks/menu/MenuTaskZkSwap.vue";
+import TaskTraderJoeSwap from "@/components/tasks/TaskTraderJoeSwap.vue";
+import MenuTaskTraderJoeSwap from "@/components/tasks/menu/MenuTaskTraderJoeSwap.vue";
 
 
 export interface TaskArg {
@@ -404,8 +406,23 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/zkswap.ico',
       implemented: '',
     }
+  },
+  TraderJoeSwap: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.traderJoeSwapTask
+      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+    },
+    component: TaskTraderJoeSwap,
+    menu: MenuTaskTraderJoeSwap,
+    service: {
+      name: 'TraderJoe',
+      link: 'https://traderjoexyz.com/arbitrum/trade',
+      img: '/icons/zkswap.ico',
+      implemented: '',
+    }
   }
-
 }
 
 export const getFlow = (flow: flow_Flow): string[] => {

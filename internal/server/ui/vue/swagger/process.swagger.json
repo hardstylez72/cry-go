@@ -1840,6 +1840,9 @@
         },
         "zkSwapTask": {
           "$ref": "#/definitions/ZkSwapTask"
+        },
+        "traderJoeSwapTask": {
+          "$ref": "#/definitions/TraderJoeSwapTask"
         }
       },
       "required": [
@@ -1913,7 +1916,8 @@
         "IzumiSwap",
         "VeSyncSwap",
         "EzkaliburSwap",
-        "ZkSwap"
+        "ZkSwap",
+        "TraderJoeSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -1964,6 +1968,32 @@
         "IZI"
       ],
       "default": "USDT"
+    },
+    "TraderJoeSwapTask": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/Amount"
+        },
+        "network": {
+          "$ref": "#/definitions/Network"
+        },
+        "fromToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "toToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "tx": {
+          "$ref": "#/definitions/TaskTx"
+        }
+      },
+      "required": [
+        "amount",
+        "network",
+        "fromToken",
+        "toToken"
+      ]
     },
     "Transaction": {
       "type": "object",

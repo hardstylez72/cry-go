@@ -77,8 +77,8 @@ func (t *MaverickSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 			return nil, errors.Wrap(err, "SyncSwapLP")
 		}
 
-		p.Tx = NewTx(res.SwapTx, gas)
-		if err := a.AddTx(ctx, res.ApproveTxHash); err != nil {
+		p.Tx = NewTx(res.Tx, gas)
+		if err := a.AddTx(ctx, res.ApproveTx); err != nil {
 			return nil, err
 		}
 
@@ -104,7 +104,7 @@ func (t *MaverickSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 	return task, nil
 }
 
-func MaverickSwap(ctx context.Context, profile *halp.Profile, p *v1.MaverickSwapTask, client zksyncera.MaverickSwapper, estimation *v1.EstimationTx) (*defi.DefaultSwapRes, *defi.Gas, error) {
+func MaverickSwap(ctx context.Context, profile *halp.Profile, p *v1.MaverickSwapTask, client zksyncera.MaverickSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *defi.Gas, error) {
 
 	var err error
 	if client == nil {
@@ -171,5 +171,5 @@ func EstimateMaverickSwapCost(ctx context.Context, profile *halp.Profile, p *v1.
 		return nil, err
 	}
 
-	return GasStation(res.EstimatedGasCost, p.Network), nil
+	return GasStation(res.ECost, p.Network), nil
 }

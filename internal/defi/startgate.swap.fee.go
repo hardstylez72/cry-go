@@ -38,8 +38,7 @@ func (c *EtheriumClient) GetStargateBridgeFee(ctx context.Context, req *GetStarg
 	opt := &bind.CallOpts{
 		Context: ctx,
 	}
-
-	fee1, fee2, err := trx.QuoteLayerZeroFee(opt, distChain, typeFuncSwap, toAddress, payload, router.IStargateRouterlzTxObj{
+	fee1, fee2, err := trx.QuoteLayerZeroFee(opt, distChain, TypeFuncSwap, toAddress, payload, router.IStargateRouterlzTxObj{
 		DstGasForCall:   big.NewInt(0),
 		DstNativeAmount: big.NewInt(0),
 		DstNativeAddr:   []byte{},

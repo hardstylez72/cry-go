@@ -23,9 +23,9 @@ import (
 
 // site https://explorer.zksync.io/tx/0x614d510f3ba8b394efbbb7712c5bc94e98239be5e79267ce6c45205ddddc8552 ETH -> USDC
 // me https://explorer.zksync.io/tx/0x044fcd4eaf54ddd686589f216f506d9c310ed8af77d8139f2ef4bb5ef45643e5 USDC -> ETH
-func (c *Client) MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error) {
+func (c *Client) MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
 
-	result := &defi.DefaultSwapRes{}
+	result := &defi.DefaultRes{}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -41,7 +41,7 @@ func (c *Client) MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*d
 	if err != nil {
 		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
-	result.ApproveTxHash = tokenLimitChecker.ApproveTx
+	result.ApproveTx = tokenLimitChecker.ApproveTx
 
 	// path ETH -> USDC
 	// 0x5aea5775959fbc2557cc8789bc1bf90a239d9a91 41c8cf74c27554a8972d3bf3d2bd4a14d8b604ab 3355df6d4c9c3035724fd0e3914de96a5a83aaf4
@@ -77,7 +77,7 @@ func (c *Client) MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*d
 		return nil, fmt.Errorf("Make712Tx: %w", err)
 	}
 
-	result.EstimatedGasCost = estimate
+	result.ECost = estimate
 
 	if req.EstimateOnly {
 		return result, nil
@@ -88,7 +88,7 @@ func (c *Client) MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*d
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.SwapTx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract)
 
 	return result, nil
 }
@@ -97,12 +97,12 @@ func (c *Client) makeMaverickSwapData(ctx context.Context, fromToken, toToken v1
 
 	fromTokenAddr, supported := c.Cfg.TokenMap[fromToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(fromToken)
+		return nil, defi.ErrTokenNotSupportedFn(fromToken)
 	}
 
 	toTokenAddr, supported := c.Cfg.TokenMap[toToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(toToken)
+		return nil, defi.ErrTokenNotSupportedFn(toToken)
 	}
 
 	am := defi.WeiToToken(amountIn, fromToken)

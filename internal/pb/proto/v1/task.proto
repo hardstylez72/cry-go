@@ -34,6 +34,7 @@ enum TaskType {
   VeSyncSwap = 20;
   EzkaliburSwap = 21;
   ZkSwap = 22;
+  TraderJoeSwap = 23;
 }
 
 
@@ -63,6 +64,23 @@ message SyncSwapLPTask {
     json_schema: {
       required: [
         "amount", "network", "a","b", "add"
+      ]
+    }
+  };
+}
+
+message TraderJoeSwapTask {
+  shared.Amount amount = 1;
+  shared.Network network = 2;
+  shared.Token from_token = 3;
+  shared.Token to_token = 4;
+
+  optional TaskTx tx = 5;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "amount", "network", "from_token","to_token"
       ]
     }
   };

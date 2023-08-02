@@ -5,9 +5,12 @@ import (
 	"math/big"
 	"net/http"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/hardstylez72/cry/internal/server/config"
+	"github.com/hardstylez72/cry/internal/traderjoe"
 	"github.com/pkg/errors"
 )
 
@@ -29,9 +32,10 @@ type Stargate struct {
 }
 
 type EtheriumClient struct {
-	Cli    *ethclient.Client
-	Cfg    *ClientConfig
-	RpcCli *rpc.Client
+	Cli              *ethclient.Client
+	Cfg              *ClientConfig
+	RpcCli           *rpc.Client
+	traderJoeService *traderjoe.Service
 }
 
 type ClientConfig struct {
@@ -45,6 +49,8 @@ type ClientConfig struct {
 	networkId *big.Int
 }
 
+var ZEROADDR = common.HexToAddress("0x0000000000000000000000000000000000000000")
+
 func NewEVMClient(c *ClientConfig) (*EtheriumClient, error) {
 
 	rpcClient, err := rpc.DialOptions(context.Background(), c.MainNet, rpc.WithHTTPClient(c.Httpcli))
@@ -53,8 +59,29 @@ func NewEVMClient(c *ClientConfig) (*EtheriumClient, error) {
 	}
 
 	return &EtheriumClient{
-		Cli:    ethclient.NewClient(rpcClient),
-		Cfg:    c,
-		RpcCli: rpcClient,
+		Cli:              ethclient.NewClient(rpcClient),
+		Cfg:              c,
+		RpcCli:           rpcClient,
+		traderJoeService: traderjoe.NewService(&traderjoe.Config{Host: config.CFG.HalperHost}),
 	}, nil
+}
+
+func (c *EtheriumClient) ResoleGas(ctx context.Context, gas *Gas, opt *bind.TransactOpts) *bind.TransactOpts {
+
+	if !gas.RuleSet() {
+		return opt
+	}
+
+	head, errHead := c.Cli.HeaderByNumber(ctx, nil)
+	if errHead == nil && head.BaseFee != nil {
+		// dynamic
+		opt.GasPrice = nil
+		opt.GasLimit = gas.GasLimit.Uint64()
+		opt.GasFeeCap = head.BaseFee
+	} else {
+		opt.GasLimit = gas.GasLimit.Uint64()
+		opt.GasPrice = &gas.GasPrice
+	}
+
+	return opt
 }

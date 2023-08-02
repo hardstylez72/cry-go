@@ -8,19 +8,20 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
+	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 )
 
-type VelocoreSwapTask struct {
+type TraderJoeSwapTask struct {
 	cancel func()
 }
 
-func (t *VelocoreSwapTask) Stop() error {
+func (t *TraderJoeSwapTask) Stop() error {
 	t.cancel()
 	return nil
 }
 
-func (t *VelocoreSwapTask) Reset(ctx context.Context, a *Input) error {
+func (t *TraderJoeSwapTask) Reset(ctx context.Context, a *Input) error {
 	task := a.Task
 
 	if err := a.UpdateTask(ctx, task); err != nil {
@@ -30,7 +31,7 @@ func (t *VelocoreSwapTask) Reset(ctx context.Context, a *Input) error {
 	return nil
 }
 
-func (t *VelocoreSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {
+func (t *TraderJoeSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {
 
 	taskContext, cancel := context.WithTimeout(ctx, taskTimeout)
 	defer cancel()
@@ -38,12 +39,12 @@ func (t *VelocoreSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 	t.cancel = cancel
 
 	task := a.Task
-	l, ok := a.Task.Task.Task.(*v1.Task_VelocoreSwapTask)
+	l, ok := a.Task.Task.Task.(*v1.Task_TraderJoeSwapTask)
 	if !ok {
-		return nil, errors.New("panic.a.Task.Task.Task.(*v1.Task_VelocoreSwapTask) call an ambulance!")
+		return nil, errors.New("panic.a.Task.Task.Task.(*v1.Task_TraderJoeSwapTask) call an ambulance!")
 	}
 
-	p := l.VelocoreSwapTask
+	p := l.TraderJoeSwapTask
 
 	switch a.Task.Status {
 	case v1.ProcessStatus_StatusDone, v1.ProcessStatus_StatusError:
@@ -61,20 +62,20 @@ func (t *VelocoreSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 		return nil, err
 	}
 
-	client, _, err := NewZkSyncClient(profile, p.Network)
+	client, err := uniclient.NewTraderJoe(p.Network, profile.BaseConfig(p.Network))
 	if err != nil {
 		return nil, err
 	}
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateVelocoreSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateTraderJoeSwapCost(ctx, profile, p, client)
 		if err != nil {
-			return nil, errors.Wrap(err, "EstimateVelocoreSwapCost")
+			return nil, errors.Wrap(err, "EstimateTraderJoeSwapCost")
 		}
-		res, gas, err := VelocoreSwap(taskContext, profile, p, client, estimation)
+		res, gas, err := TraderJoeSwap(taskContext, profile, p, client, estimation)
 		if err != nil {
-			return nil, errors.Wrap(err, "VelocoreSwap")
+			return nil, errors.Wrap(err, "TraderJoeSwap")
 		}
 
 		p.Tx = NewTx(res.Tx, gas)
@@ -104,11 +105,11 @@ func (t *VelocoreSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 	return task, nil
 }
 
-func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwapTask, client zksyncera.VelocoreSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *defi.Gas, error) {
+func TraderJoeSwap(ctx context.Context, profile *halp.Profile, p *v1.TraderJoeSwapTask, client defi.TraderJoeSwap, estimation *v1.EstimationTx) (*defi.DefaultRes, *defi.Gas, error) {
 
 	var err error
 	if client == nil {
-		client, _, err = NewZkSyncClient(profile, p.Network)
+		client, err = uniclient.NewTraderJoe(p.Network, profile.BaseConfig(p.Network))
 		if err != nil {
 			return nil, nil, err
 		}
@@ -149,7 +150,7 @@ func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwap
 		Gas = gas
 	}
 
-	res, err := client.VelocoreSwap(ctx, &defi.DefaultSwapReq{
+	res, err := client.TraderJoeSwap(ctx, &defi.DefaultSwapReq{
 		Network:      v1.Network_ZKSYNCERA,
 		Amount:       am,
 		FromToken:    p.FromToken,
@@ -165,8 +166,8 @@ func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwap
 	return res, Gas, nil
 }
 
-func EstimateVelocoreSwapCost(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwapTask, client zksyncera.VelocoreSwapper) (*v1.EstimationTx, error) {
-	res, _, err := VelocoreSwap(ctx, profile, p, client, nil)
+func EstimateTraderJoeSwapCost(ctx context.Context, profile *halp.Profile, p *v1.TraderJoeSwapTask, client defi.TraderJoeSwap) (*v1.EstimationTx, error) {
+	res, _, err := TraderJoeSwap(ctx, profile, p, client, nil)
 	if err != nil {
 		return nil, err
 	}

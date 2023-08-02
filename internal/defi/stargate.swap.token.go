@@ -24,6 +24,10 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		return nil, err
 	}
 
+	wt, err := NewWalletTransactor(req.WalletPk)
+	if err != nil {
+		return nil, err
+	}
 	tr, err := router.NewRouterTransactor(c.Cfg.Dict.Stargate.StargateRouterAddress, c.Cli)
 	if err != nil {
 		return nil, err
@@ -34,7 +38,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		return nil, err
 	}
 
-	opt, err := bind.NewKeyedTransactorWithChainID(req.Wallet.PrivateKey, chainID)
+	opt, err := bind.NewKeyedTransactorWithChainID(wt.PrivateKey, chainID)
 	if err != nil {
 		return nil, errors.Wrap(err, "bind.NewKeyedTransactorWithChainID")
 	}
@@ -42,7 +46,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 
 	fee, err := c.GetStargateBridgeFee(ctx, &GetStargateBridgeFeeReq{
 		ToChain: req.DestChain,
-		Wallet:  req.Wallet.WalletAddr,
+		Wallet:  wt.WalletAddr,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
@@ -55,10 +59,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 	min := Slippage(req.Quantity, SlippagePercent05)
 	opt.NoSend = req.EstimateOnly
 
-	if req.Gas.RuleSet() {
-		opt.GasLimit = req.Gas.GasLimit.Uint64()
-		opt.GasPrice = &req.Gas.GasPrice
-	}
+	opt = c.ResoleGas(ctx, req.Gas, opt)
 
 	// 38.677058
 	tx, err := tr.Swap(
@@ -66,7 +67,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		destChainId,
 		big.NewInt(srcPoolId),
 		big.NewInt(distPoolId),
-		req.Wallet.WalletAddr,
+		wt.WalletAddr,
 		req.Quantity,
 		min,
 		router.IStargateRouterlzTxObj{
@@ -74,21 +75,15 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 			DstNativeAmount: big.NewInt(0),
 			DstNativeAddr:   common.HexToAddress("0x0000000000000000000000000000000000000001").Bytes(),
 		},
-		req.Wallet.WalletAddr.Bytes(),
+		wt.WalletAddr.Bytes(),
 		[]byte{},
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "tr.Swap")
 	}
-
-	eCost := &EstimatedGasCost{
-		GasLimit:    big.NewInt(0).SetUint64(tx.Gas()),
-		GasPrice:    tx.GasPrice(),
-		TotalGasWei: new(big.Int).Add(MinerGasLegacy(tx.GasPrice(), tx.Gas()), fee.Fee1),
-	}
-
+	
 	return &StargateBridgeSwapToken{
 		Tx:    tx,
-		ECost: eCost,
+		ECost: Estimate(tx),
 	}, nil
 }

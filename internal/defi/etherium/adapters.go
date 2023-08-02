@@ -16,7 +16,7 @@ func (c *Client) TxViewFn(id string) string {
 	return c.defi.TxViewFn(id)
 }
 
-func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.StargateBridgeSwapReq) (*defi.StargateBridgeSwapRes, error) {
+func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.DefaultRes, error) {
 	return c.defi.StargateBridgeSwap(ctx, req)
 }
 func (c *Client) GetStargateBridgeFee(ctx context.Context, req *defi.GetStargateBridgeFeeReq) (*defi.GetStargateBridgeFeeRes, error) {

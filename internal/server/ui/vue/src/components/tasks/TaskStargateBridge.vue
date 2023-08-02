@@ -1,7 +1,8 @@
 <template>
   <v-card-actions>
     <v-container>
-      <div class="mb-3">use <a :href="link.stargatefinance" target="_blank">stargate.finance</a> to see
+      <div class="mb-3">use <a :href="taskProps.StargateBridge.service.link"
+                               target="_blank">{{ taskProps.StargateBridge.service.name }}</a> to see
         available swap
         options
       </div>
@@ -15,17 +16,7 @@
             v-on:change="inputChanged"
             :rules="[required]"
             :items="networks"
-            v-model="item.fromNetwork"
-            :disabled="disabled"
-          />
-          <v-select
-            density="compact"
-            variant="outlined"
-            label="from token"
-            v-on:change="inputChanged"
-            :rules="[required]"
-            :items="tokens"
-            v-model="item.fromToken"
+            v-model="fromNetwork"
             :disabled="disabled"
           />
         </v-col>
@@ -33,26 +24,40 @@
           <v-select
             density="compact"
             variant="outlined"
-            label="to network"
+            label="from token"
             v-on:change="inputChanged"
             :rules="[required]"
             :items="GetToNetworks"
-            v-model="item.toNetwork"
-            :disabled="disabled"
-          />
-          <v-select
-            density="compact"
-            variant="outlined"
-            v-on:change="inputChanged"
-            label="to token"
-            :items="tokens"
-            :rules="[required]"
-            v-model="item.toToken"
+            v-model="toNetwork"
             :disabled="disabled"
           />
         </v-col>
       </v-row>
-      <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>
+      <v-row>
+        <v-col>
+          <v-autocomplete
+            return-object
+            density="compact"
+            variant="outlined"
+            v-on:change="inputChanged"
+            label="direction"
+            :items="getPairs"
+            :rules="[required]"
+            v-model="pair"
+            :disabled="disabled"
+            item-title="name"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>
+        </v-col>
+        <v-col>
+          Slippage: 0.5%
+        </v-col>
+      </v-row>
+
     </v-container>
   </v-card-actions>
 </template>
@@ -62,6 +67,9 @@ import {Network, StargateBridgeTask, Task, TaskType, Token} from "@/generated/fl
 import {defineComponent, PropType} from "vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
 import {link} from "@/components/tasks/links";
+import {taskProps} from "@/components/tasks/tasks";
+import {BridgePair, tokenBridgePair} from "@/components/helper";
+import {required} from "@/components/tasks/menu/helper";
 
 export default defineComponent({
   name: "TaskStargateBridge",
@@ -83,6 +91,37 @@ export default defineComponent({
   },
 
   watch: {
+    "toNetwork": {
+      handler() {
+        this.item.toNetwork = this.toNetwork
+        if (this.toNetwork && this.fromNetwork) {
+          this.item.fromToken = undefined
+          this.item.toToken = undefined
+          this.pair = null
+        }
+      }
+    },
+    "fromNetwork": {
+      handler() {
+        this.item.fromNetwork = this.fromNetwork
+        if (this.toNetwork && this.fromNetwork) {
+          this.item.fromToken = undefined
+          this.item.toToken = undefined
+          this.pair = null
+        }
+      }
+    },
+    pair: {
+      handler() {
+        if (!this.pair) {
+          return
+        }
+        this.item.fromToken = this.pair.from
+        this.item.toToken = this.pair.to
+        this.item.fromNetwork = this.pair.fromNetwork
+        this.item.toNetwork = this.pair.toNetwork
+      },
+    },
     item: {
       handler() {
         this.$emit('taskChanged', this.getTask())
@@ -107,21 +146,115 @@ export default defineComponent({
         Network.OPTIMISM,
         Network.POLIGON,
         Network.AVALANCHE,
+        Network.ZKSYNCERA,
       ] as Network[],
-      tokens: [Token.USDC, Token.USDT, Token.ETH, Token.STG],
+      pairs: [
+
+        // from ARBITRUM
+        tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.ETH, Token.ETH),
+        tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.STG, Token.STG),
+        tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.USDT, Token.USDC),
+        tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.USDC, Token.USDC),
+
+        tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.STG, Token.STG),
+        tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDT, Token.USDC),
+        tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDC, Token.USDC),
+
+        tokenBridgePair(Network.ARBITRUM, Network.BinanaceBNB, Token.STG, Token.STG),
+        tokenBridgePair(Network.ARBITRUM, Network.BinanaceBNB, Token.USDT, Token.USDT),
+        tokenBridgePair(Network.ARBITRUM, Network.BinanaceBNB, Token.USDC, Token.USDT),
+
+        tokenBridgePair(Network.ARBITRUM, Network.AVALANCHE, Token.STG, Token.STG),
+        tokenBridgePair(Network.ARBITRUM, Network.AVALANCHE, Token.USDT, Token.USDT),
+        tokenBridgePair(Network.ARBITRUM, Network.AVALANCHE, Token.USDC, Token.USDC),
+
+        // from BinanaceBNB
+        tokenBridgePair(Network.BinanaceBNB, Network.AVALANCHE, Token.STG, Token.STG),
+        tokenBridgePair(Network.BinanaceBNB, Network.AVALANCHE, Token.USDT, Token.USDT),
+        tokenBridgePair(Network.BinanaceBNB, Network.AVALANCHE, Token.USDT, Token.USDC),
+
+        tokenBridgePair(Network.BinanaceBNB, Network.POLIGON, Token.STG, Token.STG),
+        tokenBridgePair(Network.BinanaceBNB, Network.POLIGON, Token.USDT, Token.USDT),
+        tokenBridgePair(Network.BinanaceBNB, Network.POLIGON, Token.USDT, Token.USDC),
+
+        tokenBridgePair(Network.BinanaceBNB, Network.ARBITRUM, Token.STG, Token.STG),
+        tokenBridgePair(Network.BinanaceBNB, Network.ARBITRUM, Token.USDT, Token.USDT),
+        tokenBridgePair(Network.BinanaceBNB, Network.ARBITRUM, Token.USDT, Token.USDC),
+
+        tokenBridgePair(Network.BinanaceBNB, Network.OPTIMISM, Token.STG, Token.STG),
+        tokenBridgePair(Network.BinanaceBNB, Network.OPTIMISM, Token.USDT, Token.USDC),
+
+
+        tokenBridgePair(Network.BinanaceBNB, Network.ZKSYNCERA, Token.MAV, Token.MAV),
+
+        //from OPTIMISM
+
+        tokenBridgePair(Network.OPTIMISM, Network.BinanaceBNB, Token.STG, Token.STG),
+        tokenBridgePair(Network.OPTIMISM, Network.BinanaceBNB, Token.USDC, Token.USDT),
+
+        tokenBridgePair(Network.OPTIMISM, Network.AVALANCHE, Token.STG, Token.STG),
+        tokenBridgePair(Network.OPTIMISM, Network.AVALANCHE, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.OPTIMISM, Network.AVALANCHE, Token.USDC, Token.USDT),
+
+        tokenBridgePair(Network.OPTIMISM, Network.POLIGON, Token.STG, Token.STG),
+        tokenBridgePair(Network.OPTIMISM, Network.POLIGON, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.OPTIMISM, Network.POLIGON, Token.USDC, Token.USDT),
+
+        tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.STG, Token.STG),
+        tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.USDC, Token.USDT),
+        tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.ETH, Token.ETH),
+
+        // from AVALANCHE
+        tokenBridgePair(Network.AVALANCHE, Network.BinanaceBNB, Token.STG, Token.STG),
+        tokenBridgePair(Network.AVALANCHE, Network.BinanaceBNB, Token.USDC, Token.USDT),
+        tokenBridgePair(Network.AVALANCHE, Network.BinanaceBNB, Token.USDT, Token.USDT),
+
+        tokenBridgePair(Network.AVALANCHE, Network.POLIGON, Token.USDT, Token.USDT),
+        tokenBridgePair(Network.AVALANCHE, Network.POLIGON, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.AVALANCHE, Network.POLIGON, Token.STG, Token.STG),
+
+        tokenBridgePair(Network.AVALANCHE, Network.ARBITRUM, Token.USDT, Token.USDT),
+        tokenBridgePair(Network.AVALANCHE, Network.ARBITRUM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.AVALANCHE, Network.ARBITRUM, Token.STG, Token.STG),
+
+        tokenBridgePair(Network.AVALANCHE, Network.OPTIMISM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.AVALANCHE, Network.OPTIMISM, Token.USDT, Token.USDC),
+        tokenBridgePair(Network.AVALANCHE, Network.OPTIMISM, Token.STG, Token.STG),
+
+        // from POLIGON
+        tokenBridgePair(Network.POLIGON, Network.BinanaceBNB, Token.STG, Token.STG),
+        tokenBridgePair(Network.POLIGON, Network.BinanaceBNB, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.POLIGON, Network.BinanaceBNB, Token.USDT, Token.USDT),
+
+        tokenBridgePair(Network.POLIGON, Network.AVALANCHE, Token.STG, Token.STG),
+        tokenBridgePair(Network.POLIGON, Network.AVALANCHE, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.POLIGON, Network.AVALANCHE, Token.USDT, Token.USDT),
+
+        tokenBridgePair(Network.POLIGON, Network.ARBITRUM, Token.STG, Token.STG),
+        tokenBridgePair(Network.POLIGON, Network.ARBITRUM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.POLIGON, Network.ARBITRUM, Token.USDT, Token.USDT),
+
+        tokenBridgePair(Network.POLIGON, Network.OPTIMISM, Token.STG, Token.STG),
+        tokenBridgePair(Network.POLIGON, Network.OPTIMISM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.POLIGON, Network.OPTIMISM, Token.USDT, Token.USDC),
+
+        // from ZKSYNCERA
+        tokenBridgePair(Network.ZKSYNCERA, Network.BinanaceBNB, Token.MAV, Token.MAV),
+
+      ] as BridgePair[],
+      fromNetwork: Network.OPTIMISM as null | Network,
+      toNetwork: Network.ARBITRUM as null | Network,
+      pair: null as BridgePair | null,
       item: {
-        fromNetwork: Network.ARBITRUM,
-        toNetwork: Network.OPTIMISM,
-        fromToken: Token.USDC,
-        toToken: Token.USDC,
         amount: {
           sendAll: true,
         }
       } as StargateBridgeTask,
-      required: (v: any) => !!v || 'required'
     }
   },
   methods: {
+    required,
     getTask(): Task {
       return {
         weight: this.weight.toString(),
@@ -144,12 +277,35 @@ export default defineComponent({
       if (this.task) {
         if (this.task.stargateBridgeTask) {
           this.item = this.task.stargateBridgeTask
+
+          if (this.item.fromNetwork && this.item.toNetwork && this.item.fromToken && this.item.toToken) {
+            this.pair = tokenBridgePair(this.item.fromNetwork, this.item.toNetwork, this.item.fromToken, this.item.toToken)
+          }
+
+          this.fromNetwork = this.item.fromNetwork
+          this.toNetwork = this.item.toNetwork
           this.$emit('taskChanged', this.getTask())
         }
       }
     }
   },
   computed: {
+    getPairs(): BridgePair[] {
+      const pairs = this.pairs.filter((p) => {
+        if (p.fromNetwork === this.item.fromNetwork && p.toNetwork === this.item.toNetwork) {
+          return p
+        }
+      })
+
+      if (pairs.length > 0) {
+        return pairs
+      }
+
+      return []
+    },
+    taskProps() {
+      return taskProps
+    },
     link() {
       return link
     },

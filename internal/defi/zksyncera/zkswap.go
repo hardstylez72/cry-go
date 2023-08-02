@@ -13,8 +13,8 @@ import (
 	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
-func (c *Client) ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultSwapRes, error) {
-	result := &defi.DefaultSwapRes{}
+func (c *Client) ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+	result := &defi.DefaultRes{}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -30,7 +30,7 @@ func (c *Client) ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.De
 	if err != nil {
 		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
-	result.ApproveTxHash = tokenLimitChecker.ApproveTx
+	result.ApproveTx = tokenLimitChecker.ApproveTx
 
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
@@ -57,7 +57,7 @@ func (c *Client) ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.De
 		return nil, errors.Wrap(err, "Make712Tx")
 	}
 
-	result.EstimatedGasCost = estimate
+	result.ECost = estimate
 
 	if req.EstimateOnly {
 		return result, nil
@@ -68,7 +68,7 @@ func (c *Client) ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.De
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.SwapTx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract)
 
 	return result, nil
 }
@@ -85,11 +85,11 @@ func (c *Client) makeZkSwapData(ctx context.Context, req *defi.DefaultSwapReq) (
 	}
 	from, supported := c.Cfg.TokenMap[req.FromToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.FromToken)
+		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
 	}
 	to, supported := c.Cfg.TokenMap[req.ToToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.FromToken)
+		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
 	}
 
 	path := []common.Address{from, to}

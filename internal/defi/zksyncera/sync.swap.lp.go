@@ -48,7 +48,7 @@ func (c *Client) syncSwapLiquidityXXXETHAdd(ctx context.Context, req *SyncSwapLi
 
 	A, supported := c.Cfg.TokenMap[req.A]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.A)
+		return nil, defi.ErrTokenNotSupportedFn(req.A)
 	}
 	ethAddr := common.HexToAddress("0x0000000000000000000000000000000000000000")
 

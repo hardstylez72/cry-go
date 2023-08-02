@@ -63,7 +63,7 @@ func (c *Client) getAmountOut(ctx context.Context, req *getAmountOutReq) (*big.I
 
 	fromToken, supported := c.Cfg.TokenMap[req.FromToken]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.FromToken)
+		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
 	}
 
 	poolAddr, err := c.GetSyncSwapPool(ctx, &GetSyncSwapPoolReq{
@@ -116,11 +116,11 @@ func (c *Client) GetSyncSwapPool(ctx context.Context, req *GetSyncSwapPoolReq) (
 
 	A, supported := c.Cfg.TokenMap[req.A]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.A)
+		return nil, defi.ErrTokenNotSupportedFn(req.A)
 	}
 	B, supported := c.Cfg.TokenMap[req.B]
 	if !supported {
-		return nil, defi.NewErrTokenNotSupported(req.B)
+		return nil, defi.ErrTokenNotSupportedFn(req.B)
 	}
 
 	cstorage, err := syncswappoolfactory.NewStorageCaller(c.Cfg.SyncSwap.ClassicPoolFactory, c.Provider)

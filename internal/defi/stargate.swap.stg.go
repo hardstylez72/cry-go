@@ -78,10 +78,7 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 	opt.Value = fee.Fee1
 	opt.NoSend = req.EstimateOnly
 
-	if req.Gas.RuleSet() {
-		opt.GasLimit = req.Gas.GasLimit.Uint64()
-		opt.GasPrice = &req.Gas.GasPrice
-	}
+	opt = c.ResoleGas(ctx, req.Gas, opt)
 
 	destChainId := ChainIdMap[req.DestChain]
 
@@ -97,18 +94,27 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 		return nil, errors.Wrap(err, "tr.SendTokens")
 	}
 
-	eCost := &EstimatedGasCost{
-		GasLimit:    big.NewInt(0).SetUint64(tx.Gas()),
-		GasPrice:    tx.GasPrice(),
-		TotalGasWei: new(big.Int).Add(MinerGasLegacy(tx.GasPrice(), tx.Gas()), fee.Fee1),
-	}
-
 	return &StargateBridgeSwapSTGRes{
 		Tx:    tx,
-		ECost: eCost,
+		ECost: Estimate(tx),
 	}, nil
 }
 
-func GetTxGasPrice(tx *types.Transaction) *big.Int {
-	return tx.GasPrice()
+func Estimate(tx *types.Transaction) *EstimatedGasCost {
+	gasLimit := new(big.Int).SetUint64(tx.Gas())
+	if tx.Type() == types.DynamicFeeTxType {
+		return &EstimatedGasCost{
+			GasLimit:    gasLimit,
+			GasPrice:    tx.GasFeeCap(),
+			TotalGasWei: new(big.Int).Mul(gasLimit, tx.GasFeeCap()),
+			L2Fee:       nil,
+		}
+	}
+
+	return &EstimatedGasCost{
+		GasLimit:    gasLimit,
+		GasPrice:    tx.GasPrice(),
+		TotalGasWei: new(big.Int).Mul(gasLimit, tx.GasPrice()),
+		L2Fee:       nil,
+	}
 }

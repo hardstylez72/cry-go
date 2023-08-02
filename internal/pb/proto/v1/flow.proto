@@ -118,6 +118,7 @@ message Task {
     task.VeSyncSwapTask veSyncSwapTask = 24;
     task.EzkaliburSwapTask ezkaliburSwapTask = 25;
     task.ZkSwapTask zkSwapTask = 26;
+    task.TraderJoeSwapTask traderJoeSwapTask = 27;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

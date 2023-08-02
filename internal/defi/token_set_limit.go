@@ -29,7 +29,7 @@ func (c *EtheriumClient) tokenAllowed(ctx context.Context, req *AllowedReq) (*Al
 
 	addr, ok := c.Cfg.TokenMap[req.Token]
 	if !ok {
-		return nil, NewErrTokenNotSupported(req.Token)
+		return nil, ErrTokenNotSupportedFn(req.Token)
 	}
 
 	caller, err := erc_20.NewStorageCaller(addr, c.Cli)
@@ -117,7 +117,7 @@ func (r *ApproveReq) Validate(c *ClientConfig) error {
 
 	_, ok := c.TokenMap[r.Token]
 	if !ok {
-		return NewErrTokenNotSupported(r.Token)
+		return ErrTokenNotSupportedFn(r.Token)
 	}
 
 	if r.Amount.Cmp(big.NewInt(0)) == 0 {

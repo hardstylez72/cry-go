@@ -5,7 +5,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewErrTokenNotSupported(t v1.Token) error {
+func ErrTokenNotSupportedFn(t v1.Token) error {
 	return errors.Wrap(ErrTokenNotSupported, "token: "+string(t))
 }
 

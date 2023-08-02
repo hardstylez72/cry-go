@@ -209,3 +209,21 @@ export const tokenSwapPair = (t1: Token, t2: Token): SwapPair => {
   }
 }
 
+export interface BridgePair {
+  name: string
+  from: Token
+  to: Token
+
+  fromNetwork: Network
+  toNetwork: Network
+}
+
+export const tokenBridgePair = (n1: Network, n2: Network, t1: Token, t2: Token): BridgePair => {
+  return {
+    name: `${t1} -> ${t2}`,
+    from: t1,
+    to: t2,
+    fromNetwork: n1,
+    toNetwork: n2,
+  }
+}

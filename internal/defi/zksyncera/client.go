@@ -104,6 +104,10 @@ func TxTestNetViewer(txId string) string {
 	return "https://goerli.explorer.zksync.io/tx/" + txId
 }
 
+var DefaultDeadLine = func() *big.Int {
+	return new(big.Int).SetInt64(time.Now().Add(time.Second * 20).Unix())
+}
+
 func NewTestNetClient(c *ClientConfig) (*Client, error) {
 
 	syncSwap := SyncSwap{

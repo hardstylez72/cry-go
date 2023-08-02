@@ -82,7 +82,12 @@ func (t *StargateTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 
 	if p.GetTx().GetTxId() == "" {
 
-		res, gas, err := t.Swap(taskContext, p, client, profie)
+		estimation, err := EstimateStargateBridgeSwapCost(ctx, p, profie)
+		if err != nil {
+			return nil, err
+		}
+
+		res, gas, err := t.Swap(taskContext, p, client, profie, estimation)
 		if err != nil {
 			return nil, err
 		}
@@ -193,17 +198,12 @@ func NewSwapper(ctx context.Context, a *Input) (defi.StargateSwapper, *defi.Wall
 	return swapper, wallet, nil
 }
 
-func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapper defi.StargateSwapper, profile *halp.Profile) (*SwapRes, *defi.Gas, error) {
+func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapper defi.StargateSwapper, profile *halp.Profile, estimation *v1.EstimationTx) (*SwapRes, *defi.Gas, error) {
 
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{
 		WalletAddress: profile.WalletAddr,
 		Token:         p.FromToken,
 	})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	estimation, err := EstimateStargateBridgeSwapCost(ctx, p, profile)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -222,13 +222,16 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 		am = ResolveNetworkTokenAmount(b.WEI, &gas.TotalGas, am)
 	}
 
-	swap, err := swapper.StargateBridgeSwap(ctx, &defi.StargateBridgeSwapReq{
-		DestChain: p.ToNetwork,
-		Wallet:    profile.Wallet,
-		Quantity:  am,
-		FromToken: p.FromToken,
-		ToToken:   p.ToToken,
-		Gas:       gas,
+	swap, err := swapper.StargateBridgeSwap(ctx, &defi.DefaultBridgeReq{
+		FromNetwork:  p.FromNetwork,
+		ToNetwork:    p.ToNetwork,
+		WalletPK:     profile.WalletPK,
+		Amount:       am,
+		FromToken:    p.FromToken,
+		ToToken:      p.ToToken,
+		Gas:          gas,
+		EstimateOnly: false,
+		Debug:        false,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -237,7 +240,7 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 	result := &SwapRes{
 		Swapper:   swapper,
 		Swap:      swap.Tx,
-		Allowance: swap.Allowance,
+		Allowance: swap.ApproveTx,
 	}
 
 	return result, gas, nil
@@ -314,23 +317,21 @@ func EstimateStargateBridgeSwapCost(ctx context.Context, p *v1.StargateBridgeTas
 		return nil, err
 	}
 
-	wallet, err := defi.NewWalletTransactor(profile.WalletPK)
-	if err != nil {
-		return nil, err
-	}
-
 	am, err := defi.ResolveAmount(p.Amount, b.WEI)
 	if err != nil {
 		return nil, err
 	}
 
-	swap, err := swapper.StargateBridgeSwap(ctx, &defi.StargateBridgeSwapReq{
-		DestChain:    p.ToNetwork,
-		Wallet:       wallet,
-		Quantity:     defi.Percent(am, 50),
+	swap, err := swapper.StargateBridgeSwap(ctx, &defi.DefaultBridgeReq{
+		FromNetwork:  p.FromNetwork,
+		ToNetwork:    p.ToNetwork,
+		WalletPK:     profile.WalletPK,
+		Amount:       defi.Percent(am, 50),
 		FromToken:    p.FromToken,
 		ToToken:      p.ToToken,
+		Gas:          nil,
 		EstimateOnly: true,
+		Debug:        false,
 	})
 	if err != nil {
 		return nil, err

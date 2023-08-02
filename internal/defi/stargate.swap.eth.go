@@ -5,9 +5,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/hardstylez72/cry/internal/defi/contracts/optimism_fee"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/routereth"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -77,61 +75,57 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 
 	destChainId := ChainIdMap[req.DestChain]
 
-	l1fee := big.NewInt(0)
-	if c.Cfg.Network == v1.Network_OPTIMISM {
-		optFeeCaller, err := optimism_fee.NewStorageCaller(common.HexToAddress("0x420000000000000000000000000000000000000F"), c.Cli)
-		if err != nil {
-			return nil, err
-		}
-
-		abi, err := routereth.StorageMetaData.GetAbi()
-		if err != nil {
-			return nil, err
-		}
-		data, err := abi.Pack("swapETH",
-			destChainId,
-			req.Wallet.WalletAddr,
-			req.Wallet.WalletAddr.Bytes(),
-			req.Quantity,
-			Slippage(req.Quantity, SlippagePercent05))
-		if err != nil {
-			return nil, err
-		}
-		o := &bind.CallOpts{}
-		o.Context = ctx
-		l1fee, err = optFeeCaller.GetL1Fee(o, data)
-		if err != nil {
-			return nil, err
-		}
-
-		var gasPrice *big.Int
-		var optimismDefaultGasPrice int64 = 100_000_058
-		maxGasPriceRetry := 3
-		counter := 0
-		for counter < maxGasPriceRetry {
-			counter++
-			gasPrice, err = c.SuggestGasPrice(ctx)
-			if err != nil {
-				continue
-			}
-			if gasPrice.Cmp(big.NewInt(optimismDefaultGasPrice)) < 0 {
-				continue
-			}
-		}
-		if gasPrice.Cmp(big.NewInt(optimismDefaultGasPrice)) == 0 {
-			gasPrice = big.NewInt(optimismDefaultGasPrice)
-		}
-
-		opt.GasPrice = gasPrice
-	}
+	//l1fee := big.NewInt(0)
+	//if c.Cfg.Network == v1.Network_OPTIMISM {
+	//	optFeeCaller, err := optimism_fee.NewStorageCaller(common.HexToAddress("0x420000000000000000000000000000000000000F"), c.Cli)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	abi, err := routereth.StorageMetaData.GetAbi()
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	data, err := abi.Pack("swapETH",
+	//		destChainId,
+	//		req.Wallet.WalletAddr,
+	//		req.Wallet.WalletAddr.Bytes(),
+	//		req.Quantity,
+	//		Slippage(req.Quantity, SlippagePercent05))
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	o := &bind.CallOpts{}
+	//	o.Context = ctx
+	//	l1fee, err = optFeeCaller.GetL1Fee(o, data)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	var gasPrice *big.Int
+	//	var optimismDefaultGasPrice int64 = 100_000_058
+	//	maxGasPriceRetry := 3
+	//	counter := 0
+	//	for counter < maxGasPriceRetry {
+	//		counter++
+	//		gasPrice, err = c.SuggestGasPrice(ctx)
+	//		if err != nil {
+	//			continue
+	//		}
+	//		if gasPrice.Cmp(big.NewInt(optimismDefaultGasPrice)) < 0 {
+	//			continue
+	//		}
+	//	}
+	//	if gasPrice.Cmp(big.NewInt(optimismDefaultGasPrice)) == 0 {
+	//		gasPrice = big.NewInt(optimismDefaultGasPrice)
+	//	}
+	//
+	//	opt.GasPrice = gasPrice
+	//}
 
 	opt.NoSend = req.EstimateOnly
 
-	if req.Gas.RuleSet() {
-		opt.GasLimit = req.Gas.GasLimit.Uint64()
-		opt.GasPrice = &req.Gas.GasPrice
-		opt.GasPrice = ResolveGasPriceLayerZero(&req.Gas.MaxGas, &req.Gas.GasLimit, &req.Gas.GasPrice)
-	}
+	opt = c.ResoleGas(ctx, req.Gas, opt)
 
 	opt.Value = BigIntSum(req.Quantity, fee.Fee1)
 
@@ -153,21 +147,9 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 		return nil, errors.Wrap(err, "tr.SwapETH")
 	}
 
-	// am 1799274916775232
-	//  b 2338339511083492449
-	//  v 2200050382441954
-	//  g 460521821676035
-	//
-
-	e := &EstimatedGasCost{
-		GasLimit:    new(big.Int).SetUint64(tx.Gas()),
-		GasPrice:    GasPrice(tx),
-		TotalGasWei: BigIntSum(MinerGasLegacy(GasPrice(tx), tx.Gas()), fee.Fee1, l1fee),
-	}
-
 	return &StargateBridgeSwapEthRes{
 		Tx:    tx,
-		ECost: e,
+		ECost: Estimate(tx),
 	}, nil
 }
 

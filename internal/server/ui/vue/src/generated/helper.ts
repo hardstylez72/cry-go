@@ -582,5 +582,6 @@ export enum TaskType {
   'IzumiSwap' = 'IzumiSwap',
   'VeSyncSwap' = 'VeSyncSwap',
   'EzkaliburSwap' = 'EzkaliburSwap',
-  'ZkSwap' = 'ZkSwap'
+  'ZkSwap' = 'ZkSwap',
+  'TraderJoeSwap' = 'TraderJoeSwap'
 }

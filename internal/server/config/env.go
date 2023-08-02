@@ -37,6 +37,8 @@ type (
 
 		WebKey string
 		WebIV  string
+
+		HalperHost string
 	}
 
 	App struct {
@@ -113,6 +115,7 @@ func Load() (*Config, error) {
 		PayServiceGRPCAddr: mustenv("PAY_SERVICE_GRPC_ADDR"),
 		WebKey:             mustenv("WEB_KEY"),
 		WebIV:              mustenv("WEB_IV"),
+		HalperHost:         mustenv("HALPER_HOST"),
 	}
 
 	CFG = c
