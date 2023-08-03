@@ -196,6 +196,7 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 				if err != nil {
 					return errors.Wrap(err, "LoadPP")
 				}
+				_ = <-d.sleep(ctx, pId, getDelayBeforePPTask())
 				continue
 			}
 

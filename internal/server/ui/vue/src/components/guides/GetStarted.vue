@@ -54,7 +54,7 @@
 import {defineComponent} from 'vue';
 import Zksync from "@/components/modules/Zksync.vue";
 import Snapshot from "@/components/modules/Snapshot.vue";
-import Orbiter from "@/components/modules/Orbiter.vue";
+import Orbiter from "@/components/modules/Other.vue";
 import LayerZero from "@/components/modules/LayerZero.vue";
 
 

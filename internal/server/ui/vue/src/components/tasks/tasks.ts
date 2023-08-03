@@ -167,6 +167,12 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     descFn(task) {
       let p = task.snapshotVoteTask
       return ` (space: ${p?.space})`
+    },
+    service: {
+      name: 'Snapshot.org',
+      img: '/icons/snapshot.png',
+      link: 'https://snapshot.org/#/',
+      implemented: ''
     }
   },
   SyncSwap: {
@@ -419,7 +425,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     service: {
       name: 'TraderJoe',
       link: 'https://traderjoexyz.com/arbitrum/trade',
-      img: '/icons/zkswap.ico',
+      img: '/icons/traderjoe.png',
       implemented: '',
     }
   }

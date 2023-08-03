@@ -25,21 +25,21 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 		return nil, err
 	}
 
+	txData, err := maker.MakeSwapTx(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "makeSpaceFiSwapData")
+	}
+
 	tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
 		Token:       req.FromToken,
 		WalletPK:    req.WalletPK,
 		Amount:      req.Amount,
-		SpenderAddr: c.Cfg.SpaceFI.Router,
+		SpenderAddr: txData.ContractAddr,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
 	result.ApproveTx = tokenLimitChecker.ApproveTx
-
-	txData, err := maker.MakeSwapTx(ctx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "makeSpaceFiSwapData")
-	}
 
 	tx := utils.CreateFunctionCallTransaction(
 		transactor.WalletAddr,
@@ -79,21 +79,21 @@ func (c *Client) GenericBridge(ctx context.Context, maker TxBridgeMaker, req *de
 		return nil, err
 	}
 
+	txData, err := maker.MakeBridgeTx(ctx, req)
+	if err != nil {
+		return nil, errors.Wrap(err, "makeSpaceFiSwapData")
+	}
+
 	tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
 		Token:       req.FromToken,
 		WalletPK:    req.WalletPK,
 		Amount:      req.Amount,
-		SpenderAddr: c.Cfg.SpaceFI.Router,
+		SpenderAddr: txData.ContractAddr,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
 	result.ApproveTx = tokenLimitChecker.ApproveTx
-
-	txData, err := maker.MakeBridgeTx(ctx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "makeSpaceFiSwapData")
-	}
 
 	tx := utils.CreateFunctionCallTransaction(
 		transactor.WalletAddr,

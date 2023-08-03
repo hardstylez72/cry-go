@@ -24,7 +24,7 @@
           <v-select
             density="compact"
             variant="outlined"
-            label="from token"
+            label="to network"
             v-on:change="inputChanged"
             :rules="[required]"
             :items="GetToNetworks"

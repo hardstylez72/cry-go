@@ -3,6 +3,7 @@ package defi
 import (
 	"context"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -99,6 +100,7 @@ func (c *EtheriumClient) TokenLimitChecker(ctx context.Context, req *TokenLimitC
 		r.LimitExtended = true
 		r.ApproveTx = tx.Tx
 
+		time.Sleep(time.Second * 5)
 		_ = c.WaitTxComplete(ctx, tx.Tx.Hash())
 	}
 

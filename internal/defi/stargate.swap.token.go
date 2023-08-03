@@ -52,7 +52,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
 	}
 
-	opt.Value = fee.Fee1
+	opt.Value = BigIntSum(fee.Fee1, Percent(fee.Fee1, 2))
 	destChainId := ChainIdMap[req.DestChain]
 	srcPoolId := PoolIdMap[c.Cfg.Network][req.FromToken]
 	distPoolId := PoolIdMap[req.DestChain][req.ToToken]
@@ -81,7 +81,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 	if err != nil {
 		return nil, errors.Wrap(err, "tr.Swap")
 	}
-	
+
 	return &StargateBridgeSwapToken{
 		Tx:    tx,
 		ECost: Estimate(tx),

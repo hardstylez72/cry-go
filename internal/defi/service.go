@@ -69,15 +69,17 @@ func NewEVMClient(c *ClientConfig) (*EtheriumClient, error) {
 func (c *EtheriumClient) ResoleGas(ctx context.Context, gas *Gas, opt *bind.TransactOpts) *bind.TransactOpts {
 
 	if !gas.RuleSet() {
+		head, errHead := c.Cli.HeaderByNumber(ctx, nil)
+		if errHead == nil && head.BaseFee != nil {
+			opt.GasFeeCap = big.NewInt(0).Mul(head.BaseFee, big.NewInt(3))
+		}
 		return opt
 	}
 
 	head, errHead := c.Cli.HeaderByNumber(ctx, nil)
 	if errHead == nil && head.BaseFee != nil {
-		// dynamic
-		opt.GasPrice = nil
 		opt.GasLimit = gas.GasLimit.Uint64()
-		opt.GasFeeCap = head.BaseFee
+		opt.GasFeeCap = &gas.GasPrice
 	} else {
 		opt.GasLimit = gas.GasLimit.Uint64()
 		opt.GasPrice = &gas.GasPrice

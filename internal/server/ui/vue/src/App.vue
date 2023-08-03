@@ -170,7 +170,15 @@ export default defineComponent({
 
 <style>
 
-.font {
-  /*font-family: "Roboto";*/
+@font-face {
+  font-family: "Space_Mono";
+  src: local("Space_Mono"),
+  url(~@/assets/fonts/Space_Mono/SpaceMono-Bold.ttf) format("truetype");
 }
+
+.font {
+  /*font-family: "Space_Mono", monospace;*/
+  /*font-size: 16px;*/
+}
+
 </style>

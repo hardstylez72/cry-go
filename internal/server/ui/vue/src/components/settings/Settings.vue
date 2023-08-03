@@ -186,7 +186,7 @@ export default defineComponent({
   z-index: 100;
   right: 2px;
   left: 56px;
-  background-color: white;;
+  background-color: #FFF3E0;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 

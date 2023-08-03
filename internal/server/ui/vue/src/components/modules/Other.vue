@@ -1,6 +1,6 @@
 <template>
   <div class="mx-8 my-8">
-    <div class="text-h3 text-center my-5">Orbiter.finance</div>
+    <div class="text-h3 text-center my-5">Other</div>
     <div>
       <v-table>
         <thead>
@@ -12,7 +12,10 @@
         </thead>
         <tbody>
         <tr v-for="item in integrated" :key="item.name">
-          <td><a :href="item.link">{{ item.name }}</a></td>
+          <td><a :href="item.link" class="d-inline-flex">
+            <v-img height="20px" :src="item.img" class="mr-2"/>
+            {{ item.name }}
+          </a></td>
           <td>{{ item.status }}</td>
           <td>{{ item.action }}</td>
         </tr>
@@ -73,6 +76,7 @@
 
 import {defineComponent} from 'vue';
 import {link} from "@/components/tasks/links";
+import {taskProps, taskTypes} from "@/components/tasks/tasks";
 
 enum Status {
   'integrated' = 'integrated',
@@ -82,18 +86,32 @@ enum Status {
 }
 
 export default defineComponent({
-  name: "Orbiter",
+  name: "Other",
   created() {
   },
   data() {
     return {
       integrated: [
         {
-          name: 'Bridge',
-          link: link.orbiter,
+          name: taskProps.OrbiterBridge.service.name,
+          link: taskProps.OrbiterBridge.service.link,
           status: Status.integrated,
-          action: 'bridge',
-          quest: ''
+          action: 'Bridge (ARBI, BNB, MATIC, AVAX, ETH, ZkSync, ZkSyncLite) ETH',
+          img: taskProps.OrbiterBridge.service.img
+        },
+        {
+          name: taskProps.TraderJoeSwap.service.name,
+          link: taskProps.TraderJoeSwap.service.link,
+          status: Status.integrated,
+          action: 'DEX swap arbitrum swap (STG -> ETH)',
+          img: taskProps.TraderJoeSwap.service.img,
+        },
+        {
+          name: taskProps.SnapshotVote.service.name,
+          link: taskProps.SnapshotVote.service.link,
+          status: Status.integrated,
+          action: 'follow and vote automatic on any guild',
+          img: taskProps.SnapshotVote.service.img,
         },
 
       ],

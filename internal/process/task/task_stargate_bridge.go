@@ -99,6 +99,7 @@ func (t *StargateTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 		if err := a.UpdateTask(ctx, task); err != nil {
 			return nil, err
 		}
+
 	}
 
 	if err := WaitTxComplete(taskContext, p.Tx, task, client, a); err != nil {
@@ -223,15 +224,13 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 	}
 
 	swap, err := swapper.StargateBridgeSwap(ctx, &defi.DefaultBridgeReq{
-		FromNetwork:  p.FromNetwork,
-		ToNetwork:    p.ToNetwork,
-		WalletPK:     profile.WalletPK,
-		Amount:       am,
-		FromToken:    p.FromToken,
-		ToToken:      p.ToToken,
-		Gas:          gas,
-		EstimateOnly: false,
-		Debug:        false,
+		FromNetwork: p.FromNetwork,
+		ToNetwork:   p.ToNetwork,
+		WalletPK:    profile.WalletPK,
+		Amount:      am,
+		FromToken:   p.FromToken,
+		ToToken:     p.ToToken,
+		Gas:         gas,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -326,7 +325,7 @@ func EstimateStargateBridgeSwapCost(ctx context.Context, p *v1.StargateBridgeTas
 		FromNetwork:  p.FromNetwork,
 		ToNetwork:    p.ToNetwork,
 		WalletPK:     profile.WalletPK,
-		Amount:       defi.Percent(am, 50),
+		Amount:       defi.Percent(am, 90),
 		FromToken:    p.FromToken,
 		ToToken:      p.ToToken,
 		Gas:          nil,

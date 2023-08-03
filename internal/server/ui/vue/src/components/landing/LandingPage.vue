@@ -15,7 +15,7 @@
 
     <v-img src="/icons/process.png"/>
 
-    <div class="d-flex justify-center">
+    <div class="d-flex justify-center mx-4 my-4">
       <v-btn height="60px" width="200px" style="font-size: 30px" @click="$router.push({name:'Modules'})">Modules
       </v-btn>
     </div>

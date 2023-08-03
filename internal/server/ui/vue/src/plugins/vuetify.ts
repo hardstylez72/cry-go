@@ -19,24 +19,25 @@ import {VSkeletonLoader} from "vuetify/labs/VSkeletonLoader";
 const myCustomLightTheme: ThemeDefinition = {
   dark: false,
   colors: {
-    background: '#E6FFFD',
-    surface: '#AEE2FF',
-    primary: '#ACBCFF',
-    'primary-darken-1': '#3700B3',
-    secondary: '#B799FF',
-    'secondary-darken-1': '#018786',
-    error: '#B00020',
-    info: '#2196F3',
-    success: '#4CAF50',
-    warning: '#FB8C00',
+    background: '#FFF3E0',
+    surface: '#FFF3E0',
+    primary: '#1D5D9B',
+    secondary: '#75C2F6',
+    error: '#FFF3E0',
+    info: '#FFF3E0',
+    success: '#FFF3E0',
+    warning: '#FFF3E0',
   },
 }
 export default createVuetify({
   components: {...components, VSkeletonLoader},
   directives,
   blueprint: md3,
-  // icons: {
-  //   defaultSet: 'mdi'
-  // }
+  theme: {
+    defaultTheme: 'myCustomLightTheme',
+    themes: {
+      myCustomLightTheme,
+    },
+  },
 })
 

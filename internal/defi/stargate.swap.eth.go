@@ -127,7 +127,7 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 
 	opt = c.ResoleGas(ctx, req.Gas, opt)
 
-	opt.Value = BigIntSum(req.Quantity, fee.Fee1)
+	opt.Value = BigIntSum(req.Quantity, fee.Fee1, Percent(fee.Fee1, 2))
 
 	opt.NoSend = req.EstimateOnly
 

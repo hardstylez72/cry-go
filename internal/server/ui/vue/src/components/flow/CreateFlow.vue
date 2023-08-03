@@ -2,7 +2,7 @@
   <div class="position-fixed"
        style="
        margin: auto; height: 50px; z-index: 100; right: 2px; left: 56px;
-        background-color: white; ;
+         ;
       box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;">
     <div class="mx-2 my-2 d-flex justify-space-between ma-auto">
       <span class="text-h5"><b>Flow creation</b></span>
