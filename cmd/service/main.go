@@ -285,7 +285,7 @@ func ListenGRPC(ctx context.Context, port string, s *services) error {
 
 func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 
-	tp, err := tracerProvider(cfg.JaegerUrl, false)
+	tp, err := tracerProvider(cfg.JaegerUrl, true)
 	if err == nil {
 		otel.SetTracerProvider(tp)
 	}

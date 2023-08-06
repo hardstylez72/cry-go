@@ -85,7 +85,7 @@ func (t *WethTask) Run(ctx context.Context, a *Input) (_ *v1.ProcessTask, err er
 			return nil, errors.Wrap(err, "defi.ResolveAmount")
 		}
 
-		estimation, err := EstimateWethTaskCost(ctx, p, profile)
+		estimation, err := EstimateWethTaskCost(taskContext, p, profile)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateWethTaskCost")
 		}

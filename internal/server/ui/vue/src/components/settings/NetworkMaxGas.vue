@@ -2,7 +2,7 @@
   <v-slider
     v-model="multiplier"
     density="compact"
-    label="max gas"
+    label="Ограничитель газа"
     :min="getMin"
     step="1000"
     :max="getMax"

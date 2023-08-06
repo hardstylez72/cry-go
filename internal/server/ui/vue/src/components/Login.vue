@@ -1,8 +1,8 @@
 <template>
-  <div class="d-flex justify-space-between">
-    <v-btn variant="tonal" color="blue" width="230px" height="35px" :href="loginGoogleHref()">
+  <div>
+    <v-btn variant="tonal" color="blue" width="100px" height="35px" :href="loginGoogleHref()">
       <v-img width="25" src="/google_oauth_icon.png"/>
-      login with google
+      login
     </v-btn>
   </div>
 </template>

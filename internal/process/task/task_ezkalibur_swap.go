@@ -56,7 +56,7 @@ func (t *EzkaliburSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 		}
 	}
 
-	profile, err := a.Halper.Profile(ctx, a.ProfileId)
+	profile, err := a.Halper.Profile(taskContext, a.ProfileId)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (t *EzkaliburSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateEzkaliburSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateEzkaliburSwapCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateSyncSwapLPCost")
 		}

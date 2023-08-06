@@ -23,10 +23,6 @@ const myCustomLightTheme: ThemeDefinition = {
     surface: '#FFF3E0',
     primary: '#1D5D9B',
     secondary: '#75C2F6',
-    error: '#FFF3E0',
-    info: '#FFF3E0',
-    success: '#FFF3E0',
-    warning: '#FFF3E0',
   },
 }
 export default createVuetify({

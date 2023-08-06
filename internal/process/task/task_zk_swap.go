@@ -68,7 +68,7 @@ func (t *ZkSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error)
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateZkSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateZkSwapCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateZkSwapCost")
 		}

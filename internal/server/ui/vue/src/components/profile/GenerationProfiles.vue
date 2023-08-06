@@ -2,7 +2,7 @@
   <v-dialog v-model="dialog" width="600px" height="auto" :close-on-back="false" :close-on-content-click="false"
             persistent="true">
     <template v-slot:activator="{ props }">
-      <v-btn @click="dialog = true" class="mb-4 mx-4">Generate</v-btn>
+      <v-btn @click="dialog = true" class="mb-4 mx-4">Генерация</v-btn>
     </template>
 
     <v-card>

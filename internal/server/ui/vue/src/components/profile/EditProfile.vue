@@ -5,7 +5,6 @@
       persistent
       width="1024"
     >
-
       <template v-slot:activator="{ props }">
         <v-icon
           icon="mdi-account-edit-outline"

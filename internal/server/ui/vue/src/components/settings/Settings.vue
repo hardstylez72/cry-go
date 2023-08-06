@@ -1,16 +1,13 @@
 <template>
   <v-container>
+    <NavBar title="Настройки">
+      <template v-slot:default>
+        <v-btn v-if="settingsChanged" @click=Update :loading="updating" class="ma-3">Update</v-btn>
+        <v-btn @click=Reset :loading="reseting" class="ma-3">Reset</v-btn>
+      </template>
+    </NavBar>
     <Loader v-if="loading"/>
     <div v-else>
-
-      <div class="header">
-        <div class="d-flex justify-end">
-          <v-btn v-if="settingsChanged" @click=Update :loading="updating" class="ma-3">Update</v-btn>
-          <v-btn @click=Reset :loading="reseting" class="ma-3">Reset</v-btn>
-        </div>
-      </div>
-
-      <div style="margin-top: 90px" class="text-h4 text-center">Network settings</div>
 
       <v-form ref="settings-form">
         <SettingsNetwork v-if="!loading" v-model="settings.arbitrum" :network="Network.ARBITRUM"/>
@@ -42,6 +39,7 @@ import deepEqual from 'deep-equal';
 import Loader from "@/components/Loader.vue";
 import {mapActions, mapStores} from "pinia";
 import {useSysStore, useUserStore} from "@/plugins/pinia";
+import NavBar from "@/components/NavBar.vue";
 
 interface TaskGasLimit {
   task: TaskType
@@ -50,7 +48,7 @@ interface TaskGasLimit {
 
 export default defineComponent({
   name: "Settings",
-  components: {Loader, WEIInputField, SettingsNetwork},
+  components: {NavBar, Loader, WEIInputField, SettingsNetwork},
   data() {
     return {
       orgiSettings: {} as Settings,
@@ -129,6 +127,7 @@ export default defineComponent({
       try {
         const res = await settingsService.settingsServiceReset()
         this.settings = res.settings
+        await this.loadSettings()
       } finally {
         this.reseting = false
       }

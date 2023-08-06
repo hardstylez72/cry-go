@@ -69,7 +69,7 @@ func (t *TraderJoeSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateTraderJoeSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateTraderJoeSwapCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateTraderJoeSwapCost")
 		}

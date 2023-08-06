@@ -95,8 +95,6 @@ export default defineComponent({
       handler() {
         this.item.toNetwork = this.toNetwork
         if (this.toNetwork && this.fromNetwork) {
-          this.item.fromToken = undefined
-          this.item.toToken = undefined
           this.pair = null
         }
       }
@@ -105,8 +103,6 @@ export default defineComponent({
       handler() {
         this.item.fromNetwork = this.fromNetwork
         if (this.toNetwork && this.fromNetwork) {
-          this.item.fromToken = undefined
-          this.item.toToken = undefined
           this.pair = null
         }
       }
@@ -159,6 +155,7 @@ export default defineComponent({
         tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.STG, Token.STG),
         tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDT, Token.USDC),
         tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDT, Token.USDT),
 
         tokenBridgePair(Network.ARBITRUM, Network.BinanaceBNB, Token.STG, Token.STG),
         tokenBridgePair(Network.ARBITRUM, Network.BinanaceBNB, Token.USDT, Token.USDT),
@@ -247,6 +244,10 @@ export default defineComponent({
       toNetwork: Network.ARBITRUM as null | Network,
       pair: null as BridgePair | null,
       item: {
+        fromNetwork: Network.OPTIMISM,
+        toNetwork: Network.ARBITRUM,
+        toToken: Token.ETH,
+        fromToken: Token.ETH,
         amount: {
           sendAll: true,
         }
@@ -273,7 +274,7 @@ export default defineComponent({
     inputChanged() {
       return this.validateForm()
     },
-    syncTask() {
+    async syncTask() {
       if (this.task) {
         if (this.task.stargateBridgeTask) {
           this.item = this.task.stargateBridgeTask
@@ -282,8 +283,6 @@ export default defineComponent({
             this.pair = tokenBridgePair(this.item.fromNetwork, this.item.toNetwork, this.item.fromToken, this.item.toToken)
           }
 
-          this.fromNetwork = this.item.fromNetwork
-          this.toNetwork = this.item.toNetwork
           this.$emit('taskChanged', this.getTask())
         }
       }

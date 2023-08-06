@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <NavBar :title="`Биржевой аккаунт ${withdrawer.label}`"/>
     <v-skeleton-loader
       width="100%"
       :loading="loading"
@@ -7,9 +8,6 @@
     >
       <v-responsive>
         <v-card>
-          <v-card-title>
-            <span class="text-h5">Exchange account options</span>
-          </v-card-title>
           <v-card-text>
 
             <v-form ref="formm">
@@ -84,6 +82,7 @@ import {required} from "@/components/tasks/menu/helper";
 import ProfileSearch from "@/components/profile/ProfileSearch.vue";
 import {Profile} from "@/generated/profile";
 import {Timer} from "@/components/helper";
+import NavBar from "@/components/NavBar.vue";
 
 interface Network {
   network: string
@@ -127,6 +126,7 @@ export default defineComponent({
     }
   },
   components: {
+    NavBar,
     ProfileSearch,
     CreateWithdrawerSubAcc,
     OkexWithdrawOptionSubAcc,

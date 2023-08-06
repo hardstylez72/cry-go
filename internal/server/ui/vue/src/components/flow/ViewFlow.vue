@@ -1,29 +1,32 @@
 <template>
-  <div class="position-fixed header">
-    <div class="mx-2 my-2 d-flex justify-space-between ma-auto">
-      <span class="text-h5">Flow: {{ flow.label }}</span>
-      <div>
-        <v-btn v-if="!flow.deletedAt && !flow.nextId" color="grey" @click="DeleteFlow">Delete</v-btn>
-        <v-btn class="mx-2" :disabled="selectedProfiles.length === 0" @click="startProcess">Start process</v-btn>
+  <div>
+    <NavBar :title="`Сценарий: ${flow.label}`">
+      <template v-slot:default>
         <span v-if="!flow.deletedAt && !flow.nextId">
-          <v-btn v-if="!editMode" focused @click="editModeChanged">Update</v-btn>
-          <v-btn v-else @click="updateFlow">Save changed</v-btn>
-          </span>
-      </div>
-    </div>
-    <div class="mx-8 my-3">
+        <v-btn v-if="!editMode" focused @click="editModeChanged">Изменить</v-btn>
+        <v-btn v-else @click="updateFlow">Сохранить</v-btn>
+        </span>
+        <v-btn v-if="!flow.deletedAt && !flow.nextId" color="red" @click="DeleteFlow">Удалить</v-btn>
+      </template>
+    </NavBar>
+    <div class="mx-8 my-3" style="width: 80vw">
       <ProfileSearch
         v-model="selectedProfiles"
         :disabled="editMode"
       />
-      <span class="ml-3 mb-2" v-for="profile in getProfileList">
-          <ProfileCard :label="profile.num" :profile-id="profile.id"/>
-        </span>
+      <div class="ml-3 mb-2 d-inline-flex flex-wrap" v-for="profile in getProfileList">
+        <ProfileCard :label="profile.num" :profile-id="profile.id"/>
+      </div>
+    </div>
+    <div>
+      <v-btn class="mx-8" style="width: 80vw" :disabled="selectedProfiles.length === 0" @click="startProcess">Start
+        process
+      </v-btn>
     </div>
   </div>
 
 
-  <v-spacer class="my-6" style="padding-top: 200px"/>
+  <v-spacer class="my-6"/>
   <v-form validate-on="submit" ref="flow-form">
     <FlowForm v-if="!flowLoading" :disable="disabled" :label-value="flow.label" :tasks-value="tasks"
               @flow-changed="flowChanged"/>
@@ -45,10 +48,11 @@ import {taskComponentMap, TaskArg, taskTypes} from "@/components/tasks/tasks";
 import {Delay, Timer} from "@/components/helper";
 import FlowForm from "@/components/flow/FlowForm.vue";
 import ProfileSearch from "@/components/profile/ProfileSearch.vue";
+import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
   name: "ViewFlow",
-  components: {ProfileSearch, FlowForm, ProfileCard},
+  components: {NavBar, ProfileSearch, FlowForm, ProfileCard},
   props: {
     propId: {
       type: String,

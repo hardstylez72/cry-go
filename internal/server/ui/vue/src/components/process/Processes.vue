@@ -1,8 +1,9 @@
 <template>
   <div>
+    <NavBar title="Процессы"/>
     <Loader v-if="loading"/>
     <div v-else>
-      <div class="d-inline-flex">
+      <div class="d-flex flex-wrap">
         <v-checkbox class="mx-2" color="blue" v-model="StatusReadyW" direction="horizontal" hide-details
                     density="compact">
           <template v-slot:label>
@@ -44,7 +45,7 @@
       <v-list max-width="96vw" class="px-5">
         <v-list-item
           density="compact"
-          variant="outlined"
+          variant="plain"
           class="my-1 my-4"
           v-for="item in getList"
           :key="item.id"
@@ -52,10 +53,10 @@
           height="auto"
           elevation="1"
           @click="viewProcess(item.id)"
-          style="border: 1px solid "
+          style="border: 0px solid "
         >
           <div class="d-flex justify-start">
-            <StatusCard :status="item.status" class="mr-2"/>
+            <StatusCard :status="item.status" class="mx-2"/>
             <div class="mr-2">
               <v-progress-linear
                 :model-value="item.progress"
@@ -81,7 +82,7 @@
             </div>
           </div>
         </v-list-item>
-        <v-btn v-if="showNext" @click="next" width="100%">More</v-btn>
+        <v-btn v-if="showNext" @click="next" :loading="nextLoading" width="100%">More</v-btn>
       </v-list>
 
     </div>
@@ -100,6 +101,7 @@ import dayjs from "dayjs";
 import BtnProcessStopResume from "@/components/BtnProcessStopResume.vue";
 import {getFlow} from "@/components/tasks/tasks";
 import Loader from "@/components/Loader.vue";
+import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
   name: "Processes",
@@ -142,6 +144,7 @@ export default defineComponent({
     },
   },
   components: {
+    NavBar,
     Loader,
     BtnProcessStopResume,
     StatusCard,
@@ -164,6 +167,7 @@ export default defineComponent({
       list: [] as Process[],
       showCreateFlowDialog: false,
       selected: new Set<string>(),
+      nextLoading: false
     }
   },
   computed: {
@@ -268,8 +272,9 @@ export default defineComponent({
     async UpdateList() {
       try {
 
+        this.list.length ? this.nextLoading = true : this.loading = true
         this.loadingError = false
-        this.loading = true
+
         const res = await processService.processServiceListProcess({
           body: {
             offset: this.offset.toString(),
@@ -281,6 +286,7 @@ export default defineComponent({
       } catch (e) {
         this.loadingError = true
       } finally {
+        this.nextLoading = false
         this.loading = false
       }
     },

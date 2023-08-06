@@ -1,12 +1,12 @@
 <template>
   <v-btn :loading="loading" v-if="processCanBeStopped() && !errorHappen()" :density="size"
          @click="Stop(item.id)"
-         color="orange">Stop
+         color="orange">Стоп
   </v-btn>
   <v-btn v-else-if="item.status !== ProcessStatus.StatusDone && !errorHappen()" :loading="loading"
          :density="size"
          @click="Resume(item.id)" color="green">
-    {{ processNotStarted() ? "Start" : "Resume" }}
+    {{ processNotStarted() ? "Старт" : "Возобновить" }}
   </v-btn>
 </template>
 

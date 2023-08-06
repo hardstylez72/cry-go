@@ -1,6 +1,6 @@
 <template>
   <v-row class="mx-5">
-    <v-col cols="4">
+    <v-col cols="5" v-if="!isMobile">
       <div style="position: fixed; font-size: 18px; width: 30%">
         <ol>
           <li v-for="(item) in tasks" class="my-2">
@@ -10,7 +10,7 @@
       </div>
     </v-col>
 
-    <v-col cols="8">
+    <v-col>
       <v-row>
         <v-col cols="12" sm="6" md="4">
           <v-text-field
@@ -97,6 +97,13 @@ import draggable from 'vuedraggable'
 export default defineComponent({
   name: "FlowForm",
   computed: {
+    isMobile() {
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        return true
+      } else {
+        return false
+      }
+    },
     taskProps() {
       return taskProps
     }

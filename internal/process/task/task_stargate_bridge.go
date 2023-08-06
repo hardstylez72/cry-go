@@ -82,7 +82,7 @@ func (t *StargateTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateStargateBridgeSwapCost(ctx, p, profie)
+		estimation, err := EstimateStargateBridgeSwapCost(taskContext, p, profie)
 		if err != nil {
 			return nil, err
 		}

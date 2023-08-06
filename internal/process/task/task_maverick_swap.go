@@ -68,7 +68,7 @@ func (t *MaverickSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateMaverickSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateMaverickSwapCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateSyncSwapLPCost")
 		}

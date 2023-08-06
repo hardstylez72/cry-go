@@ -1,98 +1,191 @@
 <template>
 
-  <div class="text-center text-h5 text-blue-darken-2 my-5">
-    <h2
-      class="">
-      Automate your airdrop hunting strategy
+  <v-container>
+    <NavBar title="Главная">
+      <template v-slot:default>
+        <Login v-if="!userLoggedIn"/>
+      </template>
+    </NavBar>
+
+    <h2 class="text-center text-h4 font-weight-bold text-blue-darken-2 my-5">
+      Экономьте свое время с помощью автоматизированного исполнения airdrop-активностей
     </h2>
-  </div>
 
-  <v-card
-    theme=""
-    flat
-    rounded="0"
-  >
-
-    <v-img src="/icons/process.png"/>
-
-    <div class="d-flex justify-center mx-4 my-4">
-      <v-btn height="60px" width="200px" style="font-size: 30px" @click="$router.push({name:'Modules'})">Modules
-      </v-btn>
+    <div>
+      <b>Проблема</b>
+      <p> В случае если вы занимаетесь дроп-хантингом, используя анти-детект браузер и команду людей, которые
+        руками совершают активности
+        - вы сталкиваетесь с проблемой человеческого фактора. Такой подход сложно масштабировать и контролировать.
+        Помимо этого,
+        активности в большей мере
+        довольно монотонны и не каждый способен продолжительное время повторять однообразные действия.
+      </p>
+      <b>Решение</b>
+      <p>
+        Сервис поможет вам масштабировать число ваших аккаунтов и сэкономить время на рутинных задачах
+        с помощью удобного рабочего места и автоматизации активностей.
+      </p>
+      <b>Принцип работы:</b>
+      <ol class="ml-8">
+        <li>Добавляете или генерируете evm аккаунты</li>
+        <li>Собираете сценарии исполнения активностей</li>
+        <li>Запускаете собранные сценарии для выбранных аккаунтов</li>
+      </ol>
     </div>
 
-  </v-card>
 
-  <div class="mx-5 my-8">
-    <div class="d-flex flex-wrap justify-space-between mr-5">
+    <v-expansion-panels class="mt-4">
+      <v-expansion-panel
+        key="sec"
+        title="Безопасность"
+      >
+        <v-expansion-panel-text>
+          <div>
+            <p>
+              В крипте много скама, думаю каждый сталкивался с ним хоть раз. Выполнение on-chain активностей на сетях
+              блокчейна невозможно без
+              приватного ключа. Поэтому вопрос доверия встает играет ключевую роль.
+            </p>
+            <br/>
 
-      <div v-for="item in items">
+            Расскажу подробнее о drop-hunter:
+            Проект разрабатывается, поддерживается и амнистируется одним человеком.
+            <br/>
+            <v-img src="/me.jpg" max-height="600px" class="mt-3"></v-img>
+            <div class="text-center">Вот этот человек, это я, меня зовут Сергей, приятно познакомиться:)</div>
+            <br/>
+            Я являюсь профессиональным разработчиком WEB-приложений на протяжении последних 5 лет.
+            <br/>
+            Ссылки на мои соцсети:
+            <a href="https://www.linkedin.com/in/sergey-k-317a80164/" target="_blank" class="d-inline-flex mx-1">
+              <v-img height="20px" src="/icons/linkedin.png" @click=""></v-img>
+              Linkedin
+            </a>
+            <a href="https://t.me/shinybozdo" target="_blank" class="d-inline-flex mx-1">
+              <v-img height="20px" src="/icons/telegram.png" @click=""></v-img>
+              Telegram
+            </a>
+            <a href="https://github.com/hardstylez72?tab=repositories" target="_blank" class="d-inline-flex mx-1">
+              <v-img height="20px" src="/icons/github.png" @click=""></v-img>
+              Github
+            </a>
 
-        <div style="width: 300px" class="mx-5">
-          <div class="mr-4">
-            <div class="">
+            <br/>
+            Основной сервер приложения имеет открытый исходный код, который вы можете посмотреть по <a
+            href="https://github.com/hardstylez72/cry" target="_blank" class="my-2">ссылке</a>
 
-            </div>
+            <ul class="ml-4 mt-3">
+              Какие меры предосторожности приняты:
+              <li>чувствительные данные зашифрованы (слив бд не позволит получить ваши приватные ключи)</li>
+              <li>чувствительные данные не логируются</li>
+              <li>чувствительные данные доступны для пользователя только в момент создания/генерации</li>
+            </ul>
+
+
           </div>
-          <div><h6 class="text-h5 text-blue">
-            {{ item.title }}
-          </h6>
-            <p class="my-3">
-              {{ item.details }}
-            </p></div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+      <v-expansion-panel
+        key="var"
+        title="Возможности"
+      >
+        <v-expansion-panel-text>
+          <div>
+            <ul>
+              <li>Удобная генерация новых evm аккаунтов (1, 10, 100, 1000 штук и более)</li>
+              <li>Возможность импортировать существующие emv аккаунты пачкой в 2 клика</li>
+              <li>Возможность закрепить за каждым аккаунтов socks-5 proxy, который позволит скрыть ip, и выполнять все
+                активности
+                через proxy
+              </li>
+              <li>Интерактивный просмотр баланса в 1 клик</li>
+              <li>Удобное пополнение баланса с биржи в 4 клика</li>
+              <li>Интеграция с binance и okex</li>
+              <li>Создание своего сценария активностей с помощью конструктора</li>
+              <li>Запуск сценария для выбранных аккаунтов</li>
+              <li>Возможность регулировать настройки газа. Ограничение на максимальный газ и урезание газа с помощью
+                множителя
+              </li>
+              <li>Удобная работа с ошибками, возможность интерактивной работы с процессами.
+                Можно останавливать, запускать, пропускать, и повторно выполнять шаги в которых возникла ошибка
+              </li>
+              <li>Можно получать уведомления с помощью бота в телеграме о ходе процессов</li>
+              <li>Оценка стоимости транзакции в 1 клик как в метамаске</li>
+            </ul>
+          </div>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+      <v-expansion-panel
+        key="money"
+        title="Монетизация"
+      >
+        <v-expansion-panel-text>
+          Каждому новому пользователю при регистрации будет создан внутренний аккаунт на котором будет доступно 10$.
+          Вы не можете вывести эти деньги, их можно потратить на исполнение активностей.
+          <br/>
+          Есть бесплатные (вывод/депозит на биржу и задержка) активности и платные (все остальные).
+          Платная активность имеет фиксированную цену в 0.2$.
+          Списывание с баланса происходит при успешном выполнении каждой платной активности.
+          Начального баланса хватит на прогон 50 активностей, что достаточно для ознакомления c работой сервиса.
+          Баланс можно пополнить и также смотреть детализацию платы за активности.
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+      <v-expansion-panel
+        key="proc"
+        title="Преимущества относительно конкурентов"
+      >
+        <v-expansion-panel-text>
+          <ul>
+            <li>Какие активности делать - выбор каждого. Сервис в этом смысле предоставляет полную свободу и
+              прозрачность.
+            </li>
+            <li>Не нужно платить за возможность опробовать продукт</li>
+            <li>Полный контроль над процессами (повторный запуск в случае ошибки, остановка, возобновление)</li>
+            <li>Возможно использование на мобильном устройстве</li>
+          </ul>
+
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+
+
+      <v-expansion-panel
+        v-for="i in items"
+        :key="i.title"
+        :title="i.title"
+        :text="i.details"
+      />
+    </v-expansion-panels>
+
+
+  </v-container>
 </template>
 
 <script lang="ts">
 
 import {defineComponent} from 'vue';
+import NavBar from "@/components/NavBar.vue";
+import Login from "@/components/Login.vue";
+import {mapStores} from "pinia";
+import {useUserStore} from "@/plugins/pinia";
 
 export default defineComponent({
   name: "LandingPage",
+  components: {Login, NavBar},
   methods: {},
+  computed: {
+    userLoggedIn(): boolean {
+      return this.userStore.login
+    },
+    ...mapStores(useUserStore),
+  },
   data() {
     return {
       onboarding: 0,
       items: [
         {
-          title: 'Security',
-          details: 'All sensitive data such as: private keys and secret keys are stored in encrypted format in database.\n' +
-            '            They do not appear anywhere after creation. Users can not see any sensitive information about other users.'
+          title: 'Поддерживаемые сети',
+          details: 'Ethereum, Binance BNB, Optimism, Arbitrum, Polygon, ZkSync ERA, ZkSync lite, Avalanche'
         },
-        {
-          title: 'Friendly user interface',
-          details: ' No special skills needed. You can manage multiple accounts in one place'
-        },
-        {
-          title: 'Full support',
-          details: 'Our support team will help you with any questions'
-        },
-        {
-          title: 'Create and run you custom flow',
-          details: ' You can build your own flow (example: withdraw -> swap -> bridge -> deposit -> repeat)'
-        },
-        {
-          title: 'Scalability',
-          details: 'Can support large amount of flows and accounts'
-        },
-        {
-          title: 'Withdrawal',
-          details: 'Withdraw any coins on any network is available from Binance and Okex.'
-        },
-        {
-          title: 'Deposit okex',
-          details: ' Use advantage of okex sub-accounts to make deposits to lower risks'
-        },
-        {
-          title: ' Supports many blockchains',
-          details: 'Etherium, Binance BNB, Optimism, Arbitrum, Polygon, ZkSync, Avalanche'
-        },
-        {
-          title: 'Snapshot.org voting',
-          details: 'Easily subscribe and vote any topic you want'
-        }
       ]
     }
   }

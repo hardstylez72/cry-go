@@ -68,7 +68,7 @@ func (t *VelocoreSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateVelocoreSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateVelocoreSwapCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateVelocoreSwapCost")
 		}

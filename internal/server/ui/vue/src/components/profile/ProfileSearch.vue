@@ -12,7 +12,7 @@
     :multiple="multiple"
     :rules="[required]"
     ref="label-input"
-    label="Нужно выбрать профили, можно выбрать как один, так и сразу несколько, если ввести интервал. Например 1-10"
+    label="Нужно выбрать профили, Например 1-10"
     density="comfortable"
     variant="outlined"
     clearable="true"

@@ -1,14 +1,16 @@
 <template>
   <div>
+    <NavBar title="Биржи">
+      <template v-slot:default class="d-flex justify-end ma-3">
+        <ExchangeAccountDocs class="mr-3"/>
+        <v-btn v-if="selectedSome" color="black" @click=DeleteWithdrawers class="mr-3">Удалить
+        </v-btn>
+        <v-btn @click=CreateWithdrawer class="mr-3">Добавить</v-btn>
+      </template>
+    </NavBar>
     <Loader v-if="loading"/>
     <div v-else>
-      <div class="d-flex justify-end ma-3">
-        <!--            <ExportExchangeAccounts class="mr-3"/>-->
-        <ExchangeAccountDocs class="mr-3"/>
-        <v-btn v-if="selectedSome" color="black" @click=DeleteWithdrawers class="mr-3">Delete exchange accounts
-        </v-btn>
-        <v-btn @click=CreateWithdrawer class="mr-3">Add exchange account</v-btn>
-      </div>
+
 
       <v-table fixed-header height="90vh">
         <thead>
@@ -55,10 +57,12 @@ import ExchangeAccountDocs from "@/components/exchange.acc/ExchangeAccountDocs.v
 import BtnCheckProxy from "@/components/BtnCheckProxy.vue";
 import ExportExchangeAccounts from "@/components/exchange.acc/ExportExchangeAccounts.vue";
 import Loader from "@/components/Loader.vue";
+import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
   name: "Withdraw",
   components: {
+    NavBar,
     Loader,
     ExportExchangeAccounts,
     BtnCheckProxy,

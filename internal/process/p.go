@@ -114,7 +114,7 @@ func (d *Dispatcher) KillProcess(ctx context.Context, processId string) error {
 func (d *Dispatcher) StopProcess(ctx context.Context, processId string) error {
 
 	l := log.Log.With("processId", processId).With("fn", "Dispatcher.StopProcess")
-	l.Debug("signal received")
+	l.Debug("signal stop received")
 	defer l.Debug("process stopped")
 	processTable, running := d.pTable.Get(processId)
 	if running {

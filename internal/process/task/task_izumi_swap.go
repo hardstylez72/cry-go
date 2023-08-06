@@ -68,7 +68,7 @@ func (t *IzumiSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, err
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateIzumiSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateIzumiSwapCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateIzumiSwapCost")
 		}

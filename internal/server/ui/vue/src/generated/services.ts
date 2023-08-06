@@ -33,29 +33,30 @@ export const instance = axios.create({
   baseURL: import.meta.env.DEV ? 'http://localhost:8083/' : '/',
   timeout: 30000,
   withCredentials: true,
-  transformRequest: [
-    (data, headers) => {
-
-      if (!data) {
-        data = {}
-      }
-      headers['Grpc-Metadata-tz'] = dayjs().format('Z')
-      headers.setContentType('application/base64', true)
-      headers.setAccept('application/base64', true)
-
-      console.log("request body: ", data)
-      return encrypt(data, seceret);
-    },
-  ],
-  transformResponse: [
-    (data, headers) => {
-      if (data) {
-        data = decrypt(data, seceret);
-      }
-      console.log("response body: ", data)
-      return data
-    }
-  ]
+  // transformRequest: [
+  //   (data, headers) => {
+  //
+  //     // if (!data) {
+  //     //   data = {}
+  //     // }
+  //     headers['Grpc-Metadata-tz'] = dayjs().format('Z')
+  //     // headers.setContentType('application/base64', true)
+  //     // headers.setAccept('application/base64', true)
+  //
+  //     // console.log("request body: ", data)
+  //     // return encrypt(data, seceret);
+  //     return data
+  //   },
+  // ],
+  // transformResponse: [
+  //   (data, headers) => {
+  //     if (data) {
+  //       data = decrypt(data, seceret);
+  //     }
+  //     console.log("response body: ", data)
+  //     return data
+  //   }
+  // ]
 });
 
 

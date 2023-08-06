@@ -9,7 +9,7 @@
           color="primary"
           v-bind="props"
         >
-          Docs
+          
           <v-icon icon="mdi-information-outline"/>
         </v-btn>
       </template>

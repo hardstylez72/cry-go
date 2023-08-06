@@ -11,6 +11,8 @@ import {Delay} from "@/components/helper";
 
 export const useUserStore = defineStore('user', {
   state: () => ({
+    drawer: false,
+    isMobile: true,
     login: false,
     email: '',
     ass: '0 USD',

@@ -104,7 +104,6 @@ func (t *taskDelay) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) 
 		case <-taskContext.Done():
 			return task, nil
 		}
-
 	}
 
 	return a.Task, nil

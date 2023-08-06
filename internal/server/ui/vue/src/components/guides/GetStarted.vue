@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <NavBar title="Быстрый старт"/>
     <ol>
       <li class="mt-5 text-h6"> Add existing or generate new profiles <a href="/profiles/batch/create" target="_blank">here</a>
       </li>
@@ -56,10 +57,12 @@ import Zksync from "@/components/modules/Zksync.vue";
 import Snapshot from "@/components/modules/Snapshot.vue";
 import Orbiter from "@/components/modules/Other.vue";
 import LayerZero from "@/components/modules/LayerZero.vue";
+import NavBar from "@/components/NavBar.vue";
 
 
 export default defineComponent({
   name: "GetStarted",
+  components: {NavBar},
   created() {
   },
 })

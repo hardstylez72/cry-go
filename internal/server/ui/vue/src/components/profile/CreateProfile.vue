@@ -1,9 +1,9 @@
 <template>
   <div class="mx-8 my-8" style="min-height: 500px">
     <v-container>
-      <div v-if="!demo" class="text-h4 my-5">Create profiles</div>
-      <v-btn :loading="loading" @click="validate" class="mb-4 mx-4">Validate</v-btn>
-      <v-btn v-if="!demo" :loading="loading" @click="save" class="mb-4 mx-4">Create</v-btn>
+      <NavBar title="Добавление профилей"/>
+      <v-btn :loading="loading" @click="validate" class="mb-4 mx-4">Проверить</v-btn>
+      <v-btn v-if="!demo" :loading="loading" @click="save" class="mb-4 mx-4">Добавить</v-btn>
 
       <GenerationProfiles @generated="generated" :demo="demo"/>
       <v-textarea
@@ -39,6 +39,7 @@ import {defineComponent} from 'vue';
 import Papa from 'papaparse';
 import {helperService, instance, profileService} from "@/generated/services";
 import GenerationProfiles from "@/components/profile/GenerationProfiles.vue";
+import NavBar from "@/components/NavBar.vue";
 
 
 interface Item {
@@ -57,7 +58,7 @@ export default defineComponent({
       default: false
     }
   },
-  components: {GenerationProfiles},
+  components: {NavBar, GenerationProfiles},
   name: "CreateProfile",
   data() {
     return {

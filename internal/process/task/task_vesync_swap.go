@@ -68,7 +68,7 @@ func (t *VeSyncSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateVeSyncSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateVeSyncSwapCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateSyncSwapLPCost")
 		}

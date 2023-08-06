@@ -2,7 +2,7 @@
   <v-slider
     v-model="multiplier"
     density="compact"
-    label="gas multiplier"
+    label="Множитель газа"
     min="0.1"
     max="1"
     persistent-hint

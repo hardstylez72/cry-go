@@ -68,7 +68,7 @@ func (t *SpaceFiSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateSpaceFiSwapCost(ctx, profile, p, client)
+		estimation, err := EstimateSpaceFiSwapCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateSyncSwapLPCost")
 		}

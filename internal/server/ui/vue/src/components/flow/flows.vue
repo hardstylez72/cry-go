@@ -1,28 +1,31 @@
 <template>
   <div>
+    <NavBar title="Сценарии">
+      <template v-slot:default>
+        <div class="d-flex justify-end">
+          <v-btn @click=CreateFlow class="ma-3">Добавить</v-btn>
+        </div>
+      </template>
+    </NavBar>
     <Loader v-if="loading"/>
     <div v-else>
-      <div class="d-flex justify-end">
-        <v-btn @click=CreateFlow class="ma-3">Create</v-btn>
-      </div>
 
 
       <v-list max-width="96vw" class="px-5">
         <v-list-item
           density="compact"
-          variant="outlined"
+          variant="plain"
           class="my-1 my-4"
           v-for="item in getList"
           :key="item.id"
           rounded
           height="auto"
           elevation="1"
-          active-color="black"
           @click="viewFlow(item.id)"
         >
           <div>
-            <div class="mr-2"><b>{{ `name: ${item.label}` }}</b></div>
-            <div><b>Flow:</b>
+            <div class="mr-2"><b>{{ `${item.label}` }}</b></div>
+            <div>
               <div class="mr-2" v-for="(d, i) in getFlow(item)">
                 <b>{{ i + 1 }})</b> {{ d }}
               </div>
@@ -43,10 +46,12 @@ import CreateFlow from "@/components/flow/CreateFlow.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import {getFlow} from "@/components/tasks/tasks";
 import Loader from "@/components/Loader.vue";
+import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
   name: "Constructor",
   components: {
+    NavBar,
     Loader,
     CheckBox,
     CreateFlow

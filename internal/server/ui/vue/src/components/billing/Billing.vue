@@ -1,5 +1,7 @@
 <template>
   <v-container>
+    <NavBar title="Биллинг">
+    </NavBar>
     <div class="d-flex justify-space-between">
       <div>
         <div class="my-1 text-h4"> User: {{ store.email }}</div>
@@ -41,10 +43,11 @@ import {useUserStore} from "@/plugins/pinia";
 import TaskHistory from "@/components/billing/TaskHistory.vue";
 import TopUp from "@/components/billing/TopUp.vue";
 import PaymentHistory from "@/components/billing/PaymentHistory.vue";
+import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
   name: "Billing",
-  components: {PaymentHistory, TopUp, TaskHistory},
+  components: {NavBar, PaymentHistory, TopUp, TaskHistory},
   created() {
   },
   data() {

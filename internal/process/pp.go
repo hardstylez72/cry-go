@@ -79,6 +79,9 @@ type ExecutorResult struct {
 }
 
 func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, userId string, l *zap.SugaredLogger) error {
+
+	l = l.With("fn", "runPP")
+
 	pt, _ := d.pTable.Get(pId)
 	taskFinished := make(chan bool)
 	defer close(taskFinished)
@@ -123,7 +126,7 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 
 			d.stat.ActiveTasks.Inc()
 			defer d.stat.ActiveTasks.Dec()
-
+			l.Debug("task started")
 			execTask, execErr := executor.Run(ctx,
 				&task.Input{
 					L:                    l,
@@ -159,10 +162,12 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 					execErr = res.Err
 					executed = res.Task
 					taskFinished <- true
+					l.Debug("task finished")
 					return
 				case signal := <-pt.signals:
 					switch signal {
 					case SignalStop:
+						l.Debug("signal stop received")
 						_ = executor.Stop()
 						stopped = true
 					}
@@ -173,6 +178,7 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 		<-taskFinished
 
 		if stopped {
+			l.Debug("task stopped, exiting")
 			if err := d.r.UpdateProcessTaskStatus(ctx, v1.ProcessStatus_StatusStop.String(), t.Id, pId); err != nil {
 				return errors.Wrap(err, "UpdateProcessTaskStatus")
 			}
@@ -180,7 +186,6 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 		}
 
 		if execErr != nil {
-
 			if errors.Is(execErr, task.ErrUserHasNoBalance) {
 				d.SendAlert(ctx, userId, pId, execErr, l)
 				return execErr

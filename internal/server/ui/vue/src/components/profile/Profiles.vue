@@ -3,76 +3,64 @@
     <Loader v-if="loading"/>
     <div v-else>
 
-      <div class="d-flex justify-space-between">
-        <div class="mx-2 my-2">
-          <v-checkbox
-            class="mr-3"
-            density="compact"
-            label="Address"
-            v-model="showWalletAddrs"
-            hide-details
-          />
-          <v-checkbox
-            class="mr-3"
-            density="compact"
-            label="Labels"
-            v-model="showLabels"
-            hide-details
-          />
-        </div>
-        <div class="mr-3" style="width: auto">
-          <!--              <ProfilesExport v-if="list.length > 0" class="pr-2"/>-->
-          <ProfilesDocs class="mx-2 my-2"/>
-          <v-btn class="mx-2 my-2" v-if="selectedSome" color="black" @click=DeleteProfiles>Delete</v-btn>
-          <v-btn class="mx-2 my-2" @click="$router.push({name: 'CreateProfileBatch'})">Create</v-btn>
-        </div>
+      <NavBar title="Профили">
+        <template v-slot:default>
+          <v-btn class="mx-2 my-2" v-if="selectedSome" color="black" @click=DeleteProfiles>Удалить</v-btn>
+          <v-btn v-else class="mx-2 my-2" @click="$router.push({name: 'CreateProfileBatch'})">Добавить</v-btn>
+        </template>
+      </NavBar>
+
+
+      <div class="mr-9">
+        <v-checkbox
+          density="compact"
+          label="Address"
+          v-model="showWalletAddrs"
+          hide-details
+        />
       </div>
 
 
-      <v-table fixed-header height="92vh">
-        <thead>
-        <tr>
-          <th></th>
-          <th class="text-left" v-if="showWalletAddrs">Metamask</th>
-          <th class="text-left" v-if="showLabels">Label</th>
-          <th class="text-left">Profile</th>
-          <th class="text-left">Proxy</th>
-          <th class="text-left">Meta</th>
-          <th class="text-left">Accounts</th>
-          <th class="text-left">CreatedAt</th>
-          <th class="text-left">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in getList" :key="item.id">
-          <td>
-            <CheckBox style="height: 40px" density="compact" :id="item.id" focused
-                      @CheckboxChanged="CheckboxChanged"></CheckBox>
-          </td>
-          <td v-if="showWalletAddrs"><span>{{ item.mmskId }}</span></td>
-          <td v-if="showLabels"><span>{{ item.label }}</span></td>
+      <v-list max-width="96vw" class="px-5" nav="true">
+        <v-list-item
+          density="compact"
+          variant="plain"
+          class="my-0"
+          v-for="item in getList"
+          :key="item.id"
+          rounded
+          height="auto"
+          width="auto"
+          elevation="1"
+          style="border: 0px solid "
+        >
 
-          <td>
-            <ProfileCard :label="item.num" :profile-id="item.id"/>
-          </td>
-          <td>
-            <BtnCheckProxy v-if="item.proxy" :proxy="item.proxy"/>
-            <span v-else>{{ 'disabled' }}</span>
-          </td>
-          <td>
-            {{ item.meta }}
-          </td>
-          <td>
-            <v-chip rounded variant="outlined" v-if="item.okexAccount">Okex</v-chip>
-          </td>
-          <td>{{ formatTime(item.createdAt) }}</td>
-          <td>
-            <EditProfile :profile-id="item.id" @updated="UpdateList"/>
-          </td>
-        </tr>
-        </tbody>
-      </v-table>
-      <!--      <CreateProfile :showProp="showCreateProfileDialog" @change="CreateProfileChange" @updated="UpdateList"/>-->
+          <v-row align="center">
+            <v-col cols="1">
+              <CheckBox style="height: 30px" density="compact" :id="item.id" focused
+                        @CheckboxChanged="CheckboxChanged"/>
+            </v-col>
+
+            <v-col>
+              <ProfileCard :label="item.num" :profile-id="item.id"/>
+            </v-col>
+            <v-col class="font-weight-bold" style="font-size: 12px" v-if="showWalletAddrs">{{
+                item.mmskId
+              }}
+            </v-col>
+            <v-col>
+              <i v-if="item.label">({{ item.label }})</i>
+            </v-col>
+            <v-col>
+              <BtnCheckProxy v-if="item.proxy" :proxy="item.proxy"/>
+            </v-col>
+            <v-col>
+              <EditProfile :profile-id="item.id" @updated="UpdateList"/>
+            </v-col>
+
+          </v-row>
+        </v-list-item>
+      </v-list>
     </div>
   </div>
 </template>
@@ -91,10 +79,12 @@ import ProfilesDocs from "@/components/profile/ProfilesDocs.vue";
 import ProfilesExport from "@/components/profile/ProfilesExport.vue";
 import Loader from "@/components/Loader.vue";
 import {formatTime} from "../helper";
+import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
   name: "Profiles",
   components: {
+    NavBar,
     Loader,
     ProfilesExport,
     ProfilesDocs,

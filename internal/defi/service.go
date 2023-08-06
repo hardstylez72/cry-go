@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/config"
 	"github.com/hardstylez72/cry/internal/traderjoe"
 	"github.com/pkg/errors"
@@ -69,10 +70,15 @@ func NewEVMClient(c *ClientConfig) (*EtheriumClient, error) {
 func (c *EtheriumClient) ResoleGas(ctx context.Context, gas *Gas, opt *bind.TransactOpts) *bind.TransactOpts {
 
 	if !gas.RuleSet() {
-		head, errHead := c.Cli.HeaderByNumber(ctx, nil)
-		if errHead == nil && head.BaseFee != nil {
-			opt.GasFeeCap = big.NewInt(0).Mul(head.BaseFee, big.NewInt(3))
+		if c.Cfg.Network == v1.Network_OPTIMISM {
+			opt.GasFeeCap = big.NewInt(150_000_000)
+		} else {
+			head, errHead := c.Cli.HeaderByNumber(ctx, nil)
+			if errHead == nil && head.BaseFee != nil {
+				opt.GasFeeCap = big.NewInt(0).Mul(head.BaseFee, big.NewInt(3))
+			}
 		}
+
 		return opt
 	}
 

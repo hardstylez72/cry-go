@@ -1,24 +1,22 @@
 <template>
   <v-app class="font">
+
     <v-navigation-drawer
       v-if="userLoggedIn"
-      :location="navBarLocation"
+      location="left"
+      v-model="drawer"
+      :permanent="!isMobile"
       expand-on-hover
-      permanent
-      :rail="rail"
-      @update:rail="railUpdated"
-      @click="rail = true"
     >
       <v-list-item
         prepend-avatar="/favicon-32x32.png"
         :title="userEmail"
         nav
-        @click="rail = false"
+        @click="goGeneral"
       >
         <div style="height: 20px" v-if="ass">Balance: {{ ass }}</div>
         <template v-slot:append>
           <v-btn
-            v-if="rail"
             variant="text"
             icon="mdi-logout"
             @click="logout"
@@ -29,48 +27,40 @@
       <v-divider/>
 
       <v-list density="compact" nav height="vh 90">
-        <v-list-item prepend-icon="mdi-home-floor-g" color="green" title="General" value="general"
-                     @click="$router.push({name: 'LandingPage'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-star-circle-outline" color="green" title="Modules" value="airdrops"
-                     @click="$router.push({name: 'Modules'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-star-circle-outline" color="green" title="Get started" value="getstarted"
-                     @click="$router.push({name: 'GetStarted'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-multiple-outline" color="green" title="Profiles" value="home"
+        <v-list-item prepend-icon="mdi-account-multiple-outline" color="green" title="Профили" value="home"
                      @click="$router.push({name: 'Profiles'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-cash-outline" color="green" title="Exchanges" value="Withdraw"
+        <v-list-item prepend-icon="mdi-account-cash-outline" color="green" title="Биржи" value="Withdraw"
                      @click="$router.push({name: 'Withdraw'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-hard-hat-outline" color="green" title="Constructor" value="Constructor"
+        <v-list-item prepend-icon="mdi-account-hard-hat-outline" color="green" title="Конструктор" value="Constructor"
                      @click="$router.push({name: 'Constructor'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-blender-outline" color="green" title="Processes" value="Processes"
+        <v-list-item prepend-icon="mdi-blender-outline" color="green" title="Процесы" value="Processes"
                      @click="$router.push({name: 'Processes'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-cog" title="Settings" color="green" value="Настройки"
+        <v-list-item prepend-icon="mdi-cog" title="Настройки" color="green" value="Настройки"
                      @click="$router.push({name: 'Settings'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-cash-multiple" title="Billing" color="green" value="Мани"
+        <v-list-item prepend-icon="mdi-cash-multiple" title="Биллинг" color="green" value="Мани"
                      @click="$router.push({name: 'Billing'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-information-outline" title="About" color="green" value="Обо мне"
-                     @click="$router.push({name: 'About'})"></v-list-item>
 
 
-        <div v-if="coc" class="h-auto py-4 pl-3">
+        <div class="h-auto py-4 pl-3">
           <div class="flex-column  justify-start">
 
             <a href="https://t.me/drop_hunter_alert_bot" target="_blank">
               <div style="height: 20px" class="d-inline-flex">
                 <v-img src="/icons/telegram.png"/>
-                <span class="ml-2">Bot</span>
+                <span class="ml-2">Бот</span>
               </div>
             </a>
             <br/>
             <a href="https://t.me/+WX8iCLaJBelhNTVi" target="_blank">
               <div style="height: 20px" class="d-inline-flex">
                 <v-img src="/icons/telegram.png"/>
-                <span class="ml-2">Support</span>
+                <span class="ml-2">Сообщество</span>
               </div>
             </a>
           </div>
 
 
-          <v-list-item v-if="coc" class="d-flex pt-8" style="font-size: 14px">
+          <v-list-item class="d-flex pt-8" style="font-size: 14px">
             <div v-if="impact.top">
               <i>{{ `24 Hour statistics` }}
                 <br/>
@@ -85,8 +75,8 @@
       </v-list>
 
     </v-navigation-drawer>
-    <v-main>
-      <Login v-if="!userLoggedIn" class="mt-4 mr-4" style="position: absolute; top: 0; right: 0; "/>
+
+    <v-main class="mt-7">
       <notifications/>
       <router-view/>
       <Snackbar/>
@@ -103,23 +93,29 @@ import {helperService} from "@/generated/services";
 import {mapActions, mapStores} from "pinia";
 import {useUserStore, useSysStore} from "@/plugins/pinia";
 import Snackbar from "@/components/Snackbar.vue";
+import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
+  name: 'App',
   components: {
+    NavBar,
     Snackbar,
-    Login,
     SideBar,
+    Login,
   },
   data() {
-    return {
-      drawer: true,
-      rail: true,
-      coc: false,
-    }
+
   },
   computed: {
-    navBarLocation(): "end" | "start" | "left" | "top" | "bottom" | "right" {
-      return 'left'
+    drawer: {
+      get() {
+        return this.userStore.drawer
+      },
+      set(v: boolean) {
+        this.userStore.$patch((s) => {
+          s.drawer = v
+        })
+      },
     },
     ...mapStores(useUserStore),
     impact() {
@@ -131,16 +127,17 @@ export default defineComponent({
     userEmail(): string {
       return this.userStore.email
     },
+    isMobile(): boolean {
+      return this.userStore.isMobile
+    },
     ass(): string {
       return this.userStore.ass
     },
     ...mapActions(useUserStore, ['syncUser', "syncDailyImpact"])
-
-
   },
   methods: {
-    railUpdated() {
-      this.coc = !this.coc
+    goGeneral() {
+      this.$router.push({name: 'LandingPage'})
     },
     logout() {
       document.cookie.split(";").forEach(function (c) {
@@ -151,8 +148,6 @@ export default defineComponent({
     }
   },
   async mounted() {
-
-
     const period = import.meta.env.DEV ? 60_000 : 5000
 
     await this.userStore.syncUser()
