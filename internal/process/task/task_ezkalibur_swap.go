@@ -70,11 +70,11 @@ func (t *EzkaliburSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 
 		estimation, err := EstimateEzkaliburSwapCost(taskContext, profile, p, client)
 		if err != nil {
-			return nil, errors.Wrap(err, "EstimateSyncSwapLPCost")
+			return nil, errors.Wrap(err, "EstimateEzkaliburSwapCost")
 		}
 		res, gas, err := EzkaliburSwap(taskContext, profile, p, client, estimation)
 		if err != nil {
-			return nil, errors.Wrap(err, "SyncSwapLP")
+			return nil, errors.Wrap(err, "EzkaliburSwap")
 		}
 
 		p.Tx = NewTx(res.Tx, gas)

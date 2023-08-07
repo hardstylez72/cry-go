@@ -70,11 +70,11 @@ func (t *VeSyncSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 
 		estimation, err := EstimateVeSyncSwapCost(taskContext, profile, p, client)
 		if err != nil {
-			return nil, errors.Wrap(err, "EstimateSyncSwapLPCost")
+			return nil, errors.Wrap(err, "EstimateVeSyncSwapCost")
 		}
 		res, gas, err := VeSyncSwap(taskContext, profile, p, client, estimation)
 		if err != nil {
-			return nil, errors.Wrap(err, "SyncSwapLP")
+			return nil, errors.Wrap(err, "VeSyncSwap")
 		}
 
 		p.Tx = NewTx(res.Tx, gas)

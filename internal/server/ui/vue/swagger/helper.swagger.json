@@ -304,6 +304,38 @@
         ]
       }
     },
+    "/api/gw/v1/support": {
+      "post": {
+        "operationId": "HelperService_SupportMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/SupportMessageRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SupportMessageReq"
+            }
+          }
+        ],
+        "tags": [
+          "HelperService"
+        ]
+      }
+    },
     "/api/gw/v1/user": {
       "post": {
         "operationId": "HelperService_GetUser",
@@ -658,6 +690,23 @@
           }
         }
       }
+    },
+    "SupportMessageReq": {
+      "type": "object",
+      "properties": {
+        "processId": {
+          "type": "string"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "SupportMessageRes": {
+      "type": "object"
     },
     "TaskHistoryRecord": {
       "type": "object",

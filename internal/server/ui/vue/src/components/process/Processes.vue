@@ -3,7 +3,7 @@
     <NavBar title="Процессы"/>
     <Loader v-if="loading"/>
     <div v-else>
-      <div class="d-flex flex-wrap">
+      <div class="d-flex flex-wrap ">
         <v-checkbox class="mx-2" color="blue" v-model="StatusReadyW" direction="horizontal" hide-details
                     density="compact">
           <template v-slot:label>
@@ -42,7 +42,10 @@
         </v-checkbox>
       </div>
 
-      <v-list max-width="96vw" class="px-5">
+      <div v-if="noProcesses" class="my-8 mx-8 text-center">
+        У вас нет активных процессов, можете создать новый в разделе "Конструктор"
+      </div>
+      <v-list v-else max-width="96vw" class="px-5">
         <v-list-item
           density="compact"
           variant="plain"
@@ -70,11 +73,9 @@
               </v-progress-linear>
             </div>
 
-            <div class="mr-2"><b>{{ `flow name: ${item.flowLabel}` }}</b></div>
-            <div class="mr-2">Created: {{ dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
-            <div class="mr-2">Updated: {{ dayjs(item.updatedAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
-
+            <div class="mr-2"><b>{{ `flow: ${item.flowLabel}` }}</b></div>
           </div>
+          <div class="mr-2">Created: {{ dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
           <div class="mr-2">Profiles: <b>[{{ getProfiles(item) }}]</b></div>
           <div><b>Flow:</b>
             <div class="mr-2" v-for="(d, i) in getFlow(item.flow)">
@@ -171,6 +172,9 @@ export default defineComponent({
     }
   },
   computed: {
+    noProcesses() {
+      return this.getList.length === 0
+    },
     showNext(): boolean {
       if (this.list.length === 0) {
         return false

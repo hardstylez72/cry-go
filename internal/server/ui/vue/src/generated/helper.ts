@@ -311,6 +311,28 @@ export class HelperService {
   /**
    *
    */
+  helperServiceSupportMessage(
+    params: {
+      /**  */
+      body: SupportMessageReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<SupportMessageRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/support';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   helperServiceGetUser(
     params: {
       /**  */
@@ -483,6 +505,19 @@ export interface Order {
   /**  */
   toWallet: string;
 }
+
+export interface SupportMessageReq {
+  /**  */
+  processId?: string;
+
+  /**  */
+  taskId?: string;
+
+  /**  */
+  text?: string;
+}
+
+export interface SupportMessageRes {}
 
 export interface TaskHistoryRecord {
   /**  */

@@ -1,8 +1,18 @@
 <template>
-  <v-dialog v-model="dialog" width="600px" height="auto" :close-on-back="false" :close-on-content-click="false"
+  <v-dialog v-model="dialog" min-width="350px" width="auto" height="auto" location="center"
+            :close-on-back="false"
+            :close-on-content-click="false"
             persistent="true">
     <template v-slot:activator="{ props }">
-      <v-btn @click="dialog = true" class="mb-4 mx-4">Генерация</v-btn>
+      <v-btn @click="dialog = true" class="mb-4 mx-4">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+          width="300px"
+          text="Позволяет быстро сгенерировать профили, удобно пользоваться в ознакомительных целях и не только"
+        />
+        Генерация
+      </v-btn>
     </template>
 
     <v-card>
@@ -12,9 +22,9 @@
         mandatory
         fixed-tabs
       >
-        <v-tab value="1">Number</v-tab>
+        <v-tab value="1">Количество</v-tab>
         <v-tab value="2">Proxy</v-tab>
-        <v-tab value="3">Label</v-tab>
+        <v-tab value="3">Названия</v-tab>
       </v-tabs>
 
       <v-form ref="form">
@@ -23,7 +33,7 @@
             <v-card>
               <v-card-text>
                 <v-text-field
-                  label="number of accounts to generate"
+                  label="сколько профилей генерировать"
                   variant="outlined"
                   type="number"
                   v-model="count"
@@ -31,19 +41,19 @@
                 />
               </v-card-text>
               <v-card-actions class="d-flex justify-end">
-                <v-btn @click="reset" variant="outlined">Cancel</v-btn>
-                <v-btn @click="tab='2'">Next</v-btn>
+                <v-btn @click="reset">Отмена</v-btn>
+                <v-btn @click="tab='2'" variant="flat">Далее</v-btn>
               </v-card-actions>
             </v-card>
           </v-window-item>
           <v-window-item value="2">
             <v-card-text>
               <v-checkbox
-                label="don't use proxy"
+                label="не использовать прокси"
                 v-model="noProxy"
               />
               <v-textarea
-                :label="`enter ${count} proxies in column`"
+                :label="`введите ${count} socks5 proxy колонкой`"
                 variant="outlined"
                 type="text"
                 :rules="[validateProxy]"
@@ -54,8 +64,8 @@
               />
             </v-card-text>
             <v-card-actions class="d-flex justify-end">
-              <v-btn @click="reset" variant="outlined">Cancel</v-btn>
-              <v-btn @click="tab='3'">Next</v-btn>
+              <v-btn @click="reset">Отмена</v-btn>
+              <v-btn @click="tab='3'" variant="flat">Далее</v-btn>
             </v-card-actions>
           </v-window-item>
 
@@ -84,8 +94,8 @@
               />
             </v-card-text>
             <v-card-actions class="d-flex justify-end">
-              <v-btn @click="reset" variant="outlined">Cancel</v-btn>
-              <v-btn @click="generate" variant="flat">Generate</v-btn>
+              <v-btn @click="reset" variant="outlined">Отмена</v-btn>
+              <v-btn @click="generate" variant="flat">Генерация</v-btn>
             </v-card-actions>
           </v-window-item>
         </v-window>

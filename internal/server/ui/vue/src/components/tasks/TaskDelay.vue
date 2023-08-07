@@ -14,46 +14,46 @@
         </v-checkbox>
       </v-row>
       <v-row v-if="!random">
-        <v-text-field
-          ref="delay-form"
-          density="compact"
-          variant="outlined"
-          v-on:change="inputChanged"
-          label="Duration in seconds"
-          :rules="[required]"
+
+
+        <v-slider
           v-model="duration"
-          :disabled="disabled || random"
-          :messages="getDuration"
-        />
+          density="compact"
+          label="Фиксированная задержка"
+          :min="1"
+          step="1"
+          :max="1800"
+          persistent-hint
+          center-affix
+          thumb-label="always"
+          hide-details
+          :disabled="disabled"
+        >
+          <template v-slot:thumb-label="{ modelValue }">
+            <div style="width: 80px" class="text-center">{{ humanDuration(modelValue) }}</div>
+          </template>
+        </v-slider>
       </v-row>
 
       <v-row v-if="random">
-        <v-col>
-          <v-text-field
-            ref="delay-form"
-            density="compact"
-            variant="outlined"
-            v-on:change="inputChanged"
-            label="min duration in seconds"
-            :rules="[required]"
-            v-model="minRandom"
-            :disabled="disabled"
-            :messages="humanDuration(minRandom)"
-          />
-        </v-col>
-        <v-col>
-          <v-text-field
-            ref="delay-form"
-            density="compact"
-            variant="outlined"
-            v-on:change="inputChanged"
-            label="max duration in seconds"
-            :rules="[required]"
-            v-model="maxRandom"
-            :disabled="disabled"
-            :messages="humanDuration(maxRandom)"
-          />
-        </v-col>
+        <v-range-slider
+          v-model="randomRange"
+          density="compact"
+          label="Рандомная задержка"
+          :min="1"
+          step="10"
+          :max="1800"
+          persistent-hint
+          center-affix
+          thumb-label="always"
+          hide-details
+          :disabled="disabled"
+        >
+          <template v-slot:thumb-label="{ modelValue }">
+            <div style="width: 80px" class="text-center">{{ humanDuration(modelValue) }}
+            </div>
+          </template>
+        </v-range-slider>
       </v-row>
     </v-container>
   </v-card-actions>
@@ -95,15 +95,11 @@ export default defineComponent({
         this.$emit('taskChanged', this.getTask())
       },
     },
-    minRandom: {
+    randomRange: {
       handler() {
         this.$emit('taskChanged', this.getTask())
       },
-    },
-    maxRandom: {
-      handler() {
-        this.$emit('taskChanged', this.getTask())
-      },
+      deep: true
     },
     task: {
       handler(b, a) {
@@ -119,8 +115,7 @@ export default defineComponent({
     return {
       duration: "0",
       random: true,
-      minRandom: '180',
-      maxRandom: '300',
+      randomRange: [180, 300] as Array<Number>
     }
   },
   methods: {
@@ -132,8 +127,8 @@ export default defineComponent({
         delayTask: {
           duration: this.duration ? this.duration : '0',
           random: this.random,
-          minRandom: this.minRandom,
-          maxRandom: this.maxRandom,
+          minRandom: this.randomRange[0],
+          maxRandom: this.randomRange[1],
         },
         taskType: TaskType.Delay,
         description: ""
@@ -160,16 +155,11 @@ export default defineComponent({
           const t = this.task.delayTask
           this.duration = t.duration
           this.random = t.random
-          this.minRandom = t.minRandom ? t.minRandom : this.minRandom
-          this.maxRandom = t.maxRandom ? t.maxRandom : this.maxRandom
+          this.randomRange[0] = t.minRandom ? Number(t.minRandom) : Number(this.minRandom)
+          this.randomRange[1] = t.maxRandom ? Number(t.maxRandom) : Number(this.maxRandom)
           this.$emit('taskChanged', this.getTask())
         }
       }
-    }
-  },
-  computed: {
-    getDuration(): string {
-      return humanDuration(this.duration)
     }
   },
   created() {

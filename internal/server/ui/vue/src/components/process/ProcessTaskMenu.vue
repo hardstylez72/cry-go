@@ -48,25 +48,18 @@
           <component :is="getTaskMenuComponent" :task="task.task" :status="task.status"/>
           <br/>
           <div v-if="getRecords.length > 0">History:</div>
-          <v-skeleton-loader
-            :loading="historyLoading"
-            type="article"
-          >
-            <v-responsive>
 
-              <div v-for="record in getRecords" :key="record.id">
-                <v-divider/>
-                {{ `${dayjs(record.startedAt).format('YYYY-MM-DD HH:mm:ss')}` }}
-                <StatusCard :status="record.startStatus" :size="'compact'"/>
-                ->
-                <StatusCard :msg="record.msg" :size="'compact'"
-                            :status="record.finishStatus ? record.finishStatus : ProcessStatus.StatusReady"/>
-              </div>
-              <div v-if="showHistoryDots">
-                <v-icon icon="mdi-dots-horizontal" @click="expandHistory = true"/>
-              </div>
-            </v-responsive>
-          </v-skeleton-loader>
+          <div v-for="record in getRecords" :key="record.id">
+            <v-divider/>
+            {{ `${dayjs(record.startedAt).format('YYYY-MM-DD HH:mm:ss')}` }}
+            <StatusCard :status="record.startStatus" :size="'compact'"/>
+            ->
+            <StatusCard :msg="record.msg" :size="'compact'"
+                        :status="record.finishStatus ? record.finishStatus : ProcessStatus.StatusReady"/>
+          </div>
+          <div v-if="showHistoryDots">
+            <v-icon icon="mdi-dots-horizontal" @click="expandHistory = true"/>
+          </div>
 
           <div v-if="getTransactions.length > 0">
             Transactions:
@@ -81,6 +74,7 @@
 
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
+          <Support :process-id="processId" :task-id="task.id"/>
           <v-btn v-if="errorHappen(task)" @click="retry(task, ppId)" :loading="retryLoading">Retry</v-btn>
           <v-btn v-if="skipable()" @click="skip(task, ppId)" :loading="skippingTask">Skip</v-btn>
           <EstimateTask v-if="estimatedTaskMap.get(task.task.taskType)" :task-id="task.id" :profile-id="profileId"
@@ -102,10 +96,11 @@ import {Delay, formatTime, GetStatusColor, GetStatusText} from "@/components/hel
 import dayjs from "dayjs";
 import {estimatedTaskMap, menuTaskComponentMap} from '@/components/tasks/tasks'
 import EstimateTask from "@/components/tasks/menu/EstimateTask.vue";
+import Support from "@/components/Support.vue";
 
 export default defineComponent({
   name: "ProcessTaskMenu",
-  components: {EstimateTask, StatusCard, ViewFlow},
+  components: {Support, EstimateTask, StatusCard, ViewFlow},
   watch: {
     menu: {
       handler(a, b) {

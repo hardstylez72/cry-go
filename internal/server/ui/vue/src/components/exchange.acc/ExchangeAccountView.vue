@@ -1,67 +1,60 @@
 <template>
   <v-container>
     <NavBar :title="`Биржевой аккаунт ${withdrawer.label}`"/>
-    <v-skeleton-loader
-      width="100%"
-      :loading="loading"
-      type="table"
-    >
-      <v-responsive>
-        <v-card>
-          <v-card-text>
+    <Loader v-if="loading"/>
+    <v-card v-else>
+      <v-card-text>
 
-            <v-form ref="formm">
-              <v-row>
-                <v-col><b>Status</b>: {{ withdrawerStatus }}</v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <v-text-field
-                    ref="label-input"
-                    v-model="withdrawer.label"
-                    label="label"
-                    density="comfortable"
-                    variant="outlined"
-                    :rules="labelRules()"
-                    @input="labelChanged"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <ProxyInput v-model="withdrawer.proxy" :required="true"/>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <div class="d-flex justify-center my-2 mb-5">
-                    <v-btn width="100%" v-if="WithdrawerChanged" class="my-3" :loading="updating" @click="update">Update
-                    </v-btn>
-                    <div v-if="updatingError">{{ updatingError }}</div>
-                  </div>
-                </v-col>
+        <v-form ref="formm">
+          <v-row>
+            <v-col><b>Status</b>: {{ withdrawerStatus }}</v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                ref="label-input"
+                v-model="withdrawer.label"
+                label="label"
+                density="comfortable"
+                variant="outlined"
+                :rules="labelRules()"
+                @input="labelChanged"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <ProxyInput v-model="withdrawer.proxy" :required="true"/>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <div class="d-flex justify-center my-2 mb-5">
+                <v-btn width="100%" v-if="WithdrawerChanged" class="my-3" :loading="updating" @click="update">Update
+                </v-btn>
+                <div v-if="updatingError">{{ updatingError }}</div>
+              </div>
+            </v-col>
 
-              </v-row>
-            </v-form>
+          </v-row>
+        </v-form>
 
-            <v-expansion-panels v-if="withdrawer.exchangeType === ExchangeType.Okex" variant="accordion" multiple>
-              <v-expansion-panel
-                title="Add sub account"
-              >
-                <v-expansion-panel-text>
-                  <CreateWithdrawerSubAcc :id="withdrawerId" @withdrawer-created="List"/>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-              <v-expansion-panel v-for="sub in subaccs" :title="`Sub account: ${sub.label}`">
-                <v-expansion-panel-text>
-                  <b class="d-flex justify-center">Okex deposit sub-acc addresses</b>
-                  <OkexWithdrawOptionSubAcc :id="sub.id"/>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
+        <v-expansion-panels v-if="withdrawer.exchangeType === ExchangeType.Okex" variant="accordion" multiple>
+          <v-expansion-panel
+            title="Добавить суб-аккаунт"
+          >
+            <v-expansion-panel-text>
+              <CreateWithdrawerSubAcc :id="withdrawerId" @withdrawer-created="List"/>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+          <v-expansion-panel v-for="sub in subaccs" :title="`Суб-аккаунт: ${sub.label}`">
+            <v-expansion-panel-text>
+              <b class="d-flex justify-center">Адреса депозитных суб-аккаунтов</b>
+              <OkexWithdrawOptionSubAcc :id="sub.id"/>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
 
-          </v-card-text>
-        </v-card>
-      </v-responsive>
-    </v-skeleton-loader>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 
@@ -83,6 +76,7 @@ import ProfileSearch from "@/components/profile/ProfileSearch.vue";
 import {Profile} from "@/generated/profile";
 import {Timer} from "@/components/helper";
 import NavBar from "@/components/NavBar.vue";
+import Loader from "@/components/Loader.vue";
 
 interface Network {
   network: string
@@ -126,6 +120,7 @@ export default defineComponent({
     }
   },
   components: {
+    Loader,
     NavBar,
     ProfileSearch,
     CreateWithdrawerSubAcc,

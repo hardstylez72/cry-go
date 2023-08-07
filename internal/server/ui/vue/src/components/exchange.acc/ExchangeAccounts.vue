@@ -3,42 +3,63 @@
     <NavBar title="Биржи">
       <template v-slot:default class="d-flex justify-end ma-3">
         <ExchangeAccountDocs class="mr-3"/>
-        <v-btn v-if="selectedSome" color="black" @click=DeleteWithdrawers class="mr-3">Удалить
+        <v-btn v-if="selectedSome" color="black" variant="flat" @click=DeleteWithdrawers class="mr-3">Удалить
         </v-btn>
-        <v-btn @click=CreateWithdrawer class="mr-3">Добавить</v-btn>
+        <v-btn v-else @click=CreateWithdrawer variant="flat" :class="noAccounts ? 'onboarding mx-2 my-2' : `mx-2 my-2`">
+          Добавить
+        </v-btn>
       </template>
     </NavBar>
     <Loader v-if="loading"/>
     <div v-else>
 
 
-      <v-table fixed-header height="90vh">
-        <thead>
-        <tr>
-          <th></th>
-          <th class="text-left">Label</th>
-          <th class="text-left">Exchange</th>
-          <th class="text-left">Proxy</th>
-          <th class="text-left">Options</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in getList" :key="item.id">
-          <td>
-            <CheckBox style="height: 40px" density="compact" :id="item.id" focused
-                      @CheckboxChanged="CheckboxChanged"></CheckBox>
-          </td>
-          <td>{{ item.label }}</td>
-          <td>{{ item.exchangeType }}</td>
-          <td>
-            <BtnCheckProxy v-if="item.proxy" :proxy="item.proxy"/>
-            <span v-else>{{ 'disabled' }}</span></td>
-          <td>
-            <v-btn @click="$router.push({name:'ExchangeAccountView', query: {wId: item.id}})">view</v-btn>
-          </td>
-        </tr>
-        </tbody>
-      </v-table>
+      <div v-if="noAccounts" class="my-8 mx-8 text-center">
+        Для удобного пополнения/депозита "кошельков" привязанных к профилям можно добавить аккаунты бирж okex/binance.
+        Это займет больше времени чем создание профилей, потому что сначала необходимо создать API ключи на биржах и
+        настроить их.
+        <a href="/docs/binance_account_instruction" target="_blank">инструкция для binance</a>,
+        <a href="/docs/okex_account_instruction" target="_blank">инструкция для okex</a>
+
+      </div>
+
+      <v-list v-else max-width="96vw" class="px-5" nav="true">
+        <v-list-item
+          density="compact"
+          variant="plain"
+          class="my-0"
+          v-for="item in getList"
+          :key="item.id"
+          rounded
+          height="auto"
+          width="auto"
+          elevation="1"
+          style="border: 0px solid "
+        >
+
+          <v-row align="center">
+            <v-col cols="1">
+              <CheckBox style="height: 30px" density="compact" :id="item.id" focused
+                        @CheckboxChanged="CheckboxChanged"/>
+            </v-col>
+
+            <v-col>
+              <b v-if="item.label">{{ item.label }}</b>
+            </v-col>
+            <v-col>
+              <b>{{ item.exchangeType }}</b>
+            </v-col>
+            <v-col>
+              <BtnCheckProxy v-if="item.proxy" :proxy="item.proxy"/>
+            </v-col>
+            <v-col>
+              <v-btn density="compact" @click="viewAccount(item.id)">View</v-btn>
+            </v-col>
+
+          </v-row>
+        </v-list-item>
+      </v-list>
+
       <CreateWithdraw :showProp="showCreateWithdrawerDialog" @change="CreateWithdrawerChange"
                       @profileCreated="UpdateList"/>
     </div>
@@ -81,6 +102,9 @@ export default defineComponent({
     }
   },
   computed: {
+    noAccounts() {
+      return this.getList.length === 0
+    },
     ExchangeType() {
       return ExchangeType
     },
@@ -92,6 +116,9 @@ export default defineComponent({
     }
   },
   methods: {
+    viewAccount(id: string) {
+      this.$router.push({name: 'ExchangeAccountView', query: {wId: id}})
+    },
     CheckboxChanged(id: string, value: boolean) {
       if (value) {
         this.selected.add(id)

@@ -5,7 +5,7 @@ const routes = [
   {
     name: 'Modules',
     path: '/modules',
-    component: () => import('@/components/modules/General.vue'),
+    component: () => import('@/components/landing/modules/General.vue'),
   },
   {
     name: 'About',
@@ -62,9 +62,6 @@ const routes = [
     name: 'Settings',
     path: '/settings',
     component: () => import('@/components/settings/Settings.vue'),
-    props: {
-      id: String,
-    }
   },
   {
     name: 'CreateFlow',

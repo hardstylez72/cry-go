@@ -12,11 +12,10 @@
   >
     <template v-slot:append>
 
-      <v-tooltip text="Tooltip">
+      <v-tooltip text="Ограничение максимальной стоимости транзакции после использования мультипликатора">
         <template v-slot:activator="{ props }">
           <v-icon v-bind="props" icon="mdi-information-outline"></v-icon>
         </template>
-
       </v-tooltip>
 
 

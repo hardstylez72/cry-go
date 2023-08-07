@@ -16,7 +16,7 @@
           <v-icon v-bind="props" icon="mdi-information-outline"></v-icon>
         </template>
         <div>
-          Gas multiplier allows to decrease blockchain gas price.
+          Мультипликатор газа, позволяет уменьшать газ за странзакцию.
           <br/>
           GAS = ESTIMATED_GAS * GAS_MULTIPLIER
           <br/>

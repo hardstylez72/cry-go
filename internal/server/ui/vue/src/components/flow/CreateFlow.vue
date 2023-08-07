@@ -2,8 +2,10 @@
   <NavBar title="Создание сценария">
     <template v-slot:default>
       <v-btn
+        :class="demo ? 'onboarding' : ''"
         :disabled="saveLoading"
         :loading="saveLoading"
+        variant="flat"
         @click="CreateFlow">
         Сохранить
       </v-btn>
@@ -12,7 +14,7 @@
   <v-card>
     <v-card-text>
       <v-form validate-on="submit" ref="flow-form">
-        <FlowForm @flow-changed="flowChanged"/>
+        <FlowForm @flow-changed="flowChanged" :demo="demo"/>
       </v-form>
     </v-card-text>
   </v-card>
@@ -32,6 +34,7 @@ export default defineComponent({
   components: {NavBar, FlowForm},
   data() {
     return {
+      demo: false,
       tasks: [] as Task[],
       stepTypes: taskTypes,
       show: this.showProp,
@@ -70,8 +73,13 @@ export default defineComponent({
       } finally {
         this.saveLoading = false
       }
-
     },
+  },
+  created() {
+    const s = this.$route.query.demo
+    if (s !== null && !Array.isArray(s)) {
+      this.demo = Boolean(s)
+    }
   }
 })
 

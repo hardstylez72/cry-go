@@ -3,15 +3,19 @@
     <NavBar title="Сценарии">
       <template v-slot:default>
         <div class="d-flex justify-end">
-          <v-btn @click=CreateFlow class="ma-3">Добавить</v-btn>
+          <v-btn @click=CreateFlow :class="noFlow ? 'onboarding ma-3' : 'ma-3'" variant="flat">Добавить</v-btn>
         </div>
       </template>
     </NavBar>
     <Loader v-if="loading"/>
     <div v-else>
 
-
-      <v-list max-width="96vw" class="px-5">
+      <div v-if="noFlow" class="my-8 mx-8 text-center">
+        Для создания сценария вам потребуются профили, если вы уже завели профили - нажмите добавить, для вас будет
+        пре-заполнен демонстрационный
+        бесплатный сценарий
+      </div>
+      <v-list v-else max-width="96vw" class="px-5">
         <v-list-item
           density="compact"
           variant="plain"
@@ -65,6 +69,9 @@ export default defineComponent({
     }
   },
   computed: {
+    noFlow() {
+      return this.getList.length === 0
+    },
     getList(): Flow[] {
       return this.list
     },
@@ -106,7 +113,11 @@ export default defineComponent({
 
     },
     CreateFlow() {
-      this.$router.push({name: 'CreateFlow'})
+      if (this.noFlow) {
+        this.$router.push({name: 'CreateFlow', query: {demo: true}})
+      } else {
+        this.$router.push({name: 'CreateFlow'})
+      }
     },
   },
   created() {

@@ -2,8 +2,8 @@
   <v-container>
     <NavBar title="Настройки">
       <template v-slot:default>
-        <v-btn v-if="settingsChanged" @click=Update :loading="updating" class="ma-3">Update</v-btn>
-        <v-btn @click=Reset :loading="reseting" class="ma-3">Reset</v-btn>
+        <v-btn v-if="settingsChanged" variant="flat" @click=Update :loading="updating" class="ma-3">Обновить</v-btn>
+        <v-btn @click=Reset variant="flat" :loading="reseting" class="ma-3">Сброс</v-btn>
       </template>
     </NavBar>
     <Loader v-if="loading"/>
@@ -150,9 +150,9 @@ export default defineComponent({
         const res = await settingsService.settingsServiceUpdateSettings({body: {settings: this.settings}})
         this.settings = res.settings
         this.orgiSettings = Object.assign({}, this.settings)
-        this.sysStore.showSnackBar("settings updated", false)
+        this.sysStore.showSnackBar("Настройки обновлены", false)
       } catch (e) {
-        this.sysStore.showSnackBar("settings update error", true)
+        this.sysStore.showSnackBar("Ошибка при обновлении настроек", true)
       } finally {
         this.updating = false
       }

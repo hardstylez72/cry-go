@@ -70,6 +70,22 @@ service HelperService {
       body: "*"
     };
   }
+  rpc SupportMessage(SupportMessageReq) returns (SupportMessageRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/support",
+      body: "*"
+    };
+  }
+}
+
+message SupportMessageReq {
+  optional string process_id = 1;
+  optional string task_id = 2;
+  optional string text = 3;
+}
+
+message SupportMessageRes {
+
 }
 
 message TransactionsDailyImpactReq {

@@ -53,10 +53,10 @@
 <script lang="ts">
 
 import {defineComponent} from 'vue';
-import Zksync from "@/components/modules/Zksync.vue";
-import Snapshot from "@/components/modules/Snapshot.vue";
-import Orbiter from "@/components/modules/Other.vue";
-import LayerZero from "@/components/modules/LayerZero.vue";
+import Zksync from "@/components/landing/modules/Zksync.vue";
+import Snapshot from "@/components/landing/modules/Snapshot.vue";
+import Orbiter from "@/components/landing/modules/Other.vue";
+import LayerZero from "@/components/landing/modules/LayerZero.vue";
 import NavBar from "@/components/NavBar.vue";
 
 

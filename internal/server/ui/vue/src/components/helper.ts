@@ -92,7 +92,7 @@ export const formatTime = (d: Date): string => {
   return dayjs(d).utc().tz(tz, false).format('YYYY-MM-DD HH:mm:ss')
 }
 
-export const humanDuration = (s?: string): string => {
+export const humanDuration = (s?: string | Number): string => {
   let totalSeconds = Number(s)
   const hours = Math.floor(totalSeconds / 3600);
   totalSeconds %= 3600;

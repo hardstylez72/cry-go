@@ -9,16 +9,16 @@
           color="primary"
           v-bind="props"
         >
-          
+
           <v-icon icon="mdi-information-outline"/>
         </v-btn>
       </template>
       <v-card>
         <v-card-title>
-          <span class="text-h5">What is exchange account?</span>
+          <span class="text-h5">Аккаунты бирж</span>
         </v-card-title>
         <v-card-text>
-          <b>Exchange account</b> is a account of binance/okex/bybit decentralized crypto exchange (DEX).
+          <b>Exchange account</b> is a account of binance/okex crypto exchange.
           <br/>
           <br/>
           <b>Purpose</b> - it is needed to make withdraw and deposit easier. You can make these processes completely
@@ -30,7 +30,7 @@
           transfer from okex -> binance. Repeat as many times as you want.
           <br/>
           <br/>
-          Supported DEX:
+          Supported:
           <ul>
             <li><b>Binance</b>
               - withdraw only

@@ -124,6 +124,10 @@ export default defineComponent({
     },
   },
   props: {
+    demo: {
+      type: Boolean,
+      required: false,
+    },
     disable: {
       type: Boolean as PropType<boolean>,
       required: false,
@@ -230,6 +234,47 @@ export default defineComponent({
           taskType: v.taskType,
         })
       })
+    }
+
+    if (this.demo) {
+      this.label = 'demo'
+
+      this.tasks.push({
+        component: taskComponentMap.get(TaskType.Delay),
+        weight: 1,
+        taskType: TaskType.Delay,
+        task: {
+          taskType: TaskType.Delay,
+          weight: 1,
+          delayTask: {
+            duration: 2,
+          }
+        }
+      });
+      this.tasks.push({
+        component: taskComponentMap.get(TaskType.Delay),
+        weight: 2,
+        taskType: TaskType.Delay,
+        task: {
+          taskType: TaskType.Delay,
+          weight: 2,
+          delayTask: {
+            duration: 2,
+          }
+        }
+      });
+      this.tasks.push({
+        component: taskComponentMap.get(TaskType.Delay),
+        weight: 3,
+        taskType: TaskType.Delay,
+        task: {
+          taskType: TaskType.Delay,
+          weight: 1,
+          delayTask: {
+            duration: 2,
+          }
+        }
+      });
     }
   }
 })

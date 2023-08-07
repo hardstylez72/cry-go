@@ -16,10 +16,20 @@ import {md3} from 'vuetify/blueprints'
 import {VSkeletonLoader} from "vuetify/labs/VSkeletonLoader";
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 
-const myCustomLightTheme: ThemeDefinition = {
+export const myCustomLightTheme: ThemeDefinition = {
   dark: false,
   colors: {
     background: '#FFF3E0',
+    surface: '#FFF3E0',
+    primary: '#1D5D9B',
+    secondary: '#75C2F6',
+  },
+}
+
+export const myCustomDarkTheme: ThemeDefinition = {
+  dark: true,
+  colors: {
+    background: '#000000',
     surface: '#FFF3E0',
     primary: '#1D5D9B',
     secondary: '#75C2F6',
@@ -33,6 +43,7 @@ export default createVuetify({
     defaultTheme: 'myCustomLightTheme',
     themes: {
       myCustomLightTheme,
+      myCustomDarkTheme
     },
   },
 })

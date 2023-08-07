@@ -58,6 +58,8 @@ func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, n
 				if err := updater.UpdateTask(ctx, task); err != nil {
 					return err
 				}
+				// бывает сеть перегружена, чтобы не спамить
+				time.Sleep(time.Second * 30)
 			}
 			return err
 		}

@@ -1,12 +1,10 @@
 <template>
   <v-app class="font">
-
     <v-navigation-drawer
       v-if="userLoggedIn"
       location="left"
       v-model="drawer"
       :permanent="!isMobile"
-      expand-on-hover
     >
       <v-list-item
         prepend-avatar="/favicon-32x32.png"
@@ -14,7 +12,7 @@
         nav
         @click="goGeneral"
       >
-        <div style="height: 20px" v-if="ass">Balance: {{ ass }}</div>
+        <div style="height: 20px; font-size: 14px" v-if="ass">Баланс: {{ ass }}</div>
         <template v-slot:append>
           <v-btn
             variant="text"
@@ -24,9 +22,13 @@
         </template>
       </v-list-item>
 
+      <v-list-item>
+        <v-btn @click="toggleTheme">toggle theme</v-btn>
+      </v-list-item>
+
       <v-divider/>
 
-      <v-list density="compact" nav height="vh 90">
+      <v-list density="compact" height="vh 90" nav="true">
         <v-list-item prepend-icon="mdi-account-multiple-outline" color="green" title="Профили" value="home"
                      @click="$router.push({name: 'Profiles'})"></v-list-item>
         <v-list-item prepend-icon="mdi-account-cash-outline" color="green" title="Биржи" value="Withdraw"
@@ -57,16 +59,21 @@
                 <span class="ml-2">Сообщество</span>
               </div>
             </a>
+            <span class="d-inline-flex">
+              <v-icon icon="mdi-email-edit-outline" color="blue"/>
+            <Support/>
+            </span>
+
           </div>
 
 
           <v-list-item class="d-flex pt-8" style="font-size: 14px">
             <div v-if="impact.top">
-              <i>{{ `24 Hour statistics` }}
+              <i>{{ `Статистика за 24 часа` }}
                 <br/>
-                <div>{{ ` total - ${impact.total} tx` }}</div>
-                <div>{{ ` top - ${impact.top} tx` }}</div>
-                <div>{{ ` me - ${impact.my} tx` }}</div>
+                <div>{{ ` Всего - ${impact.total} транзакций` }}</div>
+                <div>{{ ` Лидер - ${impact.top} транзакций` }}</div>
+                <div>{{ ` Я - ${impact.my} транзакций` }}</div>
               </i>
             </div>
           </v-list-item>
@@ -94,10 +101,14 @@ import {mapActions, mapStores} from "pinia";
 import {useUserStore, useSysStore} from "@/plugins/pinia";
 import Snackbar from "@/components/Snackbar.vue";
 import NavBar from "@/components/NavBar.vue";
+import Support from "@/components/Support.vue";
+import {ThemeInstance} from 'vuetify'
+import {myCustomLightTheme} from "@/plugins/vuetify";
 
 export default defineComponent({
   name: 'App',
   components: {
+    Support,
     NavBar,
     Snackbar,
     SideBar,
@@ -136,6 +147,11 @@ export default defineComponent({
     ...mapActions(useUserStore, ['syncUser', "syncDailyImpact"])
   },
   methods: {
+    toggleTheme() {
+      const theme = this.$vuetify.theme
+      console.log(theme)
+      theme.global.current.name = 'dark'
+    },
     goGeneral() {
       this.$router.push({name: 'LandingPage'})
     },
@@ -148,6 +164,11 @@ export default defineComponent({
     }
   },
   async mounted() {
+    const theme = this.$vuetify.theme
+    console.log(theme.global.current)
+    theme.global.current.dark = false
+    console.log(theme.global.current.colors.bgBlue)
+    theme.global.current.colors.bgRed = true
     const period = import.meta.env.DEV ? 60_000 : 5000
 
     await this.userStore.syncUser()
@@ -176,4 +197,20 @@ export default defineComponent({
   /*font-size: 16px;*/
 }
 
+
+.onboarding {
+  border: none; /* Убираем рамку */
+  animation: flip 2s infinite;
+}
+
+@keyframes flip {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+}
 </style>

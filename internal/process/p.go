@@ -101,9 +101,9 @@ func (d *Dispatcher) StartProcess(processId string) {
 }
 func (d *Dispatcher) KillProcess(ctx context.Context, processId string) error {
 
-	if err := d.StopProcess(ctx, processId); err != nil {
-		return err
-	}
+	//if err := d.StopProcess(ctx, processId); err != nil {
+	//	return err
+	//}
 
 	if err := d.r.DeleteProcess(context.Background(), processId); err != nil {
 		return err
@@ -143,8 +143,6 @@ func (d *Dispatcher) StopProcess(ctx context.Context, processId string) error {
 		case <-ticker.C:
 		}
 	}
-
-	return nil
 }
 func (d *Dispatcher) ResolvePStatus(ctx context.Context, processId string, l *zap.SugaredLogger) (*v1.ProcessStatus, error) {
 

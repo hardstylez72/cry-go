@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	delayBeforePPTask = time.Second * 10
+	delayBeforePPTask = time.Second * 20
 	maxTaskRetry      = 3
 )
 
@@ -106,6 +106,9 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 		return err
 	}
 
+	result := make(chan ExecutorResult)
+	defer close(result)
+
 	retryCount := 0
 	for {
 
@@ -119,8 +122,6 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 		if err != nil {
 			return err
 		}
-
-		result := make(chan ExecutorResult)
 
 		go func() {
 

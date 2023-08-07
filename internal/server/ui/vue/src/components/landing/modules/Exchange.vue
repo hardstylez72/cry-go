@@ -51,7 +51,7 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Full support of all withdrawals available on pff site + multi-sub-account deposit support',
           quest: '',
-          img: '/icons/binance.ico'
+          img: '/icons/okx.png'
         },
         {
           name: 'Binance',
@@ -59,7 +59,7 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Full support of all withdrawals available on pff site',
           quest: '',
-          img: '/icons/okx.png',
+          img: '/icons/binance.ico',
         },
       ],
     }

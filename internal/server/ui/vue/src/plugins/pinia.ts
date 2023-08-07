@@ -44,8 +44,8 @@ export const useUserStore = defineStore('user', {
         this.$patch((state) => {
           state.login = true
           state.email = res.email
-          state.ass = Number(res.funds).toPrecision(6) + " USD"
-          state.taskPrice = Number(res.taskPrice).toPrecision(2) + " USD"
+          state.ass = Number(res.funds).toFixed(2) + " USD"
+          state.taskPrice = Number(res.taskPrice).toFixed(2) + " USD"
           state.payableTasks = res.payableTasks
           state.nonpayableTasks = res.nonpayableTasks
         })

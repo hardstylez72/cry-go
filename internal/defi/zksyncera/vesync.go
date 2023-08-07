@@ -112,7 +112,7 @@ func (c *Client) makeVeSyncSwapData(ctx context.Context, req *defi.DefaultSwapRe
 	}
 	if req.FromToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, defi.SlippagePercent001)
+		amOut = defi.Slippage(amOut, defi.SlippagePercent01)
 		return abiVeSyncrouter.Pack("swapExactETHForTokens", amOut, path, w.WalletAddr, DefaultDeadLine())
 
 	} else if req.ToToken == v1.Token_ETH {

@@ -2,8 +2,51 @@
   <div class="mx-8 my-8" style="min-height: 500px">
     <v-container>
       <NavBar title="Добавление профилей"/>
-      <v-btn :loading="loading" @click="validate" class="mb-4 mx-4">Проверить</v-btn>
-      <v-btn v-if="!demo" :loading="loading" @click="save" class="mb-4 mx-4">Добавить</v-btn>
+      <div class="pb-5 font-italic text-pre-wrap text-break">
+        <p>
+          При создании профиля рекомендуется указывать socks5 proxy, если прокси указан -
+          вся активность по профилю будет совершаться через прокси.
+          Это повышает анонимность и уменьшает риск стать сибилом.
+        </p>
+        <br/>
+        <div>Форма для ввода ниже позволяет импортировать профили в формате CSV.</div>
+        <br/>
+        <div> каждая строка должна быть вида:
+          "приватный ключ (обязательно)", "socks5 proxy (опционально)", "название (опционально)"
+        </div>
+        <ul>
+
+
+          Допустимые варианты ввода:
+          <li> eee5112gd2433f855896002e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa, "123.456.67.89:5436:login:password",
+            "profile_1" - все поля заданы
+          </li>
+          <li>eee5112gd2433f855896002e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa, "",
+            "profile_1" - прокси не задан
+          </li>
+          <li>eee5112gd2433f855896002e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa, "", "" - задан только приватный ключ
+          </li>
+        </ul>
+      </div>
+
+      <v-btn :loading="loading" @click="validate" class="mb-4 mx-4">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+          width="300px"
+          text="Валидирует форму, полезна для проверки работоспособности прокси и корректности ввода приватных ключей"
+        />
+        Валидация
+      </v-btn>
+      <v-btn v-if="!demo" :loading="loading" @click="save" :class="needSave ? 'onboarding mb-4 mx-4': 'mb-4 mx-4'">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+          width="300px"
+          text="Последовательное добавление профилей из формы ввода на сервис"
+        />
+        Добавить
+      </v-btn>
 
       <GenerationProfiles @generated="generated" :demo="demo"/>
       <v-textarea
@@ -62,7 +105,7 @@ export default defineComponent({
   name: "CreateProfile",
   data() {
     return {
-
+      needSave: false,
       loading: false,
       mode: '',
       dialog: false,
@@ -79,6 +122,7 @@ export default defineComponent({
   },
   methods: {
     generated(text: string) {
+      this.needSave = true
       this.text = text
     },
     getStatusColor(item: Item): string {
@@ -105,6 +149,7 @@ export default defineComponent({
       this.dialog = false
     },
     async save() {
+      this.needSave = false
       this.loading = true
       this.mode = 'validate and save'
       this.items = []

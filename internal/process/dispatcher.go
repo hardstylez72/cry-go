@@ -215,7 +215,7 @@ func (d *Dispatcher) RunDispatcher(ctx context.Context) {
 		}
 
 		ticker := time.NewTicker(time.Second * 10)
-		resolver := time.NewTicker(time.Minute * 15)
+		resolver := time.NewTicker(time.Minute * 5)
 
 		for {
 			select {

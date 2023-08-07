@@ -160,3 +160,20 @@ func (b *Bot) SendAlert(chatId, processId, text string) error {
 	}
 	return nil
 }
+
+func (b *Bot) SupportMessage(chatId, details, msg string) error {
+	chatInt, err := strconv.Atoi(chatId)
+	if err != nil {
+		return err
+	}
+
+	out := tgbotapi.EscapeText(tgbotapi.ModeMarkdownV2, details)
+	out = "Сообщение: [" + msg + `]    ` + out
+	m := tgbotapi.NewMessage(int64(chatInt), out)
+	m.ParseMode = tgbotapi.ModeMarkdownV2
+
+	if _, err := b.driver.Send(m); err != nil {
+		return errors.Wrap(err, "b.driver.Send")
+	}
+	return nil
+}

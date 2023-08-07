@@ -1,37 +1,41 @@
 <template>
   <v-container>
-    <NavBar title="Биллинг">
-    </NavBar>
-    <div class="d-flex justify-space-between">
-      <div>
-        <div class="my-1 text-h4"> User: {{ store.email }}</div>
-        <div class="d-flex flex-row my-1 text-h5 ">
-          <div class="mr-5">Funds: <b>{{ store.ass }}</b></div>
+    <NavBar title="Биллинг"/>
+    <div class="mb-5">
+      <div class="my-1 text-h6"> Пользователь: {{ store.email }}</div>
+      <div class="d-flex flex-row my-1 text-h5 ">
+        <div class="mr-1">Баланс: <b>{{ store.ass }}</b>
           <TopUp/>
         </div>
 
+      </div>
+      <div class="my-1 text-h5">Task execution price: <b>{{ store.taskPrice }}</b></div>
 
-        <div class="my-1 text-h5">Task execution price: <b>{{ store.taskPrice }}</b></div>
-      </div>
-      <div>
-        <b> Payable Tasks</b>
-        <br/>
-        <ul>
-          <li v-for="task in store.payableTasks">
-            {{ task }}
-          </li>
-        </ul>
-        <b> Non-payable Tasks</b>
-        <br/>
-        <ul>
-          <li v-for="task in store.nonpayableTasks">
-            {{ task }}
-          </li>
-        </ul>
-      </div>
+      <v-dialog width="300px">
+        <template v-slot:activator="{ props }">
+          <v-btn v-bind="props" @click="dialog=true" density="compact">Типы задач</v-btn>
+        </template>
+
+        <v-card class="px-5 py-5">
+          <b>Платные</b>
+          <br/>
+          <ul>
+            <li v-for="task in store.payableTasks">
+              {{ task }}
+            </li>
+          </ul>
+          <b>Бесплатные</b>
+          <br/>
+          <ul>
+            <li v-for="task in store.nonpayableTasks">
+              {{ task }}
+            </li>
+          </ul>
+        </v-card>
+      </v-dialog>
     </div>
-    <TaskHistory/>
-    <PaymentHistory/>
+    <TaskHistory class="mt-5"/>
+    <PaymentHistory class="mt-5"/>
   </v-container>
 </template>
 
@@ -51,7 +55,9 @@ export default defineComponent({
   created() {
   },
   data() {
-    return {}
+    return {
+      dialog: false
+    }
   },
   computed: {
     ...mapStores(useUserStore),

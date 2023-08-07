@@ -3,10 +3,13 @@
     <NavBar :title="`Сценарий: ${flow.label}`">
       <template v-slot:default>
         <span v-if="!flow.deletedAt && !flow.nextId">
-        <v-btn v-if="!editMode" focused @click="editModeChanged">Изменить</v-btn>
-        <v-btn v-else @click="updateFlow">Сохранить</v-btn>
+        <v-btn :disabled="selectedProfiles.length > 0" v-if="!editMode" variant="flat" class="mx-1" focused
+               @click="editModeChanged">Изменить</v-btn>
+        <v-btn v-else @click="updateFlow" variant="flat" class="mx-1">Сохранить</v-btn>
         </span>
-        <v-btn v-if="!flow.deletedAt && !flow.nextId" color="red" @click="DeleteFlow">Удалить</v-btn>
+        <v-btn variant="flat" :disabled="selectedProfiles.length > 0" v-if="!flow.deletedAt && !flow.nextId"
+               color="red" @click="DeleteFlow">Удалить
+        </v-btn>
       </template>
     </NavBar>
     <div class="mx-8 my-3" style="width: 80vw">

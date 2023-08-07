@@ -39,6 +39,8 @@ type (
 		WebIV  string
 
 		HalperHost string
+
+		AdminEmail string
 	}
 
 	App struct {
@@ -113,9 +115,10 @@ func Load() (*Config, error) {
 		JaegerUrl:          mustenv("JAEGER_URL"),
 		JaegerServiceName:  mustenv("JAEGER_SERVICE_NAME"),
 		PayServiceGRPCAddr: mustenv("PAY_SERVICE_GRPC_ADDR"),
-		WebKey:             mustenv("WEB_KEY"),
-		WebIV:              mustenv("WEB_IV"),
+		WebKey:             mayend("WEB_KEY"),
+		WebIV:              mayend("WEB_IV"),
 		HalperHost:         mustenv("HALPER_HOST"),
+		AdminEmail:         mustenv("ADMIN_EMAIL"),
 	}
 
 	CFG = c

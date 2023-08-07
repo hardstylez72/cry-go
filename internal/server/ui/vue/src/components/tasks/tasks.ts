@@ -385,7 +385,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     deprecated: false,
     canBeEstimated: true,
     descFn(task) {
-      const p = task.izumiSwapTask
+      const p = task.ezkaliburSwapTask
       return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
     },
     component: TaskEzkaliburSwap,

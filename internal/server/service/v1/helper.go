@@ -10,20 +10,25 @@ import (
 	"github.com/hardstylez72/cry/internal/lib"
 	"github.com/hardstylez72/cry/internal/pay"
 	"github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/hardstylez72/cry/internal/process/task"
+	"github.com/hardstylez72/cry/internal/server/config"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/server/user"
 	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/socks5"
+	"github.com/hardstylez72/cry/internal/tg"
 	"github.com/pkg/errors"
 )
 
 type HelperService struct {
 	v1.UnimplementedHelperServiceServer
-	settingsService   *settings.Service
-	profileRepository repository.ProfileRepository
-	userRepository    repository.UserRepository
-	payService        *pay.Service
-	statRepository    repository.StatRepository
+	settingsService             *settings.Service
+	profileRepository           repository.ProfileRepository
+	userRepository              repository.UserRepository
+	payService                  *pay.Service
+	statRepository              repository.StatRepository
+	repositoryProcessRepository repository.ProcessRepository
+	tgBot                       *tg.Bot
 }
 
 func NewHelperService(
@@ -32,13 +37,17 @@ func NewHelperService(
 	userRepository repository.UserRepository,
 	payService *pay.Service,
 	statRepository repository.StatRepository,
+	repositoryProcessRepository repository.ProcessRepository,
+	tgBot *tg.Bot,
 ) *HelperService {
 	return &HelperService{
-		settingsService:   settingsService,
-		profileRepository: profileRepository,
-		userRepository:    userRepository,
-		payService:        payService,
-		statRepository:    statRepository,
+		settingsService:             settingsService,
+		profileRepository:           profileRepository,
+		userRepository:              userRepository,
+		payService:                  payService,
+		statRepository:              statRepository,
+		repositoryProcessRepository: repositoryProcessRepository,
+		tgBot:                       tgBot,
 	}
 }
 
@@ -231,4 +240,37 @@ func (s *HelperService) TransactionsDailyImpact(ctx context.Context, req *v1.Tra
 		TotalImpact: *total,
 		TopImpact:   *top,
 	}, nil
+}
+func (s *HelperService) SupportMessage(ctx context.Context, req *v1.SupportMessageReq) (*v1.SupportMessageRes, error) {
+
+	var details string
+	if req.ProcessId != nil && req.TaskId != nil {
+		t, err := s.repositoryProcessRepository.GetProcessTask(ctx, req.GetTaskId())
+		if err != nil {
+			return nil, err
+		}
+		tp, err := t.ToPB()
+		if err != nil {
+			return nil, err
+		}
+		b, err := task.Marshal(tp)
+		if err != nil {
+			return nil, err
+		}
+		details = string(b)
+	}
+
+	admin, _, err := s.userRepository.GetOrCreateUser(ctx, &repository.User{Email: config.CFG.AdminEmail})
+	if err != nil {
+		return nil, err
+	}
+	chatId, err := s.userRepository.GetUserTelegramChatId(ctx, admin.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.tgBot.SupportMessage(*chatId, details, req.GetText()); err != nil {
+		return nil, err
+	}
+	return &v1.SupportMessageRes{}, nil
 }

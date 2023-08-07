@@ -113,7 +113,7 @@ func (c *Client) makeMaverickSwapData(ctx context.Context, fromToken, toToken v1
 	}
 
 	amOut := defi.TokenAmountFloatToWEI(d.OutputAmount, toToken)
-	amOut = defi.Slippage(amOut, defi.SlippagePercent05)
+	amOut = defi.Slippage(amOut, defi.SlippagePercent1)
 
 	pathb := []byte{}
 	pathb = append(pathb, common.HexToAddress(d.Path[0]).Bytes()...)

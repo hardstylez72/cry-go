@@ -7,7 +7,7 @@
     persistent="true"
   >
     <template v-slot:activator="{ props }">
-      <v-btn density="comfortable" @click="dialog=true">TopUp balance</v-btn>
+      <v-btn density="comfortable" @click="dialog=true">Пополнить</v-btn>
     </template>
 
     <v-card>

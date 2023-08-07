@@ -1,60 +1,63 @@
 <template>
-  <v-skeleton-loader
-    width="100%"
-    :loading="listLoading"
-    type="table"
-  >
-    <v-responsive>
+  <Loader v-if="listLoading"/>
+  <div v-else>
+    <v-form ref="formm">
+      <v-row>
+        <v-col><b>Status</b>: {{ withdrawerStatus }}</v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-text-field
+            ref="label-input"
+            v-model="withdrawer.label"
+            label="label"
+            density="comfortable"
+            variant="outlined"
+            :rules="labelRules()"
+            @input="labelChanged"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12">
+          <ProxyInput v-model="withdrawer.proxy" :required="true"/>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-btn v-if="WithdrawerChanged" class="my-3" :loading="updating" @click="update">Update</v-btn>
+          <div v-if="updatingError">{{ updatingError }}</div>
+        </v-col>
+      </v-row>
+    </v-form>
 
-      <v-form ref="formm">
-        <v-row>
-          <v-col><b>Status</b>: {{ withdrawerStatus }}</v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12">
-            <v-text-field
-              ref="label-input"
-              v-model="withdrawer.label"
-              label="label"
-              density="comfortable"
-              variant="outlined"
-              :rules="labelRules()"
-              @input="labelChanged"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12">
-            <ProxyInput v-model="withdrawer.proxy" :required="true"/>
-          </v-col>
-        </v-row>
-        <v-row>
+
+    <v-list max-width="96vw" class="px-5" nav="true">
+      <v-list-item
+        density="compact"
+        variant="plain"
+        class="my-0"
+        v-for="item in items"
+        :key="item.addr"
+        rounded
+        height="auto"
+        width="auto"
+        elevation="1"
+        style="border: 0px solid "
+      >
+
+        <v-row align="center">
+
           <v-col>
-            <v-btn v-if="WithdrawerChanged" class="my-3" :loading="updating" @click="update">Update</v-btn>
-            <div v-if="updatingError">{{ updatingError }}</div>
+            {{ `${item.addr}` }}
           </v-col>
-        </v-row>
-      </v-form>
-
-      <v-table fixed-header height="90vh">
-        <thead>
-        <tr>
-          <th class="text-left">address</th>
-          <th class="text-left">profile</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="item in items">
-          <td>{{ `${item.addr}` }}</td>
-          <td class="align-center" style="width: 200px">
+          <v-col>
             <OkexWithdrawProfiles :model-value="item" :withdrawer-id="id"
                                   @updated="OkexWithdrawProfileUpdated"/>
-          </td>
-        </tr>
-        </tbody>
-      </v-table>
-    </v-responsive>
-  </v-skeleton-loader>
+          </v-col>
 
-
+        </v-row>
+      </v-list-item>
+    </v-list>
+  </div>
 </template>
 
 <script lang="ts">
@@ -72,6 +75,7 @@ import ProxyInput from "@/components/ProxyInput.vue";
 import {Profile} from "@/generated/profile";
 import {Timer} from "@/components/helper";
 import OkexWithdrawProfiles from "@/components/exchange.acc/OkexWithdrawProfiles.vue";
+import Loader from "@/components/Loader.vue";
 
 export default defineComponent({
   name: "OkexWithdrawOptionSubAcc",
@@ -88,6 +92,7 @@ export default defineComponent({
     },
   },
   components: {
+    Loader,
     OkexWithdrawProfiles,
     ProxyInput
   },

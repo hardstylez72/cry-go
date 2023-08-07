@@ -1,10 +1,10 @@
 <template>
-  <div class="text-h5">Payment history</div>
-  <div class="text-center" v-if="items.length === 0">history is empty</div>
+  <div class="text-h5">Платежи</div>
+  <div class="text-center" v-if="items.length === 0">нет платежей</div>
   <v-list v-else>
     <v-list-item
       density="compact"
-      variant="outlined"
+      variant="plain"
       class="my-1"
       v-for="item in items"
       :key="item.id"

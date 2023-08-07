@@ -27,9 +27,10 @@
       </p>
       <b>Принцип работы:</b>
       <ol class="ml-8">
-        <li>Добавляете или генерируете evm аккаунты</li>
-        <li>Собираете сценарии исполнения активностей</li>
-        <li>Запускаете собранные сценарии для выбранных аккаунтов</li>
+        <li><a href="/profiles" target="_blank">Добавьте или сгенерируйте evm аккаунты</a></li>
+        <li><a href="/constructor" target="_blank">Соберите сценарий исполнения активностей</a></li>
+        <li><a href="https://t.me/drop_hunter_alert_bot" target="_blank">Зарегистрируйтесь в телеграм-боте</a></li>
+        <li><a href="/constructor" target="_blank">Запустите сценарий для выбранных аккаунтов</a></li>
       </ol>
     </div>
 
@@ -146,6 +147,14 @@
 
         </v-expansion-panel-text>
       </v-expansion-panel>
+      <v-expansion-panel
+        key="airdrop"
+        title="Интеграции"
+      >
+        <v-expansion-panel-text>
+          <General/>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
 
 
       <v-expansion-panel
@@ -167,10 +176,11 @@ import NavBar from "@/components/NavBar.vue";
 import Login from "@/components/Login.vue";
 import {mapStores} from "pinia";
 import {useUserStore} from "@/plugins/pinia";
+import General from "@/components/landing/modules/General.vue";
 
 export default defineComponent({
   name: "LandingPage",
-  components: {Login, NavBar},
+  components: {General, Login, NavBar},
   methods: {},
   computed: {
     userLoggedIn(): boolean {

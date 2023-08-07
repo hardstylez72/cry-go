@@ -1,17 +1,19 @@
 <template>
-  <div class="text-h5">Task execution history</div>
-  <div class="text-center" v-if="items.length === 0">history is empty</div>
+  <div class="text-h5">История задач</div>
+  <div class="text-center" v-if="items.length === 0">Нет истории задач</div>
   <v-list v-else>
     <v-list-item
       density="compact"
-      variant="outlined"
+      variant="plain"
       class="my-1"
+      elevation="1"
       v-for="item in items"
       :key="item.taskId"
-      :title="item.taskType"
     >
       <div class="d-flex justify-space-between">
-        <span>{{ `Price: ${item.taskPrice} USD` }}</span>
+        <div>{{ item.taskType }}
+          <span>{{ `Price: ${item.taskPrice} USD` }}</span>
+        </div>
         <a :href="`/process/${item.processId}`" target="_blank">show process</a>
       </div>
 

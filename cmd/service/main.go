@@ -357,7 +357,7 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 
 	return &services{
 		profileService:       v1.NewProfileService(profileRepository, settingsService),
-		helperService:        v1.NewHelperService(settingsService, profileRepository, userRepository, payService, statRepository),
+		helperService:        v1.NewHelperService(settingsService, profileRepository, userRepository, payService, statRepository, processRepository, tgBot),
 		withdrawerService:    v1.NewWithdrawerService(withdrawerRepository, userRepository, profileRepository),
 		flowService:          v1.NewFlowService(flowRepository),
 		processService:       v1.NewProcessService(processRepository, dispatcher, flowRepository, settingsService),

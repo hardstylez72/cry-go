@@ -86,7 +86,7 @@ func (t *taskDelay) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) 
 		d := time.Duration(duration)
 		d *= time.Second
 
-		taskContext, cancel := context.WithTimeout(ctx, d)
+		taskContext, cancel := context.WithTimeout(ctx, time.Second*20)
 		defer cancel()
 
 		t.cancel = cancel

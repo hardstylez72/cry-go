@@ -3,10 +3,10 @@
     <NavBar :title="`Процесс: ${processId}`">
       <template v-slot:default>
         <BtnProcessStopResume class="mx-1" size="comfortable" :item="process" @updated="processUpdated"/>
-        <v-btn class="mx-1" density="comfortable"
+        <v-btn variant="flat" class="mx-1"
                @click="$router.push({name: 'ViewFlow', params: {id: process.flowId}})">Сценарий
         </v-btn>
-        <DeleteProcess class="mx-1" v-if="canCancel" :process-id="processId"/>
+        <DeleteProcess class="mx-1" :process-id="processId"/>
       </template>
     </NavBar>
 
@@ -30,7 +30,7 @@
             <span class="text-h6 text-blue-grey">Обновлено: {{ formatTime(process.updatedAt) }}</span>
           </div>
         </div>
-        <div class="mr-5">
+        <div class="mr-8">
           <div>
             <v-checkbox
               style="height: 30px"
@@ -41,14 +41,20 @@
             </v-checkbox>
           </div>
           <div>
-            <v-checkbox
-              style="height: 30px"
-              color="blue"
-              :disabled="autoRetryLoading"
-              v-model="process.autoRetry"
-              :label="getAutoRetryLabel"
-              @input="autoRetryChanged">
-            </v-checkbox>
+            <v-tooltip text="В случае возникновения ошибки попытается попробовать снова через в 10 минут">
+              <template v-slot:activator="{ props }">
+                <v-checkbox
+                  v-bind="props"
+                  style="height: 30px"
+                  color="blue"
+                  :disabled="autoRetryLoading"
+                  v-model="process.autoRetry"
+                  :label="getAutoRetryLabel"
+                  @input="autoRetryChanged"/>
+              </template>
+            </v-tooltip>
+
+
           </div>
           <div class="mt-4">
 
@@ -151,10 +157,10 @@ export default defineComponent({
       return 'grey'
     },
     getCheckboxLabel(): string {
-      return !this.showLess ? 'details on' : 'details off'
+      return !this.showLess ? 'Подробно' : 'Кратко'
     },
     getAutoRetryLabel(): string {
-      return this.process.autoRetry ? 'Auto retry on' : 'Auto retry off'
+      return this.process.autoRetry ? 'Помошник' : 'Помошник'
     },
     ProcessStatus() {
       return ProcessStatus
