@@ -11,20 +11,11 @@
 
 <script lang="ts">
 import {
-  AmUni,
-  Network,
   OrbiterBridgeTask,
-  StargateBridgeTask,
-  SyncSwapTask,
   Task,
-  TaskType,
-  Token
 } from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
-import {ca} from "vuetify/locale";
-import {processService} from "@/generated/services";
-import {GetTaskSettingsResponse, ProcessStatus} from "@/generated/process";
-import TaskSettings from "@/components/tasks/menu/TaskSettings.vue";
+import {ProcessStatus} from "@/generated/process";
 import {getAmountSend, getStatusColor} from "@/components/tasks/menu/helper";
 import {link} from "@/components/tasks/links";
 import GasOptions from "@/components/tasks/menu/GasOptions.vue";
@@ -32,7 +23,7 @@ import GasOptions from "@/components/tasks/menu/GasOptions.vue";
 export default defineComponent({
   name: "MenuTaskStargateBridge",
   methods: {getAmountSend, getStatusColor},
-  components: {GasOptions, TaskSettings},
+  components: {GasOptions},
   props: {
     task: {
       type: Object as PropType<Task>,

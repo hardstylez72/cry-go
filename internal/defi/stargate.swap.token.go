@@ -60,7 +60,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 	destChainId := ChainIdMap[req.DestChain]
 	srcPoolId := PoolIdMap[c.Cfg.Network][req.FromToken]
 	distPoolId := PoolIdMap[req.DestChain][req.ToToken]
-	min := Slippage(req.Quantity, SlippagePercent05)
+	min := Slippage(req.Quantity, req.Slippage)
 	opt.NoSend = req.EstimateOnly
 
 	l1Gasfee := big.NewInt(0)

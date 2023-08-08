@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"time"
 
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
@@ -105,7 +106,16 @@ func (t *ZksyncOfficialBridgeToEthereumTask) Run(ctx context.Context, a *Input) 
 }
 
 func NewZkSyncClient(profile *halp.Profile, n v1.Network) (*zksyncera.Client, *zksyncera.WalletTransactor, error) {
-	swapper, err := uniclient.NewZkSyncOfficialBridge(n, profile.BaseConfig(n))
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	s, err := profile.GetNetworkSettings(ctx, n)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	swapper, err := uniclient.NewZkSyncOfficialBridge(n, s.BaseConfig())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -123,6 +133,11 @@ func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *
 	l, ok := a.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask)
 	if !ok {
 		return nil, nil, errors.New("panic.a.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask) call an ambulance!")
+	}
+
+	s, err := profile.GetNetworkSettings(ctx, l.ZkSyncOfficialBridgeToEthereumTask.Network)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{
@@ -152,7 +167,7 @@ func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *
 	}
 
 	gasStation := GasStation(estimate.EstimatedGasCost, v1.Network_ZKSYNCERA)
-	gas, err := GasManager(gasStation, profile.Settings, v1.Network_ZKSYNCERA)
+	gas, err := GasManager(gasStation, s.Source, v1.Network_ZKSYNCERA)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -178,7 +193,12 @@ func EstimateZkSyncOfficialBridgeToEthSwapCost(ctx context.Context, profile *hal
 
 	network := l.Network
 
-	client, err := uniclient.NewZkSyncOfficialBridge(network, profile.BaseConfig(network))
+	s, err := profile.GetNetworkSettings(ctx, network)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := uniclient.NewZkSyncOfficialBridge(network, s.BaseConfig())
 	if err != nil {
 		return nil, err
 	}

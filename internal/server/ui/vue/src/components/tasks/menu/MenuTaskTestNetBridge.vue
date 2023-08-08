@@ -10,27 +10,18 @@
 
 <script lang="ts">
 import {
-  AmUni,
-  Network,
-  StargateBridgeTask,
-  SyncSwapTask,
   Task,
-  TaskType,
   TestNetBridgeSwapTask,
-  Token
 } from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
-import {ca} from "vuetify/locale";
-import {processService} from "@/generated/services";
-import {GetTaskSettingsResponse, ProcessStatus} from "@/generated/process";
-import TaskSettings from "@/components/tasks/menu/TaskSettings.vue";
+import {ProcessStatus} from "@/generated/process";
 import {getStatusColor} from "@/components/tasks/menu/helper";
 import {link} from "@/components/tasks/links";
 
 export default defineComponent({
   name: "MenuTaskTestNetBridge",
   methods: {getStatusColor},
-  components: {TaskSettings},
+  components: {},
   props: {
     task: {
       type: Object as PropType<Task>,

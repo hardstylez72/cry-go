@@ -12,9 +12,11 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/izumiquoter"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/izumirouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
-	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
+
+type izumiMaker struct {
+	*Client
+}
 
 // eth -> usdc
 //
@@ -24,70 +26,15 @@ import (
 // me ETH -> USDC https://explorer.zksync.io/tx/0x36731ad49420976e96d3a8889a78d5ca3661aeae1cb0f73a28fdaa4794941716
 
 func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+	return c.GenericSwap(ctx, &izumiMaker{c}, req)
+}
 
-	result := &defi.DefaultRes{}
-
-	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
-	if err != nil {
-		return nil, err
-	}
-
-	tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
-		Token:       req.FromToken,
-		WalletPK:    req.WalletPK,
-		Amount:      req.Amount,
-		SpenderAddr: c.Cfg.IZUMI.Router,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "TokenLimitChecker")
-	}
-	result.ApproveTx = tokenLimitChecker.ApproveTx
-
-	data, err := c.makeIzumiSwapData(ctx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "makeMaverickSwapData")
-	}
-	if req.Debug {
-		println("0x" + common.Bytes2Hex(data))
-	}
+func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
 
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
 		value = req.Amount
 	}
-
-	tx := utils.CreateFunctionCallTransaction(
-		transactor.WalletAddr,
-		c.Cfg.IZUMI.Router,
-		big.NewInt(0),
-		big.NewInt(0),
-		value,
-		data,
-		nil, nil,
-	)
-
-	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, transactor.Signer)
-	if err != nil {
-		return nil, fmt.Errorf("Make712Tx: %w", err)
-	}
-
-	result.ECost = estimate
-
-	if req.EstimateOnly {
-		return result, nil
-	}
-
-	hash, err := c.Provider.SendRawTransaction(raw)
-	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
-	}
-
-	result.Tx = c.NewTx(hash, defi.CodeContract)
-
-	return result, nil
-}
-
-func (c *Client) makeIzumiSwapData(ctx context.Context, req *defi.DefaultSwapReq) ([]byte, error) {
 
 	w, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -144,7 +91,11 @@ func (c *Client) makeIzumiSwapData(ctx context.Context, req *defi.DefaultSwapReq
 	}
 
 	if req.FromToken == v1.Token_WETH || req.ToToken == v1.Token_WETH {
-		return p1, nil
+		return &defi.TxData{
+			Data:         p1,
+			Value:        value,
+			ContractAddr: c.Cfg.IZUMI.Router,
+		}, nil
 	}
 
 	var p2 []byte
@@ -163,10 +114,28 @@ func (c *Client) makeIzumiSwapData(ctx context.Context, req *defi.DefaultSwapReq
 	}
 
 	if len(p2) == 0 {
-		return constractabi.Pack("multicall", [][]byte{p1})
+		data, err := constractabi.Pack("multicall", [][]byte{p1})
+		if err != nil {
+			return nil, err
+		}
+
+		return &defi.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.IZUMI.Router,
+		}, nil
 	}
 
-	return constractabi.Pack("multicall", [][]byte{p1, p2})
+	data, err := constractabi.Pack("multicall", [][]byte{p1, p2})
+	if err != nil {
+		return nil, err
+	}
+
+	return &defi.TxData{
+		Data:         data,
+		Value:        value,
+		ContractAddr: c.Cfg.IZUMI.Router,
+	}, nil
 }
 
 // site 5aea5775959fbc2557cc8789bc1bf90a239d9a91 0007d0 3355df6d4c9c3035724fd0e3914de96a5a83aaf4

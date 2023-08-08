@@ -2,7 +2,6 @@ package zksyncera
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 	"time"
 
@@ -10,33 +9,23 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/syncswaprouter"
-	"github.com/hardstylez72/cry/internal/defi/zksyncera/scan"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/accounts"
-	"github.com/zksync-sdk/zksync2-go/types"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
-func (c *Client) WaitSwapFinish(ctx context.Context, txId common.Hash) (*scan.TxStatus, error) {
-	return c.scanner.WaitComplete(ctx, txId.String(), time.Second*10)
+type syncSwapMaker struct {
+	*Client
 }
 
-func (c *Client) SyncSwap(ctx context.Context, req *defi.SyncSwapReq) (*defi.SyncSwapRes, error) {
+func (c *Client) SyncSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+	return c.GenericSwap(ctx, &syncSwapMaker{c}, req)
+}
+
+func (c *syncSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
 		return nil, err
-	}
-
-	res, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
-		Token:       req.FromToken,
-		WalletPK:    req.WalletPK,
-		Amount:      req.Amount,
-		SpenderAddr: c.Cfg.SyncSwap.RouterSwap,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
 
 	fee, err := c.getSyncSwapFee(ctx, &getSyncSwapFeeReq{
@@ -59,7 +48,7 @@ func (c *Client) SyncSwap(ctx context.Context, req *defi.SyncSwapReq) (*defi.Syn
 		return nil, errors.Wrap(err, "getAmountOut")
 	}
 
-	min := defi.Slippage(amOut, defi.SlippagePercent01)
+	min := defi.Slippage(amOut, req.Slippage)
 
 	structThing, err := abi.NewType("tuple", "struct thing", []abi.ArgumentMarshaling{
 		{Name: "a", Type: "address"},
@@ -123,85 +112,9 @@ func (c *Client) SyncSwap(ctx context.Context, req *defi.SyncSwapReq) (*defi.Syn
 		return nil, err
 	}
 
-	w, err := accounts.NewWallet(transactor.Signer, c.Provider)
-	if err != nil {
-		return nil, err
-	}
-
-	contract := c.Cfg.SyncSwap.RouterSwap
-
-	tx := utils.CreateFunctionCallTransaction(
-		w.GetAddress(),
-		contract,
-		big.NewInt(0),
-		big.NewInt(0),
-		value,
-		data,
-		nil, nil,
-	)
-
-	var gas, gasPrice *big.Int
-	if req.Gas.RuleSet() {
-		gas = &req.Gas.GasLimit
-		gasPrice = &req.Gas.GasPrice
-		gasPrice = defi.ResolveGasPriceZksync(&req.Gas.MaxGas, gas, gasPrice)
-	} else {
-		gas, err = c.Provider.EstimateGas712(tx)
-		if err != nil {
-			return nil, fmt.Errorf("failed to EstimateGas: %w", err)
-		}
-		gasPrice, err = c.Provider.GetGasPrice()
-		if err != nil {
-			return nil, fmt.Errorf("failed to GetGasPrice: %w", err)
-		}
-	}
-
-	nonce, err := c.Provider.NonceAt(ctx, w.GetAddress(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to GetGasPrice: %w", err)
-	}
-
-	prepared := &types.Transaction712{
-		Nonce:      big.NewInt(0).SetUint64(nonce),
-		GasTipCap:  big.NewInt(100_000_000),
-		GasFeeCap:  gasPrice,
-		Gas:        gas,
-		To:         &tx.To,
-		Value:      tx.Value.ToInt(),
-		Data:       tx.Data,
-		AccessList: nil,
-		ChainID:    c.NetworkId,
-		From:       &tx.From,
-		Meta:       tx.Eip712Meta,
-	}
-
-	signature, err := transactor.Signer.SignTypedData(transactor.Signer.GetDomain(), prepared)
-	if err != nil {
-		return nil, errors.Wrap(err, "Signer.SignTypedData")
-	}
-	rawTx, err := prepared.RLPValues(signature)
-	if err != nil {
-		return nil, errors.Wrap(err, "prepared.RLPValues")
-	}
-
-	result := &defi.SyncSwapRes{}
-	result.ECost = &defi.EstimatedGasCost{
-		GasLimit:    gas,
-		GasPrice:    gasPrice,
-		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas.Uint64()),
-	}
-	result.ApproveTx = res.ApproveTx
-
-	if req.EstimateOnly {
-		return result, nil
-	}
-
-	hash, err := c.Provider.SendRawTransaction(rawTx)
-	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
-	}
-
-	result.Tx = c.NewTx(hash, defi.CodeContract)
-
-	return result, nil
+	return &defi.TxData{
+		Data:         data,
+		Value:        value,
+		ContractAddr: c.Cfg.SyncSwap.RouterSwap,
+	}, nil
 }

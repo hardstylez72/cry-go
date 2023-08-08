@@ -65,7 +65,11 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		return nil, err
 	}
 
-	client, err := uniclient.NewTransfer(p.Network, profile.BaseConfig(p.Network))
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, err
+	}
+	client, err := uniclient.NewTransfer(p.Network, s.BaseConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +113,7 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		if err != nil {
 			return nil, err
 		}
-		gas, err := GasManager(estimate, profile.Settings, p.Network)
+		gas, err := GasManager(estimate, s.Source, p.Network)
 		if err != nil {
 			return nil, err
 		}
@@ -270,24 +274,17 @@ func GetOkexCli(ctx context.Context, rep repository.WithdrawerRepository, withdr
 
 func EstimateOkexDepositCost(ctx context.Context, profile *halp.Profile, p *v1.OkexDepositTask, withdrawerRepository repository.WithdrawerRepository) (*v1.EstimationTx, error) {
 
-	swapper, err := uniclient.NewTransfer(p.Network, profile.BaseConfig(p.Network))
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+
+	w, err := s.GetWalletAddr()
 	if err != nil {
 		return nil, err
 	}
+	walletAddr := *w
 
-	var walletAddr common.Address
-	if p.Network == v1.Network_ZKSYNCERA || p.Network == v1.Network_ZKSYNCLITE {
-		w, err := profile.EraWallet(p.Network)
-		if err != nil {
-			return nil, err
-		}
-		walletAddr = w.WalletAddr
-	} else {
-		w, err := profile.EthWallet()
-		if err != nil {
-			return nil, err
-		}
-		walletAddr = w.WalletAddr
+	swapper, err := uniclient.NewTransfer(p.Network, s.BaseConfig())
+	if err != nil {
+		return nil, err
 	}
 
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: walletAddr, Token: p.Token})

@@ -135,29 +135,7 @@ export class SettingsService {
   /**
    *
    */
-  settingsServiceGetNetworkByRpc(
-    params: {
-      /**  */
-      body: GetNetworkByRPCRequest;
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<GetNetworkByRPCResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/api/gw/v1/settings/network/rpc/validate';
-
-      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
-
-      let data = params['body'];
-
-      configs.data = data;
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
-  settingsServiceReset(
+  settingsServiceResetSettings(
     params: {
       /**  */
       body: ResetRequest;
@@ -200,105 +178,54 @@ export class SettingsService {
   }
 }
 
-export interface GetNetworkByRPCRequest {
-  /**  */
-  endpoint: string;
-
+export interface GetSettingsRequest {
   /**  */
   network: Network;
 }
 
-export interface GetNetworkByRPCResponse {
-  /**  */
-  valid: boolean;
-
-  /**  */
-  id: string;
-
-  /**  */
-  suggestedGasPrice: string;
-
-  /**  */
-  error?: string;
-}
-
-export interface GetSettingsRequest {}
-
 export interface GetSettingsResponse {
   /**  */
-  settings: Settings;
+  settings: NetworkSettings;
 }
 
-export interface ResetRequest {}
-
-export interface ResetResponse {
-  /**  */
-  settings: Settings;
-}
-
-export interface Settings {
-  /**  */
-  userId?: string;
-
-  /**  */
-  bnb: SettingsNetwork;
-
-  /**  */
-  optimism: SettingsNetwork;
-
-  /**  */
-  arbitrum: SettingsNetwork;
-
-  /**  */
-  etherium: SettingsNetwork;
-
-  /**  */
-  polygon: SettingsNetwork;
-
-  /**  */
-  avalanche: SettingsNetwork;
-
-  /**  */
-  zksyncTestNet: SettingsNetwork;
-
-  /**  */
-  zksyncMainNet: SettingsNetwork;
-
-  /**  */
-  taskGasLimitMap: object;
-
-  /**  */
-  zksyncLite: SettingsNetwork;
-}
-
-export interface SettingsNetwork {
+export interface NetworkSettings {
   /**  */
   id: string;
-
-  /**  */
-  useLimitGas: boolean;
 
   /**  */
   rpcEndpoint: string;
 
   /**  */
-  gasTotal?: string;
+  gasMultiplier: number;
 
   /**  */
-  gasMultiplier?: number;
+  maxGas: string;
 
   /**  */
-  maxGas?: string;
+  taskSettings: object;
+
+  /**  */
+  network: Network;
+}
+
+export interface ResetRequest {
+  /**  */
+  network: Network;
+}
+
+export interface ResetResponse {
+  /**  */
+  settings: NetworkSettings;
 }
 
 export interface UpdateSettingsRequest {
   /**  */
-  settings: Settings;
+  settings: NetworkSettings;
 }
 
 export interface UpdateSettingsResponse {
   /**  */
-  settings: Settings;
+  settings: NetworkSettings;
 }
 
 export enum Network {

@@ -10,76 +10,28 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/zkswaprouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
+type zkSwapMaker struct {
+	*Client
+}
+
 func (c *Client) ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
-	result := &defi.DefaultRes{}
+	return c.GenericSwap(ctx, &zkSwapMaker{c}, req)
+}
 
-	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
-	if err != nil {
-		return nil, err
-	}
-
-	tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
-		Token:       req.FromToken,
-		WalletPK:    req.WalletPK,
-		Amount:      req.Amount,
-		SpenderAddr: c.Cfg.ZkSwap.Router,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "TokenLimitChecker")
-	}
-	result.ApproveTx = tokenLimitChecker.ApproveTx
+func (c *zkSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
 
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
 		value = req.Amount
 	}
 
-	data, err := c.makeZkSwapData(ctx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "makeZkSwapData")
-	}
-
-	tx := utils.CreateFunctionCallTransaction(
-		transactor.WalletAddr,
-		c.Cfg.ZkSwap.Router,
-		big.NewInt(0),
-		big.NewInt(0),
-		value,
-		data,
-		nil, nil,
-	)
-
-	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, transactor.Signer)
-	if err != nil {
-		return nil, errors.Wrap(err, "Make712Tx")
-	}
-
-	result.ECost = estimate
-
-	if req.EstimateOnly {
-		return result, nil
-	}
-
-	hash, err := c.Provider.SendRawTransaction(raw)
-	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
-	}
-
-	result.Tx = c.NewTx(hash, defi.CodeContract)
-
-	return result, nil
-}
-
-func (c *Client) makeZkSwapData(ctx context.Context, req *defi.DefaultSwapReq) ([]byte, error) {
-
 	w, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
 		return nil, err
 	}
-	call, err := zkswaprouter.NewStorageCaller(c.Cfg.SpaceFI.Router, c.Provider)
+	call, err := zkswaprouter.NewStorageCaller(c.Cfg.ZkSwap.Router, c.Provider)
 	if err != nil {
 		return nil, err
 	}
@@ -107,13 +59,31 @@ func (c *Client) makeZkSwapData(ctx context.Context, req *defi.DefaultSwapReq) (
 	}
 	if req.FromToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, defi.SlippagePercent05)
-		return abispacefirouter.Pack("swapExactETHForTokens", amOut, path, w.WalletAddr, DefaultDeadLine())
+		amOut = defi.Slippage(amOut, req.Slippage)
+		data, err := abispacefirouter.Pack("swapExactETHForTokens", amOut, path, w.WalletAddr, DefaultDeadLine())
+		if err != nil {
+			return nil, err
+		}
+
+		return &defi.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.ZkSwap.Router,
+		}, nil
 
 	} else if req.ToToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, defi.SlippagePercent05)
-		return abispacefirouter.Pack("swapExactTokensForETH", req.Amount, amOut, path, w.WalletAddr, DefaultDeadLine())
+		amOut = defi.Slippage(amOut, req.Slippage)
+		data, err := abispacefirouter.Pack("swapExactTokensForETH", req.Amount, amOut, path, w.WalletAddr, DefaultDeadLine())
+		if err != nil {
+			return nil, err
+		}
+
+		return &defi.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.ZkSwap.Router,
+		}, nil
 	}
 
 	return nil, errors.New("unsupported input params")

@@ -96,6 +96,7 @@ type StargateBridgeSwapReq struct {
 	ToToken      Token
 	Gas          *Gas
 	EstimateOnly bool
+	Slippage     SlippagePercent
 }
 
 func (r *StargateBridgeSwapReq) Validate(currentChain v1.Network) error {
@@ -151,6 +152,7 @@ func (c *EtheriumClient) StargateBridgeSwap(ctx context.Context, req *DefaultBri
 			Quantity:     req.Amount,
 			Gas:          req.Gas,
 			EstimateOnly: req.EstimateOnly,
+			Slippage:     req.Slippage,
 		})
 		if err != nil {
 			return nil, errors.Wrap(err, "stargateBridgeSwapEth")
@@ -212,6 +214,7 @@ func (c *EtheriumClient) StargateBridgeSwap(ctx context.Context, req *DefaultBri
 			ToToken:      req.ToToken,
 			Gas:          req.Gas,
 			EstimateOnly: req.EstimateOnly,
+			Slippage:     req.Slippage,
 		}
 		res, err := c.StargateBridgeSwapToken(ctx, rr)
 		if err != nil {

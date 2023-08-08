@@ -172,3 +172,23 @@ func NewTx(tx *defi.Transaction, gas *defi.Gas) *v1.TaskTx {
 	}
 	return txx
 }
+
+func getSlippage(s *v1.NetworkSettings, taskType v1.TaskType) defi.SlippagePercent {
+	if s == nil || s.TaskSettings == nil {
+		return getSlippageFromConst(taskType)
+	}
+
+	v, ok := s.TaskSettings[taskType.String()]
+	if !ok {
+		return getSlippageFromConst(taskType)
+	}
+	return v.GetSlippage()
+}
+
+func getSlippageFromConst(taskType v1.TaskType) defi.SlippagePercent {
+	v, ok := defi.SlippageMap[taskType]
+	if !ok {
+		return defi.SlippagePercent05
+	}
+	return v
+}

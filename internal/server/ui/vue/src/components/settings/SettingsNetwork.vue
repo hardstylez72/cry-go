@@ -1,83 +1,103 @@
 <template>
-  <v-container>
-    <v-card>
+  <v-expansion-panel @group:selected="loadSettings">
+    <v-expansion-panel-title>
       {{ network }}
-      <v-card-text>
-        <v-row>
-          <v-col>
-            <v-text-field
-              ref="network-input"
-              v-model="settings.rpcEndpoint"
-              label="rpc endpoint"
+    </v-expansion-panel-title>
+    <v-expansion-panel-text>
+      <Loader v-if="loading"/>
+      <v-card v-else>
+        <div class="d-flex justify-end">
+          <v-btn v-if="settingsChanged" variant="flat" @click=Update :loading="updating" class="ma-3">Обновить</v-btn>
+          <v-btn @click=Reset variant="flat" :loading="reseting" class="ma-3">Сброс</v-btn>
+        </div>
+
+        <v-card-text>
+          <v-row>
+            <v-col>
+              <v-text-field
+                ref="network-input"
+                v-model="settings.rpcEndpoint"
+                label="rpc endpoint"
+                density="compact"
+                variant="outlined"
+                :disabled="true"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="settings.id"
+                label="network id"
+                density="compact"
+                variant="outlined"
+                :loading="loading"
+                :disabled="true"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <NetworkGasMultiplier v-model="settings.gasMultiplier"/>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <NetworkMaxGas v-model="settings.maxGas" :network="network"/>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-list>
+          <div v-for="(task) in taskMap">
+            <v-list-item
+              v-if="slippageAvailable(task[0])"
               density="compact"
-              variant="outlined"
-              :rules="networkRules()"
-              @input="endpointChanged(false)"
-              :loading="loading"
-              :disabled="loading"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-text-field
-              v-model="settings.id"
-              label="network id"
-              density="compact"
-              variant="outlined"
-              :loading="loading"
-              :disabled="true"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <NetworkGasMultiplier v-model="settings.gasMultiplier"/>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <NetworkMaxGas v-model="settings.maxGas" :network="network"/>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-  </v-container>
+              variant="plain"
+              class="my-1 my-4"
+              rounded
+              height="auto"
+              elevation="1"
+            >
+              <TaskSettingsC :network="network" :task-type="task[0]"
+                             :settings-prop="task[1]"
+                             @updated="taskUpdated"/>
+            </v-list-item>
+          </div>
+        </v-list>
+
+      </v-card>
+    </v-expansion-panel-text>
+  </v-expansion-panel>
 </template>
 
 <script lang="ts">
 
 import {defineComponent, PropType} from 'vue';
 import {settingsService} from "@/generated/services"
-import {Timer} from "@/components/helper";
-import {SettingsNetwork} from "@/generated/settings";
-import {Network} from "@/generated/flow";
+import {castTaskSettingsMap, castTaskSettingsMapObj, TaskSettings, Timer} from "@/components/helper";
+import {NetworkSettings} from "@/generated/settings";
+import {Network, TaskType} from "@/generated/flow";
 import NetworkGasMultiplier from "@/components/settings/NetworkGasMultiplier.vue";
 import deepEqual from "deep-equal";
 import NetworkMaxGas from "@/components/settings/NetworkMaxGas.vue";
+import Loader from "@/components/Loader.vue";
+import TaskSettingsC from "@/components/settings/TaskSettings.vue";
+import {taskProps} from "@/components/tasks/tasks";
 
 export default defineComponent({
   name: "SettingsNetwork",
-  components: {NetworkMaxGas, NetworkGasMultiplier},
+  components: {TaskSettingsC, Loader, NetworkMaxGas, NetworkGasMultiplier},
   props: {
-    modelValue: {
-      type: Object as PropType<SettingsNetwork>,
-      required: true,
-    },
     network: {
       type: Object as PropType<Network>,
       required: true,
     }
   },
-  emits: ['update:modelValue'],
   watch: {
     settings: {
       handler() {
-        if (!deepEqual(this.settings, this.modelValue)) {
-
-          this.$emit('update:modelValue', this.settings)
-        }
-
+        this.settingsChanged = !deepEqual(this.settings, this.orig)
       },
       deep: true,
     }
@@ -88,27 +108,35 @@ export default defineComponent({
       loading: false,
       suggestedGasPrice: 0,
       ETHPrice: 2000,
-      settings: {} as SettingsNetwork,
+      settings: {} as NetworkSettings,
+      orig: {} as NetworkSettings,
+      settingsChanged: false,
+      updating: false,
+      reseting: false,
+      taskMap: new Map<TaskType, TaskSettings>(),
     }
   },
   computed: {
+    TaskType() {
+      return TaskType
+    },
     Network() {
       return Network
     },
-    limitGasUSD() {
-      return this.ETHPrice / 10e17 * Number(this.settings.gasTotal)
-    }
   },
   methods: {
-    async useLimitGasChanged() {
-
+    slippageAvailable(t: TaskType) {
+      return taskProps[t].networks.some(n => n === this.network)
+    },
+    taskUpdated(taskType: TaskType, p: TaskSettings) {
+      this.taskMap.set(taskType, p)
+      this.settings.taskSettings = this.taskMap
     },
     async endpointChanged(init: boolean) {
       if (this.network == Network.ZKSYNCLITE) {
         return
       }
       if (!init) {
-
         this.timer.add(1000)
         this.timer.cb(async () => {
           this.loading = true
@@ -121,6 +149,51 @@ export default defineComponent({
         })
       }
     },
+
+    sync() {
+      this.orig = Object.assign({}, this.settings)
+      this.taskMap = castTaskSettingsMap(this.settings.taskSettings)
+    },
+    async Reset() {
+      try {
+        this.reseting = true
+        const res = await settingsService.settingsServiceResetSettings({
+          body: {
+            network: this.network
+          }
+        })
+        this.settings = res.settings
+        this.sync()
+      } finally {
+        this.reseting = false
+      }
+    },
+    async Update() {
+      try {
+        this.updating = true
+        this.settings.taskSettings = castTaskSettingsMapObj(this.taskMap)
+        const res = await settingsService.settingsServiceUpdateSettings({
+          body: {
+            settings: this.settings
+          }
+        })
+        this.settings = res.settings
+        this.sync()
+      } finally {
+        this.updating = false
+      }
+    },
+    async loadSettings() {
+      try {
+        this.loading = true
+        const res = await settingsService.settingsServiceGetSettings({body: {network: this.network}})
+        this.settings = res.settings
+        this.sync()
+      } finally {
+        this.loading = false
+      }
+
+    },
     async validate(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
       // спасибо китайцам скажи лучше
@@ -128,53 +201,9 @@ export default defineComponent({
 
       return valid
     },
-    networkRules() {
-      return [
-        async (v: string) => {
-          if (this.network == Network.ZKSYNCLITE) {
-            return true
-          }
-          if (!this.settings?.rpcEndpoint) {
-            return 'rpc required'
-          }
-
-          try {
-            const res = await settingsService.settingsServiceGetNetworkByRpc({
-              body: {
-                network: this.network,
-                endpoint: this.settings.rpcEndpoint
-              }
-            })
-
-            if (res.valid) {
-              this.settings.id = res.id
-              this.suggestedGasPrice = Number(res.suggestedGasPrice)
-              return true
-            } else {
-              this.settings.id = ''
-              this.suggestedGasPrice = 0
-              return res.error ? res.error : 'call an ambulance. api error'
-            }
-          } catch (e) {
-            return 'call an ambulance. api error'
-          }
-        }
-      ]
-    },
   },
   async created() {
-    this.settings = Object.assign({}, this.modelValue)
 
-    const res = await settingsService.settingsServiceGetNetworkByRpc({
-      body: {
-        network: this.network,
-        endpoint: this.settings.rpcEndpoint
-      }
-    })
-
-    if (res.valid) {
-      this.suggestedGasPrice = Number(res.suggestedGasPrice)
-    }
   }
 })
 

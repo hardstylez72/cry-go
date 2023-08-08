@@ -106,7 +106,10 @@ func (t *VelocoreSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 
 func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwapTask, client zksyncera.VelocoreSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *defi.Gas, error) {
 
-	var err error
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, nil, err
+	}
 	if client == nil {
 		client, _, err = NewZkSyncClient(profile, p.Network)
 		if err != nil {
@@ -142,7 +145,7 @@ func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwap
 		am = defi.Percent(am, 90)
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, profile.Settings, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -158,6 +161,7 @@ func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwap
 		EstimateOnly: estimateOnly,
 		Gas:          Gas,
 		Debug:        false,
+		Slippage:     getSlippage(s.Source, v1.TaskType_VelocoreSwap),
 	})
 	if err != nil {
 		return nil, nil, err

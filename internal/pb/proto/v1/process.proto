@@ -191,19 +191,6 @@ service ProcessService {
     };
   }
 
-  rpc GetTaskSettings(GetTaskSettingsRequest) returns (GetTaskSettingsResponse) {
-    option (google.api.http) = {
-      post: "/api/gw/v1/process/task/settings",
-      body: "*"
-    };
-  }
-
-  rpc SetTaskSettings(SetTaskSettingsRequest) returns (SetTaskSettingsResponse) {
-    option (google.api.http) = {
-      post: "/api/gw/v1/process/task/settings/set",
-      body: "*"
-    };
-  }
 
   rpc GetTaskTransactions(GetTaskTransactionsReq) returns (GetTaskTransactionsRes) {
     option (google.api.http) = {
@@ -257,33 +244,12 @@ message GetTaskTransactionsRes {
   };
 }
 
-message SetTaskSettingsRequest {
-  int64 wei = 1;
-  task.TaskType task_type = 2;
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: ["wei", "task_type"]
-    }
-  };
-}
 
-message SetTaskSettingsResponse {
 
-}
 
-message GetTaskSettingsRequest {
-  task.TaskType task_type = 1;
-  shared.Network network = 2;
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: ["task_type", "network"]
-    }
-  };
-}
 
-message GetTaskSettingsResponse {
-  optional shared.AmUni gas_limit = 1;
-}
+
+
 
 message EstimateCostRequest {
   string process_id = 1;

@@ -61,12 +61,16 @@ func (t *WethTask) Run(ctx context.Context, a *Input) (_ *v1.ProcessTask, err er
 		return nil, errors.Wrap(err, "a.Halper.Profile")
 	}
 
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, err
+	}
 	token := v1.Token_WETH
 	if p.Wrap {
 		token = v1.Token_ETH
 	}
 
-	client, err := uniclient.NewWETH(p.Network, profile.BaseConfig(p.Network))
+	client, err := uniclient.NewWETH(p.Network, s.BaseConfig())
 	if err != nil {
 		return nil, errors.Wrap(err, "uniclient.NewWETH")
 	}
@@ -89,7 +93,7 @@ func (t *WethTask) Run(ctx context.Context, a *Input) (_ *v1.ProcessTask, err er
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateWethTaskCost")
 		}
-		gas, err := GasManager(estimation, profile.Settings, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network)
 		if err != nil {
 			return nil, err
 		}
@@ -134,8 +138,11 @@ func (t *WethTask) Run(ctx context.Context, a *Input) (_ *v1.ProcessTask, err er
 }
 
 func EstimateWethTaskCost(ctx context.Context, p *v1.WETHTask, profile *halp.Profile) (*v1.EstimationTx, error) {
-
-	swapper, err := uniclient.NewWETH(p.Network, profile.BaseConfig(p.Network))
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, err
+	}
+	swapper, err := uniclient.NewWETH(p.Network, s.BaseConfig())
 	if err != nil {
 		return nil, err
 	}

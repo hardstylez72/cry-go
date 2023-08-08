@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"time"
 
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
 	"github.com/hardstylez72/cry/internal/lib"
@@ -18,6 +19,15 @@ func (s *HelperService) GetUser(ctx context.Context, req *v1.GetUserRequest) (*v
 	userId, err := user.GetUserId(ctx)
 	if err != nil {
 		return nil, status.New(codes.Unauthenticated, "").Err()
+	}
+
+	settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-08")
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.settingsService.ResolveAllSettings(ctx, userId, settingsLastUpdateDate); err != nil {
+		return nil, err
 	}
 
 	u, err := s.userRepository.GetUserById(ctx, userId)

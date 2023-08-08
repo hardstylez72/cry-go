@@ -10,70 +10,17 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/ezkaliburrouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
-func (c *Client) EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
-	result := &defi.DefaultRes{}
-
-	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
-	if err != nil {
-		return nil, err
-	}
-
-	tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
-		Token:       req.FromToken,
-		WalletPK:    req.WalletPK,
-		Amount:      req.Amount,
-		SpenderAddr: c.Cfg.Ezkalibur.Router,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "TokenLimitChecker")
-	}
-	result.ApproveTx = tokenLimitChecker.ApproveTx
-
-	value := big.NewInt(0)
-	if req.FromToken == v1.Token_ETH {
-		value = req.Amount
-	}
-
-	data, err := c.makeEzkaliburSwapData(ctx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "makeEzkaliburSwapData")
-	}
-
-	tx := utils.CreateFunctionCallTransaction(
-		transactor.WalletAddr,
-		c.Cfg.Ezkalibur.Router,
-		big.NewInt(0),
-		big.NewInt(0),
-		value,
-		data,
-		nil, nil,
-	)
-
-	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, transactor.Signer)
-	if err != nil {
-		return nil, errors.Wrap(err, "Make712Tx")
-	}
-
-	result.ECost = estimate
-
-	if req.EstimateOnly {
-		return result, nil
-	}
-
-	hash, err := c.Provider.SendRawTransaction(raw)
-	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
-	}
-
-	result.Tx = c.NewTx(hash, defi.CodeContract)
-
-	return result, nil
+type ezkaliburMaker struct {
+	*Client
 }
 
-func (c *Client) makeEzkaliburSwapData(ctx context.Context, req *defi.DefaultSwapReq) ([]byte, error) {
+func (c *Client) EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+	return c.GenericSwap(ctx, &ezkaliburMaker{c}, req)
+}
+
+func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
 
 	w, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -92,6 +39,11 @@ func (c *Client) makeEzkaliburSwapData(ctx context.Context, req *defi.DefaultSwa
 		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
 	}
 
+	value := big.NewInt(0)
+	if req.FromToken == v1.Token_ETH {
+		value = req.Amount
+	}
+
 	path := []common.Address{from, to}
 	amsOut, err := call.GetAmountsOut(&bind.CallOpts{Context: ctx}, req.Amount, path)
 	if err != nil {
@@ -107,13 +59,29 @@ func (c *Client) makeEzkaliburSwapData(ctx context.Context, req *defi.DefaultSwa
 	}
 	if req.FromToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, defi.SlippagePercent05)
-		return abiEzkaliburrouter.Pack("swapExactETHForTokensSupportingFeeOnTransferTokens", amOut, path, w.WalletAddr, w.WalletAddr, DefaultDeadLine())
+		amOut = defi.Slippage(amOut, req.Slippage)
+		data, err := abiEzkaliburrouter.Pack("swapExactETHForTokensSupportingFeeOnTransferTokens", amOut, path, w.WalletAddr, w.WalletAddr, DefaultDeadLine())
+		if err != nil {
+			return nil, err
+		}
+		return &defi.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.Ezkalibur.Router,
+		}, nil
 
 	} else if req.ToToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, defi.SlippagePercent05)
-		return abiEzkaliburrouter.Pack("swapExactTokensForETHSupportingFeeOnTransferTokens", req.Amount, amOut, path, w.WalletAddr, w.WalletAddr, DefaultDeadLine())
+		amOut = defi.Slippage(amOut, req.Slippage)
+		data, err := abiEzkaliburrouter.Pack("swapExactTokensForETHSupportingFeeOnTransferTokens", req.Amount, amOut, path, w.WalletAddr, w.WalletAddr, DefaultDeadLine())
+		if err != nil {
+			return nil, err
+		}
+		return &defi.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.Ezkalibur.Router,
+		}, nil
 	}
 
 	return nil, errors.New("unsupported input params")

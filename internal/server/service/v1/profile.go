@@ -271,10 +271,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 		return nil, err
 	}
 
-	stgs, err := s.settingsService.GetSettingsNetwork(ctx, &settings.GetSettingsNetworkRequest{
-		Network: req.Network,
-		UserId:  userId,
-	})
+	stgs, err := s.settingsService.GetSettings(ctx, userId, req.Network)
 	if err != nil {
 		return nil, err
 	}

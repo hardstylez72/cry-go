@@ -5,7 +5,6 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/hardstylez72/cry/internal/defi/zksyncera/scan"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
 
@@ -84,6 +83,7 @@ type DefaultSwapReq struct {
 	WalletPK     string
 	EstimateOnly bool
 	Gas          *Gas
+	Slippage     SlippagePercent
 	Debug        bool
 }
 
@@ -103,6 +103,7 @@ type DefaultBridgeReq struct {
 	FromToken    Token
 	ToToken      Token
 	Gas          *Gas
+	Slippage     SlippagePercent
 	EstimateOnly bool
 	Debug        bool
 }
@@ -140,8 +141,7 @@ type EstimatedGasCost struct {
 
 type SyncSwapper interface {
 	Networker
-	SyncSwap(ctx context.Context, req *SyncSwapReq) (*SyncSwapRes, error)
-	WaitSwapFinish(ctx context.Context, txId common.Hash) (*scan.TxStatus, error)
+	SyncSwap(ctx context.Context, req *DefaultSwapReq) (*DefaultRes, error)
 }
 
 type ZkSyncOfficialWithdrawalEtherium interface {

@@ -20,10 +20,7 @@
 <script lang="ts">
 import {AmUni, Network, SyncSwapTask, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
-import {ca} from "vuetify/locale";
 import {helperService, processService} from "@/generated/services";
-import {GetTaskSettingsResponse} from "@/generated/process";
-import {mdiPencilOutline} from "@mdi/js";
 import {Delay, Timer} from "@/components/helper";
 
 export default defineComponent({

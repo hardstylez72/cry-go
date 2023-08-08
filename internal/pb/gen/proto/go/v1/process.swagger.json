@@ -400,70 +400,6 @@
         ]
       }
     },
-    "/api/gw/v1/process/task/settings": {
-      "post": {
-        "operationId": "ProcessService_GetTaskSettings",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/GetTaskSettingsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/GetTaskSettingsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ProcessService"
-        ]
-      }
-    },
-    "/api/gw/v1/process/task/settings/set": {
-      "post": {
-        "operationId": "ProcessService_SetTaskSettings",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/SetTaskSettingsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/SetTaskSettingsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "ProcessService"
-        ]
-      }
-    },
     "/api/gw/v1/process/task/skip": {
       "post": {
         "operationId": "ProcessService_SkipProcessTask",
@@ -908,29 +844,6 @@
       "required": [
         "transactions"
       ]
-    },
-    "GetTaskSettingsRequest": {
-      "type": "object",
-      "properties": {
-        "taskType": {
-          "$ref": "#/definitions/TaskType"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        }
-      },
-      "required": [
-        "taskType",
-        "network"
-      ]
-    },
-    "GetTaskSettingsResponse": {
-      "type": "object",
-      "properties": {
-        "gasLimit": {
-          "$ref": "#/definitions/AmUni"
-        }
-      }
     },
     "GetTaskTransactionsReq": {
       "type": "object",
@@ -1434,25 +1347,6 @@
       ]
     },
     "RetryProcessResponse": {
-      "type": "object"
-    },
-    "SetTaskSettingsRequest": {
-      "type": "object",
-      "properties": {
-        "wei": {
-          "type": "string",
-          "format": "int64"
-        },
-        "taskType": {
-          "$ref": "#/definitions/TaskType"
-        }
-      },
-      "required": [
-        "wei",
-        "taskType"
-      ]
-    },
-    "SetTaskSettingsResponse": {
       "type": "object"
     },
     "SkipProcessTaskRequest": {

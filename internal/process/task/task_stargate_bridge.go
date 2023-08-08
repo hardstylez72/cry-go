@@ -9,7 +9,6 @@ import (
 	"github.com/hardstylez72/cry/internal/lzscan"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
-	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -176,10 +175,7 @@ func NewSwapper(ctx context.Context, a *Input) (defi.StargateSwapper, *defi.Wall
 		proxyString = profile.Proxy.String
 	}
 
-	stgs, err := a.SettingsService.GetSettingsNetwork(ctx, &settings.GetSettingsNetworkRequest{
-		Network: l.StargateBridgeTask.FromNetwork,
-		UserId:  a.UserId,
-	})
+	stgs, err := a.SettingsService.GetSettings(ctx, a.UserId, l.StargateBridgeTask.FromNetwork)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -201,6 +197,10 @@ func NewSwapper(ctx context.Context, a *Input) (defi.StargateSwapper, *defi.Wall
 
 func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapper defi.StargateSwapper, profile *halp.Profile, estimation *v1.EstimationTx) (*SwapRes, *defi.Gas, error) {
 
+	s, err := profile.GetNetworkSettings(ctx, p.FromNetwork)
+	if err != nil {
+		return nil, nil, err
+	}
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{
 		WalletAddress: profile.WalletAddr,
 		Token:         p.FromToken,
@@ -214,7 +214,7 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 		return nil, nil, err
 	}
 
-	gas, err := GasManager(estimation, profile.Settings, p.FromNetwork)
+	gas, err := GasManager(estimation, s.Source, p.FromNetwork)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -231,6 +231,7 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 		FromToken:   p.FromToken,
 		ToToken:     p.ToToken,
 		Gas:         gas,
+		Slippage:    getSlippage(s.Source, v1.TaskType_StargateBridge),
 	})
 	if err != nil {
 		return nil, nil, err
@@ -250,7 +251,7 @@ type Tx struct {
 	TxId string
 }
 
-func GasManager(e *v1.EstimationTx, s *v1.Settings, n v1.Network) (*defi.Gas, error) {
+func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network) (*defi.Gas, error) {
 	limit, ok := big.NewInt(0).SetString(e.GasLimit.Wei, 10)
 	if !ok {
 		log.Log.Error("GasLimit: " + e.GasLimit.Wei)
@@ -268,17 +269,10 @@ func GasManager(e *v1.EstimationTx, s *v1.Settings, n v1.Network) (*defi.Gas, er
 
 	beforeMultiplier := big.NewInt(totalGas.Int64())
 
-	networkSettings, err := settings.GetSettingsNetworkSource(n, s)
-	if err != nil {
-		return nil, errors.Wrap(err, "settings.GetSettingsNetworkSource")
-	}
-
 	maxGas := big.NewInt(0)
-	if networkSettings.MaxGas != nil {
-		tmp, ok := big.NewInt(0).SetString(networkSettings.GetMaxGas(), 10)
-		if ok {
-			maxGas = tmp
-		}
+	tmp, ok := big.NewInt(0).SetString(s.GetMaxGas(), 10)
+	if ok {
+		maxGas = tmp
 	}
 
 	gas := &defi.Gas{
@@ -290,7 +284,7 @@ func GasManager(e *v1.EstimationTx, s *v1.Settings, n v1.Network) (*defi.Gas, er
 		TotalGas:            *totalGas,
 	}
 
-	gas = GasMultiplier(networkSettings.GasMultiplier, gas)
+	gas = GasMultiplier(&s.GasMultiplier, gas)
 
 	if maxGas.Cmp(&gas.TotalGas) <= -1 {
 		max := defi.AmountUni(maxGas, n)
@@ -303,7 +297,12 @@ func GasManager(e *v1.EstimationTx, s *v1.Settings, n v1.Network) (*defi.Gas, er
 
 func EstimateStargateBridgeSwapCost(ctx context.Context, p *v1.StargateBridgeTask, profile *halp.Profile) (*v1.EstimationTx, error) {
 
-	swapper, err := uniclient.NewStargateSwapper(p.FromNetwork, profile.BaseConfig(p.FromNetwork))
+	s, err := profile.GetNetworkSettings(ctx, p.FromNetwork)
+	if err != nil {
+		return nil, err
+	}
+
+	swapper, err := uniclient.NewStargateSwapper(p.FromNetwork, s.BaseConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -331,6 +330,7 @@ func EstimateStargateBridgeSwapCost(ctx context.Context, p *v1.StargateBridgeTas
 		Gas:          nil,
 		EstimateOnly: true,
 		Debug:        false,
+		Slippage:     getSlippage(s.Source, v1.TaskType_StargateBridge),
 	})
 	if err != nil {
 		return nil, err

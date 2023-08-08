@@ -6,30 +6,25 @@
   <div>Status:
     <span :style="`color: ${getTxStatusColor}`">{{ getTxStatus }}</span>
   </div>
-  <!--  <TaskSettings :task-type="task.taskType" :network="item.network"/>-->
+  <GasOptions :item="item.tx" :network="Network.Etherium"/>
 </template>
 
 <script lang="ts">
 import {
   AmUni,
   Network,
-  SyncSwapTask,
   Task,
-  TaskType,
   Token, ZkSyncOfficialBridgeFromEthereumTask,
-  ZkSyncOfficialBridgeToEthereumTask
 } from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
-import {ca} from "vuetify/locale";
-import {processService} from "@/generated/services";
-import {GetTaskSettingsResponse, ProcessStatus} from "@/generated/process";
-import TaskSettings from "@/components/tasks/menu/TaskSettings.vue";
+import {ProcessStatus} from "@/generated/process";
 import {getAmountSend} from "./helper";
 import {link} from "@/components/tasks/links";
+import GasOptions from "@/components/tasks/menu/GasOptions.vue";
 
 export default defineComponent({
   name: "MenuZkSyncOfficialBridgeFromEth",
-  components: {TaskSettings},
+  components: {GasOptions},
   props: {
     task: {
       type: Object as PropType<Task>,

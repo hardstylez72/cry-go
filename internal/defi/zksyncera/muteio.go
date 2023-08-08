@@ -16,23 +16,7 @@ import (
 	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
-type MuteIOSwapReq struct {
-	Amount    *big.Int
-	FromToken v1.Token
-	ToToken   v1.Token
-
-	WalletPK     string
-	EstimateOnly bool
-	Gas          *defi.Gas
-}
-
-type MuteIOSwapRes struct {
-	Tx        *defi.Transaction
-	Allowance *defi.Transaction
-	ECost     *defi.EstimatedGasCost
-}
-
-func (c *Client) MuteIOSwap(ctx context.Context, req *MuteIOSwapReq) (*MuteIOSwapRes, error) {
+func (c *Client) MuteIOSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
 	if req.FromToken == v1.Token_ETH || req.FromToken == v1.Token_WETH {
 		return c.muteIoSwapFromEth(ctx, req)
 	}
@@ -53,14 +37,14 @@ func (c *Client) MuteIOSwap(ctx context.Context, req *MuteIOSwapReq) (*MuteIOSwa
 	}
 
 	if res.ApproveTx != nil {
-		r.Allowance = res.ApproveTx
+		r.ApproveTx = res.ApproveTx
 	}
 	return r, nil
 }
 
 // off https://explorer.zksync.io/tx/0x74dc1805388938923ffbfdbf0b021656f7bc1aca19a6508a64ffccf2632c7c94
 // my
-func (c *Client) muteIoSwapToEth(ctx context.Context, req *MuteIOSwapReq) (*MuteIOSwapRes, error) {
+func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
 
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -108,7 +92,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *MuteIOSwapReq) (*Mute
 	if err != nil {
 		return nil, fmt.Errorf("Make712Tx: %w", err)
 	}
-	result := &MuteIOSwapRes{}
+	result := &defi.DefaultRes{}
 	result.ECost = estimate
 
 	if req.EstimateOnly {
@@ -126,7 +110,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *MuteIOSwapReq) (*Mute
 
 // off https://explorer.zksync.io/tx/0xf5aa782e37711f8ebdfe19608ce24d5d0219103264d39f20d04738e677756c7d
 // my https://explorer.zksync.io/tx/0x5f86de07362b4de327a59f6ae866ba98bb4ddd65e73d19cfb1baeca5fc702292
-func (c *Client) muteIoSwapFromEth(ctx context.Context, req *MuteIOSwapReq) (*MuteIOSwapRes, error) {
+func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
 		return nil, errors.Wrap(err, "NewWalletTransactor")
@@ -178,7 +162,7 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *MuteIOSwapReq) (*Mu
 	if err != nil {
 		return nil, fmt.Errorf("Make712Tx: %w", err)
 	}
-	result := &MuteIOSwapRes{}
+	result := &defi.DefaultRes{}
 	result.ECost = estimate
 
 	if req.EstimateOnly {
@@ -194,7 +178,7 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *MuteIOSwapReq) (*Mu
 	return result, nil
 }
 
-func (c *Client) MuteIoPairFee(ctx context.Context, req *MuteIOSwapReq) (AmountOut *big.Int, Stable bool, Fee *big.Int, err error) {
+func (c *Client) MuteIoPairFee(ctx context.Context, req *defi.DefaultSwapReq) (AmountOut *big.Int, Stable bool, Fee *big.Int, err error) {
 	caller, err := muteiorouter.NewStorageCaller(c.Cfg.Muteio.RouterSwap, c.Provider)
 	if err != nil {
 		return nil, false, nil, err
@@ -206,5 +190,5 @@ func (c *Client) MuteIoPairFee(ctx context.Context, req *MuteIOSwapReq) (AmountO
 	if err != nil {
 		return nil, false, nil, err
 	}
-	return defi.Slippage(amOut.AmountOut, defi.SlippagePercent01), amOut.Stable, amOut.Fee, nil
+	return defi.Slippage(amOut.AmountOut, req.Slippage), amOut.Stable, amOut.Fee, nil
 }

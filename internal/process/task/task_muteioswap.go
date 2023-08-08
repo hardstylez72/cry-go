@@ -61,7 +61,12 @@ func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 		return nil, err
 	}
 
-	bc := profile.BaseConfig(p.Network)
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, err
+	}
+
+	bc := s.BaseConfig()
 	proxy, err := socks5.NewSock5ProxyString(bc.ProxyString, bc.UserAgentHeader)
 	if err != nil {
 		return nil, err
@@ -99,7 +104,7 @@ func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 			return nil, err
 		}
 
-		gas, err := GasManager(estimate, profile.Settings, p.Network)
+		gas, err := GasManager(estimate, s.Source, p.Network)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +113,7 @@ func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 			am = ResolveNetworkTokenAmount(b.WEI, &gas.TotalGas, am)
 		}
 
-		res, err := client.MuteIOSwap(taskContext, &zksyncera.MuteIOSwapReq{
+		res, err := client.MuteIOSwap(taskContext, &defi.DefaultSwapReq{
 			Gas:       gas,
 			Amount:    am,
 			FromToken: p.FromToken,
@@ -119,7 +124,7 @@ func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 			return nil, err
 		}
 
-		if err := a.AddTx(ctx, res.Allowance); err != nil {
+		if err := a.AddTx(ctx, res.ApproveTx); err != nil {
 			return nil, err
 		}
 
@@ -148,7 +153,12 @@ func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 
 func EstimateMuteioSwapCost(ctx context.Context, profile *halp.Profile, p *v1.MuteioSwapTask) (*v1.EstimationTx, error) {
 
-	bc := profile.BaseConfig(p.Network)
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, err
+	}
+
+	bc := s.BaseConfig()
 	proxy, err := socks5.NewSock5ProxyString(bc.ProxyString, bc.UserAgentHeader)
 	if err != nil {
 		return nil, err
@@ -180,13 +190,14 @@ func EstimateMuteioSwapCost(ctx context.Context, profile *halp.Profile, p *v1.Mu
 		return nil, err
 	}
 
-	swap, err := swapper.MuteIOSwap(ctx, &zksyncera.MuteIOSwapReq{
+	swap, err := swapper.MuteIOSwap(ctx, &defi.DefaultSwapReq{
 		Gas:          nil,
 		Amount:       defi.Percent(am, 90),
 		FromToken:    p.FromToken,
 		ToToken:      p.ToToken,
 		WalletPK:     wallet.PK,
 		EstimateOnly: true,
+		Slippage:     getSlippage(s.Source, v1.TaskType_MuteioSwap),
 	})
 	if err != nil {
 		return nil, err

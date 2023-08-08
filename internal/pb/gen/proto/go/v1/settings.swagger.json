@@ -48,41 +48,9 @@
         ]
       }
     },
-    "/api/gw/v1/settings/network/rpc/validate": {
-      "post": {
-        "operationId": "SettingsService_GetNetworkByRPC",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/GetNetworkByRPCResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/GetNetworkByRPCRequest"
-            }
-          }
-        ],
-        "tags": [
-          "SettingsService"
-        ]
-      }
-    },
     "/api/gw/v1/settings/reset": {
       "post": {
-        "operationId": "SettingsService_Reset",
+        "operationId": "SettingsService_ResetSettings",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -155,53 +123,22 @@
       },
       "additionalProperties": {}
     },
-    "GetNetworkByRPCRequest": {
+    "GetSettingsRequest": {
       "type": "object",
       "properties": {
-        "endpoint": {
-          "type": "string"
-        },
         "network": {
           "$ref": "#/definitions/Network"
         }
       },
       "required": [
-        "endpoint",
         "network"
       ]
-    },
-    "GetNetworkByRPCResponse": {
-      "type": "object",
-      "properties": {
-        "valid": {
-          "type": "boolean"
-        },
-        "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "suggestedGasPrice": {
-          "type": "string",
-          "format": "int64"
-        },
-        "error": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "valid",
-        "id",
-        "suggestedGasPrice"
-      ]
-    },
-    "GetSettingsRequest": {
-      "type": "object"
     },
     "GetSettingsResponse": {
       "type": "object",
       "properties": {
         "settings": {
-          "$ref": "#/definitions/Settings"
+          "$ref": "#/definitions/NetworkSettings"
         }
       },
       "required": [
@@ -224,92 +161,14 @@
       ],
       "default": "ARBITRUM"
     },
-    "ResetRequest": {
-      "type": "object"
-    },
-    "ResetResponse": {
-      "type": "object",
-      "properties": {
-        "settings": {
-          "$ref": "#/definitions/Settings"
-        }
-      },
-      "required": [
-        "settings"
-      ]
-    },
-    "Settings": {
-      "type": "object",
-      "properties": {
-        "userId": {
-          "type": "string"
-        },
-        "bnb": {
-          "$ref": "#/definitions/SettingsNetwork"
-        },
-        "optimism": {
-          "$ref": "#/definitions/SettingsNetwork"
-        },
-        "arbitrum": {
-          "$ref": "#/definitions/SettingsNetwork"
-        },
-        "etherium": {
-          "$ref": "#/definitions/SettingsNetwork"
-        },
-        "polygon": {
-          "$ref": "#/definitions/SettingsNetwork"
-        },
-        "avalanche": {
-          "$ref": "#/definitions/SettingsNetwork"
-        },
-        "zksyncTestNet": {
-          "$ref": "#/definitions/SettingsNetwork"
-        },
-        "zksyncMainNet": {
-          "$ref": "#/definitions/SettingsNetwork"
-        },
-        "taskGasLimitMap": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "format": "int64"
-          }
-        },
-        "zksyncLite": {
-          "$ref": "#/definitions/SettingsNetwork"
-        }
-      },
-      "required": [
-        "bnb",
-        "optimism",
-        "arbitrum",
-        "etherium",
-        "polygon",
-        "avalanche",
-        "zksyncTestNet",
-        "zksyncMainNet",
-        "taskGasLimitMap",
-        "zksyncLite"
-      ]
-    },
-    "SettingsNetwork": {
+    "NetworkSettings": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
-        },
-        "useLimitGas": {
-          "type": "boolean",
-          "title": "deprecated"
+          "type": "string"
         },
         "rpcEndpoint": {
           "type": "string"
-        },
-        "gasTotal": {
-          "type": "string",
-          "format": "int64",
-          "title": "deprecated"
         },
         "gasMultiplier": {
           "type": "number",
@@ -317,12 +176,46 @@
         },
         "maxGas": {
           "type": "string"
+        },
+        "taskSettings": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/TaskSettings"
+          }
+        },
+        "network": {
+          "$ref": "#/definitions/Network"
         }
       },
       "required": [
         "id",
-        "useLimitGas",
-        "rpcEndpoint"
+        "rpcEndpoint",
+        "taskSettings",
+        "gasMultiplier",
+        "maxGas",
+        "network"
+      ]
+    },
+    "ResetRequest": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "$ref": "#/definitions/Network"
+        }
+      },
+      "required": [
+        "network"
+      ]
+    },
+    "ResetResponse": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/NetworkSettings"
+        }
+      },
+      "required": [
+        "settings"
       ]
     },
     "Status": {
@@ -344,11 +237,19 @@
         }
       }
     },
+    "TaskSettings": {
+      "type": "object",
+      "properties": {
+        "slippage": {
+          "type": "string"
+        }
+      }
+    },
     "UpdateSettingsRequest": {
       "type": "object",
       "properties": {
         "settings": {
-          "$ref": "#/definitions/Settings"
+          "$ref": "#/definitions/NetworkSettings"
         }
       },
       "required": [
@@ -359,7 +260,7 @@
       "type": "object",
       "properties": {
         "settings": {
-          "$ref": "#/definitions/Settings"
+          "$ref": "#/definitions/NetworkSettings"
         }
       },
       "required": [

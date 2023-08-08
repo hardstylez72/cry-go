@@ -11,6 +11,7 @@ import (
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/uniclient"
+	"github.com/pkg/errors"
 )
 
 type Halp struct {
@@ -27,10 +28,10 @@ func NewHalp(profileRepository repository.ProfileRepository,
 }
 
 type Profile struct {
+	h           *Halp
 	UserAgent   string
 	UserId      string
 	Id          string
-	Settings    *v1.Settings
 	DB          *repository.Profile
 	ProxyString string
 	WalletAddr  common.Address
@@ -50,18 +51,12 @@ func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) 
 		proxyString = profile.Proxy.String
 	}
 
-	stgs, err := h.settingsService.GetSettings(ctx, profile.UserId)
-	if err != nil {
-		return nil, err
-	}
-
 	tx, err := defi.NewWalletTransactor(string(profile.MmskPk))
 	if err != nil {
 		return nil, err
 	}
 	return &Profile{
 		UserAgent:   profile.UserAgent,
-		Settings:    stgs,
 		DB:          profile,
 		ProxyString: proxyString,
 		WalletAddr:  tx.WalletAddr,
@@ -69,26 +64,41 @@ func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) 
 		Wallet:      tx,
 		Id:          profileId,
 		UserId:      profile.UserId,
+		h:           h,
 	}, nil
 }
 
-func (p *Profile) BaseConfig(network v1.Network) *uniclient.BaseClientConfig {
-	n, _ := settings.GetSettingsNetworkSource(network, p.Settings)
-	return &uniclient.BaseClientConfig{
-		ProxyString:     p.ProxyString,
-		RPCEndpoint:     n.RpcEndpoint,
-		UserAgentHeader: p.DB.UserAgent,
-	}
+type Settings struct {
+	Source *v1.NetworkSettings
+	p      *Profile
 }
 
-func (p *Profile) EraWallet(network v1.Network) (*zksyncera.WalletTransactor, error) {
-
-	n, err := settings.GetSettingsNetworkSource(network, p.Settings)
+func (p *Profile) GetNetworkSettings(ctx context.Context, network v1.Network) (*Settings, error) {
+	ns, err := p.h.settingsService.GetSettings(ctx, p.UserId, network)
 	if err != nil {
 		return nil, err
 	}
 
-	wallet, err := zksyncera.NewWalletTransactor(string(p.DB.MmskPk), big.NewInt(n.Id))
+	return &Settings{Source: ns, p: p}, nil
+}
+
+func (p *Settings) BaseConfig() *uniclient.BaseClientConfig {
+
+	return &uniclient.BaseClientConfig{
+		ProxyString:     p.p.ProxyString,
+		RPCEndpoint:     p.Source.RpcEndpoint,
+		UserAgentHeader: p.p.DB.UserAgent,
+	}
+}
+
+func (p *Settings) EraWallet() (*zksyncera.WalletTransactor, error) {
+
+	id, ok := big.NewInt(0).SetString(p.Source.Id, 10)
+	if !ok {
+		return nil, errors.New("invalid network id: " + p.Source.Id)
+	}
+
+	wallet, err := zksyncera.NewWalletTransactor(string(p.p.DB.MmskPk), id)
 	if err != nil {
 		return nil, err
 	}
@@ -106,16 +116,16 @@ func (p *Profile) EthWallet() (*defi.WalletTransactor, error) {
 	return wallet, nil
 }
 
-func (p *Profile) GetWalletAddr(n v1.Network) (*common.Address, error) {
+func (p *Settings) GetWalletAddr() (*common.Address, error) {
 	var walletAddr common.Address
-	if n == v1.Network_ZKSYNCERA || n == v1.Network_ZKSYNCLITE {
-		w, err := p.EraWallet(n)
+	if p.Source.Network == v1.Network_ZKSYNCERA || p.Source.GetNetwork() == v1.Network_ZKSYNCLITE {
+		w, err := p.EraWallet()
 		if err != nil {
 			return nil, err
 		}
 		walletAddr = w.WalletAddr
 	} else {
-		w, err := p.EthWallet()
+		w, err := p.p.EthWallet()
 		if err != nil {
 			return nil, err
 		}

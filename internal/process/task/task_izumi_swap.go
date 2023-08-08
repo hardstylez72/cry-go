@@ -106,7 +106,11 @@ func (t *IzumiSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, err
 
 func IzumiSwap(ctx context.Context, profile *halp.Profile, p *v1.IzumiSwapTask, client zksyncera.IzumiSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *defi.Gas, error) {
 
-	var err error
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	if client == nil {
 		client, _, err = NewZkSyncClient(profile, p.Network)
 		if err != nil {
@@ -142,7 +146,7 @@ func IzumiSwap(ctx context.Context, profile *halp.Profile, p *v1.IzumiSwapTask, 
 		am = defi.Percent(am, 90)
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, profile.Settings, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -158,6 +162,7 @@ func IzumiSwap(ctx context.Context, profile *halp.Profile, p *v1.IzumiSwapTask, 
 		EstimateOnly: estimateOnly,
 		Gas:          Gas,
 		Debug:        false,
+		Slippage:     getSlippage(s.Source, v1.TaskType_IzumiSwap),
 	})
 	if err != nil {
 		return nil, nil, err

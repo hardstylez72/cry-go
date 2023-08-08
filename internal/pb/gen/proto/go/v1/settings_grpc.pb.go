@@ -22,8 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SettingsServiceClient interface {
-	Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error)
-	GetNetworkByRPC(ctx context.Context, in *GetNetworkByRPCRequest, opts ...grpc.CallOption) (*GetNetworkByRPCResponse, error)
+	ResetSettings(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error)
 	GetSettings(ctx context.Context, in *GetSettingsRequest, opts ...grpc.CallOption) (*GetSettingsResponse, error)
 	UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*UpdateSettingsResponse, error)
 }
@@ -36,18 +35,9 @@ func NewSettingsServiceClient(cc grpc.ClientConnInterface) SettingsServiceClient
 	return &settingsServiceClient{cc}
 }
 
-func (c *settingsServiceClient) Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error) {
+func (c *settingsServiceClient) ResetSettings(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error) {
 	out := new(ResetResponse)
-	err := c.cc.Invoke(ctx, "/settings.SettingsService/Reset", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *settingsServiceClient) GetNetworkByRPC(ctx context.Context, in *GetNetworkByRPCRequest, opts ...grpc.CallOption) (*GetNetworkByRPCResponse, error) {
-	out := new(GetNetworkByRPCResponse)
-	err := c.cc.Invoke(ctx, "/settings.SettingsService/GetNetworkByRPC", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/settings.SettingsService/ResetSettings", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +66,7 @@ func (c *settingsServiceClient) UpdateSettings(ctx context.Context, in *UpdateSe
 // All implementations must embed UnimplementedSettingsServiceServer
 // for forward compatibility
 type SettingsServiceServer interface {
-	Reset(context.Context, *ResetRequest) (*ResetResponse, error)
-	GetNetworkByRPC(context.Context, *GetNetworkByRPCRequest) (*GetNetworkByRPCResponse, error)
+	ResetSettings(context.Context, *ResetRequest) (*ResetResponse, error)
 	GetSettings(context.Context, *GetSettingsRequest) (*GetSettingsResponse, error)
 	UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsResponse, error)
 	mustEmbedUnimplementedSettingsServiceServer()
@@ -87,11 +76,8 @@ type SettingsServiceServer interface {
 type UnimplementedSettingsServiceServer struct {
 }
 
-func (UnimplementedSettingsServiceServer) Reset(context.Context, *ResetRequest) (*ResetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Reset not implemented")
-}
-func (UnimplementedSettingsServiceServer) GetNetworkByRPC(context.Context, *GetNetworkByRPCRequest) (*GetNetworkByRPCResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetNetworkByRPC not implemented")
+func (UnimplementedSettingsServiceServer) ResetSettings(context.Context, *ResetRequest) (*ResetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetSettings not implemented")
 }
 func (UnimplementedSettingsServiceServer) GetSettings(context.Context, *GetSettingsRequest) (*GetSettingsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSettings not implemented")
@@ -112,38 +98,20 @@ func RegisterSettingsServiceServer(s grpc.ServiceRegistrar, srv SettingsServiceS
 	s.RegisterService(&SettingsService_ServiceDesc, srv)
 }
 
-func _SettingsService_Reset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SettingsService_ResetSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ResetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SettingsServiceServer).Reset(ctx, in)
+		return srv.(SettingsServiceServer).ResetSettings(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/settings.SettingsService/Reset",
+		FullMethod: "/settings.SettingsService/ResetSettings",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServiceServer).Reset(ctx, req.(*ResetRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SettingsService_GetNetworkByRPC_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetNetworkByRPCRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SettingsServiceServer).GetNetworkByRPC(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/settings.SettingsService/GetNetworkByRPC",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SettingsServiceServer).GetNetworkByRPC(ctx, req.(*GetNetworkByRPCRequest))
+		return srv.(SettingsServiceServer).ResetSettings(ctx, req.(*ResetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -192,12 +160,8 @@ var SettingsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*SettingsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Reset",
-			Handler:    _SettingsService_Reset_Handler,
-		},
-		{
-			MethodName: "GetNetworkByRPC",
-			Handler:    _SettingsService_GetNetworkByRPC_Handler,
+			MethodName: "ResetSettings",
+			Handler:    _SettingsService_ResetSettings_Handler,
 		},
 		{
 			MethodName: "GetSettings",

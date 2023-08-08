@@ -22,7 +22,7 @@ func (c *Client) StargateBridge(ctx context.Context, req *defi.DefaultBridgeReq)
 	return c.GenericBridge(ctx, &stargateBridgeMaker{c}, req)
 }
 
-func (m *stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.TxData, error) {
+func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.TxData, error) {
 
 	c := m.source
 
@@ -63,7 +63,7 @@ func (m *stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.Defaul
 	_dstChainId = dist
 	_toAddress = wt.WalletAddr.Bytes()
 	_amount = req.Amount
-	_minAmount = defi.Slippage(req.Amount, defi.SlippagePercent05)
+	_minAmount = defi.Slippage(req.Amount, req.Slippage)
 	_refundAddress = wt.WalletAddr
 	_zroPaymentAddress = ZEROADDR
 	_feeObj = startgatemavrouter.IOFTWrapperFeeObj{

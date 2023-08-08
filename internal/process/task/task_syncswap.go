@@ -7,7 +7,6 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
-	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 )
@@ -128,10 +127,7 @@ func NewSyncSwapper(ctx context.Context, a *Input) (defi.SyncSwapper, *zksyncera
 		proxyString = profile.Proxy.String
 	}
 
-	stgs, err := a.SettingsService.GetSettingsNetwork(ctx, &settings.GetSettingsNetworkRequest{
-		Network: l.SyncSwapTask.Network,
-		UserId:  a.UserId,
-	})
+	stgs, err := a.SettingsService.GetSettings(ctx, a.UserId, l.SyncSwapTask.Network)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -160,6 +156,11 @@ type SyncSwapRes struct {
 
 func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, profile *halp.Profile) (*SyncSwapRes, *defi.Gas, error) {
 
+	s, err := profile.GetNetworkSettings(ctx, a.Network)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{
 		WalletAddress: profile.WalletAddr,
 		Token:         a.FromToken,
@@ -182,7 +183,7 @@ func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, pro
 		return nil, nil, err
 	}
 
-	gas, err := GasManager(estimation, profile.Settings, a.Network)
+	gas, err := GasManager(estimation, s.Source, a.Network)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -190,13 +191,14 @@ func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, pro
 		am = ResolveNetworkTokenAmount(b.WEI, &gas.TotalGas, am)
 	}
 
-	swap, err := swapper.SyncSwap(ctx, &defi.SyncSwapReq{
+	swap, err := swapper.SyncSwap(ctx, &defi.DefaultSwapReq{
 		Network:   a.Network,
 		Amount:    am,
 		FromToken: a.FromToken,
 		ToToken:   a.ToToken,
 		WalletPK:  profile.WalletPK,
 		Gas:       gas,
+		Slippage:  getSlippage(s.Source, v1.TaskType_SyncSwap),
 	})
 	if err != nil {
 		return nil, nil, err
@@ -213,7 +215,12 @@ func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, pro
 
 func EstimateSyncSwapCost(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapTask) (*v1.EstimationTx, error) {
 
-	swapper, err := uniclient.NewSyncSwapper(p.Network, profile.BaseConfig(p.Network))
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, err
+	}
+
+	swapper, err := uniclient.NewSyncSwapper(p.Network, s.BaseConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -236,13 +243,14 @@ func EstimateSyncSwapCost(ctx context.Context, profile *halp.Profile, p *v1.Sync
 		return nil, err
 	}
 
-	swap, err := swapper.SyncSwap(ctx, &defi.SyncSwapReq{
+	swap, err := swapper.SyncSwap(ctx, &defi.DefaultSwapReq{
 		Network:      p.Network,
 		Amount:       defi.Percent(am, 50),
 		FromToken:    p.FromToken,
 		ToToken:      p.ToToken,
 		WalletPK:     wallet.PK,
 		EstimateOnly: true,
+		Slippage:     getSlippage(s.Source, v1.TaskType_SyncSwap),
 	})
 	if err != nil {
 		return nil, err

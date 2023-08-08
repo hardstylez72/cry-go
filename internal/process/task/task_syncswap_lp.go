@@ -109,7 +109,10 @@ func (t *SyncSwapLPTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 
 func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask, client zksyncera.LP, estimation *v1.EstimationTx) (*zksyncera.SyncSwapLiquidityRes, *defi.Gas, error) {
 
-	var err error
+	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	if err != nil {
+		return nil, nil, err
+	}
 	if client == nil {
 		client, _, err = NewZkSyncClient(profile, p.Network)
 		if err != nil {
@@ -162,7 +165,7 @@ func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask
 		am = defi.Percent(am, 90)
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, profile.Settings, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network)
 		if err != nil {
 			return nil, nil, err
 		}

@@ -83,7 +83,7 @@ func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *Default
 		destChainId,
 		wt.WalletAddr.Bytes(),
 		req.Amount,
-		Slippage(req.Amount, SlippagePercent05),
+		Slippage(req.Amount, req.Slippage),
 		wt.WalletAddr,
 		ZEROADDR,
 		adapterParams,

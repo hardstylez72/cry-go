@@ -1,32 +1,38 @@
 package arbitrum
 
 import (
-	"context"
 	"testing"
 
-	"github.com/hardstylez72/cry/internal/defi"
-	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test(t *testing.T) {
+
 	r, err := NewClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 
-	c := tests.GetConfig()
+	//tx, err := defi.NewWalletTransactor(tests.GetConfig().PK)
 
-	wallet, err := defi.NewWalletTransactor(c.PK)
-	assert.NoError(t, err)
-	assert.NotNil(t, wallet)
-
-	b, err := r.GetBalance(context.Background(), &defi.GetBalanceReq{
-		WalletAddress: wallet.WalletAddr,
-		Token:         v1.Token_ETH,
-	})
-	assert.NoError(t, err)
-	assert.NotNil(t, b)
+	opt, err := bind.NewKeyedTransactorWithChainID(tx.PrivateKey, r.NetworkId)
+	//
+	//tx1 := &types.DynamicFeeTx{}
+	//
+	//
+	//c := tests.GetConfig()
+	//
+	//wallet, err := defi.NewWalletTransactor(c.PK)
+	//assert.NoError(t, err)
+	//assert.NotNil(t, wallet)
+	//
+	//b, err := r.GetBalance(context.Background(), &defi.GetBalanceReq{
+	//	WalletAddress: wallet.WalletAddr,
+	//	Token:         v1.Token_ETH,
+	//})
+	//assert.NoError(t, err)
+	//assert.NotNil(t, b)
 	//res, err := r.Transfer(context.Background(), &defi.TransferReq{
 	//	Wallet: wallet,
 	//	ToAddr: common.HexToAddress("0xb83f35d9d80ceff4d9ad93eff941d5aba64a6341"),

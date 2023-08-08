@@ -148,7 +148,13 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a
 func EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx context.Context, profile *halp.Profile, p *v1.ZkSyncOfficialBridgeFromEthereumTask) (*v1.EstimationTx, error) {
 
 	network := v1.Network_ZKSYNCERA
-	client, err := uniclient.NewZkSyncOfficialBridge(network, profile.BaseConfig(network))
+
+	s, err := profile.GetNetworkSettings(ctx, network)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := uniclient.NewZkSyncOfficialBridge(network, s.BaseConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +193,12 @@ func NewEthClient(ctx context.Context, halper *halp.Halp, profileId string, n v1
 		return nil, nil, err
 	}
 
-	swapper, err := uniclient.NewBaseClient(n, profile.BaseConfig(n))
+	s, err := profile.GetNetworkSettings(ctx, n)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	swapper, err := uniclient.NewBaseClient(n, s.BaseConfig())
 	if err != nil {
 		return nil, nil, err
 	}

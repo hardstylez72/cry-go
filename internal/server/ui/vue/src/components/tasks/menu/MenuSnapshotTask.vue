@@ -10,10 +10,9 @@
 <script lang="ts">
 import {OkexDepositTask, SnapshotVoteTask, Task, TaskType} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
-import {castGasLimitMap, formatTime, humanDuration} from "@/components/helper";
+import {formatTime, humanDuration} from "@/components/helper";
 import {ProcessStatus} from "@/generated/process";
 import {getStatusColor} from "@/components/tasks/menu/helper";
-import {instance} from "@/generated/services";
 import {link} from "@/components/tasks/links";
 
 

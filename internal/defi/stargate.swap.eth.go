@@ -19,6 +19,7 @@ type StargateBridgeSwapEthReq struct {
 	Quantity     *big.Int
 	Gas          *Gas
 	EstimateOnly bool
+	Slippage     SlippagePercent
 }
 
 func (r *StargateBridgeSwapEthReq) Validate(srcChain v1.Network) error {
@@ -123,7 +124,7 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 		req.Wallet.WalletAddr,
 		req.Wallet.WalletAddr.Bytes(),
 		req.Quantity,
-		Slippage(req.Quantity, SlippagePercent05),
+		Slippage(req.Quantity, req.Slippage),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "tr.SwapETH")
@@ -160,17 +161,21 @@ func BigIntSum(values ...*big.Int) *big.Int {
 type SlippagePercent = string
 
 const (
-	SlippagePercent2   SlippagePercent = "2"
-	SlippagePercent1   SlippagePercent = "1"
-	SlippagePercent05  SlippagePercent = "0.5"
-	SlippagePercent02  SlippagePercent = "0.2"
-	SlippagePercent03  SlippagePercent = "0.3"
-	SlippagePercent01  SlippagePercent = "0.1"
-	SlippagePercent001 SlippagePercent = "0.01"
+	SlippagePercent5    SlippagePercent = "5"
+	SlippagePercent2    SlippagePercent = "2"
+	SlippagePercent1    SlippagePercent = "1"
+	SlippagePercent05   SlippagePercent = "0.5"
+	SlippagePercent02   SlippagePercent = "0.2"
+	SlippagePercent03   SlippagePercent = "0.3"
+	SlippagePercent01   SlippagePercent = "0.1"
+	SlippagePercent001  SlippagePercent = "0.01"
+	SlippagePercentZero SlippagePercent = "0"
 )
 
 func Slippage(v *big.Int, slippagePercent SlippagePercent) *big.Int {
 	switch slippagePercent {
+	case SlippagePercentZero:
+		return v
 	case SlippagePercent05:
 		prec := big.NewInt(0).Div(v, big.NewInt(1000))
 		return big.NewInt(0).Mul(prec, big.NewInt(995))
@@ -191,7 +196,10 @@ func Slippage(v *big.Int, slippagePercent SlippagePercent) *big.Int {
 		return big.NewInt(0).Mul(prec, big.NewInt(99))
 	case SlippagePercent2:
 		prec := big.NewInt(0).Div(v, big.NewInt(100))
-		return big.NewInt(0).Mul(prec, big.NewInt(99))
+		return big.NewInt(0).Mul(prec, big.NewInt(98))
+	case SlippagePercent5:
+		prec := big.NewInt(0).Div(v, big.NewInt(100))
+		return big.NewInt(0).Mul(prec, big.NewInt(95))
 	}
 	return nil
 }

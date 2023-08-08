@@ -179,7 +179,6 @@ export default defineComponent({
         let totalTask = p.profiles[0].tasks.length
         let total = totalProfiles * totalTask
 
-        console.log(total)
         let finished = 0
 
         p.profiles.forEach((p) => {

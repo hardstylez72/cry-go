@@ -185,7 +185,7 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 		MaxAge: 60 * 60 * 24 * 30,
 		Secure: false,
 	}, func(ctx context.Context, u auth.CustomUser) (auth.CustomUser, error) {
-		userDB, alreadyRegistred, err := s.userRepository.GetOrCreateUser(ctx, &repository.User{
+		userDB, _, err := s.userRepository.GetOrCreateUser(ctx, &repository.User{
 			Id:     u.Id,
 			Email:  u.Email,
 			Access: u.Access,
@@ -205,9 +205,12 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 			}
 		}
 
-		if !alreadyRegistred {
-			_, _ = s.userSettingsService.ResolveSettingsForUser(ctx, userDB.Id)
+		settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-08")
+		if err != nil {
+			return u, err
 		}
+
+		_ = s.userSettingsService.ResolveAllSettings(ctx, userDB.Id, settingsLastUpdateDate)
 
 		return auth.CustomUser{
 			Id:     userDB.Id,

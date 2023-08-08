@@ -6,7 +6,6 @@ import (
 
 	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
-	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/snapshot"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -54,6 +53,16 @@ func (t *SnapshotVoteTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 
 	p := l.SnapshotVoteTask
 
+	profile, err := a.Halper.Profile(ctx, a.ProfileId)
+	if err != nil {
+		return nil, err
+	}
+
+	s, err := profile.GetNetworkSettings(ctx, v1.Network_ARBITRUM)
+	if err != nil {
+		return nil, err
+	}
+
 	switch a.Task.Status {
 	case v1.ProcessStatus_StatusDone, v1.ProcessStatus_StatusError:
 		return a.Task, nil
@@ -70,21 +79,11 @@ func (t *SnapshotVoteTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 		}
 	}
 
-	profile, err := a.ProfileRepository.GetProfile(ctx, a.ProfileId)
-	if err != nil {
-		return nil, errors.Wrap(err, "a.ProfileRepository.GetProfile")
-	}
-
-	stgs, err := a.SettingsService.GetSettings(ctx, a.UserId)
-	if err != nil {
-		return nil, errors.Wrap(err, "GetSettings")
-	}
-
 	if p.Proposal == nil {
 		proposals, err := a.Snapshot.ActiveProposals(taskContext, &snapshot.ActiveProposalsReq{
-			ProviderRPC: stgs.Arbitrum.RpcEndpoint,
+			ProviderRPC: s.BaseConfig().RPCEndpoint,
 			Space:       p.Space,
-			Pk:          string(profile.MmskPk),
+			Pk:          profile.WalletPK,
 		})
 		if err != nil {
 			return nil, errors.Wrap(err, "Snapshot.ActiveProposals")
@@ -124,19 +123,18 @@ func (t *SnapshotVoteTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 		}
 
 		for _, network := range networks {
-
-			netSettings, err := settings.GetSettingsNetworkSource(network, stgs)
+			s, err := profile.GetNetworkSettings(ctx, network)
 			if err != nil {
-				return nil, errors.Wrap(err, "settings.GetSettingsNetworkSource")
+				return nil, err
 			}
 
 			VoteContext, VoteContextCancel := context.WithTimeout(ctx, time.Minute*2)
 			err = a.Snapshot.Vote(VoteContext, &snapshot.VoteReq{
 				Type:        proposal.Type,
 				ProposalId:  proposalId,
-				ProviderRPC: netSettings.RpcEndpoint,
+				ProviderRPC: s.BaseConfig().RPCEndpoint,
 				Space:       p.Space,
-				Pk:          string(profile.MmskPk),
+				Pk:          profile.WalletPK,
 			})
 			VoteContextCancel()
 

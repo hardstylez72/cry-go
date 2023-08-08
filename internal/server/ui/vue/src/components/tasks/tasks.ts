@@ -26,7 +26,6 @@ import TaskWethSwap from "@/components/tasks/TaskWethSwap.vue";
 import MenuTaskWethSwap from "@/components/tasks/menu/MenuTaskWethSwap.vue";
 import TaskMuteIoSwap from "@/components/tasks/TaskMuteIoSwap.vue";
 import MenuTaskMuteioSwap from "@/components/tasks/menu/MenuTaskMuteioSwap.vue";
-import {Process} from "@/generated/process";
 import {humanDuration} from "@/components/helper";
 import TaskSyncSwapLP from "@/components/tasks/TaskSyncSwapLP.vue";
 import MenuTaskSyncSwapLP from "@/components/tasks/menu/MenuTaskSyncSwapLP.vue";
@@ -66,6 +65,8 @@ interface TaskSpec {
   descFn: DescFn
 
   service?: Service
+
+  networks: Network[]
 }
 
 interface Service {
@@ -106,7 +107,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     descFn(task: Task): string {
       let p = task.delayTask
       return ` (${p?.random ? `${humanDuration(p?.minRandom)}:${humanDuration(p?.maxRandom)}` : humanDuration(p?.duration)})`
-    }
+    },
+    networks: [],
   },
   StargateBridge: {
     deprecated: false,
@@ -122,7 +124,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/stg.svg',
       link: 'https://stargate.finance/',
       implemented: 'Bridge'
-    }
+    },
+    networks: [Network.BinanaceBNB, Network.POLIGON, Network.AVALANCHE, Network.OPTIMISM, Network.ARBITRUM, Network.ZKSYNCERA]
   },
   WithdrawExchange: {
     deprecated: false,
@@ -132,7 +135,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     descFn(task) {
       let p = task.withdrawExchangeTask
       return ` (${p?.network} am: ${p?.sendAllCoins ? 'all' : `[${p?.amountMin}:${p?.amountMax}]`} ${p?.token})`
-    }
+    },
+    networks: [],
   },
   OkexDeposit: {
     deprecated: false,
@@ -142,7 +146,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     descFn(task) {
       let p = task.okexDepositTask
       return ` (${p?.network} ${p?.token})`
-    }
+    },
+    networks: [],
   },
   TestNetBridgeSwap: {
     deprecated: false,
@@ -157,7 +162,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/testnetbridge.svg',
       link: 'https://testnetbridge.com/',
       implemented: 'Bridge'
-    }
+    },
+    networks: [Network.ARBITRUM],
   },
   SnapshotVote: {
     deprecated: false,
@@ -173,7 +179,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/snapshot.png',
       link: 'https://snapshot.org/#/',
       implemented: ''
-    }
+    },
+    networks: [Network.ARBITRUM]
   },
   SyncSwap: {
     deprecated: false,
@@ -189,7 +196,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/syncswap.svg',
       link: 'https://syncswap.xyz/',
       implemented: 'Swap'
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   ZkSyncOfficialBridgeToEthereum: {
     deprecated: false,
@@ -205,7 +213,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/era.svg',
       link: 'https://portal.zksync.io/bridge/',
       implemented: 'L1 <-> L0'
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   Mock: {
     deprecated: true,
@@ -214,7 +223,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     component: null,
     descFn(task) {
       return ''
-    }
+    },
+    networks: []
   },
   OkexBinance: {
     deprecated: true,
@@ -223,7 +233,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     component: null,
     descFn(task) {
       return ''
-    }
+    },
+    networks: []
   },
   Swap1inch: {
     deprecated: true,
@@ -232,7 +243,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     component: null,
     descFn(task) {
       return ''
-    }
+    },
+    networks: []
   },
   OrbiterBridge: {
     deprecated: false,
@@ -248,7 +260,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/orbiter.ico',
       link: 'https://www.orbiter.finance/',
       implemented: 'Bridge'
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   ZkSyncOfficialBridgeFromEthereum: {
     deprecated: false,
@@ -264,7 +277,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/era.svg',
       link: 'https://portal.zksync.io/bridge/',
       implemented: 'L1 <-> L0'
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   WETH: {
     deprecated: false,
@@ -273,7 +287,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     canBeEstimated: true,
     descFn(task) {
       return task.wETHTask?.wrap ? ' (wrap)' : ' (unwrap)'
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   MuteioSwap: {
     deprecated: false,
@@ -289,7 +304,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/muteio.png',
       link: 'https://app.mute.io/swap',
       implemented: 'Swap'
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   SyncSwapLP: {
     deprecated: false,
@@ -300,6 +316,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     menu: MenuTaskSyncSwapLP,
     component: TaskSyncSwapLP,
+    networks: [Network.ZKSYNCERA]
   },
   MaverickSwap: {
     deprecated: false,
@@ -315,7 +332,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/maverick.ico',
       link: 'https://app.mav.xyz/?chain=324',
       implemented: ''
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   SpaceFISwap: {
     deprecated: false,
@@ -331,7 +349,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       link: 'https://swap-zksync.spacefi.io/#/swap',
       img: '/icons/spacefi.png',
       implemented: '',
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   VelocoreSwap: {
     deprecated: false,
@@ -347,7 +366,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       link: 'https://app.velocore.xyz/swap',
       img: '/icons/velocore.png',
       implemented: '',
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   IzumiSwap: {
     deprecated: false,
@@ -363,7 +383,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       link: 'https://izumi.finance/trade/swap',
       img: '/icons/izumi.svg',
       implemented: '',
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   VeSyncSwap: {
     deprecated: false,
@@ -379,7 +400,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       link: 'https://app.vesync.finance/swap',
       img: '/icons/vesync.svg',
       implemented: '',
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   EzkaliburSwap: {
     deprecated: false,
@@ -395,7 +417,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       link: 'https://dapp.ezkalibur.com/',
       img: '/icons/ezkalibur.ico',
       implemented: '',
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   ZkSwap: {
     deprecated: false,
@@ -411,7 +434,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       link: 'https://zkswap.finance/swap',
       img: '/icons/zkswap.ico',
       implemented: '',
-    }
+    },
+    networks: [Network.ZKSYNCERA]
   },
   TraderJoeSwap: {
     deprecated: false,
@@ -427,8 +451,10 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       link: 'https://traderjoexyz.com/arbitrum/trade',
       img: '/icons/traderjoe.png',
       implemented: '',
-    }
-  }
+    },
+    networks: [Network.ARBITRUM]
+  },
+
 }
 
 export const getFlow = (flow: flow_Flow): string[] => {

@@ -95,8 +95,9 @@ type ProcessProfileRepository interface {
 }
 
 type SettingsRepository interface {
-	GetSettings(ctx context.Context, userId string) (*v1.Settings, error)
-	UpdateSettings(ctx context.Context, request *v1.Settings) error
+	GetSettings(ctx context.Context, userId string, network v1.Network) (*v1.NetworkSettings, error)
+	UpdateSettings(ctx context.Context, userId string, request *v1.NetworkSettings) error
+	GetSettingsDate(ctx context.Context, userId string, network v1.Network) (*time.Time, error)
 }
 
 type UserRepository interface {

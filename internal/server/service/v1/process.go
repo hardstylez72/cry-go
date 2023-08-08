@@ -2,12 +2,10 @@ package v1
 
 import (
 	"context"
-	"math/big"
 	"sort"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/hardstylez72/cry/internal/defi"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process"
 	"github.com/hardstylez72/cry/internal/process/task"
@@ -222,10 +220,6 @@ func (s *ProcessService) StopProcess(ctx context.Context, req *v1.StopProcessReq
 	return &v1.StopProcessResponse{}, nil
 }
 func (s *ProcessService) ResumeProcess(ctx context.Context, req *v1.ResumeProcessRequest) (*v1.ResumeProcessResponse, error) {
-	//userId, err := user.GetUserId(ctx)
-	//if err != nil {
-	//	return nil, err
-	//}
 	s.dispatcher.ResumeProcess(ctx, req.ProcessId)
 	return &v1.ResumeProcessResponse{}, nil
 }
@@ -250,50 +244,7 @@ func (s *ProcessService) EstimateCost(ctx context.Context, req *v1.EstimateCostR
 		Data:  res,
 	}, nil
 }
-func (s *ProcessService) GetTaskSettings(ctx context.Context, req *v1.GetTaskSettingsRequest) (*v1.GetTaskSettingsResponse, error) {
-	userId, err := user.GetUserId(ctx)
-	if err != nil {
-		return nil, err
-	}
 
-	stgs, err := s.settingsService.GetSettings(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	gasLimit, ok := stgs.TaskGasLimitMap[req.TaskType.String()]
-	if !ok {
-		return &v1.GetTaskSettingsResponse{}, nil
-	}
-
-	return &v1.GetTaskSettingsResponse{
-		GasLimit: defi.AmountUni(big.NewInt(gasLimit), req.Network),
-	}, nil
-}
-func (s *ProcessService) SetTaskSettings(ctx context.Context, req *v1.SetTaskSettingsRequest) (*v1.SetTaskSettingsResponse, error) {
-
-	userId, err := user.GetUserId(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	stgs, err := s.settingsService.GetSettings(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	if stgs.TaskGasLimitMap == nil {
-		stgs.TaskGasLimitMap = map[string]int64{}
-	}
-
-	stgs.TaskGasLimitMap[req.TaskType.String()] = req.Wei
-
-	if err := s.settingsService.UpdateSettings(ctx, stgs); err != nil {
-		return nil, err
-	}
-
-	return &v1.SetTaskSettingsResponse{}, nil
-}
 func (s *ProcessService) GetTaskTransactions(ctx context.Context, req *v1.GetTaskTransactionsReq) (*v1.GetTaskTransactionsRes, error) {
 
 	userId, err := user.GetUserId(ctx)

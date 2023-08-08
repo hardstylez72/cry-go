@@ -3,7 +3,6 @@
   <div>Network: <b>{{ item.network }}</b></div>
   <div>Swap: <b>{{ `${item.fromToken} to ${item.toToken}` }}</b></div>
   <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>
-  <div>Slippage: 0.5%</div>
   <div>Status:
     <span :style="`color: ${getTxStatusColor}`">{{ getTxStatus }}</span>
   </div>
@@ -23,10 +22,7 @@ import {
   VelocoreSwapTask
 } from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
-import {ca} from "vuetify/locale";
-import {processService} from "@/generated/services";
-import {GetTaskSettingsResponse, ProcessStatus} from "@/generated/process";
-import TaskSettings from "@/components/tasks/menu/TaskSettings.vue";
+import {ProcessStatus} from "@/generated/process";
 import {getAmountSend} from "./helper";
 import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
@@ -34,7 +30,7 @@ import GasOptions from "@/components/tasks/menu/GasOptions.vue";
 
 export default defineComponent({
   name: "MenuTaskVelocoreSwap",
-  components: {GasOptions, TaskSettings},
+  components: {GasOptions},
   props: {
     task: {
       type: Object as PropType<Task>,

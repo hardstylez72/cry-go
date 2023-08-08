@@ -118,9 +118,13 @@ export const humanDuration = (s?: string | Number): string => {
 }
 
 
-export const castGasLimitMap = (a: Object): Map<TaskType, number> => {
+export interface TaskSettings {
+  slippage?: string
+}
 
-  const result = new Map<TaskType, number>()
+export const castTaskSettingsMap = (a: Object): Map<TaskType, TaskSettings> => {
+
+  const result = new Map<TaskType, TaskSettings>()
 
   if (!a) {
     return result
@@ -128,10 +132,20 @@ export const castGasLimitMap = (a: Object): Map<TaskType, number> => {
 
   for (const name of Object.getOwnPropertyNames(a)) {
     //@ts-ignore
-    result.set(name, a[name])
+    result.set(name, {...a[name]})
   }
 
   return result
+}
+
+export const castTaskSettingsMapObj = (a: Map<TaskType, TaskSettings>): Object => {
+
+  let out = {}
+  a.forEach((k, v) => {
+    out[v] = k
+  })
+
+  return out
 }
 
 export const percent = (v: any) => {

@@ -2,8 +2,10 @@ package settings
 
 import (
 	"context"
-	"sync"
+	"encoding/json"
+	"time"
 
+	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/arbitrum"
 	"github.com/hardstylez72/cry/internal/defi/avalanche"
 	"github.com/hardstylez72/cry/internal/defi/bnb"
@@ -12,7 +14,6 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/poligon"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	"github.com/hardstylez72/cry/internal/defi/zksynclite"
-	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/uniclient"
@@ -28,300 +29,165 @@ type Service struct {
 	rep repository.SettingsRepository
 }
 
+type ResolveNet struct {
+	Network v1.Network
+	GasMax  string
+	RPC     string
+}
+
+var Networks = []v1.Network{
+	v1.Network_ARBITRUM,
+	v1.Network_ZKSYNCERA,
+	v1.Network_OPTIMISM,
+	v1.Network_Etherium,
+	v1.Network_BinanaceBNB,
+	v1.Network_ZKSYNCLITE,
+	v1.Network_AVALANCHE,
+	v1.Network_POLIGON,
+}
+
 func NewService(rep repository.SettingsRepository) *Service {
 	return &Service{rep: rep}
 }
 
-func (s *Service) GetSettings(ctx context.Context, userId string) (*v1.Settings, error) {
-	return s.rep.GetSettings(ctx, userId)
+func (s *Service) GetSettings(ctx context.Context, userId string, network v1.Network) (*v1.NetworkSettings, error) {
+	return s.rep.GetSettings(ctx, userId, network)
 }
-
-func (s *Service) UpdateSettings(ctx context.Context, in *v1.Settings) error {
-	return s.rep.UpdateSettings(ctx, in)
+func (s *Service) UpdateSettings(ctx context.Context, userId string, in *v1.NetworkSettings) error {
+	return s.rep.UpdateSettings(ctx, userId, in)
 }
+func (s *Service) ResolveAllSettings(ctx context.Context, userId string, lastUpdate time.Time) error {
+	for _, n := range Networks {
 
-func (s *Service) GetSettingsNetwork(ctx context.Context, req *GetSettingsNetworkRequest) (*v1.SettingsNetwork, error) {
+		updated, err := s.rep.GetSettingsDate(ctx, userId, n)
+		if err != nil {
+			if !errors.Is(err, repository.ErrNotFound) {
+				return err
+			}
+		}
 
-	stgs, err := s.ResolveSettingsForUser(ctx, req.UserId)
-	if err != nil {
-		return nil, err
+		forceUpdate := updated == nil || lastUpdate.After(*updated)
+		if forceUpdate {
+			if _, err := s.ResolveSettings(ctx, userId, n, false); err != nil {
+				return err
+			}
+		}
 	}
-	switch req.Network {
-	case v1.Network_BinanaceBNB:
-		return stgs.Bnb, nil
-	case v1.Network_ARBITRUM:
-		return stgs.Arbitrum, nil
-	case v1.Network_OPTIMISM:
-		return stgs.Optimism, nil
-	case v1.Network_Etherium:
-		return stgs.Etherium, nil
-	case v1.Network_POLIGON:
-		return stgs.Polygon, nil
-	case v1.Network_AVALANCHE:
-		return stgs.Avalanche, nil
-	case v1.Network_ZKSYNCERA:
-		return stgs.ZksyncMainNet, nil
-	case v1.Network_ZKSYNCERATESTNET:
-		return stgs.ZksyncTestNet, nil
-	case v1.Network_ZKSYNCLITE:
-		return stgs.ZksyncLite, nil
-	}
-
-	return nil, errors.New("usupported network: " + req.Network.String())
+	return nil
 }
-
-func GetSettingsNetworkSource(network v1.Network, stgs *v1.Settings) (*v1.SettingsNetwork, error) {
-	switch network {
-	case v1.Network_BinanaceBNB:
-		return stgs.Bnb, nil
-	case v1.Network_ARBITRUM:
-		return stgs.Arbitrum, nil
-	case v1.Network_OPTIMISM:
-		return stgs.Optimism, nil
-	case v1.Network_Etherium:
-		return stgs.Etherium, nil
-	case v1.Network_POLIGON:
-		return stgs.Polygon, nil
-	case v1.Network_AVALANCHE:
-		return stgs.Avalanche, nil
-	case v1.Network_ZKSYNCERATESTNET:
-		return stgs.ZksyncTestNet, nil
-	case v1.Network_ZKSYNCERA:
-		return stgs.ZksyncMainNet, nil
-	case v1.Network_ZKSYNCLITE:
-		return stgs.ZksyncLite, nil
-	default:
-		return nil, errors.New("unknown network: " + network.String())
-	}
-}
-
-var mu sync.Mutex = sync.Mutex{}
-
-func (s *Service) ResolveSettingsForUser(ctx context.Context, userId string) (*v1.Settings, error) {
-	mu.Lock()
-	defer mu.Unlock()
+func (s *Service) ResolveSettings(ctx context.Context, userId string, network v1.Network, force bool) (*v1.NetworkSettings, error) {
 
 	rep := s.rep
 
-	settings, err := rep.GetSettings(ctx, userId)
+	current, err := rep.GetSettings(ctx, userId, network)
 	if err != nil {
-		if errors.Is(err, repository.ErrNotFound) {
-
-			s, err := DefaultSettings(ctx, userId)
-			if err != nil {
-				return nil, err
-			}
-
-			if err := rep.UpdateSettings(ctx, s); err != nil {
-				return rep.GetSettings(ctx, userId)
-			}
+		if !errors.Is(err, repository.ErrNotFound) {
+			return nil, err
 		}
+	}
+
+	resolved, err := resolveSettings(current, network, force)
+	if err != nil {
 		return nil, err
 	}
 
-	// new networks
-	if settings.ZksyncTestNet == nil || settings.ZksyncMainNet == nil {
-		zksyncTestNet, err := uniclient.NewBaseClient(v1.Network_ZKSYNCERATESTNET, &uniclient.BaseClientConfig{
-			RPCEndpoint: zksyncera.TestNetURL,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		zksyncCli, err := uniclient.NewBaseClient(v1.Network_ZKSYNCERA, &uniclient.BaseClientConfig{
-			RPCEndpoint: zksyncera.MainNetURL,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		settings.ZksyncTestNet = &v1.SettingsNetwork{
-			Id:          zksyncTestNet.GetNetworkId().Int64(),
-			RpcEndpoint: zksyncera.TestNetURL,
-		}
-
-		settings.ZksyncMainNet = &v1.SettingsNetwork{
-			Id:          zksyncCli.GetNetworkId().Int64(),
-			RpcEndpoint: zksyncera.MainNetURL,
-		}
-
-		if err := rep.UpdateSettings(ctx, settings); err != nil {
-			return rep.GetSettings(ctx, userId)
-		}
-		return rep.GetSettings(ctx, userId)
+	before, err := json.Marshal(current)
+	if err != nil {
+		return nil, err
 	}
 
-	if settings.ZksyncLite == nil {
+	after, err := json.Marshal(resolved)
+	if err != nil {
+		return nil, err
+	}
 
-		zksyncCli, err := uniclient.NewBaseClient(v1.Network_ZKSYNCLITE, &uniclient.BaseClientConfig{
-			RPCEndpoint: zksynclite.MainNetURL,
-		})
-		if err != nil {
-			return nil, err
-		}
+	if string(after) == string(before) {
+		return current, nil
+	}
+	if err := s.rep.UpdateSettings(ctx, userId, resolved); err != nil {
+		return nil, err
+	}
 
-		settings.ZksyncLite = &v1.SettingsNetwork{
-			Id:          zksyncCli.GetNetworkId().Int64(),
-			RpcEndpoint: zksynclite.MainNetURL,
-		}
+	return resolved, nil
 
-		if err := rep.UpdateSettings(ctx, settings); err != nil {
-			return rep.GetSettings(ctx, userId)
-		}
-		return rep.GetSettings(ctx, userId)
+}
+
+func resolveSettings(in *v1.NetworkSettings, network v1.Network, force bool) (*v1.NetworkSettings, error) {
+
+	s := ResolveNet{
+		Network: network,
 	}
 
 	eth := "10000000000000000"
-	poligon := "40000000000000000000"
-	avalanche := "1000000000000000000"
-	bnb := "100000000000000000"
-	if settings.ZksyncTestNet.MaxGas == nil {
-		settings.ZksyncTestNet.MaxGas = &eth
-	}
-	if settings.ZksyncMainNet.MaxGas == nil {
-		settings.ZksyncMainNet.MaxGas = &eth
-	}
-	if settings.ZksyncLite.MaxGas == nil {
-		settings.ZksyncLite.MaxGas = &eth
-	}
-	if settings.Arbitrum.MaxGas == nil {
-		settings.Arbitrum.MaxGas = &eth
-	}
-	if settings.Optimism.MaxGas == nil {
-		settings.Optimism.MaxGas = &eth
-	}
-	if settings.Etherium.MaxGas == nil {
-		settings.Etherium.MaxGas = &eth
-	}
-	if settings.Polygon.MaxGas == nil {
-		settings.Polygon.MaxGas = &poligon
-	}
-	if settings.Avalanche.MaxGas == nil {
-		settings.Avalanche.MaxGas = &avalanche
-	}
-	if settings.Bnb.MaxGas == nil {
-		settings.Bnb.MaxGas = &bnb
+	poligonMax := "40000000000000000000"
+	avalancheMax := "1000000000000000000"
+	bnbGas := "100000000000000000"
+
+	switch network {
+	case v1.Network_POLIGON:
+		s.RPC = poligon.MainNetURL
+		s.GasMax = poligonMax
+	case v1.Network_BinanaceBNB:
+		s.RPC = bnb.MainNetURL
+		s.GasMax = bnbGas
+	case v1.Network_ARBITRUM:
+		s.RPC = arbitrum.MainNetURL
+		s.GasMax = eth
+	case v1.Network_OPTIMISM:
+		s.RPC = optimism.MainNetURL
+		s.GasMax = eth
+	case v1.Network_Etherium:
+		s.RPC = etherium.MainNetURL
+		s.GasMax = eth
+	case v1.Network_ZKSYNCERA:
+		s.RPC = zksyncera.MainNetURL
+		s.GasMax = eth
+	case v1.Network_ZKSYNCLITE:
+		s.RPC = zksynclite.MainNetURL
+		s.GasMax = eth
+	case v1.Network_AVALANCHE:
+		s.RPC = avalanche.MainNetURL
+		s.GasMax = avalancheMax
 	}
 
-	return settings, nil
+	return resolveNetworkSettings(in, s, force)
 }
+func resolveNetworkSettings(in *v1.NetworkSettings, s ResolveNet, force bool) (*v1.NetworkSettings, error) {
 
-func DefaultSettings(ctx context.Context, userId string) (*v1.Settings, error) {
-
-	etheriumCli, err := uniclient.NewBaseClient(v1.Network_Etherium, &uniclient.BaseClientConfig{
-		RPCEndpoint: etherium.MainNetURL,
-	})
-	if err != nil {
-		return nil, err
+	out := in
+	if force {
+		out = nil
 	}
-	log.Log.Debug("settings v1.Network_Etherium ok")
-
-	bnbCli, err := uniclient.NewBaseClient(v1.Network_BinanaceBNB, &uniclient.BaseClientConfig{
-		RPCEndpoint: bnb.MainNetURL,
-	})
-	if err != nil {
-		return nil, err
-	}
-	log.Log.Debug("settings v1.Network_BinanaceBNB ok")
-
-	poligonCli, err := uniclient.NewBaseClient(v1.Network_POLIGON, &uniclient.BaseClientConfig{
-		RPCEndpoint: poligon.MainNetURL,
-	})
-	if err != nil {
-		return nil, err
-	}
-	log.Log.Debug("settings v1.Network_POLIGON ok")
-
-	arbitrumCli, err := uniclient.NewBaseClient(v1.Network_ARBITRUM, &uniclient.BaseClientConfig{
-		RPCEndpoint: arbitrum.MainNetURL,
-	})
-	if err != nil {
-		return nil, err
-	}
-	log.Log.Debug("settings v1.Network_ARBITRUM ok")
-
-	optimismCli, err := uniclient.NewBaseClient(v1.Network_OPTIMISM, &uniclient.BaseClientConfig{
-		RPCEndpoint: optimism.MainNetURL,
-	})
-	if err != nil {
-		return nil, err
-	}
-	log.Log.Debug("settings v1.Network_OPTIMISM ok")
-
-	avalancheCli, err := uniclient.NewBaseClient(v1.Network_AVALANCHE, &uniclient.BaseClientConfig{
-		RPCEndpoint: avalanche.MainNetURL,
-	})
-	if err != nil {
-		return nil, err
-	}
-	log.Log.Debug("settings v1.Network_AVALANCHE ok")
-
-	zksyncTestNet, err := uniclient.NewBaseClient(v1.Network_ZKSYNCERATESTNET, &uniclient.BaseClientConfig{
-		RPCEndpoint: zksyncera.TestNetURL,
-	})
-	if err != nil {
-		return nil, err
+	if out == nil {
+		out = &v1.NetworkSettings{
+			Network:      s.Network,
+			TaskSettings: map[string]*v1.TaskSettings{},
+		}
 	}
 
-	zksyncCli, err := uniclient.NewBaseClient(v1.Network_ZKSYNCERA, &uniclient.BaseClientConfig{
-		RPCEndpoint: zksyncera.MainNetURL,
-	})
-	if err != nil {
-		return nil, err
+	if out.Id == "" {
+		cli, err := uniclient.NewBaseClient(s.Network, &uniclient.BaseClientConfig{
+			RPCEndpoint: s.RPC,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		out.Id = cli.GetNetworkId().String()
+		out.RpcEndpoint = s.RPC
+		out.MaxGas = s.GasMax
+		out.GasMultiplier = 1
 	}
 
-	zksyncLiteCli, err := uniclient.NewBaseClient(v1.Network_ZKSYNCLITE, &uniclient.BaseClientConfig{
-		RPCEndpoint: zksynclite.MainNetURL,
-	})
-	if err != nil {
-		return nil, err
+	for taskType, slippage := range defi.SlippageMap {
+		_, exist := out.TaskSettings[taskType.String()]
+		if !exist {
+			tmp := slippage
+			out.TaskSettings[taskType.String()] = &v1.TaskSettings{
+				Slippage: &tmp,
+			}
+		}
 	}
 
-	log.Log.Debug("settings v1.Network_AVALANCHE ok")
-	out := &v1.Settings{
-		UserId: userId,
-		Bnb: &v1.SettingsNetwork{
-			Id:          bnbCli.GetNetworkId().Int64(),
-			RpcEndpoint: bnb.MainNetURL,
-		},
-		Optimism: &v1.SettingsNetwork{
-			Id:          optimismCli.GetNetworkId().Int64(),
-			RpcEndpoint: optimism.MainNetURL,
-		},
-		Arbitrum: &v1.SettingsNetwork{
-			Id:          arbitrumCli.GetNetworkId().Int64(),
-			RpcEndpoint: arbitrum.MainNetURL,
-		},
-		Etherium: &v1.SettingsNetwork{
-			Id:          etheriumCli.GetNetworkId().Int64(),
-			RpcEndpoint: etherium.MainNetURL,
-		},
-		Polygon: &v1.SettingsNetwork{
-			Id:          poligonCli.GetNetworkId().Int64(),
-			RpcEndpoint: poligon.MainNetURL,
-		},
-		Avalanche: &v1.SettingsNetwork{
-			Id:          avalancheCli.GetNetworkId().Int64(),
-			RpcEndpoint: avalanche.MainNetURL,
-		},
-		ZksyncTestNet: &v1.SettingsNetwork{
-			Id:          zksyncTestNet.GetNetworkId().Int64(),
-			RpcEndpoint: zksyncera.TestNetURL,
-		},
-		ZksyncMainNet: &v1.SettingsNetwork{
-			Id:          zksyncCli.GetNetworkId().Int64(),
-			RpcEndpoint: zksyncera.MainNetURL,
-		},
-		ZksyncLite: &v1.SettingsNetwork{
-			Id:          zksyncLiteCli.GetNetworkId().Int64(),
-			RpcEndpoint: zksynclite.MainNetURL,
-		},
-	}
-
-	out.TaskGasLimitMap = map[string]int64{
-		v1.TaskType_StargateBridge.String():                 2000000000000000,
-		v1.TaskType_ZkSyncOfficialBridgeToEthereum.String(): 2000000000000000,
-		v1.TaskType_SyncSwap.String():                       2000000000000000,
-	}
 	return out, nil
 }

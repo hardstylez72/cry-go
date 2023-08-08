@@ -9,8 +9,11 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/velocorerouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
+
+type velocoreMaker struct {
+	*Client
+}
 
 // site ETH -> USDC
 // me ETH -> USDC https://explorer.zksync.io/tx/0xd93d5099e7f0193778351365fae505e713e89acde63e9a0e229b27bf3c13d8b7
@@ -18,66 +21,15 @@ import (
 // site USDC -> ETH
 // me USDC -> ETH https://explorer.zksync.io/tx/0xaa2dcfa8280071efa6fa4c7264902bbd5d589d2a9ab3b5b6e313cf903a0e9e18
 func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
-	result := &defi.DefaultRes{}
+	return c.GenericSwap(ctx, &velocoreMaker{c}, req)
+}
 
-	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
-	if err != nil {
-		return nil, err
-	}
-
-	tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
-		Token:       req.FromToken,
-		WalletPK:    req.WalletPK,
-		Amount:      req.Amount,
-		SpenderAddr: c.Cfg.Velocore.Router,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "TokenLimitChecker")
-	}
-	result.ApproveTx = tokenLimitChecker.ApproveTx
+func (c velocoreMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
 
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
 		value = req.Amount
 	}
-
-	data, err := c.makeVelocoreSwapData(ctx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "makeSpaceFiSwapData")
-	}
-
-	tx := utils.CreateFunctionCallTransaction(
-		transactor.WalletAddr,
-		c.Cfg.Velocore.Router,
-		big.NewInt(0),
-		big.NewInt(0),
-		value,
-		data,
-		nil, nil,
-	)
-
-	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, transactor.Signer)
-	if err != nil {
-		return nil, errors.Wrap(err, "Make712Tx")
-	}
-
-	result.ECost = estimate
-
-	if req.EstimateOnly {
-		return result, nil
-	}
-
-	hash, err := c.Provider.SendRawTransaction(raw)
-	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
-	}
-
-	result.Tx = c.NewTx(hash, defi.CodeContract)
-
-	return result, nil
-}
-
-func (c *Client) makeVelocoreSwapData(ctx context.Context, req *defi.DefaultSwapReq) ([]byte, error) {
 
 	w, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -115,13 +67,31 @@ func (c *Client) makeVelocoreSwapData(ctx context.Context, req *defi.DefaultSwap
 	}
 	if req.FromToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, defi.SlippagePercent05)
-		return abiSource.Pack("swapExactETHForTokens", amOut, path, w.WalletAddr, DefaultDeadLine())
+		amOut = defi.Slippage(amOut, req.Slippage)
+		data, err := abiSource.Pack("swapExactETHForTokens", amOut, path, w.WalletAddr, DefaultDeadLine())
+		if err != nil {
+			return nil, err
+		}
+
+		return &defi.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.Velocore.Router,
+		}, nil
 
 	} else if req.ToToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, defi.SlippagePercent05)
-		return abiSource.Pack("swapExactTokensForETH", req.Amount, amOut, path, w.WalletAddr, DefaultDeadLine())
+		amOut = defi.Slippage(amOut, req.Slippage)
+		data, err := abiSource.Pack("swapExactTokensForETH", req.Amount, amOut, path, w.WalletAddr, DefaultDeadLine())
+		if err != nil {
+			return nil, err
+		}
+
+		return &defi.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.Velocore.Router,
+		}, nil
 	}
 
 	return nil, errors.New("unsupported input params")

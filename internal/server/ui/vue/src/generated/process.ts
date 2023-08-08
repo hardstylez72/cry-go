@@ -377,50 +377,6 @@ export class ProcessService {
   /**
    *
    */
-  processServiceGetTaskSettings(
-    params: {
-      /**  */
-      body: GetTaskSettingsRequest;
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<GetTaskSettingsResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/api/gw/v1/process/task/settings';
-
-      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
-
-      let data = params['body'];
-
-      configs.data = data;
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
-  processServiceSetTaskSettings(
-    params: {
-      /**  */
-      body: SetTaskSettingsRequest;
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<SetTaskSettingsResponse> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/api/gw/v1/process/task/settings/set';
-
-      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
-
-      let data = params['body'];
-
-      configs.data = data;
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
   processServiceSkipProcessTask(
     params: {
       /**  */
@@ -674,19 +630,6 @@ export interface GetProfileTransactionsReq {
 export interface GetProfileTransactionsRes {
   /**  */
   transactions: Transaction[];
-}
-
-export interface GetTaskSettingsRequest {
-  /**  */
-  taskType: TaskType;
-
-  /**  */
-  network: Network;
-}
-
-export interface GetTaskSettingsResponse {
-  /**  */
-  gasLimit?: AmUni;
 }
 
 export interface GetTaskTransactionsReq {
@@ -978,16 +921,6 @@ export interface RetryProcessRequest {
 }
 
 export interface RetryProcessResponse {}
-
-export interface SetTaskSettingsRequest {
-  /**  */
-  wei: string;
-
-  /**  */
-  taskType: TaskType;
-}
-
-export interface SetTaskSettingsResponse {}
 
 export interface SkipProcessTaskRequest {
   /**  */

@@ -35,8 +35,6 @@ type ProcessServiceClient interface {
 	ListProcess(ctx context.Context, in *ListProcessRequest, opts ...grpc.CallOption) (*ListProcessResponse, error)
 	RetryProcess(ctx context.Context, in *RetryProcessRequest, opts ...grpc.CallOption) (*RetryProcessResponse, error)
 	EstimateCost(ctx context.Context, in *EstimateCostRequest, opts ...grpc.CallOption) (*EstimateCostResponse, error)
-	GetTaskSettings(ctx context.Context, in *GetTaskSettingsRequest, opts ...grpc.CallOption) (*GetTaskSettingsResponse, error)
-	SetTaskSettings(ctx context.Context, in *SetTaskSettingsRequest, opts ...grpc.CallOption) (*SetTaskSettingsResponse, error)
 	GetTaskTransactions(ctx context.Context, in *GetTaskTransactionsReq, opts ...grpc.CallOption) (*GetTaskTransactionsRes, error)
 	GetProfileTransactions(ctx context.Context, in *GetProfileTransactionsReq, opts ...grpc.CallOption) (*GetProfileTransactionsRes, error)
 }
@@ -166,24 +164,6 @@ func (c *processServiceClient) EstimateCost(ctx context.Context, in *EstimateCos
 	return out, nil
 }
 
-func (c *processServiceClient) GetTaskSettings(ctx context.Context, in *GetTaskSettingsRequest, opts ...grpc.CallOption) (*GetTaskSettingsResponse, error) {
-	out := new(GetTaskSettingsResponse)
-	err := c.cc.Invoke(ctx, "/process.ProcessService/GetTaskSettings", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *processServiceClient) SetTaskSettings(ctx context.Context, in *SetTaskSettingsRequest, opts ...grpc.CallOption) (*SetTaskSettingsResponse, error) {
-	out := new(SetTaskSettingsResponse)
-	err := c.cc.Invoke(ctx, "/process.ProcessService/SetTaskSettings", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *processServiceClient) GetTaskTransactions(ctx context.Context, in *GetTaskTransactionsReq, opts ...grpc.CallOption) (*GetTaskTransactionsRes, error) {
 	out := new(GetTaskTransactionsRes)
 	err := c.cc.Invoke(ctx, "/process.ProcessService/GetTaskTransactions", in, out, opts...)
@@ -219,8 +199,6 @@ type ProcessServiceServer interface {
 	ListProcess(context.Context, *ListProcessRequest) (*ListProcessResponse, error)
 	RetryProcess(context.Context, *RetryProcessRequest) (*RetryProcessResponse, error)
 	EstimateCost(context.Context, *EstimateCostRequest) (*EstimateCostResponse, error)
-	GetTaskSettings(context.Context, *GetTaskSettingsRequest) (*GetTaskSettingsResponse, error)
-	SetTaskSettings(context.Context, *SetTaskSettingsRequest) (*SetTaskSettingsResponse, error)
 	GetTaskTransactions(context.Context, *GetTaskTransactionsReq) (*GetTaskTransactionsRes, error)
 	GetProfileTransactions(context.Context, *GetProfileTransactionsReq) (*GetProfileTransactionsRes, error)
 	mustEmbedUnimplementedProcessServiceServer()
@@ -268,12 +246,6 @@ func (UnimplementedProcessServiceServer) RetryProcess(context.Context, *RetryPro
 }
 func (UnimplementedProcessServiceServer) EstimateCost(context.Context, *EstimateCostRequest) (*EstimateCostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EstimateCost not implemented")
-}
-func (UnimplementedProcessServiceServer) GetTaskSettings(context.Context, *GetTaskSettingsRequest) (*GetTaskSettingsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTaskSettings not implemented")
-}
-func (UnimplementedProcessServiceServer) SetTaskSettings(context.Context, *SetTaskSettingsRequest) (*SetTaskSettingsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetTaskSettings not implemented")
 }
 func (UnimplementedProcessServiceServer) GetTaskTransactions(context.Context, *GetTaskTransactionsReq) (*GetTaskTransactionsRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTaskTransactions not implemented")
@@ -528,42 +500,6 @@ func _ProcessService_EstimateCost_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProcessService_GetTaskSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTaskSettingsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProcessServiceServer).GetTaskSettings(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/process.ProcessService/GetTaskSettings",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProcessServiceServer).GetTaskSettings(ctx, req.(*GetTaskSettingsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ProcessService_SetTaskSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetTaskSettingsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProcessServiceServer).SetTaskSettings(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/process.ProcessService/SetTaskSettings",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProcessServiceServer).SetTaskSettings(ctx, req.(*SetTaskSettingsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ProcessService_GetTaskTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetTaskTransactionsReq)
 	if err := dec(in); err != nil {
@@ -658,14 +594,6 @@ var ProcessService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EstimateCost",
 			Handler:    _ProcessService_EstimateCost_Handler,
-		},
-		{
-			MethodName: "GetTaskSettings",
-			Handler:    _ProcessService_GetTaskSettings_Handler,
-		},
-		{
-			MethodName: "SetTaskSettings",
-			Handler:    _ProcessService_SetTaskSettings_Handler,
 		},
 		{
 			MethodName: "GetTaskTransactions",

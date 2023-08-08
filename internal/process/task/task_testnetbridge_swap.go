@@ -6,7 +6,6 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
-	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -78,10 +77,7 @@ func (t *TestNetBridgeSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessT
 		proxyString = profile.Proxy.String
 	}
 
-	stgs, err := a.SettingsService.GetSettingsNetwork(ctx, &settings.GetSettingsNetworkRequest{
-		Network: p.Network,
-		UserId:  a.UserId,
-	})
+	stgs, err := a.SettingsService.GetSettings(ctx, a.UserId, p.Network)
 	if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,6 @@ package task
 import (
 	"context"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/orbiter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -66,7 +65,12 @@ func (t *OrbiterBridgeTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 	if err != nil {
 		return nil, err
 	}
-	client, err := uniclient.NewOrbiterSwapper(p.FromNetwork, profile.BaseConfig(p.FromNetwork))
+
+	s, err := profile.GetNetworkSettings(ctx, p.FromNetwork)
+	if err != nil {
+		return nil, err
+	}
+	client, err := uniclient.NewOrbiterSwapper(p.FromNetwork, s.BaseConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +82,7 @@ func (t *OrbiterBridgeTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 			return nil, err
 		}
 
-		walletAddr, err := profile.GetWalletAddr(p.FromNetwork)
+		walletAddr, err := s.GetWalletAddr()
 		if err != nil {
 			return nil, err
 		}
@@ -95,7 +99,7 @@ func (t *OrbiterBridgeTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 			return nil, err
 		}
 
-		gas, err := GasManager(estimation, profile.Settings, p.FromNetwork)
+		gas, err := GasManager(estimation, s.Source, p.FromNetwork)
 		if err != nil {
 			return nil, err
 		}
@@ -143,25 +147,20 @@ func (t *OrbiterBridgeTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 
 func EstimateOrbiterBridgeCost(ctx context.Context, orbiterService *orbiter.Service, profile *halp.Profile, p *v1.OrbiterBridgeTask) (*v1.EstimationTx, error) {
 
-	swapper, err := uniclient.NewOrbiterSwapper(p.FromNetwork, profile.BaseConfig(p.FromNetwork))
+	s, err := profile.GetNetworkSettings(ctx, p.FromNetwork)
+	if err != nil {
+		return nil, err
+	}
+	swapper, err := uniclient.NewOrbiterSwapper(p.FromNetwork, s.BaseConfig())
 	if err != nil {
 		return nil, err
 	}
 
-	var walletAddr common.Address
-	if p.FromNetwork == v1.Network_ZKSYNCERA || p.FromNetwork == v1.Network_ZKSYNCLITE {
-		w, err := profile.EraWallet(p.FromNetwork)
-		if err != nil {
-			return nil, err
-		}
-		walletAddr = w.WalletAddr
-	} else {
-		w, err := profile.EthWallet()
-		if err != nil {
-			return nil, err
-		}
-		walletAddr = w.WalletAddr
+	w, err := s.GetWalletAddr()
+	if err != nil {
+		return nil, err
 	}
+	walletAddr := *w
 
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: walletAddr, Token: p.FromToken})
 	if err != nil {
