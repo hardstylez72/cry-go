@@ -29,10 +29,10 @@ export const myCustomLightTheme: ThemeDefinition = {
 export const myCustomDarkTheme: ThemeDefinition = {
   dark: true,
   colors: {
-    background: '#000000',
-    surface: '#FFF3E0',
-    primary: '#1D5D9B',
-    secondary: '#75C2F6',
+    background: '#2D4356',
+    surface: '#2D4356',
+    primary: '#4682A9',
+    secondary: '#EAB2A0',
   },
 }
 export default createVuetify({
@@ -40,10 +40,10 @@ export default createVuetify({
   directives,
   blueprint: md3,
   theme: {
-    defaultTheme: 'myCustomLightTheme',
+    defaultTheme: 'light',
     themes: {
-      myCustomLightTheme,
-      myCustomDarkTheme
+      'light': myCustomLightTheme,
+      'dark': myCustomDarkTheme
     },
   },
 })

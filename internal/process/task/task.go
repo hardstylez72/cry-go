@@ -386,6 +386,10 @@ func (w *Wrap) Run(ctx context.Context, a *Input) (task *v1.ProcessTask, err err
 	}
 
 	if err != nil {
+		// если транзакция еще не обработалась
+		if errors.Is(err, ErrTransactionIsNotReady) {
+			return a.Task, nil
+		}
 		e := err.Error()
 		a.Task.Error = &e
 		a.Task.Status = v1.ProcessStatus_StatusError

@@ -78,6 +78,10 @@ func (c *EtheriumClient) TokenLimitChecker(ctx context.Context, req *TokenLimitC
 		ApproveTx:     nil,
 	}
 
+	if req.Token == c.GetNetworkToken() {
+		return r, nil
+	}
+
 	allowed, err := c.TokenAllowed(ctx, &AllowedReq{
 		Token:       req.Token,
 		WalletAddr:  req.Wallet.WalletAddr,

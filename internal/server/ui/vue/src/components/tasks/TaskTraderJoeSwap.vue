@@ -123,6 +123,13 @@ export default defineComponent({
     return {
       pairs: [
         tokenSwapPair(Token.STG, Token.ETH),
+        tokenSwapPair(Token.ETH, Token.USDT),
+        tokenSwapPair(Token.USDT, Token.ETH),
+        tokenSwapPair(Token.ETH, Token.USDC),
+        tokenSwapPair(Token.USDC, Token.ETH),
+
+        tokenSwapPair(Token.USDT, Token.USDC),
+        tokenSwapPair(Token.USDC, Token.USDT),
       ] as SwapPair[],
       pair: null as SwapPair | null,
       networks: [Network.ARBITRUM] as Network[],

@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/hardstylez72/cry/internal/defi/contracts/optimism_fee"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stg"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -75,12 +76,41 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
 	}
 
-	opt.Value = BigIntSum(fee.Fee1, Percent(fee.Fee1, 2))
+	destChainId := ChainIdMap[req.DestChain]
+
+	l1Gasfee := big.NewInt(0)
+	if c.Cfg.Network == v1.Network_OPTIMISM {
+		optFeeCaller, err := optimism_fee.NewStorageCaller(common.HexToAddress("0x420000000000000000000000000000000000000F"), c.Cli)
+		if err != nil {
+			return nil, err
+		}
+
+		abi, err := stg.StgMetaData.GetAbi()
+		if err != nil {
+			return nil, err
+		}
+		data, err := abi.Pack("sendTokens",
+			destChainId,
+			req.Wallet.WalletAddr.Bytes(),
+			req.Quantity,
+			common.HexToAddress("0x0000000000000000000000000000000000000000"),
+			[]byte{},
+		)
+		if err != nil {
+			return nil, err
+		}
+		o := &bind.CallOpts{}
+		o.Context = ctx
+		l1Gasfee, err = optFeeCaller.GetL1Fee(o, data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	opt.Value = BigIntSum(fee.Fee1, Percent(fee.Fee1, 10), l1Gasfee)
 	opt.NoSend = req.EstimateOnly
 
 	opt = c.ResoleGas(ctx, req.Gas, opt)
-
-	destChainId := ChainIdMap[req.DestChain]
 
 	tx, err := tr.SendTokens(
 		opt,
@@ -96,17 +126,21 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 
 	return &StargateBridgeSwapSTGRes{
 		Tx:    tx,
-		ECost: Estimate(tx),
+		ECost: Estimate(tx, nil),
 	}, nil
 }
 
-func Estimate(tx *types.Transaction) *EstimatedGasCost {
+func Estimate(tx *types.Transaction, l1GasFee *big.Int) *EstimatedGasCost {
 	gasLimit := new(big.Int).SetUint64(tx.Gas())
+
 	if tx.Type() == types.DynamicFeeTxType {
+		fee := BigIntSum(tx.GasFeeCap())
+
+		gp, _ := big.NewFloat(0).Quo(big.NewFloat(0).SetInt(fee), big.NewFloat(0).SetInt(gasLimit)).Int(nil)
 		return &EstimatedGasCost{
 			GasLimit:    gasLimit,
-			GasPrice:    tx.GasFeeCap(),
-			TotalGasWei: new(big.Int).Mul(gasLimit, tx.GasFeeCap()),
+			GasPrice:    gp,
+			TotalGasWei: BigIntSum(fee, l1GasFee),
 			L2Fee:       nil,
 		}
 	}

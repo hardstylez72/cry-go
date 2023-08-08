@@ -13,4 +13,5 @@ func ErrGasIsOverMax(max, estimated string) error {
 var (
 	ErrUserHasNoBalance              = errors.New("User has not enough balance. visit billing page please")
 	ErrProfileHasNoConnectedOkexAddr = errors.New("Profile is not connected to okex deposit wallet")
+	ErrTransactionIsNotReady         = errors.New("transaction is not ready")
 )

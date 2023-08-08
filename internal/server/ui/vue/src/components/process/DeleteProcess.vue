@@ -5,7 +5,7 @@
     width="200px"
   >
     <template v-slot:activator="{ props }">
-      <v-btn variant="flat" color="red" @click="menu=true">Удалить</v-btn>
+      <v-btn variant="flat" color="blue-grey-darken-3" @click="menu=true">Удалить</v-btn>
     </template>
 
     <template v-slot:default="{ props }">

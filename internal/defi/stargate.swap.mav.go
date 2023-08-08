@@ -97,7 +97,7 @@ func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *Default
 		return nil, errors.Wrap(err, "router.SendOFT")
 	}
 
-	result.ECost = Estimate(tx)
+	result.ECost = Estimate(tx, nil)
 	result.Tx = c.NewTx(tx.Hash(), CodeContract)
 
 	return result, nil

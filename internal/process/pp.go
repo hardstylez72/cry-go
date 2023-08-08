@@ -241,7 +241,6 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 		}
 	}
 }
-
 func (d *Dispatcher) SendAlert(ctx context.Context, userId string, pId string, execErr error, l *zap.SugaredLogger) {
 
 	if execErr == nil {
@@ -261,7 +260,6 @@ func (d *Dispatcher) SendAlert(ctx context.Context, userId string, pId string, e
 		l.Warn("SendAlert", zap.Error(err))
 	}
 }
-
 func (d *Dispatcher) NotifyUserProcessStarted(ctx context.Context, userId string, pId string) {
 
 	chatId, err := d.runner.userRepository.GetUserTelegramChatId(ctx, userId)
@@ -275,7 +273,6 @@ func (d *Dispatcher) NotifyUserProcessStarted(ctx context.Context, userId string
 	if err := d.runner.tgBot.ProcessStarted(*chatId, pId); err != nil {
 	}
 }
-
 func (d *Dispatcher) NotifyUserProcessFinished(ctx context.Context, userId string, pId string, l *zap.SugaredLogger) {
 
 	chatId, err := d.runner.userRepository.GetUserTelegramChatId(ctx, userId)
@@ -291,7 +288,6 @@ func (d *Dispatcher) NotifyUserProcessFinished(ctx context.Context, userId strin
 		l.Warn("tgBot.ProcessStarted", zap.Error(err))
 	}
 }
-
 func (d *Dispatcher) LoadPP(ctx context.Context, profileId string) (*PP, error) {
 	ppDB, err := d.runner.processRepository.GetProcessProfileArg(ctx, profileId)
 	if err != nil {
@@ -304,7 +300,6 @@ func (d *Dispatcher) LoadPP(ctx context.Context, profileId string) (*PP, error) 
 	}
 	return pp, nil
 }
-
 func (d *Dispatcher) UpdatePPStatus(ctx context.Context, ppId, pId string, status v1.ProcessStatus) error {
 	if err := d.r.UpdateProcessProfileStatus(ctx, ppId, pId, status.String()); err != nil {
 		return errors.Wrap(err, "UpdateProcessProfileStatus")
@@ -314,7 +309,6 @@ func (d *Dispatcher) UpdatePPStatus(ctx context.Context, ppId, pId string, statu
 	}
 	return nil
 }
-
 func (d *Dispatcher) sleep(ctx context.Context, processId processId, sleepTime time.Duration) chan Signal {
 	signals := make(chan Signal)
 
@@ -338,7 +332,6 @@ func (d *Dispatcher) sleep(ctx context.Context, processId processId, sleepTime t
 
 	return signals
 }
-
 func (d *Dispatcher) resolvePPStatus(ctx context.Context, profileId string, l *zap.SugaredLogger) (*v1.ProcessStatus, error) {
 
 	pp, err := d.LoadPP(ctx, profileId)

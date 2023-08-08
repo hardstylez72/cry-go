@@ -23,7 +23,7 @@
       </v-list-item>
 
       <v-list-item>
-        <v-btn @click="toggleTheme">toggle theme</v-btn>
+        <v-switch @click="toggleTheme" :label="getTheme()">toggle theme</v-switch>
       </v-list-item>
 
       <v-divider/>
@@ -35,7 +35,7 @@
                      @click="$router.push({name: 'Withdraw'})"></v-list-item>
         <v-list-item prepend-icon="mdi-account-hard-hat-outline" color="green" title="Конструктор" value="Constructor"
                      @click="$router.push({name: 'Constructor'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-blender-outline" color="green" title="Процесы" value="Processes"
+        <v-list-item prepend-icon="mdi-blender-outline" color="green" title="Процессы" value="Processes"
                      @click="$router.push({name: 'Processes'})"></v-list-item>
         <v-list-item prepend-icon="mdi-cog" title="Настройки" color="green" value="Настройки"
                      @click="$router.push({name: 'Settings'})"></v-list-item>
@@ -148,9 +148,8 @@ export default defineComponent({
   },
   methods: {
     toggleTheme() {
-      const theme = this.$vuetify.theme
-      console.log(theme)
-      theme.global.current.name = 'dark'
+      const theme = this.getTheme() === 'dark' ? 'light' : 'dark'
+      this.setTheme(theme)
     },
     goGeneral() {
       this.$router.push({name: 'LandingPage'})
@@ -161,14 +160,23 @@ export default defineComponent({
       });
       localStorage.clear();
       window.location.reload()
+    },
+    getTheme() {
+      const t = window.localStorage.getItem('cry_theme')
+      if (!t) {
+        return this.$vuetify.theme.global.name
+      }
+
+      return t
+    },
+    setTheme(theme: string) {
+      window.localStorage.setItem('cry_theme', theme)
+      this.$vuetify.theme.global.name = theme
     }
   },
+
   async mounted() {
-    const theme = this.$vuetify.theme
-    console.log(theme.global.current)
-    theme.global.current.dark = false
-    console.log(theme.global.current.colors.bgBlue)
-    theme.global.current.colors.bgRed = true
+    this.$vuetify.theme.global.name = this.getTheme()
     const period = import.meta.env.DEV ? 60_000 : 5000
 
     await this.userStore.syncUser()

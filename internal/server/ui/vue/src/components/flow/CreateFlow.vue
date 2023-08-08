@@ -68,8 +68,8 @@ export default defineComponent({
         this.saveLoading = true
         this.item.tasks = this.tasks
 
-        await flowService.flowServiceCreateFlow({body: this.item})
-        this.$router.push({name: "Constructor"})
+        const res = await flowService.flowServiceCreateFlow({body: this.item})
+        this.$router.push({name: "ViewFlow", params: {id: res.flow.id}})
       } finally {
         this.saveLoading = false
       }

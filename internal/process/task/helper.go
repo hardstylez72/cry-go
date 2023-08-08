@@ -38,28 +38,28 @@ func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, n
 		if err := networker.WaitTxComplete(ctx, common.HexToHash(tx.TxId)); err != nil {
 			if errors.Is(err, defi.ErrTxStatusFailed) {
 				tx.TxCompleted = false
-				tx.RetryCount++
-				if tx.RetryCount > 2 {
-					tx.TxCompleted = false
-					tx.RetryCount = 0
-					tx.TxId = ""
-				}
+				tx.RetryCount = 0
+				tx.TxId = ""
 				if err := updater.UpdateTask(ctx, task); err != nil {
 					return err
 				}
 			}
 			if errors.Is(err, defi.ErrTxNotFound) {
-				if tx.RetryCount > 2 {
+				if tx.RetryCount > 5 {
 					tx.TxCompleted = false
 					tx.RetryCount = 0
 					tx.TxId = ""
+					if err := updater.UpdateTask(ctx, task); err != nil {
+						return err
+					}
+					return errors.New("failed to make transaction")
 				}
 				tx.RetryCount++
 				if err := updater.UpdateTask(ctx, task); err != nil {
 					return err
 				}
 				// бывает сеть перегружена, чтобы не спамить
-				time.Sleep(time.Second * 30)
+				return ErrTransactionIsNotReady
 			}
 			return err
 		}

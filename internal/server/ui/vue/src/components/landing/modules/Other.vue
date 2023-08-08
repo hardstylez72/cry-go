@@ -103,7 +103,7 @@ export default defineComponent({
           name: taskProps.TraderJoeSwap.service.name,
           link: taskProps.TraderJoeSwap.service.link,
           status: Status.integrated,
-          action: 'DEX swap arbitrum swap (STG -> ETH)',
+          action: 'DEX swap arbitrum (STG, USDT, USDC -> ETH)',
           img: taskProps.TraderJoeSwap.service.img,
         },
         {
