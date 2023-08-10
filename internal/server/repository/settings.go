@@ -16,7 +16,7 @@ func (r *pgRepository) GetSettings(ctx context.Context, userId string, network v
 	var payload string
 	if err := r.conn.GetContext(ctx, &payload, "select payload from settings_v2 where user_id = $1 and key = $2", userId, network.String()); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, ErrNotFound
+			return nil, errors.Wrap(ErrNotFound, "settings not found")
 		}
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *pgRepository) GetSettingsDate(ctx context.Context, userId string, netwo
 	var updatedAt time.Time
 	if err := r.conn.GetContext(ctx, &updatedAt, "select updated_at from settings_v2 where user_id = $1 and key = $2", userId, network.String()); err != nil {
 		if err == sql.ErrNoRows {
-			return nil, ErrNotFound
+			return nil, errors.Wrap(ErrNotFound, "settings date not found")
 		}
 		return nil, err
 	}

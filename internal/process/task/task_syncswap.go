@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -154,7 +155,7 @@ type SyncSwapRes struct {
 	Swapper   defi.SyncSwapper
 }
 
-func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, profile *halp.Profile) (*SyncSwapRes, *defi.Gas, error) {
+func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, profile *halp.Profile) (*SyncSwapRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, a.Network)
 	if err != nil {
@@ -245,7 +246,7 @@ func EstimateSyncSwapCost(ctx context.Context, profile *halp.Profile, p *v1.Sync
 
 	swap, err := swapper.SyncSwap(ctx, &defi.DefaultSwapReq{
 		Network:      p.Network,
-		Amount:       defi.Percent(am, 50),
+		Amount:       bozdo.Percent(am, 50),
 		FromToken:    p.FromToken,
 		ToToken:      p.ToToken,
 		WalletPK:     wallet.PK,

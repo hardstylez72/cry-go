@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/traderjoe"
 	"github.com/pkg/errors"
 )
@@ -42,7 +43,7 @@ func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq)
 		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
 	if limitTx.LimitExtended {
-		result.ApproveTx = c.NewTx(limitTx.ApproveTx.Hash(), CodeApprove)
+		result.ApproveTx = c.NewTx(limitTx.ApproveTx.Hash(), CodeApprove, nil)
 	}
 
 	to := common.HexToAddress(res.ContractAddr)
@@ -74,7 +75,7 @@ func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq)
 		return nil, err
 	}
 
-	e := &EstimatedGasCost{
+	e := &bozdo.EstimatedGasCost{
 		GasLimit:    new(big.Int).SetUint64(estimate),
 		GasPrice:    gasPrice,
 		TotalGasWei: MinerGasLegacy(gasPrice, estimate),
@@ -133,7 +134,7 @@ func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq)
 		return nil, err
 	}
 
-	result.Tx = c.NewTx(tx.Hash(), CodeContract)
+	result.Tx = c.NewTx(tx.Hash(), CodeContract, nil)
 
 	return result, nil
 }

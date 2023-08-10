@@ -53,9 +53,6 @@
         <v-col>
           <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>
         </v-col>
-        <v-col>
-          Slippage: 0.5%
-        </v-col>
       </v-row>
 
     </v-container>

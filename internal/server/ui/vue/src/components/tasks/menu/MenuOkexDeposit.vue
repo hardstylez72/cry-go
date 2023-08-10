@@ -12,7 +12,7 @@ import {defineComponent, PropType} from "vue";
 import {formatTime, humanDuration} from "@/components/helper";
 import {ProcessStatus} from "@/generated/process";
 import {getStatusColor} from "@/components/tasks/menu/helper";
-import GasOptions from "@/components/tasks/menu/GasOptions.vue";
+import GasOptions from "@/components/tasks/menu/TaskDetails.vue";
 
 export default defineComponent({
   name: "MenuDelayTask",

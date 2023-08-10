@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/server/config"
 	"github.com/hardstylez72/cry/internal/traderjoe"
 	"github.com/pkg/errors"
@@ -49,8 +50,6 @@ type ClientConfig struct {
 	networkId *big.Int
 }
 
-var ZEROADDR = common.HexToAddress("0x0000000000000000000000000000000000000000")
-
 func NewEVMClient(c *ClientConfig) (*EtheriumClient, error) {
 
 	rpcClient, err := rpc.DialOptions(context.Background(), c.MainNet, rpc.WithHTTPClient(c.Httpcli))
@@ -71,7 +70,7 @@ func NewEVMClient(c *ClientConfig) (*EtheriumClient, error) {
 	}, nil
 }
 
-func (c *EtheriumClient) ResoleGas(ctx context.Context, gas *Gas, opt *bind.TransactOpts) *bind.TransactOpts {
+func (c *EtheriumClient) ResoleGas(ctx context.Context, gas *bozdo.Gas, opt *bind.TransactOpts) *bind.TransactOpts {
 
 	if !gas.RuleSet() {
 		return opt
@@ -80,7 +79,7 @@ func (c *EtheriumClient) ResoleGas(ctx context.Context, gas *Gas, opt *bind.Tran
 	head, errHead := c.Cli.HeaderByNumber(ctx, nil)
 	if errHead == nil && head.BaseFee != nil {
 		opt.GasLimit = gas.GasLimit.Uint64()
-		opt.GasFeeCap = big.NewInt(0).Mul(&gas.GasLimit, &gas.GasPrice)
+		opt.GasFeeCap = &gas.GasPrice
 	} else {
 		opt.GasLimit = gas.GasLimit.Uint64()
 		opt.GasPrice = &gas.GasPrice

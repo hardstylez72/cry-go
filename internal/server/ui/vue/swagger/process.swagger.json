@@ -686,8 +686,12 @@
         "error": {
           "type": "string"
         },
-        "data": {
-          "$ref": "#/definitions/EstimationTx"
+        "estimations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/EstimationTx"
+          }
         }
       }
     },
@@ -711,6 +715,16 @@
         },
         "gasValuePercent": {
           "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/TxDetail"
+          }
         }
       },
       "required": [
@@ -719,7 +733,9 @@
         "gas",
         "gasLimit",
         "gasPrice",
-        "gasValuePercent"
+        "gasValuePercent",
+        "name",
+        "details"
       ]
     },
     "EzkaliburSwapTask": {
@@ -955,6 +971,36 @@
         "network",
         "fromToken",
         "toToken"
+      ]
+    },
+    "MerklyMintAndBridgeNFTTask": {
+      "type": "object",
+      "properties": {
+        "fromNetwork": {
+          "$ref": "#/definitions/Network"
+        },
+        "toNetwork": {
+          "$ref": "#/definitions/Network"
+        },
+        "mintTx": {
+          "$ref": "#/definitions/TaskTx"
+        },
+        "bridgeTx": {
+          "$ref": "#/definitions/TaskTx"
+        },
+        "nftId": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "string",
+          "title": "deprecated"
+        }
+      },
+      "required": [
+        "fromNetwork",
+        "toNetwork",
+        "mintTx",
+        "bridgeTx"
       ]
     },
     "MockTask": {
@@ -1669,7 +1715,8 @@
           "$ref": "#/definitions/StargateBridgeTask"
         },
         "mockTask": {
-          "$ref": "#/definitions/MockTask"
+          "$ref": "#/definitions/MockTask",
+          "title": "deprecated"
         },
         "delayTask": {
           "$ref": "#/definitions/DelayTask"
@@ -1691,7 +1738,8 @@
           "title": "deprecated"
         },
         "swap1inchTask": {
-          "$ref": "#/definitions/Swap1inchTask"
+          "$ref": "#/definitions/Swap1inchTask",
+          "title": "deprecated"
         },
         "syncSwapTask": {
           "$ref": "#/definitions/SyncSwapTask"
@@ -1737,6 +1785,9 @@
         },
         "traderJoeSwapTask": {
           "$ref": "#/definitions/TraderJoeSwapTask"
+        },
+        "merklyMintAndBridgeNFTTask": {
+          "$ref": "#/definitions/MerklyMintAndBridgeNFTTask"
         }
       },
       "required": [
@@ -1782,8 +1833,21 @@
         "multiplier": {
           "type": "number",
           "format": "float"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/TxDetail"
+          }
         }
-      }
+      },
+      "required": [
+        "txCompleted",
+        "txId",
+        "retryCount",
+        "details"
+      ]
     },
     "TaskType": {
       "type": "string",
@@ -1811,7 +1875,8 @@
         "VeSyncSwap",
         "EzkaliburSwap",
         "ZkSwap",
-        "TraderJoeSwap"
+        "TraderJoeSwap",
+        "MerklyMintAndBridgeNFT"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -1931,6 +1996,21 @@
         "createdAt",
         "network",
         "url"
+      ]
+    },
+    "TxDetail": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "value"
       ]
     },
     "VeSyncSwapTask": {

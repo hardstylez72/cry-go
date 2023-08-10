@@ -7,6 +7,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/router"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/startgatemavrouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -22,7 +24,7 @@ func (c *Client) StargateBridge(ctx context.Context, req *defi.DefaultBridgeReq)
 	return c.GenericBridge(ctx, &stargateBridgeMaker{c}, req)
 }
 
-func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.TxData, error) {
+func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.TxData, error) {
 
 	c := m.source
 
@@ -55,7 +57,7 @@ func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.Default
 		return nil, err
 	}
 
-	dist, ok := defi.ChainIdMap[req.ToNetwork]
+	dist, ok := layerzero.LayerZeroChainMap[req.ToNetwork]
 	if !ok {
 		return nil, errors.New("network is not supported: " + req.ToNetwork.String())
 	}
@@ -63,7 +65,13 @@ func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.Default
 	_dstChainId = dist
 	_toAddress = wt.WalletAddr.Bytes()
 	_amount = req.Amount
-	_minAmount = defi.Slippage(req.Amount, req.Slippage)
+
+	amSlip, err := defi.Slippage(req.Amount, req.Slippage)
+	if err != nil {
+		return nil, err
+	}
+
+	_minAmount = amSlip
 	_refundAddress = wt.WalletAddr
 	_zroPaymentAddress = ZEROADDR
 	_feeObj = startgatemavrouter.IOFTWrapperFeeObj{
@@ -72,11 +80,11 @@ func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.Default
 		PartnerId: [2]byte{0, 0},
 	}
 
-	adapterParams, err := defi.MakeLayerZeroAdapterParams(1, big.NewInt(100000))
+	adapterParams, err := layerzero.MakeLayerZeroAdapterParams(1, big.NewInt(100000))
 	if err != nil {
 		return nil, err
 	}
-
+	//0x00010000000000000000000000000000000000000000000000000000000000061a80
 	//_adapterParams = common.Hex2Bytes("0x000100000000000000000000000000000000000000000000000000000000000186a0")
 	_adapterParams = adapterParams
 
@@ -106,10 +114,11 @@ func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.Default
 		return nil, err
 	}
 
-	return &defi.TxData{
+	return &bozdo.TxData{
 		Data:         data,
 		Value:        value,
 		ContractAddr: contractAddr,
+		Details:      []bozdo.TxDetail{bozdo.NewProtocolFeeDetails(fee.Fee1, c.Cfg.Network, v1.Token_ETH)},
 	}, nil
 }
 
@@ -152,7 +161,7 @@ func (m stargateBridgeMaker) GetStargateBridgeFee(ctx context.Context, req *GetS
 
 	toAddress := w.GetAddress().Bytes()
 	payload := common.HexToAddress("0").Bytes()
-	distChain, ok := defi.ChainIdMap[req.ToChain]
+	distChain, ok := layerzero.LayerZeroChainMap[req.ToChain]
 	if !ok {
 		return nil, errors.New("invalid chain: " + string(req.ToChain))
 	}
@@ -161,7 +170,7 @@ func (m stargateBridgeMaker) GetStargateBridgeFee(ctx context.Context, req *GetS
 		Context: ctx,
 	}
 
-	fee1, fee2, err := trx.QuoteLayerZeroFee(opt, distChain, defi.TypeFuncSwap, toAddress, payload, router.IStargateRouterlzTxObj{
+	fee1, fee2, err := trx.QuoteLayerZeroFee(opt, distChain, layerzero.TypeFuncSwap, toAddress, payload, router.IStargateRouterlzTxObj{
 		DstGasForCall:   big.NewInt(0),
 		DstNativeAmount: big.NewInt(0),
 		DstNativeAddr:   []byte{},

@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/ezkaliburrouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -20,7 +21,7 @@ func (c *Client) EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*
 	return c.GenericSwap(ctx, &ezkaliburMaker{c}, req)
 }
 
-func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
+func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error) {
 
 	w, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -59,12 +60,16 @@ func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapRe
 	}
 	if req.FromToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, req.Slippage)
+		amSlip, err := defi.Slippage(amOut, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
+		amOut = amSlip
 		data, err := abiEzkaliburrouter.Pack("swapExactETHForTokensSupportingFeeOnTransferTokens", amOut, path, w.WalletAddr, w.WalletAddr, DefaultDeadLine())
 		if err != nil {
 			return nil, err
 		}
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.Ezkalibur.Router,
@@ -72,12 +77,16 @@ func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapRe
 
 	} else if req.ToToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, req.Slippage)
+		amSlip, err := defi.Slippage(amOut, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
+		amOut = amSlip
 		data, err := abiEzkaliburrouter.Pack("swapExactTokensForETHSupportingFeeOnTransferTokens", req.Amount, amOut, path, w.WalletAddr, w.WalletAddr, DefaultDeadLine())
 		if err != nil {
 			return nil, err
 		}
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.Ezkalibur.Router,

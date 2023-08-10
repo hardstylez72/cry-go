@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
 	"github.com/hardstylez72/cry/internal/uniclient"
@@ -166,7 +167,7 @@ func EstimateWethTaskCost(ctx context.Context, p *v1.WETHTask, profile *halp.Pro
 	}
 
 	swap, err := swapper.SwapWETH(ctx, &defi.WETHReq{
-		Amount:       defi.Percent(am, 50),
+		Amount:       bozdo.Percent(am, 50),
 		Wrap:         p.Wrap,
 		WalletPK:     profile.WalletPK,
 		EstimateOnly: true,

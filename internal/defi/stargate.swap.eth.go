@@ -7,6 +7,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	"github.com/hardstylez72/cry/internal/defi/contracts/optimism_fee"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/routereth"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -17,7 +19,7 @@ type StargateBridgeSwapEthReq struct {
 	DestChain    v1.Network
 	Wallet       *WalletTransactor
 	Quantity     *big.Int
-	Gas          *Gas
+	Gas          *bozdo.Gas
 	EstimateOnly bool
 	Slippage     SlippagePercent
 }
@@ -39,11 +41,11 @@ func (r *StargateBridgeSwapEthReq) Validate(srcChain v1.Network) error {
 
 type StargateBridgeSwapEthRes struct {
 	Tx    *types.Transaction
-	ECost *EstimatedGasCost
+	ECost *bozdo.EstimatedGasCost
 }
 
 func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *StargateBridgeSwapEthReq) (*StargateBridgeSwapEthRes, error) {
-
+	details := []bozdo.TxDetail{}
 	//var gasLimitPrice = map[v1.Network]uint64{
 	//	v1.Network_ARBITRUM:    4_000_000,
 	//	v1.Network_OPTIMISM:    1_000_000,
@@ -76,10 +78,16 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
 	}
 
-	destChainId := ChainIdMap[req.DestChain]
+	fee.Fee1 = bozdo.BigIntSum(fee.Fee1, bozdo.Percent(fee.Fee1, 2))
+	destChainId := layerzero.LayerZeroChainMap[req.DestChain]
 
 	l1Gasfee := big.NewInt(0)
 	if c.Cfg.Network == v1.Network_OPTIMISM {
+		amSlip, err := Slippage(req.Quantity, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
+
 		optFeeCaller, err := optimism_fee.NewStorageCaller(common.HexToAddress("0x420000000000000000000000000000000000000F"), c.Cli)
 		if err != nil {
 			return nil, err
@@ -94,7 +102,7 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 			req.Wallet.WalletAddr,
 			req.Wallet.WalletAddr.Bytes(),
 			req.Quantity,
-			Slippage(req.Quantity, SlippagePercent05))
+			amSlip)
 		if err != nil {
 			return nil, err
 		}
@@ -104,16 +112,22 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 		if err != nil {
 			return nil, err
 		}
+		details = append(details, bozdo.NewOpimismFeeDetails(l1Gasfee, c.Cfg.Network, v1.Token_ETH))
 	}
+
+	details = append(details, bozdo.NewLZFeeDetails(fee.Fee1, c.Cfg.Network, v1.Token_ETH))
 
 	opt.NoSend = req.EstimateOnly
 
 	opt = c.ResoleGas(ctx, req.Gas, opt)
 
-	opt.Value = BigIntSum(req.Quantity, fee.Fee1, Percent(fee.Fee1, 2), l1Gasfee)
+	opt.Value = bozdo.BigIntSum(req.Quantity, fee.Fee1, l1Gasfee)
 
 	opt.NoSend = req.EstimateOnly
-
+	amSlip, err := Slippage(req.Quantity, req.Slippage)
+	if err != nil {
+		return nil, err
+	}
 	tr, err := routereth.NewStorageTransactor(c.Cfg.Dict.Stargate.StargateRouterEthAddress, c.Cli)
 	if err != nil {
 		return nil, err
@@ -124,7 +138,7 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 		req.Wallet.WalletAddr,
 		req.Wallet.WalletAddr.Bytes(),
 		req.Quantity,
-		Slippage(req.Quantity, req.Slippage),
+		amSlip,
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "tr.SwapETH")
@@ -132,7 +146,7 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 
 	return &StargateBridgeSwapEthRes{
 		Tx:    tx,
-		ECost: Estimate(tx, l1Gasfee),
+		ECost: Estimate(tx, l1Gasfee, "bridge", details),
 	}, nil
 }
 
@@ -141,65 +155,4 @@ func GasPrice(tx *types.Transaction) *big.Int {
 		return tx.GasFeeCap()
 	}
 	return tx.GasPrice()
-}
-
-func BigIntSum(values ...*big.Int) *big.Int {
-
-	result := big.NewInt(0)
-
-	for _, v := range values {
-		if v == nil {
-			continue
-		}
-		result = new(big.Int).Add(v, result)
-	}
-
-	return result
-
-}
-
-type SlippagePercent = string
-
-const (
-	SlippagePercent5    SlippagePercent = "5"
-	SlippagePercent2    SlippagePercent = "2"
-	SlippagePercent1    SlippagePercent = "1"
-	SlippagePercent05   SlippagePercent = "0.5"
-	SlippagePercent02   SlippagePercent = "0.2"
-	SlippagePercent03   SlippagePercent = "0.3"
-	SlippagePercent01   SlippagePercent = "0.1"
-	SlippagePercent001  SlippagePercent = "0.01"
-	SlippagePercentZero SlippagePercent = "0"
-)
-
-func Slippage(v *big.Int, slippagePercent SlippagePercent) *big.Int {
-	switch slippagePercent {
-	case SlippagePercentZero:
-		return v
-	case SlippagePercent05:
-		prec := big.NewInt(0).Div(v, big.NewInt(1000))
-		return big.NewInt(0).Mul(prec, big.NewInt(995))
-	case SlippagePercent01:
-		prec := big.NewInt(0).Div(v, big.NewInt(1000))
-		return big.NewInt(0).Mul(prec, big.NewInt(999))
-	case SlippagePercent001:
-		prec := big.NewInt(0).Div(v, big.NewInt(10000))
-		return big.NewInt(0).Mul(prec, big.NewInt(9999))
-	case SlippagePercent02:
-		prec := big.NewInt(0).Div(v, big.NewInt(10000))
-		return big.NewInt(0).Mul(prec, big.NewInt(9998))
-	case SlippagePercent03:
-		prec := big.NewInt(0).Div(v, big.NewInt(10000))
-		return big.NewInt(0).Mul(prec, big.NewInt(9997))
-	case SlippagePercent1:
-		prec := big.NewInt(0).Div(v, big.NewInt(100))
-		return big.NewInt(0).Mul(prec, big.NewInt(99))
-	case SlippagePercent2:
-		prec := big.NewInt(0).Div(v, big.NewInt(100))
-		return big.NewInt(0).Mul(prec, big.NewInt(98))
-	case SlippagePercent5:
-		prec := big.NewInt(0).Div(v, big.NewInt(100))
-		return big.NewInt(0).Mul(prec, big.NewInt(95))
-	}
-	return nil
 }

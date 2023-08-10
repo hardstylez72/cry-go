@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/pkg/errors"
 	"github.com/zksync-sdk/zksync2-go/accounts"
 	"github.com/zksync-sdk/zksync2-go/contracts/ethtoken"
@@ -94,7 +95,7 @@ func (c *Client) BridgeToEthereumNetwork(ctx context.Context, req *L1L2BridgeReq
 	}
 
 	result := &L1L2BridgeRes{}
-	result.EstimatedGasCost = &defi.EstimatedGasCost{
+	result.EstimatedGasCost = &bozdo.EstimatedGasCost{
 		GasLimit:    gas,
 		GasPrice:    gasPrice,
 		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas.Uint64()),
@@ -110,7 +111,7 @@ func (c *Client) BridgeToEthereumNetwork(ctx context.Context, req *L1L2BridgeReq
 	}
 
 	return &L1L2BridgeRes{
-		TxHash: c.NewTx(hash, defi.CodeContract),
+		TxHash: c.NewTx(hash, defi.CodeContract, nil),
 	}, nil
 }
 
@@ -149,7 +150,7 @@ func (c *Client) BridgeFromEthereumNetwork(ctx context.Context, req *L1L2BridgeR
 	}
 
 	return &L1L2BridgeRes{
-		TxHash: c.NewTx(tx.Hash(), defi.CodeContract),
+		TxHash: c.NewTx(tx.Hash(), defi.CodeContract, nil),
 	}, nil
 }
 

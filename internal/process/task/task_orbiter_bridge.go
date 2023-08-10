@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/orbiter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -182,7 +183,7 @@ func EstimateOrbiterBridgeCost(ctx context.Context, orbiterService *orbiter.Serv
 		ToNetwork:      p.ToNetwork,
 		FromToken:      p.FromToken,
 		ToToken:        p.ToToken,
-		Amount:         defi.Percent(am, 90),
+		Amount:         bozdo.Percent(am, 90),
 		WalletPk:       profile.WalletPK,
 		Gas:            nil,
 		EstimateOnly:   true,

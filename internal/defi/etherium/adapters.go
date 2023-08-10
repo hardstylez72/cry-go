@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 )
 
 func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi.GetBalanceRes, error) {
@@ -55,10 +56,10 @@ type L1L2BridgeReq struct {
 	Amount       *big.Int
 	WalletPK     string
 	EstimateOnly bool
-	Gas          *defi.Gas
+	Gas          *bozdo.Gas
 }
 
 type L1L2BridgeRes struct {
 	TxHash           *defi.Transaction
-	EstimatedGasCost *defi.EstimatedGasCost
+	EstimatedGasCost *bozdo.EstimatedGasCost
 }

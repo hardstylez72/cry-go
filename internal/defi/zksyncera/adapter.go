@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	tt "github.com/ethereum/go-ethereum/core/types"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/orbiter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -110,12 +111,12 @@ type L1L2BridgeReq struct {
 	Amount       *big.Int
 	WalletPK     string
 	EstimateOnly bool
-	Gas          *defi.Gas
+	Gas          *bozdo.Gas
 }
 
 type L1L2BridgeRes struct {
 	TxHash           *defi.Transaction
-	EstimatedGasCost *defi.EstimatedGasCost
+	EstimatedGasCost *bozdo.EstimatedGasCost
 }
 
 func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) (*defi.OrbiterBridgeRes, error) {
@@ -233,7 +234,7 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 		return nil, errors.Wrap(err, "prepared.RLPValues")
 	}
 
-	res.ECost = &defi.EstimatedGasCost{
+	res.ECost = &bozdo.EstimatedGasCost{
 		GasLimit:    gas,
 		GasPrice:    gasPrice,
 		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas.Uint64()),
@@ -248,7 +249,7 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	res.Tx = c.NewTx(hash, defi.CodeTransfer)
+	res.Tx = c.NewTx(hash, defi.CodeTransfer, nil)
 
 	return res, nil
 
@@ -315,7 +316,7 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 		return nil, errors.Wrap(err, "prepared.RLPValues")
 	}
 
-	res.ECost = &defi.EstimatedGasCost{
+	res.ECost = &bozdo.EstimatedGasCost{
 		GasLimit:    gas,
 		GasPrice:    gasPrice,
 		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas.Uint64()),
@@ -330,7 +331,7 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	res.Tx = c.NewTx(hash, defi.CodeTransfer)
+	res.Tx = c.NewTx(hash, defi.CodeTransfer, nil)
 
 	return res, nil
 }

@@ -39,9 +39,6 @@
         <v-col>
           <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>
         </v-col>
-        <v-col>
-          <v-col>Slippage: 0.1%</v-col>
-        </v-col>
       </v-row>
     </v-container>
   </v-card-actions>

@@ -7,6 +7,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	"github.com/hardstylez72/cry/internal/defi/contracts/optimism_fee"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/router"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -17,11 +19,11 @@ type StargateBridgeSwapTokenReq = StargateBridgeSwapReq
 
 type StargateBridgeSwapToken struct {
 	Tx    *types.Transaction
-	ECost *EstimatedGasCost
+	ECost *bozdo.EstimatedGasCost
 }
 
 func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *StargateBridgeSwapTokenReq) (*StargateBridgeSwapToken, error) {
-
+	details := []bozdo.TxDetail{}
 	contractAddr := c.Cfg.Dict.Stargate.StargateRouterAddress
 
 	if err := req.Validate(c.Cfg.Network); err != nil {
@@ -56,11 +58,18 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
 	}
 
-	opt.Value = BigIntSum(fee.Fee1, Percent(fee.Fee1, 30))
-	destChainId := ChainIdMap[req.DestChain]
+	fee.Fee1 = bozdo.BigIntSum(fee.Fee1, bozdo.Percent(fee.Fee1, 30))
+
+	opt.Value = fee.Fee1
+	destChainId := layerzero.LayerZeroChainMap[req.DestChain]
 	srcPoolId := PoolIdMap[c.Cfg.Network][req.FromToken]
 	distPoolId := PoolIdMap[req.DestChain][req.ToToken]
-	min := Slippage(req.Quantity, req.Slippage)
+
+	amSlip, err := Slippage(req.Quantity, req.Slippage)
+	if err != nil {
+		return nil, err
+	}
+
 	opt.NoSend = req.EstimateOnly
 
 	l1Gasfee := big.NewInt(0)
@@ -80,7 +89,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 			big.NewInt(distPoolId),
 			wt.WalletAddr,
 			req.Quantity,
-			min,
+			amSlip,
 			router.IStargateRouterlzTxObj{
 				DstGasForCall:   big.NewInt(0),
 				DstNativeAmount: big.NewInt(0),
@@ -98,10 +107,12 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		if err != nil {
 			return nil, err
 		}
+		details = append(details, bozdo.NewOpimismFeeDetails(l1Gasfee, c.Cfg.Network, v1.Token_ETH))
 	}
 
-	opt.Value = BigIntSum(opt.Value, l1Gasfee)
+	details = append(details, bozdo.NewLZFeeDetails(fee.Fee1, c.Cfg.Network, req.FromToken))
 
+	opt.Value = bozdo.BigIntSum(opt.Value, l1Gasfee)
 	opt = c.ResoleGas(ctx, req.Gas, opt)
 
 	// 38.677058
@@ -112,7 +123,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		big.NewInt(distPoolId),
 		wt.WalletAddr,
 		req.Quantity,
-		min,
+		amSlip,
 		router.IStargateRouterlzTxObj{
 			DstGasForCall:   big.NewInt(0),
 			DstNativeAmount: big.NewInt(0),
@@ -127,6 +138,6 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 
 	return &StargateBridgeSwapToken{
 		Tx:    tx,
-		ECost: Estimate(tx, nil),
+		ECost: Estimate(tx, nil, "bridge", details),
 	}, nil
 }

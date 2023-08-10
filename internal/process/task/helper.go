@@ -7,18 +7,21 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/pkg/errors"
 )
 
-func GasStation(ecost *defi.EstimatedGasCost, network v1.Network) *v1.EstimationTx {
+func GasStation(ecost *bozdo.EstimatedGasCost, network v1.Network) *v1.EstimationTx {
 	result := &v1.EstimationTx{}
 	result.GasLimit = defi.AmountUni(ecost.GasLimit, network)
 	result.GasPrice = defi.AmountUni(ecost.GasPrice, network)
 	result.Gas = defi.AmountUni(ecost.TotalGasWei, network)
 
 	result.GasValuePercent = ""
+	result.Name = ecost.Name
+	result.Details = CastDetails(ecost.Details)
 
 	return result
 }
@@ -29,7 +32,7 @@ func ResolveNetworkTokenAmount(balance, gas, value *big.Int) *big.Int {
 		return value
 	}
 
-	return defi.Percent(new(big.Int).Sub(balance, gas), 99)
+	return bozdo.Percent(new(big.Int).Sub(balance, gas), 99)
 }
 
 func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, networker defi.Networker, updater TaskUpdater) error {
@@ -72,7 +75,7 @@ func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, n
 	return nil
 }
 
-func GasMultiplier(mul *float64, gas *defi.Gas) *defi.Gas {
+func GasMultiplier(mul *float64, gas *bozdo.Gas) *bozdo.Gas {
 
 	if mul == nil || *mul == 0 || *mul == 1 {
 		gas.GasMultiplier = 1
@@ -149,7 +152,7 @@ func TransactionAdd(ctx context.Context, rep repository.TransactionRepository, t
 	return rep.TransactionAdd(ctx, tx)
 }
 
-func NewTx(tx *defi.Transaction, gas *defi.Gas) *v1.TaskTx {
+func NewTx(tx *defi.Transaction, gas *bozdo.Gas) *v1.TaskTx {
 
 	if tx == nil {
 		return nil
@@ -161,6 +164,7 @@ func NewTx(tx *defi.Transaction, gas *defi.Gas) *v1.TaskTx {
 		Url:         &tx.Url,
 		Network:     &tx.Network,
 		Code:        &tx.Code,
+		Details:     CastDetails(tx.Details),
 	}
 
 	if gas != nil {
@@ -171,6 +175,21 @@ func NewTx(tx *defi.Transaction, gas *defi.Gas) *v1.TaskTx {
 		txx.Multiplier = &m
 	}
 	return txx
+}
+
+func CastDetails(in []bozdo.TxDetail) []*v1.TxDetail {
+	out := make([]*v1.TxDetail, len(in))
+	if in == nil || len(in) == 0 {
+		return out
+	}
+	for i := range in {
+		out[i] = &v1.TxDetail{
+			Key:   in[i].Key,
+			Value: in[i].Value,
+		}
+	}
+
+	return out
 }
 
 func getSlippage(s *v1.NetworkSettings, taskType v1.TaskType) defi.SlippagePercent {

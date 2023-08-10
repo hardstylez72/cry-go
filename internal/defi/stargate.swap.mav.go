@@ -4,16 +4,17 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/startgatemavrouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
 func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *DefaultBridgeReq) (*DefaultRes, error) {
-
+	details := []bozdo.TxDetail{}
 	result := &DefaultRes{}
 
 	// https://bscscan.com/address/0x86355F02119bdBC28ED6A4D5E0cA327Ca7730fFF
@@ -44,7 +45,7 @@ func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *Default
 		return nil, errors.Wrap(err, "TokenLimitChecker")
 	}
 	if limitTx.LimitExtended {
-		result.ApproveTx = c.NewTx(limitTx.ApproveTx.Hash(), CodeApprove)
+		result.ApproveTx = c.NewTx(limitTx.ApproveTx.Hash(), CodeApprove, nil)
 	}
 
 	chainID, err := c.Cli.ChainID(ctx)
@@ -66,13 +67,21 @@ func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *Default
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
 	}
 
-	opt.Value = BigIntSum(fee.Fee1, Percent(fee.Fee1, 2))
+	details = append(details, bozdo.NewLZFeeDetails(fee.Fee1, c.Cfg.Network, v1.Token_ETH))
+
+	fee.Fee1 = bozdo.BigIntSum(fee.Fee1, bozdo.Percent(fee.Fee1, 2))
+	opt.Value = fee.Fee1
 	opt.NoSend = req.EstimateOnly
 	opt = c.ResoleGas(ctx, req.Gas, opt)
 
-	destChainId := ChainIdMap[req.ToNetwork]
+	destChainId := layerzero.LayerZeroChainMap[req.ToNetwork]
 
-	adapterParams, err := MakeLayerZeroAdapterParams(1, big.NewInt(150000))
+	adapterParams, err := layerzero.MakeLayerZeroAdapterParams(1, big.NewInt(150000))
+	if err != nil {
+		return nil, err
+	}
+
+	amSlip, err := Slippage(req.Amount, req.Slippage)
 	if err != nil {
 		return nil, err
 	}
@@ -83,13 +92,13 @@ func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *Default
 		destChainId,
 		wt.WalletAddr.Bytes(),
 		req.Amount,
-		Slippage(req.Amount, req.Slippage),
+		amSlip,
 		wt.WalletAddr,
-		ZEROADDR,
+		bozdo.ZEROADDR,
 		adapterParams,
 		startgatemavrouter.IOFTWrapperFeeObj{
 			CallerBps: big.NewInt(0),
-			Caller:    ZEROADDR,
+			Caller:    bozdo.ZEROADDR,
 			PartnerId: [2]byte{0, 0},
 		},
 	)
@@ -97,41 +106,8 @@ func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *Default
 		return nil, errors.Wrap(err, "router.SendOFT")
 	}
 
-	result.ECost = Estimate(tx, nil)
-	result.Tx = c.NewTx(tx.Hash(), CodeContract)
+	result.ECost = Estimate(tx, nil, "bridge", details)
+	result.Tx = c.NewTx(tx.Hash(), CodeContract, details)
 
 	return result, nil
-}
-
-func MakeLayerZeroAdapterParams(a uint16, b *big.Int) ([]byte, error) {
-
-	structThing, err := abi.NewType("tuple", "lzAdapterParams", []abi.ArgumentMarshaling{
-		{Name: "a", Type: "uint16"},
-		{Name: "b", Type: "uint256"},
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "abi.NewType")
-	}
-
-	record := struct {
-		A uint16
-		B *big.Int
-	}{
-		A: a,
-		B: b,
-	}
-
-	args := abi.Arguments{
-		{Type: structThing, Name: "lzAdapterParams"},
-	}
-	adapterParams, err := args.Pack(&record)
-	if err != nil {
-		return nil, errors.Wrap(err, "args.Pack(&record)")
-	}
-
-	// 34 байтов
-	// https://github.com/LayerZero-Labs/solidity-examples/blob/main/contracts/lzApp/LzApp.sol#L64
-	adapterParams = adapterParams[30:]
-
-	return adapterParams, nil
 }

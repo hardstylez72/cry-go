@@ -758,7 +758,8 @@
         "VeSyncSwap",
         "EzkaliburSwap",
         "ZkSwap",
-        "TraderJoeSwap"
+        "TraderJoeSwap",
+        "MerklyMintAndBridgeNFT"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

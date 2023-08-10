@@ -3,7 +3,6 @@ package arbitrum
 import (
 	"testing"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +15,7 @@ func Test(t *testing.T) {
 
 	//tx, err := defi.NewWalletTransactor(tests.GetConfig().PK)
 
-	opt, err := bind.NewKeyedTransactorWithChainID(tx.PrivateKey, r.NetworkId)
+	//opt, err := bind.NewKeyedTransactorWithChainID(tx.PrivateKey, r.NetworkId)
 	//
 	//tx1 := &types.DynamicFeeTx{}
 	//

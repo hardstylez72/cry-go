@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/router"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -30,7 +31,7 @@ func (c *EtheriumClient) GetStargateBridgeFee(ctx context.Context, req *GetStarg
 
 	toAddress := req.Wallet.Bytes()
 	payload := common.HexToAddress("0").Bytes()
-	distChain, ok := ChainIdMap[req.ToChain]
+	distChain, ok := layerzero.LayerZeroChainMap[req.ToChain]
 	if !ok {
 		return nil, errors.New("invalid chain: " + string(req.ToChain))
 	}
@@ -38,7 +39,7 @@ func (c *EtheriumClient) GetStargateBridgeFee(ctx context.Context, req *GetStarg
 	opt := &bind.CallOpts{
 		Context: ctx,
 	}
-	fee1, fee2, err := trx.QuoteLayerZeroFee(opt, distChain, TypeFuncSwap, toAddress, payload, router.IStargateRouterlzTxObj{
+	fee1, fee2, err := trx.QuoteLayerZeroFee(opt, distChain, layerzero.TypeFuncSwap, toAddress, payload, router.IStargateRouterlzTxObj{
 		DstGasForCall:   big.NewInt(0),
 		DstNativeAmount: big.NewInt(0),
 		DstNativeAddr:   []byte{},

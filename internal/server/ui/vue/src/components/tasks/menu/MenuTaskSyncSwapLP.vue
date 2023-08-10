@@ -1,5 +1,8 @@
 <template>
-  <a :href="link.syncSwap" target="_blank">SyncSwap LP</a>
+  <div class="d-inline-flex">
+    <a :href="taskProps.SyncSwap.service.link" target="_blank">{{ taskProps.SyncSwap.service.name }}</a>
+    <MenuTaskSettings :network="item.network"/>
+  </div>
   <div>Network: <b>{{ item.network }}</b></div>
   <div>Pool: <b>{{ `${item.a}/${item.b}` }}</b></div>
   <div>Operation: <b>{{ `${item.add ? 'deposit' : 'withdraw'}` }}</b></div>
@@ -16,11 +19,13 @@ import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";
 import {getAmountSend} from "./helper";
 import {link} from "@/components/tasks/links";
-import GasOptions from "@/components/tasks/menu/GasOptions.vue";
+import GasOptions from "@/components/tasks/menu/TaskDetails.vue";
+import {taskProps} from "../tasks";
+import MenuTaskSettings from "@/components/tasks/menu/MenuTaskSettings.vue";
 
 export default defineComponent({
   name: "MenuTaskSyncSwapLP",
-  components: {GasOptions},
+  components: {MenuTaskSettings, GasOptions},
   props: {
     task: {
       type: Object as PropType<Task>,
@@ -47,6 +52,9 @@ export default defineComponent({
     }
   },
   computed: {
+    taskProps() {
+      return taskProps
+    },
     link() {
       return link
     },

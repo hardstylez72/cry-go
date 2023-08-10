@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/etherium"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera/scan"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -316,11 +317,12 @@ func newClient(
 	}, nil
 }
 
-func (c *Client) NewTx(id common.Hash, code defi.TxCode) *defi.Transaction {
+func (c *Client) NewTx(id common.Hash, code defi.TxCode, Details []bozdo.TxDetail) *defi.Transaction {
 	return &defi.Transaction{
 		Code:    code,
 		Network: c.Cfg.Network,
 		Id:      id.String(),
 		Url:     c.TxViewFn(id.String()),
+		Details: Details,
 	}
 }

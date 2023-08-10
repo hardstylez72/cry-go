@@ -17,37 +17,27 @@
       </v-btn>
     </template>
 
-    <v-skeleton-loader
-      :loading="loading"
-      type="table"
-      min-height="200px"
-      elevation="10"
-    >
-      <v-responsive>
-
-        <v-card>
-          <v-card-title class="d-flex justify-space-between">
-            <div>Market Estimation</div>
-            <v-icon icon="mdi-close" @click="showTooltip = false"/>
-          </v-card-title>
-          <v-card-text style="white-space: pre-wrap">
-            <div v-if="errorMessage" style="color: red">{{ errorMessage }}</div>
-            <div v-else class="d-flex justify-space-between">
-              <div>
-                <!--                <div><b> balance</b>: {{ getBalance(estimation.balance, false) }}</div>-->
-                <!--                <div><b>value</b>: {{ getBalance(estimation.value, false) }}</div>-->
-                <div><b>gas</b>: {{ getBalance(estimation.gas, true) }}</div>
-              </div>
-              <div>
-                <div><b>gas limit</b>: {{ getBalance(estimation.gasLimit, false) }}</div>
-                <div><b>gas price</b>: {{ getBalance(estimation.gasPrice, false) }}</div>
-                <!--                <div><b>gas/value: </b>: {{ `${Number(estimation.gasValuePercent).toPrecision(2)}%` }}</div>-->
-              </div>
+    <v-card>
+      <v-card-title class="d-flex justify-space-between">
+        <div>Market Estimation</div>
+        <v-icon icon="mdi-close" @click="showTooltip = false"/>
+      </v-card-title>
+      <Loader v-if="loading"/>
+      <v-card-text v-else style="white-space: pre-wrap">
+        <div v-if="errorMessage" style="color: red">{{ errorMessage }}</div>
+        <div v-else v-for="estimation in estimations" class="d-flex justify-space-between elevation-1 px-3 py-3">
+          <div><b>{{ estimation.name }}</b><br/></div>
+          <div>
+            <div><b>gas</b>: {{ getBalance(estimation.gas, true) }}</div>
+            <div v-for="d in estimation.details">
+              <b>{{ d.key }}</b> {{ Number(d.value.split(" ")[0]).toPrecision(2) + " " + d.value.split(" ")[1] }}
             </div>
-          </v-card-text>
-        </v-card>
-      </v-responsive>
-    </v-skeleton-loader>
+            <div><b>gas limit</b>: {{ getBalance(estimation.gasLimit, false) }}</div>
+            <div><b>gas price</b>: {{ getBalance(estimation.gasPrice, false) }}</div>
+          </div>
+        </div>
+      </v-card-text>
+    </v-card>
   </v-menu>
 </template>
 
@@ -56,9 +46,11 @@ import {AmUni, Network, Token} from "@/generated/flow";
 import {defineComponent} from "vue";
 import {processService} from "@/generated/services";
 import {EstimationTx} from "@/generated/process";
+import Loader from "@/components/Loader.vue";
 
 export default defineComponent({
   name: "EstimateTask",
+  components: {Loader},
   props: {
     taskId: {
       type: String,
@@ -87,7 +79,7 @@ export default defineComponent({
       errorMessage: '',
       loading: false,
       showTooltip: false,
-      estimation: {} as EstimationTx
+      estimations: {} as EstimationTx[]
     }
   },
   methods: {
@@ -109,9 +101,9 @@ export default defineComponent({
             token = Token.AVAX
             break
         }
-        return `\n ${token}: ${Number(am.eth).toPrecision(3)}\n  USD: ${Number(am.usd)} \n GWEI: ${Number(am.gwei)}`
+        return `${Number(am.usd).toPrecision(2)} USD`
       }
-      return `\n GWEI: ${Number(am.gwei)}`
+      return `${Number(am.gwei).toPrecision(2)} GWEI`
     },
     async estimate() {
       try {
@@ -126,8 +118,8 @@ export default defineComponent({
         })
         if (res.error) {
           this.errorMessage = res.error
-        } else if (res.data) {
-          this.estimation = res.data
+        } else if (res.estimations) {
+          this.estimations = res.estimations
         }
       } catch (e) {
         this.errorMessage = 'error estimating'

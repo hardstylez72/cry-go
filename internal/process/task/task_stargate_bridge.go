@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/log"
 	"github.com/hardstylez72/cry/internal/lzscan"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -195,7 +196,7 @@ func NewSwapper(ctx context.Context, a *Input) (defi.StargateSwapper, *defi.Wall
 	return swapper, wallet, nil
 }
 
-func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapper defi.StargateSwapper, profile *halp.Profile, estimation *v1.EstimationTx) (*SwapRes, *defi.Gas, error) {
+func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapper defi.StargateSwapper, profile *halp.Profile, estimation *v1.EstimationTx) (*SwapRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.FromNetwork)
 	if err != nil {
@@ -251,7 +252,7 @@ type Tx struct {
 	TxId string
 }
 
-func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network) (*defi.Gas, error) {
+func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network) (*bozdo.Gas, error) {
 	limit, ok := big.NewInt(0).SetString(e.GasLimit.Wei, 10)
 	if !ok {
 		log.Log.Error("GasLimit: " + e.GasLimit.Wei)
@@ -275,7 +276,7 @@ func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network) (*defi.
 		maxGas = tmp
 	}
 
-	gas := &defi.Gas{
+	gas := &bozdo.Gas{
 		Network:             n,
 		MaxGas:              *maxGas,
 		GasBeforeMultiplier: *beforeMultiplier,
@@ -324,7 +325,7 @@ func EstimateStargateBridgeSwapCost(ctx context.Context, p *v1.StargateBridgeTas
 		FromNetwork:  p.FromNetwork,
 		ToNetwork:    p.ToNetwork,
 		WalletPK:     profile.WalletPK,
-		Amount:       defi.Percent(am, 90),
+		Amount:       bozdo.Percent(am, 90),
 		FromToken:    p.FromToken,
 		ToToken:      p.ToToken,
 		Gas:          nil,

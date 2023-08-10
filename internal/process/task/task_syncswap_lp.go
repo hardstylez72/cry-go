@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -107,7 +108,7 @@ func (t *SyncSwapLPTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 	return task, nil
 }
 
-func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask, client zksyncera.LP, estimation *v1.EstimationTx) (*zksyncera.SyncSwapLiquidityRes, *defi.Gas, error) {
+func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask, client zksyncera.LP, estimation *v1.EstimationTx) (*zksyncera.SyncSwapLiquidityRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
@@ -160,9 +161,9 @@ func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask
 	}
 
 	estimateOnly := estimation == nil
-	var Gas *defi.Gas
+	var Gas *bozdo.Gas
 	if estimateOnly {
-		am = defi.Percent(am, 90)
+		am = bozdo.Percent(am, 90)
 		Gas = nil
 	} else {
 		gas, err := GasManager(estimation, s.Source, p.Network)

@@ -1,5 +1,9 @@
 <template>
-  <a :href="link.officialZkSyncBridge" target="_blank">Official bridge</a>
+  <div class="d-inline-flex">
+    <a :href="taskProps.ZkSyncOfficialBridgeFromEthereum.service.link"
+       target="_blank">{{ taskProps.ZkSyncOfficialBridgeFromEthereum.service.name }}</a>
+    <MenuTaskSettings :network="Network.ZKSYNCERA"/>
+  </div>
   <div>Network: <b>{{ item.network }}</b></div>
   <div>Bridge to: <b>{{ Network.Etherium }}</b></div>
   <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>
@@ -20,11 +24,13 @@ import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";
 import {getAmountSend} from "./helper";
 import {link} from "@/components/tasks/links";
-import GasOptions from "@/components/tasks/menu/GasOptions.vue";
+import GasOptions from "@/components/tasks/menu/TaskDetails.vue";
+import {taskProps} from "@/components/tasks/tasks";
+import MenuTaskSettings from "@/components/tasks/menu/MenuTaskSettings.vue";
 
 export default defineComponent({
   name: "MenuZkSyncOfficialBridgeToEth",
-  components: {GasOptions},
+  components: {MenuTaskSettings, GasOptions},
   props: {
     task: {
       type: Object as PropType<Task>,
@@ -52,6 +58,9 @@ export default defineComponent({
     }
   },
   computed: {
+    taskProps() {
+      return taskProps
+    },
     link() {
       return link
     },

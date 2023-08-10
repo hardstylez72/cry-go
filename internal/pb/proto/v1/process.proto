@@ -265,7 +265,7 @@ message EstimateCostRequest {
 
 message EstimateCostResponse {
   optional string error = 1;
-  optional EstimationTx data = 2;
+  repeated EstimationTx estimations = 2;
 }
 
 message EstimationTx {
@@ -275,10 +275,12 @@ message EstimationTx {
   shared.AmUni gas_limit = 4;
   shared.AmUni gas_price = 5;
   string gasValuePercent = 6;
+  string name = 7;
+  repeated task.TxDetail details = 8;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["balance", "value", "gas", "gas_limit", "gas_price", "gasValuePercent"]
+      required: ["balance", "value", "gas", "gas_limit", "gas_price", "gasValuePercent", "name", "details"]
     }
   };
 }

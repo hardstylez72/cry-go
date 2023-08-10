@@ -232,7 +232,7 @@ func (s *ProcessService) CancelProcess(ctx context.Context, req *v1.CancelProces
 	return &v1.CancelProcessResponse{}, nil
 }
 func (s *ProcessService) EstimateCost(ctx context.Context, req *v1.EstimateCostRequest) (*v1.EstimateCostResponse, error) {
-	res, err := s.dispatcher.EstimateTaskCost(ctx, req.ProfileId, req.TaskId)
+	etimations, err := s.dispatcher.EstimateTaskCost(ctx, req.ProfileId, req.TaskId)
 	if err != nil {
 		e := err.Error()
 		return &v1.EstimateCostResponse{
@@ -240,8 +240,8 @@ func (s *ProcessService) EstimateCost(ctx context.Context, req *v1.EstimateCostR
 		}, nil
 	}
 	return &v1.EstimateCostResponse{
-		Error: nil,
-		Data:  res,
+		Error:       nil,
+		Estimations: etimations,
 	}, nil
 }
 

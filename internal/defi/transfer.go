@@ -8,13 +8,14 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/erc_20"
 	"github.com/pkg/errors"
 )
 
 type TransferRes struct {
 	Tx    *Transaction
-	ECost *EstimatedGasCost
+	ECost *bozdo.EstimatedGasCost
 }
 
 type TransferReq struct {
@@ -23,7 +24,7 @@ type TransferReq struct {
 	Token  Token
 	Amount *big.Int
 
-	Gas          *Gas
+	Gas          *bozdo.Gas
 	EstimateOnly bool
 }
 
@@ -77,14 +78,14 @@ func (c *EtheriumClient) Transfer(ctx context.Context, r *TransferReq) (*Transfe
 		return nil, errors.Wrap(err, "Transfer")
 	}
 
-	eCost := &EstimatedGasCost{
+	eCost := &bozdo.EstimatedGasCost{
 		GasLimit:    big.NewInt(0).SetUint64(tx.Gas()),
 		GasPrice:    tx.GasPrice(),
 		TotalGasWei: MinerGasLegacy(tx.GasPrice(), tx.Gas()),
 	}
 
 	return &TransferRes{
-		Tx:    c.NewTx(tx.Hash(), CodeTransfer),
+		Tx:    c.NewTx(tx.Hash(), CodeTransfer, nil),
 		ECost: eCost,
 	}, nil
 }
@@ -114,7 +115,7 @@ type TransferMainTokenReq struct {
 	Wallet       *WalletTransactor
 	ToAddr       common.Address
 	Amount       *big.Int
-	Gas          *Gas
+	Gas          *bozdo.Gas
 	EstimateOnly bool
 }
 
@@ -154,7 +155,7 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 		return nil, err
 	}
 
-	estimate := &EstimatedGasCost{
+	estimate := &bozdo.EstimatedGasCost{
 		GasLimit:    big.NewInt(0).SetUint64(gas),
 		GasPrice:    gasPrice,
 		TotalGasWei: MinerGasLegacy(gasPrice, gas),
@@ -196,7 +197,7 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 		return nil, err
 	}
 	return &TransferRes{
-		Tx:    c.NewTx(signedTx.Hash(), CodeTransfer),
+		Tx:    c.NewTx(signedTx.Hash(), CodeTransfer, nil),
 		ECost: estimate,
 	}, nil
 }

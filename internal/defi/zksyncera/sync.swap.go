@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/syncswaprouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -21,7 +22,7 @@ func (c *Client) SyncSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.
 	return c.GenericSwap(ctx, &syncSwapMaker{c}, req)
 }
 
-func (c *syncSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
+func (c *syncSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error) {
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -48,7 +49,10 @@ func (c *syncSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq
 		return nil, errors.Wrap(err, "getAmountOut")
 	}
 
-	min := defi.Slippage(amOut, req.Slippage)
+	min, err := defi.Slippage(amOut, req.Slippage)
+	if err != nil {
+		return nil, err
+	}
 
 	structThing, err := abi.NewType("tuple", "struct thing", []abi.ArgumentMarshaling{
 		{Name: "a", Type: "address"},
@@ -112,7 +116,7 @@ func (c *syncSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq
 		return nil, err
 	}
 
-	return &defi.TxData{
+	return &bozdo.TxData{
 		Data:         data,
 		Value:        value,
 		ContractAddr: c.Cfg.SyncSwap.RouterSwap,

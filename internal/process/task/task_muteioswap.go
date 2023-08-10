@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -119,6 +120,7 @@ func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 			FromToken: p.FromToken,
 			ToToken:   p.ToToken,
 			WalletPK:  profile.WalletPK,
+			Slippage:  getSlippage(s.Source, v1.TaskType_MuteioSwap),
 		})
 		if err != nil {
 			return nil, err
@@ -192,7 +194,7 @@ func EstimateMuteioSwapCost(ctx context.Context, profile *halp.Profile, p *v1.Mu
 
 	swap, err := swapper.MuteIOSwap(ctx, &defi.DefaultSwapReq{
 		Gas:          nil,
-		Amount:       defi.Percent(am, 90),
+		Amount:       bozdo.Percent(am, 90),
 		FromToken:    p.FromToken,
 		ToToken:      p.ToToken,
 		WalletPK:     wallet.PK,

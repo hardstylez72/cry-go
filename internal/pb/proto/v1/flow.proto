@@ -96,14 +96,14 @@ message Task {
   string description  = 3;
   oneof task {
     task.StargateBridgeTask stargateBridgeTask = 4;
-    task.MockTask mock_task = 5;
+    task.MockTask mock_task = 5; //deprecated
     task.DelayTask delay_task = 6;
     task.WithdrawExchangeTask withdrawExchangeTask= 7;
     task.OkexDepositTask okexDepositTask = 8;
     task.TestNetBridgeSwapTask testNetBridgeSwapTask= 9;
     task.SnapshotVoteTask snapshotVoteTask = 10;
     task.OkexBinanaceTask okexBinanaceTask = 11; //deprecated
-    task.Swap1inchTask swap1inchTask = 12;
+    task.Swap1inchTask swap1inchTask = 12; //deprecated
     task.SyncSwapTask syncSwapTask = 13;
     task.ZkSyncOfficialBridgeToEthereumTask  zkSyncOfficialBridgeToEthereumTask = 14;
     task.OrbiterBridgeTask orbiterBridgeTask = 15;
@@ -119,6 +119,7 @@ message Task {
     task.EzkaliburSwapTask ezkaliburSwapTask = 25;
     task.ZkSwapTask zkSwapTask = 26;
     task.TraderJoeSwapTask traderJoeSwapTask = 27;
+    task.MerklyMintAndBridgeNFTTask merklyMintAndBridgeNFTTask = 28;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

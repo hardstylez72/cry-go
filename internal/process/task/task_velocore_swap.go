@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -104,7 +105,7 @@ func (t *VelocoreSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 	return task, nil
 }
 
-func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwapTask, client zksyncera.VelocoreSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *defi.Gas, error) {
+func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwapTask, client zksyncera.VelocoreSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
@@ -140,9 +141,9 @@ func VelocoreSwap(ctx context.Context, profile *halp.Profile, p *v1.VelocoreSwap
 	}
 
 	estimateOnly := estimation == nil
-	var Gas *defi.Gas
+	var Gas *bozdo.Gas
 	if estimateOnly {
-		am = defi.Percent(am, 90)
+		am = bozdo.Percent(am, 90)
 		Gas = nil
 	} else {
 		gas, err := GasManager(estimation, s.Source, p.Network)

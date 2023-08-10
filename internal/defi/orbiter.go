@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/orbiter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
@@ -20,13 +21,13 @@ type OrbiterBridgeReq struct {
 
 	WalletPk string
 
-	Gas          *Gas
+	Gas          *bozdo.Gas
 	EstimateOnly bool
 }
 
 type OrbiterBridgeRes struct {
 	Tx    *Transaction
-	ECost *EstimatedGasCost
+	ECost *bozdo.EstimatedGasCost
 }
 
 func (c *EtheriumClient) OrbiterBridge(ctx context.Context, req *OrbiterBridgeReq) (*OrbiterBridgeRes, error) {

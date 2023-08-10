@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/izumiquoter"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/izumirouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -29,7 +30,7 @@ func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi
 	return c.GenericSwap(ctx, &izumiMaker{c}, req)
 }
 
-func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
+func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error) {
 
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
@@ -91,7 +92,7 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 	}
 
 	if req.FromToken == v1.Token_WETH || req.ToToken == v1.Token_WETH {
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         p1,
 			Value:        value,
 			ContractAddr: c.Cfg.IZUMI.Router,
@@ -119,7 +120,7 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 			return nil, err
 		}
 
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.IZUMI.Router,
@@ -131,7 +132,7 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 		return nil, err
 	}
 
-	return &defi.TxData{
+	return &bozdo.TxData{
 		Data:         data,
 		Value:        value,
 		ContractAddr: c.Cfg.IZUMI.Router,

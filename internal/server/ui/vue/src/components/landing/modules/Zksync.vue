@@ -159,6 +159,14 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Swap (ETH <-> USDC)',
           quest: ''
+        },
+        {
+          name: taskProps.MerklyMintAndBridgeNFT.service.name,
+          link: taskProps.MerklyMintAndBridgeNFT.service.link,
+          img: taskProps.MerklyMintAndBridgeNFT.service.img,
+          status: Status.integrated,
+          action: 'Mint and Bridge NFT',
+          quest: ''
         }
       ],
       links: [

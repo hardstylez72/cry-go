@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/erc_20"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -18,7 +19,7 @@ type TokenLimitCheckerReq struct {
 	WalletPK    string
 	Amount      *big.Int
 	SpenderAddr common.Address
-	Gas         *defi.Gas
+	Gas         *bozdo.Gas
 }
 
 type TokenLimitCheckerRes struct {
@@ -64,7 +65,7 @@ func (c *Client) TokenLimitChecker(ctx context.Context, req *TokenLimitCheckerRe
 			return nil, err
 		}
 
-		r.ApproveTx = c.NewTx(tx.TxHash, defi.CodeApprove)
+		r.ApproveTx = c.NewTx(tx.TxHash, defi.CodeApprove, nil)
 	}
 
 	return r, nil

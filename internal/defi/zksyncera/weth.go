@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/weth"
 	"github.com/pkg/errors"
 	"github.com/zksync-sdk/zksync2-go/accounts"
@@ -69,7 +70,7 @@ func (c *Client) WrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRes,
 	if err != nil {
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
-	result.Tx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
 
 	return result, nil
 }
@@ -120,12 +121,12 @@ func (c *Client) UnWrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRe
 	if err != nil {
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
-	result.Tx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
 
 	return result, nil
 }
 
-func (c *Client) Make712Tx(ctx context.Context, tx *types.Transaction, gasOpt *defi.Gas, signer *accounts.DefaultEthSigner) ([]byte, *defi.EstimatedGasCost, error) {
+func (c *Client) Make712Tx(ctx context.Context, tx *types.Transaction, gasOpt *bozdo.Gas, signer *accounts.DefaultEthSigner) ([]byte, *bozdo.EstimatedGasCost, error) {
 	nonce, err := c.Provider.NonceAt(ctx, tx.From, nil)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to GetGasPrice: %w", err)
@@ -171,7 +172,7 @@ func (c *Client) Make712Tx(ctx context.Context, tx *types.Transaction, gasOpt *d
 		return nil, nil, errors.Wrap(err, "prepared.RLPValues")
 	}
 
-	return rawTx, &defi.EstimatedGasCost{
+	return rawTx, &bozdo.EstimatedGasCost{
 		GasLimit:    gas,
 		GasPrice:    gasPrice,
 		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas.Uint64()),

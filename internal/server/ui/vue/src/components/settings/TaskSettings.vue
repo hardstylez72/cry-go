@@ -3,11 +3,11 @@
     <div class="mt-2"><b>{{ taskType }}</b> <i>slippage</i></div>
 
     <v-radio-group direction="horizontal" inline hide-details v-model="settings.slippage">
-      <v-radio value="5" label="5%"/>
       <v-radio value="2" label="2%"/>
       <v-radio value="1" label="1%"/>
       <v-radio value="0.5" label="0.5%"/>
       <v-radio value="0.1" label="0.1%"/>
+      <v-radio value="0" label="0%"/>
     </v-radio-group>
   </div>
 </template>
@@ -23,16 +23,6 @@ import {taskProps} from "@/components/tasks/tasks";
 export default defineComponent({
   name: "TaskSettings",
   watch: {
-    settingsProp: {
-      handler() {
-        if (!deepEqual(this.orig, this.settingsProp)) {
-          this.settings = Object.assign({}, this.settingsProp)
-          this.orig = Object.assign({}, this.settingsProp)
-        }
-      },
-      deep: true,
-      immediate: true
-    },
     settings: {
       handler() {
         if (!deepEqual(this.settings, this.orig)) {
@@ -65,17 +55,10 @@ export default defineComponent({
       orig: null as TaskSettings,
     }
   },
-  computed: {
-    taskProps() {
-      return taskProps
-    },
-    Network() {
-      return Network
-    },
-  },
 
   created() {
-
+    this.orig = Object.assign({}, this.settingsProp)
+    this.settings = Object.assign({}, this.settingsProp)
   }
 })
 

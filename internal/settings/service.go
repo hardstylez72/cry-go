@@ -165,6 +165,10 @@ func resolveNetworkSettings(in *v1.NetworkSettings, s ResolveNet, force bool) (*
 		}
 	}
 
+	if out.TaskSettings == nil {
+		out.TaskSettings = map[string]*v1.TaskSettings{}
+	}
+
 	if out.Id == "" {
 		cli, err := uniclient.NewBaseClient(s.Network, &uniclient.BaseClientConfig{
 			RPCEndpoint: s.RPC,

@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/spacefirouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -25,7 +26,7 @@ func (c *Client) SpaceFiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*de
 	return c.GenericSwap(ctx, &spaceFiMaker{c}, req)
 }
 
-func (c *spaceFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
+func (c *spaceFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error) {
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
 		value = req.Amount
@@ -64,13 +65,19 @@ func (c *spaceFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 
 	if req.FromToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, req.Slippage)
+
+		amSlip, err := defi.Slippage(amOut, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
+
+		amOut = amSlip
 		data, err := abispacefirouter.Pack("swapExactETHForTokens", amOut, path, w.WalletAddr, DefaultDeadLine())
 		if err != nil {
 			return nil, err
 		}
 
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.SpaceFI.Router,
@@ -78,13 +85,19 @@ func (c *spaceFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 
 	} else if req.ToToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, req.Slippage)
+
+		amSlip, err := defi.Slippage(amOut, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
+
+		amOut = amSlip
 		data, err := abispacefirouter.Pack("swapExactTokensForETH", req.Amount, amOut, path, w.WalletAddr, DefaultDeadLine())
 		if err != nil {
 			return nil, err
 		}
 
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.SpaceFI.Router,

@@ -5,6 +5,8 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
 
@@ -23,6 +25,12 @@ type Networker interface {
 type Balancer interface {
 	GetBalance(ctx context.Context, req *GetBalanceReq) (*GetBalanceRes, error)
 	GetNetworkToken() Token
+}
+
+type MintAndBridgeNFT interface {
+	Networker
+	MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*DefaultRes, *big.Int, *big.Int, error)
+	MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*DefaultRes, error)
 }
 
 type StargateSwapper interface {
@@ -44,27 +52,6 @@ type OrbiterSwapper interface {
 	OrbiterBridge(ctx context.Context, req *OrbiterBridgeReq) (*OrbiterBridgeRes, error)
 }
 
-type Gas struct {
-	Network       v1.Network
-	GasMultiplier float64
-	MaxGas        big.Int
-
-	GasBeforeMultiplier big.Int
-	GasLimit            big.Int
-	GasPrice            big.Int
-	TotalGas            big.Int
-}
-
-type TxData struct {
-	Data         []byte
-	Value        *big.Int
-	ContractAddr common.Address
-}
-
-func (g *Gas) RuleSet() bool {
-	return g != nil
-}
-
 type SyncSwapReq struct {
 	Network      v1.Network
 	Amount       *big.Int
@@ -72,7 +59,7 @@ type SyncSwapReq struct {
 	ToToken      v1.Token
 	WalletPK     string
 	EstimateOnly bool
-	Gas          *Gas
+	Gas          *bozdo.Gas
 }
 
 type DefaultSwapReq struct {
@@ -82,7 +69,7 @@ type DefaultSwapReq struct {
 	ToToken      v1.Token
 	WalletPK     string
 	EstimateOnly bool
-	Gas          *Gas
+	Gas          *bozdo.Gas
 	Slippage     SlippagePercent
 	Debug        bool
 }
@@ -90,7 +77,8 @@ type DefaultSwapReq struct {
 type DefaultRes struct {
 	Tx        *Transaction
 	ApproveTx *Transaction
-	ECost     *EstimatedGasCost
+	ECost     *bozdo.EstimatedGasCost
+	TxDetails []bozdo.TxDetail
 }
 
 type SyncSwapRes = DefaultRes
@@ -102,7 +90,7 @@ type DefaultBridgeReq struct {
 	Amount       *big.Int
 	FromToken    Token
 	ToToken      Token
-	Gas          *Gas
+	Gas          *bozdo.Gas
 	Slippage     SlippagePercent
 	EstimateOnly bool
 	Debug        bool
@@ -121,22 +109,17 @@ type Transaction struct {
 	Network v1.Network
 	Id      string
 	Url     string
+	Details []bozdo.TxDetail
 }
 
-func (c *EtheriumClient) NewTx(id common.Hash, code TxCode) *Transaction {
+func (c *EtheriumClient) NewTx(id common.Hash, code TxCode, details []bozdo.TxDetail) *Transaction {
 	return &Transaction{
 		Code:    code,
 		Network: c.Cfg.Network,
 		Id:      id.String(),
 		Url:     c.TxViewFn(id.String()),
+		Details: details,
 	}
-}
-
-type EstimatedGasCost struct {
-	GasLimit    *big.Int
-	GasPrice    *big.Int
-	TotalGasWei *big.Int
-	L2Fee       *big.Int
 }
 
 type SyncSwapper interface {
@@ -160,12 +143,12 @@ type WETHReq struct {
 
 	WalletPK     string
 	EstimateOnly bool
-	Gas          *Gas
+	Gas          *bozdo.Gas
 }
 
 type WETHRes struct {
 	Tx    *Transaction
-	ECost *EstimatedGasCost
+	ECost *bozdo.EstimatedGasCost
 }
 
 type WETH interface {

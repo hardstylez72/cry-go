@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/exchange/okex"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -310,7 +311,7 @@ func EstimateOkexDepositCost(ctx context.Context, profile *halp.Profile, p *v1.O
 		Pk:           profile.WalletPK,
 		ToAddr:       common.HexToAddress(*addr),
 		Token:        p.Token,
-		Amount:       defi.Percent(am, 90),
+		Amount:       bozdo.Percent(am, 90),
 		Gas:          nil,
 		EstimateOnly: true,
 	})

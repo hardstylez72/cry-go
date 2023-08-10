@@ -18,7 +18,7 @@ import (
 
 const (
 	delayBeforePPTask = time.Second * 20
-	maxTaskRetry      = 3
+	maxTaskRetry      = 0
 )
 
 func getDelayBeforePPTask() time.Duration {

@@ -84,8 +84,10 @@ func (d *Dispatcher) GetStat() *Stat {
 	return d.stat
 }
 
-func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId string) (*v1.EstimationTx, error) {
+func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId string) ([]*v1.EstimationTx, error) {
 
+	out := make([]*v1.EstimationTx, 0)
+	var e *v1.EstimationTx
 	taskDB, err := d.r.GetProcessTask(ctx, taskId)
 	if err != nil {
 		return nil, err
@@ -104,58 +106,72 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	switch t.Task.TaskType {
 	case v1.TaskType_SyncSwap:
 		p := t.Task.Task.(*v1.Task_SyncSwapTask).SyncSwapTask
-		return task.EstimateSyncSwapCost(ctx, profile, p)
+		e, err = task.EstimateSyncSwapCost(ctx, profile, p)
 	case v1.TaskType_ZkSyncOfficialBridgeToEthereum:
 		p := t.Task.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask).ZkSyncOfficialBridgeToEthereumTask
-		return task.EstimateZkSyncOfficialBridgeToEthSwapCost(ctx, profile, p)
+		e, err = task.EstimateZkSyncOfficialBridgeToEthSwapCost(ctx, profile, p)
 	case v1.TaskType_StargateBridge:
 		p := t.Task.Task.(*v1.Task_StargateBridgeTask).StargateBridgeTask
-		return task.EstimateStargateBridgeSwapCost(ctx, p, profile)
+		e, err = task.EstimateStargateBridgeSwapCost(ctx, p, profile)
 	case v1.TaskType_OrbiterBridge:
 		p := t.Task.Task.(*v1.Task_OrbiterBridgeTask).OrbiterBridgeTask
-		return task.EstimateOrbiterBridgeCost(ctx, d.orbiterService, profile, p)
+		e, err = task.EstimateOrbiterBridgeCost(ctx, d.orbiterService, profile, p)
 	//case v1.TaskType_ZkSyncOfficialBridgeFromEthereum:
 	//	p := arg.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask).ZkSyncOfficialBridgeFromEthereumTask
 	//	return task.EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx, profile, p)
 	case v1.TaskType_WETH:
 		p := t.Task.Task.(*v1.Task_WETHTask).WETHTask
-		return task.EstimateWethTaskCost(ctx, p, profile)
+		e, err = task.EstimateWethTaskCost(ctx, p, profile)
 	case v1.TaskType_MuteioSwap:
 		p := t.Task.Task.(*v1.Task_MuteioSwapTask).MuteioSwapTask
-		return task.EstimateMuteioSwapCost(ctx, profile, p)
+		e, err = task.EstimateMuteioSwapCost(ctx, profile, p)
 	case v1.TaskType_OkexDeposit:
 		p := t.Task.Task.(*v1.Task_OkexDepositTask).OkexDepositTask
-		return task.EstimateOkexDepositCost(ctx, profile, p, d.runner.withdrawerRepository)
+		e, err = task.EstimateOkexDepositCost(ctx, profile, p, d.runner.withdrawerRepository)
 	case v1.TaskType_SyncSwapLP:
 		p := t.Task.Task.(*v1.Task_SyncSwapLPTask).SyncSwapLPTask
-		return task.EstimateSyncSwapLPCost(ctx, profile, p, nil)
+		e, err = task.EstimateSyncSwapLPCost(ctx, profile, p, nil)
 	case v1.TaskType_MaverickSwap:
 		p := t.Task.Task.(*v1.Task_MaverickSwapTask).MaverickSwapTask
-		return task.EstimateMaverickSwapCost(ctx, profile, p, nil)
+		e, err = task.EstimateMaverickSwapCost(ctx, profile, p, nil)
 	case v1.TaskType_SpaceFISwap:
 		p := t.Task.Task.(*v1.Task_SpaceFiSwapTask).SpaceFiSwapTask
-		return task.EstimateSpaceFiSwapCost(ctx, profile, p, nil)
+		e, err = task.EstimateSpaceFiSwapCost(ctx, profile, p, nil)
 	case v1.TaskType_VelocoreSwap:
 		p := t.Task.Task.(*v1.Task_VelocoreSwapTask).VelocoreSwapTask
-		return task.EstimateVelocoreSwapCost(ctx, profile, p, nil)
+		e, err = task.EstimateVelocoreSwapCost(ctx, profile, p, nil)
 	case v1.TaskType_IzumiSwap:
 		p := t.Task.Task.(*v1.Task_IzumiSwapTask).IzumiSwapTask
-		return task.EstimateIzumiSwapCost(ctx, profile, p, nil)
+		e, err = task.EstimateIzumiSwapCost(ctx, profile, p, nil)
 	case v1.TaskType_VeSyncSwap:
 		p := t.Task.Task.(*v1.Task_VeSyncSwapTask).VeSyncSwapTask
-		return task.EstimateVeSyncSwapCost(ctx, profile, p, nil)
+		e, err = task.EstimateVeSyncSwapCost(ctx, profile, p, nil)
 	case v1.TaskType_EzkaliburSwap:
 		p := t.Task.Task.(*v1.Task_EzkaliburSwapTask).EzkaliburSwapTask
-		return task.EstimateEzkaliburSwapCost(ctx, profile, p, nil)
+		e, err = task.EstimateEzkaliburSwapCost(ctx, profile, p, nil)
 	case v1.TaskType_ZkSwap:
 		p := t.Task.Task.(*v1.Task_ZkSwapTask).ZkSwapTask
-		return task.EstimateZkSwapCost(ctx, profile, p, nil)
+		e, err = task.EstimateZkSwapCost(ctx, profile, p, nil)
 	case v1.TaskType_TraderJoeSwap:
 		p := t.Task.Task.(*v1.Task_TraderJoeSwapTask).TraderJoeSwapTask
-		return task.EstimateTraderJoeSwapCost(ctx, profile, p, nil)
+		e, err = task.EstimateTraderJoeSwapCost(ctx, profile, p, nil)
+	case v1.TaskType_MerklyMintAndBridgeNFT:
+		p := t.Task.Task.(*v1.Task_MerklyMintAndBridgeNFTTask).MerklyMintAndBridgeNFTTask
+		e1, _, err := task.EstimateMerklyMintCost(ctx, profile, p, nil)
+		if err != nil {
+			return nil, errors.Wrap(err, "EstimateMerklyMintCost")
+		}
+		out = append(out, e1)
+		return out, nil
+	default:
+		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
+	}
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
+	out = append(out, e)
+	return out, nil
 }
 func (d *Dispatcher) SkipTask(ctx context.Context, processId, profileId, taskId string) error {
 
@@ -215,7 +231,7 @@ func (d *Dispatcher) RunDispatcher(ctx context.Context) {
 		}
 
 		ticker := time.NewTicker(time.Second * 10)
-		resolver := time.NewTicker(time.Minute * 5)
+		resolver := time.NewTicker(time.Minute * 15)
 
 		for {
 			select {

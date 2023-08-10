@@ -11,6 +11,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/maverickrouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -29,7 +30,7 @@ func (c *Client) MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*d
 	return c.GenericSwap(ctx, &maverickFiMaker{c}, req)
 }
 
-func (c *maverickFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
+func (c *maverickFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error) {
 
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
@@ -59,7 +60,12 @@ func (c *maverickFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapR
 	}
 
 	amOut := defi.TokenAmountFloatToWEI(d.OutputAmount, req.ToToken)
-	amOut = defi.Slippage(amOut, req.Slippage)
+
+	amSlip, err := defi.Slippage(amOut, req.Slippage)
+	if err != nil {
+		return nil, err
+	}
+	amOut = amSlip
 
 	pathb := []byte{}
 	pathb = append(pathb, common.HexToAddress(d.Path[0]).Bytes()...)
@@ -114,7 +120,7 @@ func (c *maverickFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapR
 		if err != nil {
 			return nil, err
 		}
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.Maverick.Router,
@@ -125,7 +131,7 @@ func (c *maverickFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapR
 	if err != nil {
 		return nil, err
 	}
-	return &defi.TxData{
+	return &bozdo.TxData{
 		Data:         data,
 		Value:        value,
 		ContractAddr: c.Cfg.Maverick.Router,

@@ -552,7 +552,7 @@ export interface EstimateCostResponse {
   error?: string;
 
   /**  */
-  data?: EstimationTx;
+  estimations?: EstimationTx[];
 }
 
 export interface EstimationTx {
@@ -573,6 +573,12 @@ export interface EstimationTx {
 
   /**  */
   gasValuePercent: string;
+
+  /**  */
+  name: string;
+
+  /**  */
+  details: TxDetail[];
 }
 
 export interface EzkaliburSwapTask {
@@ -687,6 +693,26 @@ export interface MaverickSwapTask {
 
   /**  */
   tx?: TaskTx;
+}
+
+export interface MerklyMintAndBridgeNFTTask {
+  /**  */
+  fromNetwork: Network;
+
+  /**  */
+  toNetwork: Network;
+
+  /**  */
+  mintTx: TaskTx;
+
+  /**  */
+  bridgeTx: TaskTx;
+
+  /**  */
+  nftId?: string;
+
+  /**  */
+  fee?: string;
 }
 
 export interface MockTask {}
@@ -1173,17 +1199,20 @@ export interface Task {
 
   /**  */
   traderJoeSwapTask?: TraderJoeSwapTask;
+
+  /**  */
+  merklyMintAndBridgeNFTTask?: MerklyMintAndBridgeNFTTask;
 }
 
 export interface TaskTx {
   /**  */
-  txCompleted?: boolean;
+  txCompleted: boolean;
 
   /**  */
-  txId?: string;
+  txId: string;
 
   /**  */
-  retryCount?: string;
+  retryCount: string;
 
   /**  */
   url?: string;
@@ -1205,6 +1234,9 @@ export interface TaskTx {
 
   /**  */
   multiplier?: number;
+
+  /**  */
+  details: TxDetail[];
 }
 
 export interface TestNetBridgeSwapTask {
@@ -1268,6 +1300,14 @@ export interface Transaction {
 
   /**  */
   url: string;
+}
+
+export interface TxDetail {
+  /**  */
+  key: string;
+
+  /**  */
+  value: string;
 }
 
 export interface VeSyncSwapTask {
@@ -1470,7 +1510,8 @@ export enum TaskType {
   'VeSyncSwap' = 'VeSyncSwap',
   'EzkaliburSwap' = 'EzkaliburSwap',
   'ZkSwap' = 'ZkSwap',
-  'TraderJoeSwap' = 'TraderJoeSwap'
+  'TraderJoeSwap' = 'TraderJoeSwap',
+  'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT'
 }
 
 export enum Token {

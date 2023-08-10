@@ -35,9 +35,21 @@ enum TaskType {
   EzkaliburSwap = 21;
   ZkSwap = 22;
   TraderJoeSwap = 23;
+  MerklyMintAndBridgeNFT = 24;
 }
 
 
+message TxDetail {
+  string key = 1;
+  string value = 2;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "key", "value"
+      ]
+    }
+  };
+}
 
 message TaskTx {
   bool   tx_completed = 1;
@@ -50,6 +62,32 @@ message TaskTx {
   optional shared.AmUni gas_result = 8;
   optional shared.AmUni gas_limit = 9;
   optional float multiplier = 10;
+  repeated TxDetail details = 11;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "tx_completed", "tx_id", "retry_count","details"
+      ]
+    }
+  };
+}
+
+message MerklyMintAndBridgeNFTTask {
+  shared.Network from_network = 1;
+  shared.Network to_network = 2;
+  optional TaskTx mint_tx = 3;
+  optional TaskTx bridge_tx = 4;
+  optional string nft_id = 5;
+  optional string fee = 6; //deprecated
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "from_network", "to_network", "mint_tx","bridge_tx"
+      ]
+    }
+  };
 }
 
 message SyncSwapLPTask {

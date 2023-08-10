@@ -1,5 +1,8 @@
 <template>
-  <a :href="taskProps.VeSyncSwap.service.link" target="_blank">{{ taskProps.VeSyncSwap.service.name }}</a>
+  <div class="d-inline-flex">
+    <a :href="taskProps.VeSyncSwap.service.link" target="_blank">{{ taskProps.VeSyncSwap.service.name }}</a>
+    <MenuTaskSettings :network="item.network"/>
+  </div>
   <div>Network: <b>{{ item.network }}</b></div>
   <div>Swap: <b>{{ `${item.fromToken} to ${item.toToken}` }}</b></div>
   <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>
@@ -26,11 +29,12 @@ import {ProcessStatus} from "@/generated/process";
 import {getAmountSend} from "./helper";
 import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
-import GasOptions from "@/components/tasks/menu/GasOptions.vue";
+import GasOptions from "@/components/tasks/menu/TaskDetails.vue";
+import MenuTaskSettings from "@/components/tasks/menu/MenuTaskSettings.vue";
 
 export default defineComponent({
   name: "MenuTaskVeSyncSwap",
-  components: {GasOptions},
+  components: {MenuTaskSettings, GasOptions},
   props: {
     task: {
       type: Object as PropType<Task>,

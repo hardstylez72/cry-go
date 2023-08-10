@@ -45,6 +45,8 @@ import TaskZkSwap from "@/components/tasks/TaskZkSwap.vue";
 import MenuTaskZkSwap from "@/components/tasks/menu/MenuTaskZkSwap.vue";
 import TaskTraderJoeSwap from "@/components/tasks/TaskTraderJoeSwap.vue";
 import MenuTaskTraderJoeSwap from "@/components/tasks/menu/MenuTaskTraderJoeSwap.vue";
+import MenuTaskMerklyNFT from "@/components/tasks/menu/MenuTaskMerklyNFT.vue";
+import TaskMerklyNFT from "@/components/tasks/TaskMerklyNFT.vue";
 
 
 export interface TaskArg {
@@ -454,7 +456,23 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     networks: [Network.ARBITRUM]
   },
-
+  MerklyMintAndBridgeNFT: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.merklyMintAndBridgeNFTTask
+      return ` (from ${p?.fromNetwork} to ${p?.toNetwork})`
+    },
+    component: TaskMerklyNFT,
+    menu: MenuTaskMerklyNFT,
+    service: {
+      name: 'Merkly',
+      link: 'https://minter.merkly.com/',
+      img: '/icons/merkly.webp',
+      implemented: '',
+    },
+    networks: [Network.ZKSYNCERA]
+  }
 }
 
 export const getFlow = (flow: flow_Flow): string[] => {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/velocorerouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -24,7 +25,7 @@ func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*d
 	return c.GenericSwap(ctx, &velocoreMaker{c}, req)
 }
 
-func (c velocoreMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error) {
+func (c velocoreMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error) {
 
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
@@ -67,13 +68,17 @@ func (c velocoreMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 	}
 	if req.FromToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, req.Slippage)
+		amSlip, err := defi.Slippage(amOut, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
+		amOut = amSlip
 		data, err := abiSource.Pack("swapExactETHForTokens", amOut, path, w.WalletAddr, DefaultDeadLine())
 		if err != nil {
 			return nil, err
 		}
 
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.Velocore.Router,
@@ -81,13 +86,17 @@ func (c velocoreMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 
 	} else if req.ToToken == v1.Token_ETH {
 		amOut := amsOut[1]
-		amOut = defi.Slippage(amOut, req.Slippage)
+		amSlip, err := defi.Slippage(amOut, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
+		amOut = amSlip
 		data, err := abiSource.Pack("swapExactTokensForETH", req.Amount, amOut, path, w.WalletAddr, DefaultDeadLine())
 		if err != nil {
 			return nil, err
 		}
 
-		return &defi.TxData{
+		return &bozdo.TxData{
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.Velocore.Router,

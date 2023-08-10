@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -128,7 +129,7 @@ func NewZkSyncClient(profile *halp.Profile, n v1.Network) (*zksyncera.Client, *z
 	return swapper, wallet, nil
 }
 
-func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *Input, client *zksyncera.Client, wallet *zksyncera.WalletTransactor, profile *halp.Profile) (*defi.Transaction, *defi.Gas, error) {
+func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *Input, client *zksyncera.Client, wallet *zksyncera.WalletTransactor, profile *halp.Profile) (*defi.Transaction, *bozdo.Gas, error) {
 
 	l, ok := a.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask)
 	if !ok {
@@ -158,7 +159,7 @@ func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *
 	}
 
 	estimate, err := client.BridgeToEthereumNetwork(ctx, &zksyncera.L1L2BridgeReq{
-		Amount:       defi.Percent(am, 50),
+		Amount:       bozdo.Percent(am, 50),
 		WalletPK:     wallet.PK,
 		EstimateOnly: true,
 	})
@@ -214,7 +215,7 @@ func EstimateZkSyncOfficialBridgeToEthSwapCost(ctx context.Context, profile *hal
 	}
 
 	res, err := client.BridgeToEthereumNetwork(ctx, &zksyncera.L1L2BridgeReq{
-		Amount:       defi.Percent(am, 50),
+		Amount:       bozdo.Percent(am, 50),
 		WalletPK:     profile.WalletPK,
 		EstimateOnly: true,
 	})

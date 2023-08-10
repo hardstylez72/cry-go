@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/syncswaprouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -21,7 +22,7 @@ type SyncSwapLiquidityReq struct {
 	Add      bool
 
 	EstimateOnly bool
-	Gas          *defi.Gas
+	Gas          *bozdo.Gas
 	debug        bool
 }
 
@@ -29,7 +30,7 @@ type SyncSwapLiquidityRes struct {
 	SwapTx           *defi.Transaction
 	ApproveATxHash   *defi.Transaction
 	ApproveBTxHash   *defi.Transaction
-	EstimatedGasCost *defi.EstimatedGasCost
+	EstimatedGasCost *bozdo.EstimatedGasCost
 }
 
 func (c *Client) SyncSwapLiquidity(ctx context.Context, req *SyncSwapLiquidityReq) (*SyncSwapLiquidityRes, error) {
@@ -87,7 +88,11 @@ func (c *Client) syncSwapLiquidityXXXETHAdd(ctx context.Context, req *SyncSwapLi
 	liquidityB := new(big.Float).Mul(r1, new(big.Float).SetInt(amOut))
 	superLiquidity := new(big.Float).Add(liquidityA, liquidityB)
 	averageLiquidity, _ := new(big.Float).Quo(superLiquidity, big.NewFloat(2)).Int(nil)
-	minLiquidity := defi.Slippage(averageLiquidity, defi.SlippagePercent001)
+
+	minLiquidity, err := defi.Slippage(averageLiquidity, defi.SlippagePercent001)
+	if err != nil {
+		return nil, err
+	}
 
 	inputs := []syncswaprouter.SyncSwapRouterTokenInput{
 		{
@@ -157,7 +162,7 @@ func (c *Client) syncSwapLiquidityXXXETHAdd(ctx context.Context, req *SyncSwapLi
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.SwapTx = c.NewTx(hash, defi.CodeContract)
+	result.SwapTx = c.NewTx(hash, defi.CodeContract, nil)
 
 	return result, nil
 }
@@ -193,9 +198,19 @@ func (c *Client) syncSwapLiquidityXXXETHRemove(ctx context.Context, req *SyncSwa
 	minAmountA, _ := new(big.Float).Quo(new(big.Float).SetInt(req.Amount), ra).Int(nil)
 	minAmountB, _ := new(big.Float).Quo(new(big.Float).SetInt(req.Amount), rb).Int(nil)
 
+	a, err := defi.Slippage(minAmountA, defi.SlippagePercent001)
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := defi.Slippage(minAmountB, defi.SlippagePercent001)
+	if err != nil {
+		return nil, err
+	}
+
 	minAmounts := []*big.Int{
-		defi.Slippage(minAmountA, defi.SlippagePercent001),
-		defi.Slippage(minAmountB, defi.SlippagePercent001),
+		a,
+		b,
 	}
 	cbdata := common.Hex2Bytes("0x")
 	data1 := makeDataForBurnLiquidity(transactor.WalletAddr, false)
@@ -235,7 +250,7 @@ func (c *Client) syncSwapLiquidityXXXETHRemove(ctx context.Context, req *SyncSwa
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.SwapTx = c.NewTx(hash, defi.CodeContract)
+	result.SwapTx = c.NewTx(hash, defi.CodeContract, nil)
 
 	return result, nil
 }

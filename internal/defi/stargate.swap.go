@@ -4,24 +4,13 @@ import (
 	"context"
 	"math/big"
 
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
 var (
-	ChainIdMap = map[v1.Network]uint16{
-		v1.Network_Etherium:    101,
-		v1.Network_BinanaceBNB: 102,
-		v1.Network_AVALANCHE:   106,
-		v1.Network_POLIGON:     109,
-		v1.Network_ARBITRUM:    110,
-		v1.Network_OPTIMISM:    111,
-		v1.Network_GOERLIETH:   154,
-		v1.Network_ZKSYNCERA:   165,
-		//SBNameFantom:        112,
-		//SBNameMetis:         151,
-	}
-
 	PoolIdMap = map[v1.Network]map[Token]int64{
 		v1.Network_ARBITRUM: {
 			v1.Token_USDC: 1,
@@ -80,10 +69,6 @@ type (
 	StargateBridgeChainName string
 )
 
-const (
-	TypeFuncSwap uint8 = 1
-)
-
 type GasLimit struct {
 	TotalGas *big.Int
 }
@@ -94,7 +79,7 @@ type StargateBridgeSwapReq struct {
 	Quantity     *big.Int
 	FromToken    Token
 	ToToken      Token
-	Gas          *Gas
+	Gas          *bozdo.Gas
 	EstimateOnly bool
 	Slippage     SlippagePercent
 }
@@ -116,7 +101,7 @@ func (r *StargateBridgeSwapReq) Validate(currentChain v1.Network) error {
 		return errors.New("invalid chain, same chain")
 	}
 
-	_, ok := ChainIdMap[r.DestChain]
+	_, ok := layerzero.LayerZeroChainMap[r.DestChain]
 	if !ok {
 		return errors.New("invalid chain: " + string(r.DestChain))
 	}
@@ -158,7 +143,7 @@ func (c *EtheriumClient) StargateBridgeSwap(ctx context.Context, req *DefaultBri
 			return nil, errors.Wrap(err, "stargateBridgeSwapEth")
 		}
 		if res.Tx != nil {
-			r.Tx = c.NewTx(res.Tx.Hash(), CodeContract)
+			r.Tx = c.NewTx(res.Tx.Hash(), CodeContract, res.ECost.Details)
 		}
 		r.ECost = res.ECost
 	case v1.Token_MAV:
@@ -174,7 +159,7 @@ func (c *EtheriumClient) StargateBridgeSwap(ctx context.Context, req *DefaultBri
 			return nil, errors.Wrap(err, "TokenLimitChecker")
 		}
 		if limitTx.LimitExtended {
-			r.ApproveTx = c.NewTx(limitTx.ApproveTx.Hash(), CodeApprove)
+			r.ApproveTx = c.NewTx(limitTx.ApproveTx.Hash(), CodeApprove, nil)
 		}
 
 		res, err := c.StargateBridgeSwapSTG(ctx, &StargateBridgeSwapSTGReq{
@@ -189,7 +174,7 @@ func (c *EtheriumClient) StargateBridgeSwap(ctx context.Context, req *DefaultBri
 		}
 
 		if res.Tx != nil {
-			r.Tx = c.NewTx(res.Tx.Hash(), CodeContract)
+			r.Tx = c.NewTx(res.Tx.Hash(), CodeContract, res.ECost.Details)
 		}
 		r.ECost = res.ECost
 	default:
@@ -203,7 +188,7 @@ func (c *EtheriumClient) StargateBridgeSwap(ctx context.Context, req *DefaultBri
 			return nil, errors.Wrap(err, "TokenLimitChecker")
 		}
 		if limitTx.LimitExtended {
-			r.ApproveTx = c.NewTx(limitTx.ApproveTx.Hash(), CodeApprove)
+			r.ApproveTx = c.NewTx(limitTx.ApproveTx.Hash(), CodeApprove, nil)
 		}
 
 		rr := &StargateBridgeSwapTokenReq{
@@ -221,7 +206,7 @@ func (c *EtheriumClient) StargateBridgeSwap(ctx context.Context, req *DefaultBri
 			return nil, errors.Wrap(err, "stargateBridgeSwap")
 		}
 		if res.Tx != nil {
-			r.Tx = c.NewTx(res.Tx.Hash(), CodeContract)
+			r.Tx = c.NewTx(res.Tx.Hash(), CodeContract, res.ECost.Details)
 		}
 		r.ECost = res.ECost
 	}

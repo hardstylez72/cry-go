@@ -5,16 +5,17 @@ import (
 	"math/big"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/pkg/errors"
 	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
 type TxSwapMaker interface {
-	MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*defi.TxData, error)
+	MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error)
 }
 
 type TxBridgeMaker interface {
-	MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.TxData, error)
+	MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.TxData, error)
 }
 
 func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
@@ -67,7 +68,7 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.Tx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
 
 	return result, nil
 }
@@ -121,7 +122,7 @@ func (c *Client) GenericBridge(ctx context.Context, maker TxBridgeMaker, req *de
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
 
-	result.Tx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
 
 	return result, nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	muteiorouter "github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/muteio"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -103,7 +104,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 	if err != nil {
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
-	result.Tx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
 
 	return result, nil
 }
@@ -146,7 +147,7 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 		value = req.Amount
 	}
 
-	value = defi.BigIntSum(value, fee)
+	value = bozdo.BigIntSum(value, fee)
 
 	tx := utils.CreateFunctionCallTransaction(
 		w.GetAddress(),
@@ -173,7 +174,7 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 	if err != nil {
 		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
 	}
-	result.Tx = c.NewTx(hash, defi.CodeContract)
+	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
 
 	return result, nil
 }
@@ -190,5 +191,11 @@ func (c *Client) MuteIoPairFee(ctx context.Context, req *defi.DefaultSwapReq) (A
 	if err != nil {
 		return nil, false, nil, err
 	}
-	return defi.Slippage(amOut.AmountOut, req.Slippage), amOut.Stable, amOut.Fee, nil
+
+	amSlip, err := defi.Slippage(amOut.AmountOut, req.Slippage)
+	if err != nil {
+		return nil, false, nil, err
+	}
+
+	return amSlip, amOut.Stable, amOut.Fee, nil
 }

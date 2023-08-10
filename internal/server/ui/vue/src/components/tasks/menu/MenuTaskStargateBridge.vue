@@ -1,5 +1,8 @@
 <template>
-  <a :href="link.stargatefinance" target="_blank">stargate.finance</a>
+  <div class="d-inline-flex">
+    <a :href="taskProps.StargateBridge.service.link" target="_blank">{{ taskProps.StargateBridge.service.name }}</a>
+    <MenuTaskSettings :network="item.fromNetwork"/>
+  </div>
   <div>Network: <b>{{ `${item.fromNetwork} to ${item.toNetwork}` }}</b></div>
   <div>Token: <b>{{ `${item.fromToken} to ${item.toToken}` }}</b></div>
   <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>
@@ -16,12 +19,14 @@ import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";
 import {getAmountSend, getStatusColor} from "@/components/tasks/menu/helper";
 import {link} from "@/components/tasks/links";
-import GasOptions from "@/components/tasks/menu/GasOptions.vue";
+import GasOptions from "@/components/tasks/menu/TaskDetails.vue";
+import {taskProps} from "../tasks";
+import MenuTaskSettings from "@/components/tasks/menu/MenuTaskSettings.vue";
 
 export default defineComponent({
   name: "MenuTaskStargateBridge",
   methods: {getAmountSend, getStatusColor},
-  components: {GasOptions},
+  components: {MenuTaskSettings, GasOptions},
   props: {
     task: {
       type: Object as PropType<Task>,
@@ -48,6 +53,9 @@ export default defineComponent({
     }
   },
   computed: {
+    taskProps() {
+      return taskProps
+    },
     link() {
       return link
     },

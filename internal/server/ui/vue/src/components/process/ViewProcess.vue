@@ -123,7 +123,7 @@ export default defineComponent({
       showLess: false,
       menu: false,
       processId: this.$route.params.id.toString(),
-      process: {autoRetry: false} as Process,
+      process: {autoRetry: false, profiles: []} as Process,
       profiles: [] as ProcessProfile[],
       updatedAt: new Date(1),
       poller: {} as any,

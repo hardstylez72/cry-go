@@ -133,6 +133,6 @@ func (c *EtheriumClient) TestNetBridgeSwap(ctx context.Context, req *TestNetBrid
 	}
 
 	return &TestNetBridgeSwapRes{
-		Tx: c.NewTx(tx.Hash(), CodeContract),
+		Tx: c.NewTx(tx.Hash(), CodeContract, nil),
 	}, nil
 }

@@ -119,9 +119,3 @@ func ResolveAmount(amount *v1.Amount, balance *big.Int) (*big.Int, error) {
 
 	return am, nil
 }
-
-func Percent(value *big.Int, percent int) *big.Int {
-	f := math.Round(float64(percent))
-	b1p := new(big.Int).Div(value, new(big.Int).SetInt64(100))
-	return new(big.Int).Mul(b1p, new(big.Int).SetInt64(int64(f)))
-}

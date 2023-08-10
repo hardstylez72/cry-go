@@ -7,6 +7,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	"github.com/hardstylez72/cry/internal/defi/contracts/optimism_fee"
 	"github.com/hardstylez72/cry/internal/defi/contracts/stg"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -17,7 +19,7 @@ type StargateBridgeSwapSTGReq struct {
 	DestChain    v1.Network
 	Wallet       *WalletTransactor
 	Quantity     *big.Int
-	Gas          *Gas
+	Gas          *bozdo.Gas
 	EstimateOnly bool
 }
 
@@ -43,11 +45,11 @@ func (r *StargateBridgeSwapSTGReq) Validate() error {
 
 type StargateBridgeSwapSTGRes struct {
 	Tx    *types.Transaction
-	ECost *EstimatedGasCost
+	ECost *bozdo.EstimatedGasCost
 }
 
 func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *StargateBridgeSwapSTGReq) (*StargateBridgeSwapSTGRes, error) {
-
+	details := []bozdo.TxDetail{}
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -76,7 +78,9 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
 	}
 
-	destChainId := ChainIdMap[req.DestChain]
+	fee.Fee1 = bozdo.BigIntSum(bozdo.Percent(fee.Fee1, 10), fee.Fee1)
+
+	destChainId := layerzero.LayerZeroChainMap[req.DestChain]
 
 	l1Gasfee := big.NewInt(0)
 	if c.Cfg.Network == v1.Network_OPTIMISM {
@@ -105,9 +109,11 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 		if err != nil {
 			return nil, err
 		}
+		details = append(details, bozdo.NewOpimismFeeDetails(l1Gasfee, c.Cfg.Network, v1.Token_ETH))
 	}
+	details = append(details, bozdo.NewLZFeeDetails(fee.Fee1, c.Cfg.Network, v1.Token_ETH))
 
-	opt.Value = BigIntSum(fee.Fee1, Percent(fee.Fee1, 10), l1Gasfee)
+	opt.Value = bozdo.BigIntSum(fee.Fee1, l1Gasfee)
 	opt.NoSend = req.EstimateOnly
 
 	opt = c.ResoleGas(ctx, req.Gas, opt)
@@ -126,29 +132,30 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 
 	return &StargateBridgeSwapSTGRes{
 		Tx:    tx,
-		ECost: Estimate(tx, nil),
+		ECost: Estimate(tx, nil, "bridge", details),
 	}, nil
 }
 
-func Estimate(tx *types.Transaction, l1GasFee *big.Int) *EstimatedGasCost {
+func Estimate(tx *types.Transaction, l1GasFee *big.Int, name string, details []bozdo.TxDetail) *bozdo.EstimatedGasCost {
 	gasLimit := new(big.Int).SetUint64(tx.Gas())
+	gasLimit = bozdo.BigIntSum(gasLimit, bozdo.Percent(gasLimit, 30))
 
 	if tx.Type() == types.DynamicFeeTxType {
-		fee := BigIntSum(tx.GasFeeCap())
+		fee := bozdo.BigIntSum(tx.GasFeeCap())
 
-		gp, _ := big.NewFloat(0).Quo(big.NewFloat(0).SetInt(fee), big.NewFloat(0).SetInt(gasLimit)).Int(nil)
-		return &EstimatedGasCost{
+		return &bozdo.EstimatedGasCost{
 			GasLimit:    gasLimit,
-			GasPrice:    gp,
-			TotalGasWei: BigIntSum(fee, l1GasFee),
-			L2Fee:       nil,
+			GasPrice:    fee,
+			TotalGasWei: new(big.Int).Mul(bozdo.BigIntSum(fee, l1GasFee), gasLimit),
+			Details:     details,
 		}
 	}
 
-	return &EstimatedGasCost{
+	return &bozdo.EstimatedGasCost{
 		GasLimit:    gasLimit,
 		GasPrice:    tx.GasPrice(),
 		TotalGasWei: new(big.Int).Mul(gasLimit, tx.GasPrice()),
-		L2Fee:       nil,
+		Name:        name,
+		Details:     details,
 	}
 }
