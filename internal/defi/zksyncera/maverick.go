@@ -26,7 +26,7 @@ type maverickFiMaker struct {
 
 // site https://explorer.zksync.io/tx/0x614d510f3ba8b394efbbb7712c5bc94e98239be5e79267ce6c45205ddddc8552 ETH -> USDC
 // me https://explorer.zksync.io/tx/0x044fcd4eaf54ddd686589f216f506d9c310ed8af77d8139f2ef4bb5ef45643e5 USDC -> ETH
-func (c *Client) MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	return c.GenericSwap(ctx, &maverickFiMaker{c}, req)
 }
 

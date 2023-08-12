@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/hardstylez72/cry/internal/defi"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
@@ -55,6 +56,8 @@ func (c *Client) TxViewFn(id string) string {
 func (c *Client) GetNetworkId() *big.Int {
 	return c.Cfg.networkId
 }
-func (c *Client) SuggestGasPrice(ctx context.Context) (*big.Int, error) {
-	return nil, errors.New("not implemented") // todo:...
+
+func (c *Client) GetPublicKey(pk string) string {
+	w, _ := defi.NewWalletTransactor(pk)
+	return w.WalletAddrHR
 }

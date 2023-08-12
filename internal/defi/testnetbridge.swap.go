@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/testnetbridge"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -19,7 +20,7 @@ type TestNetBridgeSwapReq struct {
 }
 
 type TestNetBridgeSwapRes struct {
-	Tx *Transaction
+	Tx *bozdo.Transaction
 }
 
 var testNetBridgeSwapDist = map[Network]uint16{

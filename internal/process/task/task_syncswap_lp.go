@@ -130,7 +130,7 @@ func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask
 
 	if p.Add {
 		balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-			WalletAddress: wallet.WalletAddr,
+			WalletAddress: wallet.WalletAddr.String(),
 			Token:         p.A,
 		})
 		if err != nil {

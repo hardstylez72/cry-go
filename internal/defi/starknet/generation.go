@@ -3,6 +3,7 @@ package starknet
 import (
 	"github.com/dontpanicdao/caigo"
 	"github.com/dontpanicdao/caigo/types"
+	"github.com/pkg/errors"
 )
 
 type Account struct {
@@ -25,4 +26,19 @@ func DegenerateAccount() (*Account, error) {
 		PublicKey:  types.BigToHex(x),
 		PrivateKey: types.BigToHex(pk),
 	}, nil
+}
+
+func GetPublicKeyHash(pk string) (string, error) {
+
+	pkb := types.HexToBN(pk)
+	if pkb == nil {
+		return "", errors.New("can not cast to big.Int")
+	}
+
+	x, _, err := caigo.Curve.PrivateToPoint(pkb)
+	if err != nil {
+		return "", err
+	}
+
+	return types.BigToHex(x), nil
 }

@@ -6,12 +6,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
 	"github.com/pkg/errors"
+	zkTypes "github.com/zksync-sdk/zksync2-go/types"
 	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
-func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*defi.DefaultRes, *big.Int, *big.Int, error) {
+func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, *big.Int, *big.Int, error) {
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
 		Cli:      c.Provider.GetClient(),
@@ -24,7 +26,7 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*de
 		return nil, nil, nil, err
 	}
 
-	result := &defi.DefaultRes{}
+	result := &bozdo.DefaultRes{}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -63,7 +65,7 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*de
 
 	return result, mintId, txData.Value, nil
 }
-func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*defi.DefaultRes, error) {
+func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error) {
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
 		Cli:      c.Provider.GetClient(),
@@ -86,7 +88,7 @@ func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) 
 		return nil, err
 	}
 
-	result := &defi.DefaultRes{}
+	result := &bozdo.DefaultRes{}
 
 	tx := utils.CreateFunctionCallTransaction(
 		transactor.WalletAddr,
@@ -119,4 +121,51 @@ func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) 
 	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
 
 	return result, nil
+}
+
+func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.Int, error) {
+
+	m := &merkly.Maker{
+		TokenMap: c.Cfg.TokenMap,
+		Cli:      c.Provider.GetClient(),
+		Network:  c.Cfg.Network,
+		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
+	}
+
+	maxId := big.NewInt(1999999)
+	minId := big.NewInt(1000000)
+	tx, err := c.Provider.GetTransaction(txHash)
+	if err != nil {
+		return nil, err
+	}
+
+	logs, err := c.Provider.GetLogs(zkTypes.FilterQuery{
+		BlockHash: &tx.BlockHash,
+		Addresses: []common.Address{tx.To},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, log := range logs {
+		if log.Address.String() != common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768").String() {
+			continue
+		}
+		for _, topic := range log.Topics {
+			topicBig := topic.Big()
+			if maxId.Cmp(topicBig) >= 0 && topicBig.Cmp(minId) >= 0 {
+
+				owner, err := m.GetOwner(ctx, topicBig)
+				if err != nil {
+					continue
+				}
+
+				if owner.String() == tx.From.String() {
+					return topicBig, nil
+				}
+			}
+		}
+	}
+
+	return nil, errors.New("nft not found")
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -106,7 +107,7 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Run(ctx context.Context, a *Input
 	return task, nil
 }
 
-func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a *Input, client *zksyncera.Client, profile *halp.Profile, ethClient defi.Networker) (*defi.Transaction, error) {
+func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a *Input, client *zksyncera.Client, profile *halp.Profile, ethClient defi.Networker) (*bozdo.Transaction, error) {
 
 	l, ok := a.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask)
 	if !ok {
@@ -116,7 +117,7 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a
 	p := l.ZkSyncOfficialBridgeFromEthereumTask
 
 	b, err := ethClient.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.WalletAddr,
+		WalletAddress: profile.WalletAddr.String(),
 		Token:         v1.Token_ETH,
 	})
 	if err != nil {
@@ -159,7 +160,7 @@ func EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx context.Context, profile *h
 		return nil, err
 	}
 
-	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.WalletAddr, Token: v1.Token_ETH})
+	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.WalletAddr.String(), Token: v1.Token_ETH})
 	if err != nil {
 		return nil, err
 	}

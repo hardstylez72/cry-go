@@ -20,7 +20,7 @@ type stargateBridgeMaker struct {
 	source *Client
 }
 
-func (c *Client) StargateBridge(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.DefaultRes, error) {
+func (c *Client) StargateBridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.DefaultRes, error) {
 	return c.GenericBridge(ctx, &stargateBridgeMaker{c}, req)
 }
 

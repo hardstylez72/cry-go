@@ -23,7 +23,7 @@ type TokenLimitCheckerReq struct {
 }
 
 type TokenLimitCheckerRes struct {
-	ApproveTx *defi.Transaction
+	ApproveTx *bozdo.Transaction
 }
 
 func (c *Client) TokenLimitChecker(ctx context.Context, req *TokenLimitCheckerReq) (*TokenLimitCheckerRes, error) {
@@ -61,7 +61,7 @@ func (c *Client) TokenLimitChecker(ctx context.Context, req *TokenLimitCheckerRe
 			return nil, err
 		}
 
-		if err := c.WaitTxComplete(ctx, tx.TxHash); err != nil {
+		if err := c.WaitTxComplete(ctx, tx.TxHash.String()); err != nil {
 			return nil, err
 		}
 

@@ -626,7 +626,8 @@
         "GOERLIETH",
         "ZKSYNCERA",
         "ZKSYNCERATESTNET",
-        "ZKSYNCLITE"
+        "ZKSYNCLITE",
+        "StarkNet"
       ],
       "default": "ARBITRUM"
     },
@@ -759,7 +760,8 @@
         "EzkaliburSwap",
         "ZkSwap",
         "TraderJoeSwap",
-        "MerklyMintAndBridgeNFT"
+        "MerklyMintAndBridgeNFT",
+        "DeployStarkNetAccount"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

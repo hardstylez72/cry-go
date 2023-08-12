@@ -17,7 +17,7 @@ func (c *Client) GetNetworkToken() defi.Token {
 func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi.GetBalanceRes, error) {
 
 	acc, err := c.AccountInfo(ctx, &AccountInfoReq{
-		Addr: req.WalletAddress,
+		Addr: common.HexToAddress(req.WalletAddress),
 	})
 	if err != nil {
 		return nil, err

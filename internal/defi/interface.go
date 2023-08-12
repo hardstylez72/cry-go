@@ -17,9 +17,9 @@ type Network = v1.Network
 type Networker interface {
 	TxViewFn(id string) string
 	GetNetworkId() *big.Int
-	SuggestGasPrice(ctx context.Context) (*big.Int, error)
-	WaitTxComplete(ctx context.Context, tx common.Hash) error
+	WaitTxComplete(ctx context.Context, tx string) error
 	Balancer
+	GetPublicKey(pk string) string
 }
 
 type Balancer interface {
@@ -29,13 +29,14 @@ type Balancer interface {
 
 type MintAndBridgeNFT interface {
 	Networker
-	MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*DefaultRes, *big.Int, *big.Int, error)
-	MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*DefaultRes, error)
+	MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, *big.Int, *big.Int, error)
+	MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error)
+	GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.Int, error)
 }
 
 type StargateSwapper interface {
 	Networker
-	StargateBridgeSwap(ctx context.Context, req *DefaultBridgeReq) (*DefaultRes, error)
+	StargateBridgeSwap(ctx context.Context, req *DefaultBridgeReq) (*bozdo.DefaultRes, error)
 }
 type TestNetworkBridgeSwapper interface {
 	Networker
@@ -44,7 +45,7 @@ type TestNetworkBridgeSwapper interface {
 
 type TraderJoeSwap interface {
 	Networker
-	TraderJoeSwap(ctx context.Context, req *DefaultSwapReq) (*DefaultRes, error)
+	TraderJoeSwap(ctx context.Context, req *DefaultSwapReq) (*bozdo.DefaultRes, error)
 }
 
 type OrbiterSwapper interface {
@@ -74,14 +75,7 @@ type DefaultSwapReq struct {
 	Debug        bool
 }
 
-type DefaultRes struct {
-	Tx        *Transaction
-	ApproveTx *Transaction
-	ECost     *bozdo.EstimatedGasCost
-	TxDetails []bozdo.TxDetail
-}
-
-type SyncSwapRes = DefaultRes
+type SyncSwapRes = bozdo.DefaultRes
 
 type DefaultBridgeReq struct {
 	FromNetwork  v1.Network
@@ -104,16 +98,8 @@ const (
 	CodeTransfer TxCode = "transfer"
 )
 
-type Transaction struct {
-	Code    TxCode
-	Network v1.Network
-	Id      string
-	Url     string
-	Details []bozdo.TxDetail
-}
-
-func (c *EtheriumClient) NewTx(id common.Hash, code TxCode, details []bozdo.TxDetail) *Transaction {
-	return &Transaction{
+func (c *EtheriumClient) NewTx(id common.Hash, code TxCode, details []bozdo.TxDetail) *bozdo.Transaction {
+	return &bozdo.Transaction{
 		Code:    code,
 		Network: c.Cfg.Network,
 		Id:      id.String(),
@@ -124,7 +110,7 @@ func (c *EtheriumClient) NewTx(id common.Hash, code TxCode, details []bozdo.TxDe
 
 type SyncSwapper interface {
 	Networker
-	SyncSwap(ctx context.Context, req *DefaultSwapReq) (*DefaultRes, error)
+	SyncSwap(ctx context.Context, req *DefaultSwapReq) (*bozdo.DefaultRes, error)
 }
 
 type ZkSyncOfficialWithdrawalEtherium interface {
@@ -147,7 +133,7 @@ type WETHReq struct {
 }
 
 type WETHRes struct {
-	Tx    *Transaction
+	Tx    *bozdo.Transaction
 	ECost *bozdo.EstimatedGasCost
 }
 

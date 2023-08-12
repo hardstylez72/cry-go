@@ -13,6 +13,7 @@ import (
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
+	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/exchange/pub"
 	"github.com/hardstylez72/cry/internal/lib"
 	log "github.com/hardstylez72/cry/internal/log"
@@ -358,8 +359,16 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 	)
 	go dispatcher.RunDispatcher(ctx)
 
+	starknetNewClient, err := starknet.NewClient(&starknet.ClientConfig{
+		HttpCli:     &http.Client{},
+		RPCEndpoint: starknet.MainnetRPC,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	return &services{
-		profileService:       v1.NewProfileService(profileRepository, settingsService),
+		profileService:       v1.NewProfileService(profileRepository, settingsService, starknetNewClient),
 		helperService:        v1.NewHelperService(settingsService, profileRepository, userRepository, payService, statRepository, processRepository, tgBot),
 		withdrawerService:    v1.NewWithdrawerService(withdrawerRepository, userRepository, profileRepository),
 		flowService:          v1.NewFlowService(flowRepository),

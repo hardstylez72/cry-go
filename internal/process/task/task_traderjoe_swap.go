@@ -111,7 +111,7 @@ func (t *TraderJoeSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 	return task, nil
 }
 
-func TraderJoeSwap(ctx context.Context, profile *halp.Profile, p *v1.TraderJoeSwapTask, client defi.TraderJoeSwap, estimation *v1.EstimationTx) (*defi.DefaultRes, *bozdo.Gas, error) {
+func TraderJoeSwap(ctx context.Context, profile *halp.Profile, p *v1.TraderJoeSwapTask, client defi.TraderJoeSwap, estimation *v1.EstimationTx) (*bozdo.DefaultRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
@@ -131,7 +131,7 @@ func TraderJoeSwap(ctx context.Context, profile *halp.Profile, p *v1.TraderJoeSw
 	}
 
 	balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: wallet.WalletAddr,
+		WalletAddress: wallet.WalletAddr.String(),
 		Token:         p.FromToken,
 	})
 	if err != nil {

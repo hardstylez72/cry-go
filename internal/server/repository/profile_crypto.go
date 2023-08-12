@@ -54,9 +54,9 @@ func (c *ProfileRepositoryCrypto) SearchNotConnectedOkexDepositProfile(ctx conte
 	return list, nil
 }
 
-func (c *ProfileRepositoryCrypto) ListProfiles(ctx context.Context, userId string) ([]Profile, error) {
+func (c *ProfileRepositoryCrypto) ListProfiles(ctx context.Context, userId string, profileType string, offset int64) ([]Profile, error) {
 
-	list, err := c.source.ListProfiles(ctx, userId)
+	list, err := c.source.ListProfiles(ctx, userId, profileType, offset)
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,7 @@ type syncSwapMaker struct {
 	*Client
 }
 
-func (c *Client) SyncSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) SyncSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	return c.GenericSwap(ctx, &syncSwapMaker{c}, req)
 }
 

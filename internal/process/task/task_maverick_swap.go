@@ -105,7 +105,7 @@ func (t *MaverickSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 	return task, nil
 }
 
-func MaverickSwap(ctx context.Context, profile *halp.Profile, p *v1.MaverickSwapTask, client zksyncera.MaverickSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *bozdo.Gas, error) {
+func MaverickSwap(ctx context.Context, profile *halp.Profile, p *v1.MaverickSwapTask, client zksyncera.MaverickSwapper, estimation *v1.EstimationTx) (*bozdo.DefaultRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
@@ -124,7 +124,7 @@ func MaverickSwap(ctx context.Context, profile *halp.Profile, p *v1.MaverickSwap
 	}
 
 	balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: wallet.WalletAddr,
+		WalletAddress: wallet.WalletAddr.String(),
 		Token:         p.FromToken,
 	})
 	if err != nil {

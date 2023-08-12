@@ -383,6 +383,9 @@ export interface CreateProfileRequest {
 
   /**  */
   okexAccount?: OkexAccount;
+
+  /**  */
+  type: ProfileType;
 }
 
 export interface CreateProfileResponse {
@@ -407,6 +410,9 @@ export interface ExportProfilesRes {
 export interface GenerateProfilesReq {
   /**  */
   count: string;
+
+  /**  */
+  type: ProfileType;
 }
 
 export interface GenerateProfilesRes {
@@ -437,7 +443,13 @@ export interface GetProfileResponse {
   profile: Profile;
 }
 
-export interface ListProfileRequest {}
+export interface ListProfileRequest {
+  /**  */
+  type: ProfileType;
+
+  /**  */
+  offset: string;
+}
 
 export interface ListProfileResponse {
   /**  */
@@ -482,11 +494,17 @@ export interface Profile {
 
   /**  */
   deletedAt?: Date;
+
+  /**  */
+  type: ProfileType;
 }
 
 export interface SearchProfileRequest {
   /**  */
   pattern: string;
+
+  /**  */
+  type: ProfileType;
 }
 
 export interface SearchProfileResponse {
@@ -549,7 +567,13 @@ export enum Network {
   'GOERLIETH' = 'GOERLIETH',
   'ZKSYNCERA' = 'ZKSYNCERA',
   'ZKSYNCERATESTNET' = 'ZKSYNCERATESTNET',
-  'ZKSYNCLITE' = 'ZKSYNCLITE'
+  'ZKSYNCLITE' = 'ZKSYNCLITE',
+  'StarkNet' = 'StarkNet'
+}
+
+export enum ProfileType {
+  'EVM' = 'EVM',
+  'StarkNet' = 'StarkNet'
 }
 
 export enum Token {

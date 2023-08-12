@@ -8,11 +8,11 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 )
 
-func (c *Client) WaitTxComplete(ctx context.Context, tx common.Hash) error {
+func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
 	ticker := time.NewTicker(time.Second * 5)
 
 	for {
-		tx, err := c.TxInfo(ctx, tx)
+		tx, err := c.TxInfo(ctx, common.HexToHash(tx))
 		if err != nil {
 			return err
 		}

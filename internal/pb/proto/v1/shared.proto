@@ -18,6 +18,7 @@ enum Network {
   ZKSYNCERA = 7;
   ZKSYNCERATESTNET = 8;
   ZKSYNCLITE = 9;
+  StarkNet = 10;
 }
 
 enum Token {

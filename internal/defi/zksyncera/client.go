@@ -317,8 +317,8 @@ func newClient(
 	}, nil
 }
 
-func (c *Client) NewTx(id common.Hash, code defi.TxCode, Details []bozdo.TxDetail) *defi.Transaction {
-	return &defi.Transaction{
+func (c *Client) NewTx(id common.Hash, code defi.TxCode, Details []bozdo.TxDetail) *bozdo.Transaction {
+	return &bozdo.Transaction{
 		Code:    code,
 		Network: c.Cfg.Network,
 		Id:      id.String(),

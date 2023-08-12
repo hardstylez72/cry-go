@@ -26,7 +26,7 @@ type izumiMaker struct {
 // me USDC -> ETH
 // me ETH -> USDC https://explorer.zksync.io/tx/0x36731ad49420976e96d3a8889a78d5ca3661aeae1cb0f73a28fdaa4794941716
 
-func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	return c.GenericSwap(ctx, &izumiMaker{c}, req)
 }
 

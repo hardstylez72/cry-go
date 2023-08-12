@@ -13,9 +13,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *DefaultBridgeReq) (*DefaultRes, error) {
+func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *DefaultBridgeReq) (*bozdo.DefaultRes, error) {
 	details := []bozdo.TxDetail{}
-	result := &DefaultRes{}
+	result := &bozdo.DefaultRes{}
 
 	// https://bscscan.com/address/0x86355F02119bdBC28ED6A4D5E0cA327Ca7730fFF
 	constractAddr := common.HexToAddress("0x86355F02119bdBC28ED6A4D5E0cA327Ca7730fFF")

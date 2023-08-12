@@ -5,7 +5,6 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -38,7 +37,7 @@ func ResolveNetworkTokenAmount(balance, gas, value *big.Int) *big.Int {
 func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, networker defi.Networker, updater TaskUpdater) error {
 	if ptx != nil && ptx.TxId != "" {
 		tx := ptx
-		if err := networker.WaitTxComplete(ctx, common.HexToHash(tx.TxId)); err != nil {
+		if err := networker.WaitTxComplete(ctx, tx.TxId); err != nil {
 			if errors.Is(err, defi.ErrTxStatusFailed) {
 				tx.TxCompleted = false
 				tx.RetryCount = 0
@@ -122,7 +121,7 @@ func (a *Input) AddTx2(ctx context.Context, transactions ...*v1.TaskTx) error {
 	return nil
 }
 
-func (a *Input) AddTx(ctx context.Context, transactions ...*defi.Transaction) error {
+func (a *Input) AddTx(ctx context.Context, transactions ...*bozdo.Transaction) error {
 
 	for i := range transactions {
 		tx := transactions[i]
@@ -152,7 +151,7 @@ func TransactionAdd(ctx context.Context, rep repository.TransactionRepository, t
 	return rep.TransactionAdd(ctx, tx)
 }
 
-func NewTx(tx *defi.Transaction, gas *bozdo.Gas) *v1.TaskTx {
+func NewTx(tx *bozdo.Transaction, gas *bozdo.Gas) *v1.TaskTx {
 
 	if tx == nil {
 		return nil

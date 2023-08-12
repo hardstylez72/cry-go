@@ -48,7 +48,14 @@
         Добавить
       </v-btn>
 
-      <GenerationProfiles @generated="generated" :demo="demo"/>
+      <GenerationProfiles @generated="generated" :demo="demo" :loading="loading" :profile-type="selectProfileType"/>
+      <div class="mr-9 d-flex justify-start">
+        <v-radio-group v-model="selectProfileType" inline="true" hide-details density="compact" :disabled="needSave">
+          Выберите тип профилей:
+          <v-radio class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
+          <v-radio class="mx-8" :value="ProfileType.StarkNet">StarkNet</v-radio>
+        </v-radio-group>
+      </div>
       <v-textarea
         auto-grow
         density="compact"
@@ -83,6 +90,7 @@ import Papa from 'papaparse';
 import {helperService, instance, profileService} from "@/generated/services";
 import GenerationProfiles from "@/components/profile/GenerationProfiles.vue";
 import NavBar from "@/components/NavBar.vue";
+import {ProfileType} from "@/generated/profile";
 
 
 interface Item {
@@ -94,6 +102,17 @@ interface Item {
 }
 
 export default defineComponent({
+  watch: {
+    selectProfileType: {
+      handler() {
+      }
+    }
+  },
+  computed: {
+    ProfileType() {
+      return ProfileType
+    }
+  },
   props: {
     demo: {
       required: false,
@@ -114,10 +133,8 @@ export default defineComponent({
       valid: false,
       generateCount: 10,
       errorMessage: '',
-      text: `
-    eee5112gd2433f855896002e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa; 123.456.67.89:login:password; my_label_1
-    eee5119x3h243f855896004e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa; ""; my_label_2
-    eee51g23s62h3f855896004e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa; 123.456.67.89:login:password; ""`,
+      text: '',
+      selectProfileType: ProfileType.EVM
     }
   },
   methods: {
@@ -142,11 +159,6 @@ export default defineComponent({
     },
     print(data: string[][]) {
       this.text = this.format(data)
-    },
-    async generate() {
-      const res = await profileService.profileServiceGenerateProfiles({body: {count: this.generateCount.toString()}})
-      this.text = res.text
-      this.dialog = false
     },
     async save() {
       this.needSave = false
@@ -182,7 +194,8 @@ export default defineComponent({
             body: {
               proxy: item.proxy,
               mmskPk: item.pk,
-              label: item.label ? item.label : ''
+              label: item.label ? item.label : '',
+              type: this.selectProfileType,
             }
           })
           item.status = 'ok'

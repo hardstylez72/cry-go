@@ -197,8 +197,7 @@ export default defineComponent({
   methods: {
     getFlow,
     viewProcess(id: string) {
-      const routeData = this.$router.resolve({name: 'ViewProcess', params: {id: id}});
-      window.open(routeData.href, '_blank');
+      this.$router.push({name: 'ViewProcess', params: {id: id}});
     },
     getProfiles(p: Process): string {
       let labels: number[] = []

@@ -105,7 +105,7 @@ func (t *VeSyncSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 	return task, nil
 }
 
-func VeSyncSwap(ctx context.Context, profile *halp.Profile, p *v1.VeSyncSwapTask, client zksyncera.VeSyncSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *bozdo.Gas, error) {
+func VeSyncSwap(ctx context.Context, profile *halp.Profile, p *v1.VeSyncSwapTask, client zksyncera.VeSyncSwapper, estimation *v1.EstimationTx) (*bozdo.DefaultRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
@@ -124,7 +124,7 @@ func VeSyncSwap(ctx context.Context, profile *halp.Profile, p *v1.VeSyncSwapTask
 	}
 
 	balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: wallet.WalletAddr,
+		WalletAddress: wallet.WalletAddr.String(),
 		Token:         p.FromToken,
 	})
 	if err != nil {

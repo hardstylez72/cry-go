@@ -14,7 +14,7 @@ import (
 )
 
 type TransferRes struct {
-	Tx    *Transaction
+	Tx    *bozdo.Transaction
 	ECost *bozdo.EstimatedGasCost
 }
 
@@ -131,7 +131,7 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 	}
 
 	b, err := c.GetBalance(ctx, &GetBalanceReq{
-		WalletAddress: r.Wallet.WalletAddr,
+		WalletAddress: r.Wallet.WalletAddr.String(),
 		Token:         c.Cfg.MainToken,
 	})
 	if err != nil {

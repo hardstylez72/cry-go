@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/google/uuid"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository"
@@ -28,13 +29,15 @@ type ProfileService struct {
 	v1.UnimplementedProfileServiceServer
 	repository      repository.ProfileRepository
 	settingsService *settings.Service
+	starkNetClient  *starknet.Client
 }
 
-func NewProfileService(repository repository.ProfileRepository, settingsService *settings.Service) *ProfileService {
+func NewProfileService(repository repository.ProfileRepository, settingsService *settings.Service, starkNetClient *starknet.Client) *ProfileService {
 
 	return &ProfileService{
 		repository:      repository,
 		settingsService: settingsService,
+		starkNetClient:  starkNetClient,
 	}
 }
 
@@ -87,7 +90,7 @@ func (s *ProfileService) GetProfile(ctx context.Context, req *v1.GetProfileReque
 		return nil, err
 	}
 
-	pr, err := p.ToPB()
+	pr, err := p.ToPB(s.starkNetClient)
 	if err != nil {
 		return nil, err
 	}
@@ -111,13 +114,23 @@ func (s *ProfileService) CreateProfile(ctx context.Context, req *v1.CreateProfil
 		UserId:    userId,
 		CreatedAt: time.Now(),
 		UserAgent: uarand.NewWithCustomList(lib.UserAgents).GetRandom(),
+		Type:      req.Type.String(),
 	}
 
-	w, err := defi.NewWalletTransactor(req.MmskPk)
-	if err != nil {
-		return nil, errors.New("invalid pk")
+	switch req.Type {
+	case v1.ProfileType_EVM:
+		w, err := defi.NewWalletTransactor(req.MmskPk)
+		if err != nil {
+			return nil, errors.New("invalid pk")
+		}
+		a.MmskId = []byte(w.WalletAddrHR)
+	case v1.ProfileType_StarkNet:
+		publicKey, err := starknet.GetPublicKeyHash(req.MmskPk)
+		if err != nil {
+			return nil, err
+		}
+		a.MmskId = []byte(publicKey)
 	}
-	a.MmskId = []byte(w.WalletAddrHR)
 
 	if req.Proxy != nil {
 		p, err := socks5.NewSock5ProxyString(req.GetProxy(), "")
@@ -152,7 +165,7 @@ func (s *ProfileService) CreateProfile(ctx context.Context, req *v1.CreateProfil
 	if err != nil {
 		return nil, err
 	}
-	pr, err := res.ToPB()
+	pr, err := res.ToPB(s.starkNetClient)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +179,7 @@ func (s *ProfileService) ListProfile(ctx context.Context, req *v1.ListProfileReq
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.repository.ListProfiles(ctx, userId)
+	res, err := s.repository.ListProfiles(ctx, userId, req.Type.String(), req.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +188,7 @@ func (s *ProfileService) ListProfile(ctx context.Context, req *v1.ListProfileReq
 
 	for i := range res {
 		p := res[i]
-		pp, err := p.ToPB()
+		pp, err := p.ToPB(s.starkNetClient)
 		if err != nil {
 			return nil, err
 		}
@@ -206,7 +219,7 @@ func (s *ProfileService) SearchProfilesNotConnectedToOkexDeposit(ctx context.Con
 	out := make([]*v1.Profile, 0)
 
 	for _, p := range profiles {
-		o, err := p.ToPB()
+		o, err := p.ToPB(s.starkNetClient)
 		if err != nil {
 			return nil, err
 		}
@@ -227,7 +240,7 @@ func (s *ProfileService) SearchProfile(ctx context.Context, req *v1.SearchProfil
 	out := make([]*v1.Profile, 0)
 
 	for _, p := range profiles {
-		o, err := p.ToPB()
+		o, err := p.ToPB(s.starkNetClient)
 		if err != nil {
 			return nil, err
 		}
@@ -257,11 +270,6 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 	wg := sync.WaitGroup{}
 
 	profile, err := s.repository.GetProfile(ctx, req.ProfileId)
-	if err != nil {
-		return nil, err
-	}
-
-	wallet, err := defi.NewWalletTransactor(string(profile.MmskPk))
 	if err != nil {
 		return nil, err
 	}
@@ -301,11 +309,13 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 			continue
 		}
 
-		go func(balancer defi.Balancer, i int) {
+		go func(balancer defi.Networker, i int) {
 			defer wg.Done()
 
+			pubKey := balancer.GetPublicKey(string(profile.MmskPk))
+
 			b, err := balancer.GetBalance(ctx, &defi.GetBalanceReq{
-				WalletAddress: wallet.WalletAddr,
+				WalletAddress: pubKey,
 				Token:         tokens[i],
 			})
 			if err != nil {
@@ -383,18 +393,25 @@ func (s *ProfileService) GenerateProfiles(ctx context.Context, req *v1.GenerateP
 	w.Comma = ';'
 
 	for i := 0; i < int(req.Count); i++ {
-		key, err := crypto.GenerateKey()
-		if err != nil {
-			return nil, err
-		}
+		switch req.Type {
+		case v1.ProfileType_EVM:
+			key, err := crypto.GenerateKey()
+			if err != nil {
+				return nil, err
+			}
+			privateKey := hex.EncodeToString(key.D.Bytes())
 
-		//address := crypto.PubkeyToAddress(key.PublicKey).Hex()
-
-		// Get the private key
-		privateKey := hex.EncodeToString(key.D.Bytes())
-
-		if err := w.Write([]string{privateKey, "", ""}); err != nil {
-			return nil, err
+			if err := w.Write([]string{privateKey, "", ""}); err != nil {
+				return nil, err
+			}
+		case v1.ProfileType_StarkNet:
+			acc, err := starknet.DegenerateAccount()
+			if err != nil {
+				return nil, err
+			}
+			if err := w.Write([]string{acc.PrivateKey, "", ""}); err != nil {
+				return nil, err
+			}
 		}
 	}
 

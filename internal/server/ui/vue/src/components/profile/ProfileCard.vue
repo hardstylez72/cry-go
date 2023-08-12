@@ -21,8 +21,14 @@
           <v-icon icon="mdi-close" @click="menu = false"/>
         </div>
 
-
-        <div class="d-flex justify-space-between">
+        <div class="d-flex justify-space-between" v-if="this.profile.type === ProfileType.StarkNet">
+          <div>
+            <v-card-item>
+              <Balance :profile-id="profileId" :network="Network.StarkNet"/>
+            </v-card-item>
+          </div>
+        </div>
+        <div class="d-flex justify-space-between" v-if="this.profile.type === ProfileType.EVM">
           <div>
             <v-card-item>
               <Balance :profile-id="profileId" :network="Network.ARBITRUM"/>
@@ -57,10 +63,8 @@
             Recent Transactions:
             <div v-for="(tx, i) in transactions">
               <div>
-                <a class="mr-1" :href="tx.url" target="_blank">TX</a>
-                <b> {{ tx.code }}</b>
-                {{ formatTime(tx.createdAt) }}
-                <a :href="`/process/${tx.processId}`" target="_blank">Process</a>
+                <a class="mr-1" :href="tx.url" target="_blank"> <b> {{ tx.code }}</b></a>
+                <a :href="`/process/${tx.processId}`" target="_blank"> {{ formatTime(tx.createdAt) }}</a>
               </div>
             </div>
           </div>
@@ -76,7 +80,7 @@
 import {defineComponent} from 'vue';
 import {processService, profileService} from "@/generated/services"
 import Balance from "@/components/profile/Balance.vue";
-import {Network, Profile} from "@/generated/profile";
+import {Network, Profile, ProfileType} from "@/generated/profile";
 import TopUp from "@/components/billing/TopUp.vue";
 import Withdraw from "@/components/exchange.acc/ExchangeAccounts.vue";
 import TopUpProfile from "@/components/exchange.acc/TopUpProfile.vue";
@@ -105,14 +109,18 @@ export default defineComponent({
     }
   },
   computed: {
+    ProfileType() {
+      return ProfileType
+    },
     Network() {
       return Network
     }
   },
   methods: {
     async load() {
-      this.loadTransactions()
       this.loadProfile()
+      this.loadTransactions()
+
     },
     formatTime,
     async loadTransactions() {

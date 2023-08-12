@@ -11,7 +11,7 @@ import (
 )
 
 type GetBalanceReq struct {
-	WalletAddress common.Address
+	WalletAddress string
 	Token         Token
 }
 
@@ -35,7 +35,7 @@ func (c *EtheriumClient) getBalance(ctx context.Context, req *GetBalanceReq) (*G
 	fromAddress := req.WalletAddress
 
 	if req.Token == c.Cfg.MainToken {
-		b, err := c.Cli.BalanceAt(ctx, fromAddress, nil)
+		b, err := c.Cli.BalanceAt(ctx, common.HexToAddress(fromAddress), nil)
 		if err != nil {
 			return nil, err
 		}
@@ -64,7 +64,7 @@ func (c *EtheriumClient) getBalance(ctx context.Context, req *GetBalanceReq) (*G
 		Context: ctx,
 	}
 
-	b, err := s.BalanceOf(opt, fromAddress)
+	b, err := s.BalanceOf(opt, common.HexToAddress(fromAddress))
 	if err != nil {
 		return nil, err
 	}

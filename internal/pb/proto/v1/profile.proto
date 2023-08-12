@@ -9,6 +9,11 @@ import "v1/shared.proto";
 package profile;
 option go_package = "grpc/v1";
 
+enum ProfileType {
+  EVM  = 0;
+  StarkNet = 1;
+}
+
 message Profile {
   string id = 1;
   string label = 2;
@@ -20,10 +25,11 @@ message Profile {
   string user_agent = 8;
   int64 num = 9;
   optional google.protobuf.Timestamp deleted_at = 10;
+  ProfileType type = 11;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id", "label", "meta", "created_at", "mmsk_id", "user_agent", "num"]
+      required: ["id", "label", "meta", "created_at", "mmsk_id", "user_agent", "num", "type"]
     }
   };
 }
@@ -109,9 +115,10 @@ service ProfileService {
 
 message GenerateProfilesReq {
   int64 count = 1;
+  ProfileType type = 2;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["count"]
+      required: ["count", "type"]
     }
   };
 }
@@ -254,10 +261,11 @@ message SearchProfilesNotConnectedToOkexDepositResponse {
 
 message SearchProfileRequest {
   string pattern = 1;
+  ProfileType type = 2;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["pattern"]
+      required: ["pattern", "type"]
     }
   };
 }
@@ -278,10 +286,11 @@ message CreateProfileRequest {
   string mmsk_pk = 3;
   optional string meta = 4;
   optional profile.OkexAccount okex_account = 5;
+  ProfileType type = 6;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["label", "mmsk_pk"]
+      required: ["label", "mmsk_pk", "type"]
     }
   };
 }
@@ -296,7 +305,13 @@ message CreateProfileResponse {
 }
 
 message ListProfileRequest {
-
+  ProfileType type = 1;
+  int64 offset = 2;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["type", "offset"]
+    }
+  };
 }
 
 message ListProfileResponse {

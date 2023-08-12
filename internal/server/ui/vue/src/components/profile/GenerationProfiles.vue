@@ -4,7 +4,7 @@
             :close-on-content-click="false"
             persistent="true">
     <template v-slot:activator="{ props }">
-      <v-btn @click="dialog = true" class="mb-4 mx-4">
+      <v-btn @click="dialog = true" :loading="loading" class="mb-4 mx-4">
         <v-tooltip
           activator="parent"
           location="bottom"
@@ -107,14 +107,24 @@
 
 <script lang="ts">
 
-import {defineComponent} from 'vue';
+import {defineComponent, PropType} from 'vue';
 //@ts-ignore
 import Papa from 'papaparse';
 import {helperService, instance, profileService} from "@/generated/services";
+import {ProfileType} from "@/generated/profile";
 
 
 export default defineComponent({
   props: {
+    profileType: {
+      required: true,
+      type: String as PropType<ProfileType>,
+    },
+    loading: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
     demo: {
       required: false,
       type: Boolean,
@@ -122,6 +132,11 @@ export default defineComponent({
     }
   },
   watch: {
+    profileType: {
+      handler() {
+        console.log('ProfileType', this.ProfileType)
+      }
+    },
     tab: {
       handler() {
         if (this.tab.toString() === '3')
@@ -285,7 +300,12 @@ export default defineComponent({
       if (!await this.validate()) {
         return
       }
-      const res = await profileService.profileServiceGenerateProfiles({body: {count: this.count.toString()}})
+      const res = await profileService.profileServiceGenerateProfiles({
+        body: {
+          count: this.count.toString(),
+          type: this.profileType
+        }
+      })
 
       const result = Papa.parse<string[]>(res.text, {skipEmptyLines: true, delimitersToGuess: [';', ',']})
 

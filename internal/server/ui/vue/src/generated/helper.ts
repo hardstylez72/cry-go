@@ -591,7 +591,8 @@ export enum Network {
   'GOERLIETH' = 'GOERLIETH',
   'ZKSYNCERA' = 'ZKSYNCERA',
   'ZKSYNCERATESTNET' = 'ZKSYNCERATESTNET',
-  'ZKSYNCLITE' = 'ZKSYNCLITE'
+  'ZKSYNCLITE' = 'ZKSYNCLITE',
+  'StarkNet' = 'StarkNet'
 }
 
 export enum TaskType {
@@ -619,5 +620,6 @@ export enum TaskType {
   'EzkaliburSwap' = 'EzkaliburSwap',
   'ZkSwap' = 'ZkSwap',
   'TraderJoeSwap' = 'TraderJoeSwap',
-  'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT'
+  'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT',
+  'DeployStarkNetAccount' = 'DeployStarkNetAccount'
 }

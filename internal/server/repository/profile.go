@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/starknet"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository/pg"
 	"github.com/jmoiron/sqlx"
@@ -27,6 +28,7 @@ type Profile struct {
 	UserAgent string         `db:"user_agent"`
 	MmskId    []byte         `db:"mmsk_id"`
 	DeletedAt sql.NullTime   `db:"deleted_at"`
+	Type      string         `db:"type"`
 }
 
 var ProfileCols = []string{
@@ -41,28 +43,38 @@ var ProfileCols = []string{
 	"user_agent",
 	"mmsk_id",
 	"deleted_at",
+	"type",
 }
 
 var (
 	prfh = NewHelper(ProfileCols)
 )
 
-func (a *Profile) ToPB() (*v1.Profile, error) {
+func (a *Profile) ToPB(starkNetClient *starknet.Client) (*v1.Profile, error) {
 
-	transactor, err := defi.NewWalletTransactor(string(a.MmskPk))
-	if err != nil {
-		return nil, err
+	pType := v1.ProfileType(v1.ProfileType_value[a.Type])
+	publicKey := ""
+	switch pType {
+	case v1.ProfileType_EVM:
+		transactor, err := defi.NewWalletTransactor(string(a.MmskPk))
+		if err != nil {
+			return nil, err
+		}
+		publicKey = transactor.WalletAddrHR
+	case v1.ProfileType_StarkNet:
+		publicKey = starkNetClient.GetPublicKey(string(a.MmskPk))
 	}
 
 	p := &v1.Profile{
 		Id:        a.Id,
 		Label:     a.Label,
 		Proxy:     nil,
-		MmskId:    transactor.WalletAddrHR,
+		MmskId:    publicKey,
 		Meta:      nil,
 		CreatedAt: timestamppb.New(a.CreatedAt),
 		UserAgent: a.UserAgent,
 		Num:       a.Num,
+		Type:      pType,
 	}
 
 	if a.Proxy.Valid {
@@ -94,7 +106,7 @@ func (r *pgRepository) CreateProfile(ctx context.Context, req *Profile) (err err
 	}()
 	txx := pg.WrapSqlxTx(tx)
 
-	maxNum, err := SelectProfileMaxNumByUser(ctx, txx, req.UserId)
+	maxNum, err := SelectProfileMaxNumByUser(ctx, txx, req.UserId, req.Type)
 	if err != nil {
 		return err
 	}
@@ -111,10 +123,10 @@ func (r *pgRepository) CreateProfile(ctx context.Context, req *Profile) (err err
 
 	return nil
 }
-func SelectProfileMaxNumByUser(ctx context.Context, conn pg.SqlDriver, userId string) (int64, error) {
-	q := `select coalesce(max(num), 0) from profiles where user_id = $1`
+func SelectProfileMaxNumByUser(ctx context.Context, conn pg.SqlDriver, userId string, profileType string) (int64, error) {
+	q := `select coalesce(max(num), 0) from profiles where user_id = $1 and type = $2`
 	var num int64 = 1
-	if err := conn.GetContext(ctx, &num, q, userId); err != nil {
+	if err := conn.GetContext(ctx, &num, q, userId, profileType); err != nil {
 		return 0, err
 	}
 	return num, nil
@@ -177,19 +189,24 @@ func GetProfile(ctx context.Context, conn *sqlx.DB, id string) (*Profile, error)
 	}
 	return &a, nil
 }
-func (r *pgRepository) ListProfiles(ctx context.Context, userId string) ([]Profile, error) {
+func (r *pgRepository) ListProfiles(ctx context.Context, userId string, profileType string, offset int64) ([]Profile, error) {
 
-	res, err := listProfiles(ctx, r.conn, userId)
+	res, err := listProfiles(ctx, r.conn, userId, profileType, offset)
 	if err != nil {
 		return nil, err
 	}
 
 	return res, nil
 }
-func listProfiles(ctx context.Context, conn *sqlx.DB, userId string) ([]Profile, error) {
-	q := Join(`select `, prfh.Cols(), ` from profiles where user_id = $1 and deleted_at is null order by num asc`)
+func listProfiles(ctx context.Context, conn *sqlx.DB, userId string, profileType string, offset int64) ([]Profile, error) {
+	q := Join(`select `, prfh.Cols(), ` from profiles as p
+	where p.user_id = $1 
+    and p.deleted_at is null 
+	and p."type" = $2
+	order by p.num asc
+	offset $3 limit 30`)
 	out := make([]Profile, 0)
-	if err := conn.SelectContext(ctx, &out, q, userId); err != nil {
+	if err := conn.SelectContext(ctx, &out, q, userId, profileType, offset); err != nil {
 		return nil, err
 	}
 

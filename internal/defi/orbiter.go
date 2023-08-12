@@ -26,7 +26,7 @@ type OrbiterBridgeReq struct {
 }
 
 type OrbiterBridgeRes struct {
-	Tx    *Transaction
+	Tx    *bozdo.Transaction
 	ECost *bozdo.EstimatedGasCost
 }
 

@@ -21,7 +21,7 @@ type velocoreMaker struct {
 
 // site USDC -> ETH
 // me USDC -> ETH https://explorer.zksync.io/tx/0xaa2dcfa8280071efa6fa4c7264902bbd5d589d2a9ab3b5b6e313cf903a0e9e18
-func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	return c.GenericSwap(ctx, &velocoreMaker{c}, req)
 }
 

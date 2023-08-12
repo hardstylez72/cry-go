@@ -314,6 +314,21 @@
     "DeleteFlowResponse": {
       "type": "object"
     },
+    "DeployStarkNetAccountTask": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "$ref": "#/definitions/Network"
+        },
+        "tx": {
+          "$ref": "#/definitions/TaskTx"
+        }
+      },
+      "required": [
+        "network",
+        "tx"
+      ]
+    },
     "EzkaliburSwapTask": {
       "type": "object",
       "properties": {
@@ -504,7 +519,8 @@
         "GOERLIETH",
         "ZKSYNCERA",
         "ZKSYNCERATESTNET",
-        "ZKSYNCLITE"
+        "ZKSYNCLITE",
+        "StarkNet"
       ],
       "default": "ARBITRUM"
     },
@@ -1000,6 +1016,9 @@
         },
         "merklyMintAndBridgeNFTTask": {
           "$ref": "#/definitions/MerklyMintAndBridgeNFTTask"
+        },
+        "deployStarkNetAccountTask": {
+          "$ref": "#/definitions/DeployStarkNetAccountTask"
         }
       },
       "required": [
@@ -1088,7 +1107,8 @@
         "EzkaliburSwap",
         "ZkSwap",
         "TraderJoeSwap",
-        "MerklyMintAndBridgeNFT"
+        "MerklyMintAndBridgeNFT",
+        "DeployStarkNetAccount"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

@@ -33,10 +33,15 @@ type GetBalanceRes struct {
 	Float         float64
 }
 
+func (c *Client) GetPublicKey(pk string) string {
+	w, _ := NewWalletTransactor(pk, big.NewInt(324))
+	return w.WalletAddrHR
+}
+
 func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi.GetBalanceRes, error) {
 
 	if req.Token == c.Cfg.MainToken {
-		b, err := c.Provider.GetClient().BalanceAt(ctx, req.WalletAddress, nil)
+		b, err := c.Provider.GetClient().BalanceAt(ctx, common.HexToAddress(req.WalletAddress), nil)
 		if err != nil {
 			return nil, err
 		}
@@ -61,7 +66,7 @@ func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi
 		return nil, err
 	}
 
-	b, err := token.BalanceOf(nil, req.WalletAddress)
+	b, err := token.BalanceOf(nil, common.HexToAddress(req.WalletAddress))
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +99,8 @@ func (c *Client) SuggestGasPrice(ctx context.Context) (*big.Int, error) {
 	return c.Provider.SuggestGasPrice(ctx)
 }
 
-func (c *Client) WaitTxComplete(ctx context.Context, tx common.Hash) error {
-	res, err := c.Provider.WaitMined(ctx, tx)
+func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
+	res, err := c.Provider.WaitMined(ctx, common.HexToHash(tx))
 	if err != nil {
 		return err
 	}
@@ -115,7 +120,7 @@ type L1L2BridgeReq struct {
 }
 
 type L1L2BridgeRes struct {
-	TxHash           *defi.Transaction
+	TxHash           *bozdo.Transaction
 	EstimatedGasCost *bozdo.EstimatedGasCost
 }
 
@@ -336,6 +341,6 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 	return res, nil
 }
 
-func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (*defi.DefaultRes, error) {
+func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.DefaultRes, error) {
 	return c.StargateBridge(ctx, req)
 }

@@ -79,7 +79,7 @@ export default defineComponent({
   methods: {
     getFlow,
     viewFlow(id: string) {
-      window.open("/flow/" + id, "_blank")
+      this.$router.push({name: 'ViewFlow', params: {id}})
     },
     showStep(flow: Flow): string {
       if (!flow || !flow.tasks) {

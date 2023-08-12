@@ -2,51 +2,53 @@ import {Network, Task, TaskType} from "@/generated/flow";
 import {flow_Flow} from "@/generated/process";
 
 
-import TaskStargateBridge from "@/components/tasks/TaskStargateBridge.vue";
-import TaskDelay from "@/components/tasks/TaskDelay.vue";
-import TaskExchangeWithdraw from "@/components/tasks/TaskExchangeWithdraw.vue";
-import TaskOkexDeposit from "@/components/tasks/TaskOkexDeposit.vue";
-import TaskTestNetBridgeSwap from "@/components/tasks/TaskTestNetBridgeSwap.vue";
-import TaskSnapshotVote from "@/components/tasks/TaskSnapshotVote.vue";
-import TaskSyncSwap from "@/components/tasks/TaskSyncSwap.vue";
+import TaskStargateBridge from "@/components/tasks/block/TaskStargateBridge.vue";
+import TaskDelay from "@/components/tasks/block/TaskDelay.vue";
+import TaskExchangeWithdraw from "@/components/tasks/block/TaskExchangeWithdraw.vue";
+import TaskOkexDeposit from "@/components/tasks/block/TaskOkexDeposit.vue";
+import TaskTestNetBridgeSwap from "@/components/tasks/block/TaskTestNetBridgeSwap.vue";
+import TaskSnapshotVote from "@/components/tasks/block/TaskSnapshotVote.vue";
+import TaskSyncSwap from "@/components/tasks/block/TaskSyncSwap.vue";
 import MenuTaskSyncSwap from "@/components/tasks/menu/MenuTaskSyncSwap.vue";
-import MenuDelayTask from "@/components/tasks/menu/MenuDelayTask.vue";
-import MenuExchangeWithdraw from "@/components/tasks/menu/MenuExchangeWithdraw.vue";
-import MenuOkexDeposit from "@/components/tasks/menu/MenuOkexDeposit.vue";
-import MenuSnapshotTask from "@/components/tasks/menu/MenuSnapshotTask.vue";
+import MenuDelayTask from "@/components/tasks/menu/Delay.vue";
+import MenuExchangeWithdraw from "@/components/tasks/menu/ExchangeWithdraw.vue";
+import MenuOkexDeposit from "@/components/tasks/menu/OkexDeposit.vue";
+import MenuSnapshotTask from "@/components/tasks/menu/Snapshot.vue";
 import MenuTaskStargateBridge from "@/components/tasks/menu/MenuTaskStargateBridge.vue";
 import MenuTaskTestNetBridge from "@/components/tasks/menu/MenuTaskTestNetBridge.vue";
-import TaskZkSyncOfficialBridgeToEth from "@/components/tasks/TaskZkSyncOfficialBridgeToEth.vue";
-import TaskOrbiterBridge from "@/components/tasks/TaskOrbiterBridge.vue";
+import TaskZkSyncOfficialBridgeToEth from "@/components/tasks/block/TaskZkSyncOfficialBridgeToEth.vue";
+import TaskOrbiterBridge from "@/components/tasks/block/TaskOrbiterBridge.vue";
 import MenuTaskOrbiterBridge from "@/components/tasks/menu/MenuTaskOrbiterBridge.vue";
 import MenuZkSyncOfficialBridgeToEth from "@/components/tasks/menu/MenuZkSyncOfficialBridgeToEth.vue";
-import TaskZkSyncOfficialBridgeFromEth from "@/components/tasks/TaskZkSyncOfficialBridgeFromEth.vue";
+import TaskZkSyncOfficialBridgeFromEth from "@/components/tasks/block/TaskZkSyncOfficialBridgeFromEth.vue";
 import MenuZkSyncOfficialBridgeFromEth from "@/components/tasks/menu/MenuZkSyncOfficialBridgeFromEth.vue";
-import TaskWethSwap from "@/components/tasks/TaskWethSwap.vue";
+import TaskWethSwap from "@/components/tasks/block/TaskWethSwap.vue";
 import MenuTaskWethSwap from "@/components/tasks/menu/MenuTaskWethSwap.vue";
-import TaskMuteIoSwap from "@/components/tasks/TaskMuteIoSwap.vue";
+import TaskMuteIoSwap from "@/components/tasks/block/TaskMuteIoSwap.vue";
 import MenuTaskMuteioSwap from "@/components/tasks/menu/MenuTaskMuteioSwap.vue";
 import {humanDuration} from "@/components/helper";
-import TaskSyncSwapLP from "@/components/tasks/TaskSyncSwapLP.vue";
+import TaskSyncSwapLP from "@/components/tasks/block/TaskSyncSwapLP.vue";
 import MenuTaskSyncSwapLP from "@/components/tasks/menu/MenuTaskSyncSwapLP.vue";
-import TaskMaverickSwap from "@/components/tasks/TaskMaverickSwap.vue";
+import TaskMaverickSwap from "@/components/tasks/block/TaskMaverickSwap.vue";
 import MenuTaskMaverickSwap from "@/components/tasks/menu/MenuTaskMaverickSwap.vue";
-import TaskSpaceFiSwap from "@/components/tasks/TaskSpaceFiSwap.vue";
+import TaskSpaceFiSwap from "@/components/tasks/block/TaskSpaceFiSwap.vue";
 import MenuTaskSpaceFiSwap from "@/components/tasks/menu/MenuTaskSpaceFiSwap.vue";
-import TaskVelocoreSwap from "@/components/tasks/TaskVelocoreSwap.vue";
+import TaskVelocoreSwap from "@/components/tasks/block/TaskVelocoreSwap.vue";
 import MenuTaskVelocoreSwap from "@/components/tasks/menu/MenuTaskVelocoreSwap.vue";
-import TaskIzumiSwap from "@/components/tasks/TaskIzumiSwap.vue";
+import TaskIzumiSwap from "@/components/tasks/block/TaskIzumiSwap.vue";
 import MenuTaskIzumiSwap from "@/components/tasks/menu/MenuTaskIzumiSwap.vue";
-import TaskVeSyncSwap from "@/components/tasks/TaskVeSyncSwap.vue";
+import TaskVeSyncSwap from "@/components/tasks/block/TaskVeSyncSwap.vue";
 import MenuTaskVeSyncSwap from "@/components/tasks/menu/MenuTaskVeSyncSwap.vue";
-import TaskEzkaliburSwap from "@/components/tasks/TaskEzkaliburSwap.vue";
+import TaskEzkaliburSwap from "@/components/tasks/block/TaskEzkaliburSwap.vue";
 import MenuTaskEzkaliburSwap from "@/components/tasks/menu/MenuTaskEzkaliburSwap.vue";
-import TaskZkSwap from "@/components/tasks/TaskZkSwap.vue";
+import TaskZkSwap from "@/components/tasks/block/TaskZkSwap.vue";
 import MenuTaskZkSwap from "@/components/tasks/menu/MenuTaskZkSwap.vue";
-import TaskTraderJoeSwap from "@/components/tasks/TaskTraderJoeSwap.vue";
+import TaskTraderJoeSwap from "@/components/tasks/block/TaskTraderJoeSwap.vue";
 import MenuTaskTraderJoeSwap from "@/components/tasks/menu/MenuTaskTraderJoeSwap.vue";
 import MenuTaskMerklyNFT from "@/components/tasks/menu/MenuTaskMerklyNFT.vue";
-import TaskMerklyNFT from "@/components/tasks/TaskMerklyNFT.vue";
+import TaskMerklyNFT from "@/components/tasks/block/TaskMerklyNFT.vue";
+import TaskDeployStarkNetAccount from "@/components/tasks/block/DeployStarkNetAccount.vue";
+import DeployStarkNetAccount from "@/components/tasks/menu/DeployStarkNetAccount.vue";
 
 
 export interface TaskArg {
@@ -57,7 +59,7 @@ export interface TaskArg {
   taskType: TaskType
 }
 
-interface TaskSpec {
+export interface TaskSpec {
   menu: any
   component: any
 
@@ -66,9 +68,23 @@ interface TaskSpec {
 
   descFn: DescFn
 
-  service?: Service
+  service: Service
 
-  networks: Network[]
+  networks: Set<Network>
+
+  airdrops: Set<Airdrop>
+  job: TaskJob
+}
+
+export enum TaskJob {
+  Swap = 'Swap',
+  Bridge = 'Bridge',
+  Exchange = 'Exchange',
+  Other = 'Other',
+
+  NFT = "NFT",
+
+  LP = 'LP'
 }
 
 interface Service {
@@ -77,28 +93,54 @@ interface Service {
 
   name: string
 
-  implemented: string
+  op: string
 }
-
-export const serviceList: Service[] = [
-  {
-    name: 'Binance',
-    img: '/icons/binance.ico',
-    link: 'https://www.binance.com/',
-    implemented: 'Withdraw'
-  },
-  {
-    name: 'Okex',
-    img: '/icons/okx.png',
-    link: 'https://www.okx.com/',
-    implemented: 'Withdraw, Deposit'
-  },
-]
 
 interface DescFn {
   (task: Task): string;
 }
 
+
+export enum Airdrop {
+  LayerZero = "LayerZero",
+  ZkSync = "ZkSync",
+  StarkNet = "StarkNet",
+  Orbiter = "Orbiter",
+}
+
+const Universal = [Airdrop.ZkSync, Airdrop.StarkNet, Airdrop.Orbiter, Airdrop.LayerZero]
+
+export const allNetworks: Network[] = [
+  Network.ZKSYNCERA,
+  Network.ARBITRUM,
+  Network.StarkNet,
+  Network.AVALANCHE,
+  Network.BinanaceBNB,
+  Network.POLIGON,
+  Network.OPTIMISM,
+  Network.Etherium
+]
+
+const deprecated: TaskSpec = {
+  deprecated: true,
+  canBeEstimated: false,
+  menu: null,
+  component: null,
+  descFn(task) {
+    return ''
+  },
+
+  service: {
+    name: '',
+    img: '',
+    link: '',
+    op: '',
+
+  },
+  job: TaskJob.Other,
+  networks: new Set<Network>(allNetworks),
+  airdrops: new Set<Airdrop>()
+}
 
 export const taskProps: Record<TaskType, TaskSpec> = {
   Delay: {
@@ -110,7 +152,15 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       let p = task.delayTask
       return ` (${p?.random ? `${humanDuration(p?.minRandom)}:${humanDuration(p?.maxRandom)}` : humanDuration(p?.duration)})`
     },
-    networks: [],
+    service: {
+      name: 'Delay',
+      link: '',
+      img: '',
+      op: '',
+    },
+    job: TaskJob.Other,
+    networks: new Set<Network>(allNetworks),
+    airdrops: new Set<Airdrop>(Universal)
   },
   StargateBridge: {
     deprecated: false,
@@ -122,12 +172,20 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       return ` (${p?.fromNetwork} ${p?.fromToken} to ${p?.toNetwork} ${p?.toToken})`
     },
     service: {
-      name: 'Startgate.finance',
+      name: 'Stargate',
       img: '/icons/stg.svg',
       link: 'https://stargate.finance/',
-      implemented: 'Bridge'
+      op: 'bridge',
     },
-    networks: [Network.BinanaceBNB, Network.POLIGON, Network.AVALANCHE, Network.OPTIMISM, Network.ARBITRUM, Network.ZKSYNCERA]
+    networks: new Set<Network>([
+      Network.BinanaceBNB,
+      Network.POLIGON,
+      Network.AVALANCHE,
+      Network.OPTIMISM,
+      Network.ARBITRUM,
+      Network.ZKSYNCERA]),
+    job: TaskJob.Bridge,
+    airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync])
   },
   WithdrawExchange: {
     deprecated: false,
@@ -138,7 +196,15 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       let p = task.withdrawExchangeTask
       return ` (${p?.network} am: ${p?.sendAllCoins ? 'all' : `[${p?.amountMin}:${p?.amountMax}]`} ${p?.token})`
     },
-    networks: [],
+    service: {
+      name: 'Вывод',
+      img: '',
+      link: '',
+      op: 'вывод',
+    },
+    job: TaskJob.Exchange,
+    networks: new Set<Network>(allNetworks),
+    airdrops: new Set<Airdrop>(Universal)
   },
   OkexDeposit: {
     deprecated: false,
@@ -149,7 +215,15 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       let p = task.okexDepositTask
       return ` (${p?.network} ${p?.token})`
     },
-    networks: [],
+    service: {
+      name: 'Депозит',
+      link: 'https://www.okx.com/',
+      img: '',
+      op: 'депозит',
+    },
+    job: TaskJob.Exchange,
+    networks: new Set<Network>(allNetworks),
+    airdrops: new Set<Airdrop>(Universal)
   },
   TestNetBridgeSwap: {
     deprecated: false,
@@ -163,9 +237,12 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'TestNet-bridge',
       img: '/icons/testnetbridge.svg',
       link: 'https://testnetbridge.com/',
-      implemented: 'Bridge'
+      op: 'bridge',
+
     },
-    networks: [Network.ARBITRUM],
+    job: TaskJob.Bridge,
+    networks: new Set<Network>([Network.ARBITRUM]),
+    airdrops: new Set<Airdrop>([Airdrop.LayerZero])
   },
   SnapshotVote: {
     deprecated: false,
@@ -180,9 +257,12 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'Snapshot.org',
       img: '/icons/snapshot.png',
       link: 'https://snapshot.org/#/',
-      implemented: ''
+      op: 'vote',
+
     },
-    networks: [Network.ARBITRUM]
+    job: TaskJob.Other,
+    networks: new Set<Network>([Network.ARBITRUM]),
+    airdrops: new Set<Airdrop>(Universal)
   },
   SyncSwap: {
     deprecated: false,
@@ -197,9 +277,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'SyncSwap',
       img: '/icons/syncswap.svg',
       link: 'https://syncswap.xyz/',
-      implemented: 'Swap'
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    job: TaskJob.Swap,
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   ZkSyncOfficialBridgeToEthereum: {
     deprecated: false,
@@ -211,43 +293,18 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       return ` (from ${Network.ZKSYNCERA} to ${Network.Etherium} ETH)`
     },
     service: {
-      name: 'zksync bridge',
+      name: 'zksync to ETH',
       img: '/icons/era.svg',
       link: 'https://portal.zksync.io/bridge/',
-      implemented: 'L1 <-> L0'
+      op: 'bridge',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Bridge,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
-  Mock: {
-    deprecated: true,
-    canBeEstimated: false,
-    menu: null,
-    component: null,
-    descFn(task) {
-      return ''
-    },
-    networks: []
-  },
-  OkexBinance: {
-    deprecated: true,
-    canBeEstimated: false,
-    menu: null,
-    component: null,
-    descFn(task) {
-      return ''
-    },
-    networks: []
-  },
-  Swap1inch: {
-    deprecated: true,
-    canBeEstimated: false,
-    menu: null,
-    component: null,
-    descFn(task) {
-      return ''
-    },
-    networks: []
-  },
+  Mock: deprecated,
+  OkexBinance: deprecated,
+  Swap1inch: deprecated,
   OrbiterBridge: {
     deprecated: false,
     canBeEstimated: true,
@@ -258,12 +315,14 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       return ` (from ${p?.fromNetwork} ${p?.fromToken} to ${p?.toNetwork} ${p?.toToken})`
     },
     service: {
-      name: 'Orbiter.finance',
+      name: 'Orbiter',
       img: '/icons/orbiter.ico',
       link: 'https://www.orbiter.finance/',
-      implemented: 'Bridge'
+      op: 'bridge',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Bridge,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>(Universal)
   },
   ZkSyncOfficialBridgeFromEthereum: {
     deprecated: false,
@@ -275,12 +334,14 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       return ` (from ${Network.Etherium} to ${Network.ZKSYNCERA} ETH)`
     },
     service: {
-      name: 'zksync bridge',
+      name: 'zksync from ETH',
       img: '/icons/era.svg',
       link: 'https://portal.zksync.io/bridge/',
-      implemented: 'L1 <-> L0'
+      op: 'bridge',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Bridge,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   WETH: {
     deprecated: false,
@@ -290,7 +351,15 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     descFn(task) {
       return task.wETHTask?.wrap ? ' (wrap)' : ' (unwrap)'
     },
-    networks: [Network.ZKSYNCERA]
+    service: {
+      link: '',
+      img: '',
+      name: 'WETH <> ETH',
+      op: 'swap',
+    },
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   MuteioSwap: {
     deprecated: false,
@@ -305,9 +374,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'Mute.io',
       img: '/icons/muteio.png',
       link: 'https://app.mute.io/swap',
-      implemented: 'Swap'
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   SyncSwapLP: {
     deprecated: false,
@@ -318,7 +389,15 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     menu: MenuTaskSyncSwapLP,
     component: TaskSyncSwapLP,
-    networks: [Network.ZKSYNCERA]
+    service: {
+      name: 'SyncSwap',
+      img: '/icons/syncswap.svg',
+      link: 'https://syncswap.xyz/',
+      op: 'LP',
+    },
+    job: TaskJob.LP,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   MaverickSwap: {
     deprecated: false,
@@ -333,9 +412,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'Maverick',
       img: '/icons/maverick.ico',
       link: 'https://app.mav.xyz/?chain=324',
-      implemented: ''
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync, Airdrop.LayerZero])
   },
   SpaceFISwap: {
     deprecated: false,
@@ -350,9 +431,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'SpaceFi',
       link: 'https://swap-zksync.spacefi.io/#/swap',
       img: '/icons/spacefi.png',
-      implemented: '',
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   VelocoreSwap: {
     deprecated: false,
@@ -367,9 +450,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'Velocore',
       link: 'https://app.velocore.xyz/swap',
       img: '/icons/velocore.png',
-      implemented: '',
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   IzumiSwap: {
     deprecated: false,
@@ -384,9 +469,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'IZUMI',
       link: 'https://izumi.finance/trade/swap',
       img: '/icons/izumi.svg',
-      implemented: '',
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   VeSyncSwap: {
     deprecated: false,
@@ -401,9 +488,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'VeSync',
       link: 'https://app.vesync.finance/swap',
       img: '/icons/vesync.svg',
-      implemented: '',
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   EzkaliburSwap: {
     deprecated: false,
@@ -418,9 +507,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'Ezkalibur',
       link: 'https://dapp.ezkalibur.com/',
       img: '/icons/ezkalibur.ico',
-      implemented: '',
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   ZkSwap: {
     deprecated: false,
@@ -435,9 +526,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'ZkSwap',
       link: 'https://zkswap.finance/swap',
       img: '/icons/zkswap.ico',
-      implemented: '',
+      op: 'swap',
     },
-    networks: [Network.ZKSYNCERA]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
   },
   TraderJoeSwap: {
     deprecated: false,
@@ -452,9 +545,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'TraderJoe',
       link: 'https://traderjoexyz.com/arbitrum/trade',
       img: '/icons/traderjoe.png',
-      implemented: '',
+      op: 'trade',
     },
-    networks: [Network.ARBITRUM]
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ARBITRUM]),
+    airdrops: new Set<Airdrop>(Universal)
   },
   MerklyMintAndBridgeNFT: {
     deprecated: false,
@@ -469,10 +564,31 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'Merkly',
       link: 'https://minter.merkly.com/',
       img: '/icons/merkly.webp',
-      implemented: '',
+      op: 'mint/brdge NFT',
     },
-    networks: [Network.ZKSYNCERA]
-  }
+    job: TaskJob.NFT,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync])
+  },
+  DeployStarkNetAccount: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.deployStarkNetAccountTask
+      return ''
+    },
+    component: TaskDeployStarkNetAccount,
+    menu: DeployStarkNetAccount,
+    service: {
+      name: 'StarkNet acc deploy',
+      link: 'https://starkgate.starknet.io/',
+      img: '/icons/starknet.svg',
+      op: 'deploy account',
+    },
+    job: TaskJob.Other,
+    networks: new Set<Network>([Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet])
+  },
 }
 
 export const getFlow = (flow: flow_Flow): string[] => {

@@ -14,9 +14,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq) (*DefaultRes, error) {
+func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq) (*bozdo.DefaultRes, error) {
 
-	result := &DefaultRes{}
+	result := &bozdo.DefaultRes{}
 
 	tr, err := NewWalletTransactor(req.WalletPK)
 	if err != nil {

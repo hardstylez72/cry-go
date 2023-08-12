@@ -522,6 +522,14 @@ export interface DelayTask {
   randomDuration?: string;
 }
 
+export interface DeployStarkNetAccountTask {
+  /**  */
+  network: Network;
+
+  /**  */
+  tx: TaskTx;
+}
+
 export interface DisableAutoRetryRequest {
   /**  */
   processId: string;
@@ -1202,6 +1210,9 @@ export interface Task {
 
   /**  */
   merklyMintAndBridgeNFTTask?: MerklyMintAndBridgeNFTTask;
+
+  /**  */
+  deployStarkNetAccountTask?: DeployStarkNetAccountTask;
 }
 
 export interface TaskTx {
@@ -1474,7 +1485,8 @@ export enum Network {
   'GOERLIETH' = 'GOERLIETH',
   'ZKSYNCERA' = 'ZKSYNCERA',
   'ZKSYNCERATESTNET' = 'ZKSYNCERATESTNET',
-  'ZKSYNCLITE' = 'ZKSYNCLITE'
+  'ZKSYNCLITE' = 'ZKSYNCLITE',
+  'StarkNet' = 'StarkNet'
 }
 
 export enum ProcessStatus {
@@ -1511,7 +1523,8 @@ export enum TaskType {
   'EzkaliburSwap' = 'EzkaliburSwap',
   'ZkSwap' = 'ZkSwap',
   'TraderJoeSwap' = 'TraderJoeSwap',
-  'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT'
+  'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT',
+  'DeployStarkNetAccount' = 'DeployStarkNetAccount'
 }
 
 export enum Token {

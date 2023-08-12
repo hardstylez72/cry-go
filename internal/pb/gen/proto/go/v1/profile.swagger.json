@@ -418,11 +418,15 @@
         },
         "okexAccount": {
           "$ref": "#/definitions/OkexAccount"
+        },
+        "type": {
+          "$ref": "#/definitions/ProfileType"
         }
       },
       "required": [
         "label",
-        "mmskPk"
+        "mmskPk",
+        "type"
       ]
     },
     "CreateProfileResponse": {
@@ -470,10 +474,14 @@
         "count": {
           "type": "string",
           "format": "int64"
+        },
+        "type": {
+          "$ref": "#/definitions/ProfileType"
         }
       },
       "required": [
-        "count"
+        "count",
+        "type"
       ]
     },
     "GenerateProfilesRes": {
@@ -540,7 +548,20 @@
       ]
     },
     "ListProfileRequest": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "offset": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "type",
+        "offset"
+      ]
     },
     "ListProfileResponse": {
       "type": "object",
@@ -569,7 +590,8 @@
         "GOERLIETH",
         "ZKSYNCERA",
         "ZKSYNCERATESTNET",
-        "ZKSYNCLITE"
+        "ZKSYNCLITE",
+        "StarkNet"
       ],
       "default": "ARBITRUM"
     },
@@ -624,6 +646,9 @@
         "deletedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "type": {
+          "$ref": "#/definitions/ProfileType"
         }
       },
       "required": [
@@ -633,18 +658,31 @@
         "createdAt",
         "mmskId",
         "userAgent",
-        "num"
+        "num",
+        "type"
       ]
+    },
+    "ProfileType": {
+      "type": "string",
+      "enum": [
+        "EVM",
+        "StarkNet"
+      ],
+      "default": "EVM"
     },
     "SearchProfileRequest": {
       "type": "object",
       "properties": {
         "pattern": {
           "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/ProfileType"
         }
       },
       "required": [
-        "pattern"
+        "pattern",
+        "type"
       ]
     },
     "SearchProfileResponse": {

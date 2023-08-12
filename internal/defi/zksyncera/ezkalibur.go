@@ -17,7 +17,7 @@ type ezkaliburMaker struct {
 	*Client
 }
 
-func (c *Client) EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	return c.GenericSwap(ctx, &ezkaliburMaker{c}, req)
 }
 

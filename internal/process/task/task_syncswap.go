@@ -150,8 +150,8 @@ func NewSyncSwapper(ctx context.Context, a *Input) (defi.SyncSwapper, *zksyncera
 }
 
 type SyncSwapRes struct {
-	Swap      *defi.Transaction
-	Allowance *defi.Transaction
+	Swap      *bozdo.Transaction
+	Allowance *bozdo.Transaction
 	Swapper   defi.SyncSwapper
 }
 
@@ -163,7 +163,7 @@ func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, pro
 	}
 
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.WalletAddr,
+		WalletAddress: profile.WalletAddr.String(),
 		Token:         a.FromToken,
 	})
 	if err != nil {
@@ -230,7 +230,7 @@ func EstimateSyncSwapCost(ctx context.Context, profile *halp.Profile, p *v1.Sync
 		return nil, err
 	}
 
-	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: wallet.WalletAddr, Token: p.FromToken})
+	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: wallet.WalletAddr.String(), Token: p.FromToken})
 	if err != nil {
 		return nil, err
 	}

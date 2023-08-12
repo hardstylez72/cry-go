@@ -12,6 +12,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/etherium"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
 	"github.com/hardstylez72/cry/internal/defi/poligon"
+	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	"github.com/hardstylez72/cry/internal/defi/zksynclite"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -44,6 +45,7 @@ var Networks = []v1.Network{
 	v1.Network_ZKSYNCLITE,
 	v1.Network_AVALANCHE,
 	v1.Network_POLIGON,
+	v1.Network_StarkNet,
 }
 
 func NewService(rep repository.SettingsRepository) *Service {
@@ -148,6 +150,9 @@ func resolveSettings(in *v1.NetworkSettings, network v1.Network, force bool) (*v
 	case v1.Network_AVALANCHE:
 		s.RPC = avalanche.MainNetURL
 		s.GasMax = avalancheMax
+	case v1.Network_StarkNet:
+		s.RPC = starknet.MainnetRPC
+		s.GasMax = eth
 	}
 
 	return resolveNetworkSettings(in, s, force)

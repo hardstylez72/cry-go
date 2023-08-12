@@ -11,7 +11,7 @@ import (
 
 type ProfileRepository interface {
 	CreateProfile(ctx context.Context, req *Profile) error
-	ListProfiles(ctx context.Context, userId string) ([]Profile, error)
+	ListProfiles(ctx context.Context, userId string, profileType string, offset int64) ([]Profile, error)
 	DeleteProfile(ctx context.Context, req *v1.DeleteProfileRequest) (*v1.DeleteProfileResponse, error)
 	SearchProfile(ctx context.Context, pattern, userId string) ([]Profile, error)
 	SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string) ([]Profile, error)

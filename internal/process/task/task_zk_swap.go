@@ -105,7 +105,7 @@ func (t *ZkSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error)
 	return task, nil
 }
 
-func ZkSwap(ctx context.Context, profile *halp.Profile, p *v1.ZkSwapTask, client zksyncera.ZkSwapper, estimation *v1.EstimationTx) (*defi.DefaultRes, *bozdo.Gas, error) {
+func ZkSwap(ctx context.Context, profile *halp.Profile, p *v1.ZkSwapTask, client zksyncera.ZkSwapper, estimation *v1.EstimationTx) (*bozdo.DefaultRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
@@ -124,7 +124,7 @@ func ZkSwap(ctx context.Context, profile *halp.Profile, p *v1.ZkSwapTask, client
 	}
 
 	balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: wallet.WalletAddr,
+		WalletAddress: wallet.WalletAddr.String(),
 		Token:         p.FromToken,
 	})
 	if err != nil {

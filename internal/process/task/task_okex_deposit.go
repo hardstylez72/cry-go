@@ -98,7 +98,7 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		}
 
 		b, err := client.GetBalance(taskContext, &defi.GetBalanceReq{
-			WalletAddress: profile.WalletAddr,
+			WalletAddress: profile.WalletAddr.String(),
 			Token:         p.Token,
 		})
 		if err != nil {
@@ -288,7 +288,7 @@ func EstimateOkexDepositCost(ctx context.Context, profile *halp.Profile, p *v1.O
 		return nil, err
 	}
 
-	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: walletAddr, Token: p.Token})
+	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: walletAddr.String(), Token: p.Token})
 	if err != nil {
 		return nil, err
 	}

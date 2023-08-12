@@ -1,7 +1,11 @@
 <template>
   <v-expansion-panel @group:selected="loadSettings">
     <v-expansion-panel-title>
-      {{ network }}
+      <div class="d-flex align-center ">
+        <v-img height="22px" :src="network.img" class="mx-4"/>
+        <div>{{ network.name }}</div>
+      </div>
+
     </v-expansion-panel-title>
     <v-expansion-panel-text>
       <Loader v-if="loading"/>
@@ -43,7 +47,7 @@
           </v-row>
           <v-row>
             <v-col>
-              <NetworkMaxGas v-model="settings.maxGas" :network="network"/>
+              <NetworkMaxGas v-model="settings.maxGas" :network="network.value"/>
             </v-col>
           </v-row>
         </v-card-text>
@@ -59,7 +63,7 @@
               height="auto"
               elevation="1"
             >
-              <TaskSettingsC :network="network" :task-type="task[0]"
+              <TaskSettingsC :network="network.value" :task-type="task[0]"
                              :settings-prop="task[1]"
                              @updated="taskUpdated"/>
             </v-list-item>
@@ -75,7 +79,7 @@
 
 import {defineComponent, PropType} from 'vue';
 import {settingsService} from "@/generated/services"
-import {castTaskSettingsMap, castTaskSettingsMapObj, TaskSettings, Timer} from "@/components/helper";
+import {castTaskSettingsMap, castTaskSettingsMapObj, network, TaskSettings, Timer} from "@/components/helper";
 import {NetworkSettings} from "@/generated/settings";
 import {Network, TaskType} from "@/generated/flow";
 import NetworkGasMultiplier from "@/components/settings/NetworkGasMultiplier.vue";
@@ -90,7 +94,7 @@ export default defineComponent({
   components: {TaskSettingsC, Loader, NetworkMaxGas, NetworkGasMultiplier},
   props: {
     network: {
-      type: Object as PropType<Network>,
+      type: Object as PropType<network>,
       required: true,
     }
   },
@@ -126,14 +130,14 @@ export default defineComponent({
   },
   methods: {
     slippageAvailable(t: TaskType) {
-      return taskProps[t].networks.some(n => n === this.network)
+      return taskProps[t].networks.some(n => n === this.network.value)
     },
     taskUpdated(taskType: TaskType, p: TaskSettings) {
       this.taskMap.set(taskType, p)
       this.settings.taskSettings = this.taskMap
     },
     async endpointChanged(init: boolean) {
-      if (this.network == Network.ZKSYNCLITE) {
+      if (this.network.value == Network.ZKSYNCLITE) {
         return
       }
       if (!init) {
@@ -159,7 +163,7 @@ export default defineComponent({
         this.reseting = true
         const res = await settingsService.settingsServiceResetSettings({
           body: {
-            network: this.network
+            network: this.network.value
           }
         })
         this.settings = res.settings
@@ -186,7 +190,7 @@ export default defineComponent({
     async loadSettings() {
       try {
         this.loading = true
-        const res = await settingsService.settingsServiceGetSettings({body: {network: this.network}})
+        const res = await settingsService.settingsServiceGetSettings({body: {network: this.network.value}})
         this.settings = res.settings
         this.sync()
       } finally {

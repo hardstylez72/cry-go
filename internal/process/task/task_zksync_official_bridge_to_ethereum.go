@@ -129,7 +129,7 @@ func NewZkSyncClient(profile *halp.Profile, n v1.Network) (*zksyncera.Client, *z
 	return swapper, wallet, nil
 }
 
-func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *Input, client *zksyncera.Client, wallet *zksyncera.WalletTransactor, profile *halp.Profile) (*defi.Transaction, *bozdo.Gas, error) {
+func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *Input, client *zksyncera.Client, wallet *zksyncera.WalletTransactor, profile *halp.Profile) (*bozdo.Transaction, *bozdo.Gas, error) {
 
 	l, ok := a.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask)
 	if !ok {
@@ -142,7 +142,7 @@ func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *
 	}
 
 	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: wallet.WalletAddr,
+		WalletAddress: wallet.WalletAddr.String(),
 		Token:         v1.Token_ETH,
 	})
 	if err != nil {
@@ -204,7 +204,7 @@ func EstimateZkSyncOfficialBridgeToEthSwapCost(ctx context.Context, profile *hal
 		return nil, err
 	}
 
-	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.WalletAddr, Token: v1.Token_ETH})
+	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.WalletAddr.String(), Token: v1.Token_ETH})
 	if err != nil {
 		return nil, err
 	}

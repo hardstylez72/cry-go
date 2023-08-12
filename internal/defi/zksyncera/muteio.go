@@ -17,7 +17,7 @@ import (
 	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
-func (c *Client) MuteIOSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) MuteIOSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	if req.FromToken == v1.Token_ETH || req.FromToken == v1.Token_WETH {
 		return c.muteIoSwapFromEth(ctx, req)
 	}
@@ -45,7 +45,7 @@ func (c *Client) MuteIOSwap(ctx context.Context, req *defi.DefaultSwapReq) (*def
 
 // off https://explorer.zksync.io/tx/0x74dc1805388938923ffbfdbf0b021656f7bc1aca19a6508a64ffccf2632c7c94
 // my
-func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -93,7 +93,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 	if err != nil {
 		return nil, fmt.Errorf("Make712Tx: %w", err)
 	}
-	result := &defi.DefaultRes{}
+	result := &bozdo.DefaultRes{}
 	result.ECost = estimate
 
 	if req.EstimateOnly {
@@ -111,7 +111,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 
 // off https://explorer.zksync.io/tx/0xf5aa782e37711f8ebdfe19608ce24d5d0219103264d39f20d04738e677756c7d
 // my https://explorer.zksync.io/tx/0x5f86de07362b4de327a59f6ae866ba98bb4ddd65e73d19cfb1baeca5fc702292
-func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
 		return nil, errors.Wrap(err, "NewWalletTransactor")
@@ -163,7 +163,7 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 	if err != nil {
 		return nil, fmt.Errorf("Make712Tx: %w", err)
 	}
-	result := &defi.DefaultRes{}
+	result := &bozdo.DefaultRes{}
 	result.ECost = estimate
 
 	if req.EstimateOnly {

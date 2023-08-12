@@ -80,6 +80,7 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_ZkSwap,
 	v1.TaskType_TraderJoeSwap,
 	v1.TaskType_MerklyMintAndBridgeNFT,
+	v1.TaskType_DeployStarkNetAccount,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -113,6 +114,7 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_ZkSwap:                           &Wrap{Tasker: &ZkSwapTask{}},
 	v1.TaskType_TraderJoeSwap:                    &Wrap{Tasker: &TraderJoeSwapTask{}},
 	v1.TaskType_MerklyMintAndBridgeNFT:           &Wrap{Tasker: &MerklyMintAndBridgeNFTTask{}},
+	v1.TaskType_DeployStarkNetAccount:            &Wrap{Tasker: &DeployStarkNetAccountTask{}},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -262,7 +264,12 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)")
 		}
 		return Marshal(t.MerklyMintAndBridgeNFTTask)
-
+	case v1.TaskType_DeployStarkNetAccount:
+		t, ok := m.Task.(*v1.Task_DeployStarkNetAccountTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_DeployStarkNetAccountTask)")
+		}
+		return Marshal(t.DeployStarkNetAccountTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}

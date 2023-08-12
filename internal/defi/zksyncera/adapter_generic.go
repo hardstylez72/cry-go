@@ -18,8 +18,8 @@ type TxBridgeMaker interface {
 	MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.TxData, error)
 }
 
-func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
-	result := &defi.DefaultRes{}
+func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
+	result := &bozdo.DefaultRes{}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
@@ -72,8 +72,8 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 
 	return result, nil
 }
-func (c *Client) GenericBridge(ctx context.Context, maker TxBridgeMaker, req *defi.DefaultBridgeReq) (*defi.DefaultRes, error) {
-	result := &defi.DefaultRes{}
+func (c *Client) GenericBridge(ctx context.Context, maker TxBridgeMaker, req *defi.DefaultBridgeReq) (*bozdo.DefaultRes, error) {
+	result := &bozdo.DefaultRes{}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {

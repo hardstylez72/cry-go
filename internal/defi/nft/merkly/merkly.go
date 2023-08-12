@@ -150,3 +150,18 @@ func (m *Maker) MakeBridgeTx(ctx context.Context, req *MakeBridgeTxReq) (*bozdo.
 
 	return tx, nil
 }
+
+func (m *Maker) GetOwner(ctx context.Context, id *big.Int) (*common.Address, error) {
+	c, err := NewMinterCaller(m.CA, m.Cli)
+	if err != nil {
+		return nil, err
+	}
+
+	opt := &bind.CallOpts{Context: ctx}
+
+	a, err := c.OwnerOf(opt, id)
+	if err != nil {
+		return nil, err
+	}
+	return &a, nil
+}

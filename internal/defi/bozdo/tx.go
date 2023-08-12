@@ -27,6 +27,29 @@ type TxDetail struct {
 	Value string
 }
 
+type TxCode = string
+
+const (
+	CodeApprove  TxCode = "approve"
+	CodeContract TxCode = "contract"
+	CodeTransfer TxCode = "transfer"
+)
+
+type Transaction struct {
+	Code    TxCode
+	Network v1.Network
+	Id      string
+	Url     string
+	Details []TxDetail
+}
+
+type DefaultRes struct {
+	Tx        *Transaction
+	ApproveTx *Transaction
+	ECost     *EstimatedGasCost
+	TxDetails []TxDetail
+}
+
 type TxData struct {
 	Data         []byte
 	Value        *big.Int
@@ -44,7 +67,14 @@ func (g *Gas) RuleSet() bool {
 	return g != nil
 }
 
+type TxType = string
+
+const TxTypeLegacy = "legacy"
+const TxTypeDynamic = "legacy"
+const TxTypeStarkNet = "starkNet"
+
 type EstimatedGasCost struct {
+	Type        TxType
 	Name        string
 	GasLimit    *big.Int
 	GasPrice    *big.Int

@@ -39,11 +39,17 @@
           <v-row class="d-flex justify-space-between">
             <v-col>
               <v-card>
-                <v-card-title v-if="!disable" class="d-flex justify-space-between px-0">
-                  <h4>
-                    <v-icon icon="mdi-dots-vertical" class="handle" @click="() => {}"/>
-                    {{ `${element.weight}) ${element.taskType}` }}
-                  </h4>
+                <v-card-title v-if="!disable" class="d-flex justify-space-between px-0 align-center">
+                  <div class="d-inline-flex align-center">
+                    <h4>
+                      <v-icon icon="mdi-dots-vertical" class="handle" @click="() => {}"/>
+                      {{ `${element.weight}) ${element.taskType}` }}
+                    </h4>
+                    <a target="_blank" :href="taskSpec(element).service.link" class="mx-1">
+                      <v-img height="22px" :src="taskSpec(element).service.img"/>
+                    </a>
+                  </div>
+
                   <v-icon icon="mdi-close" @click="taskDeleted(element.weight)"></v-icon>
                 </v-card-title>
                 <v-card-title v-else class="px-2">
@@ -54,11 +60,12 @@
 
                 <component
                   @taskChanged="taskChanged"
-                  style="box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;"
+                  style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;"
                   :is="element.component"
                   :weight="element.weight"
                   :task="element.task"
                   :disabled="disable"
+                  :spec="taskSpec(element)"
                 />
               </v-card>
             </v-col>
@@ -70,14 +77,39 @@
       <v-row v-if="!disable">
         <v-container>
           <v-card cols="12"
-                  style="box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;">
+                  style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;">
             <v-col cols="12">
-              <v-btn class="mx-1 my-1" density="compact" variant="tonal" v-for="taskType in stepTypes"
-                     @click="addStep(taskType)">
-                {{ taskType }}
-              </v-btn>
-            </v-col>
+              <div class="d-inline-flex align-center">{{ `Тип фильтра: ` }}
+                <v-radio-group inline="true" v-model="filterType" hide-details>
+                  <v-radio v-for="item in Filters" :value="item" :label="item"/>
+                </v-radio-group>
+              </div>
+              <div>Значения фильтра:
+                <v-radio-group v-if="filterType === 'Сеть'" v-model="filterNetwork" inline="true">
+                  <v-chip density="compact" size="5px" value="Все сети" @click="filterNetwork = 'Все сети'">{{
+                      "Все сети"
+                    }}
+                  </v-chip>
+                  <v-chip v-for="network in networks" @click="filterNetwork = network" :value="network"
+                          density="compact" class="mx-1 my-1">
+                    <v-img height="22px" :src="networkProps[network].img"/>
+                    {{ networkProps[network].name }}
+                  </v-chip>
+                </v-radio-group>
+                <v-radio-group v-if="filterType === 'Airdrop'" v-model="filterAirdrop" inline="true">
+                  <v-radio value="Все Airdrop" label="Все Airdrop"/>
+                  <v-radio v-for="airdrop in airdrops" :value="airdrop" :label="airdrop"></v-radio>
+                </v-radio-group>
 
+              </div>
+              <div v-for="job in taskJobs" class="d-flex flex-wrap">
+                <v-divider class="my-1"/>
+                <b>{{ job }}</b>
+                <div v-for="tt in filterTasksByJob(job)">
+                  <TaskChip class="mx-1 my-1" @click="addStep(tt)" :task-type="tt"/>
+                </div>
+              </div>
+            </v-col>
           </v-card>
         </v-container>
       </v-row>
@@ -88,30 +120,48 @@
 
 <script lang="ts">
 
-import {defineComponent, PropType} from 'vue';
-import {Task, TaskType} from "@/generated/flow";
-import {taskComponentMap, TaskArg, taskTypes, taskProps} from '@/components/tasks/tasks'
+import {defineComponent, PropType, ref} from 'vue';
+import {Network, Task, TaskType} from "@/generated/flow";
+import {taskComponentMap, TaskArg, taskTypes, taskProps, TaskJob, TaskSpec, Airdrop} from '@/components/tasks/tasks'
 import draggable from 'vuedraggable'
+import TaskChip from "@/components/tasks/TaskChip.vue";
+import {networkProps} from "@/components/helper";
 
 
 export default defineComponent({
   name: "FlowForm",
   computed: {
     isMobile() {
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        return true
-      } else {
-        return false
-      }
+      return window.innerWidth < 1280
+    },
+    networkProps() {
+      return networkProps
     },
     taskProps() {
       return taskProps
-    }
+    },
+    taskTypes() {
+      return taskTypes
+    },
+    Filters(): string[] {
+      return ['Сеть', 'Airdrop']
+    },
   },
   components: {
+    TaskChip,
     draggable,
   },
   watch: {
+    filterNetwork: {
+      handler() {
+        this.getTaskList()
+      },
+    },
+    filterAirdrop: {
+      handler() {
+        this.getTaskList()
+      },
+    },
     label: {
       handler() {
         this.$emit('flowChanged', this.label, this.tasks)
@@ -122,6 +172,11 @@ export default defineComponent({
         this.$emit('flowChanged', this.label, this.tasks)
       }
     },
+    filter: {
+      handler() {
+        this.getTaskList()
+      },
+    }
   },
   props: {
     demo: {
@@ -149,14 +204,85 @@ export default defineComponent({
       label: "",
       selectedTask: TaskType.Delay,
       tasks: [] as TaskArg[],
-      stepTypes: taskTypes,
-      componentData: {
-        type: "transition",
-        name: "flip-list"
-      }
+
+      filterType: 'Сеть' as 'Сеть' | 'Airdrop',
+
+
+      taskJobs: [] as TaskJob[],
+      jobSet: new Set<TaskJob>(),
+
+      filterNetwork: 'Все сети' as 'Все сети' | Network,
+      networks: [] as Network[],
+      networkSet: new Set<Network>(),
+
+      filterAirdrop: 'Все Airdrop' as 'Все Airdrop' | Airdrop,
+      airdrops: [] as Airdrop[],
+      airdropSet: new Set<Airdrop>()
     }
   },
   methods: {
+    filterTasksByJob(job: TaskJob): TaskType[] {
+      const out: TaskType[] = []
+
+      this.taskTypes.forEach((taskType) => {
+        if (this.taskProps[taskType].job !== job) {
+          return
+        }
+
+        switch (true) {
+          case this.filterType === 'Сеть' :
+            if (this.filterNetwork !== 'Все сети' && !this.taskProps[taskType].networks.has(this.filterNetwork)) {
+              return;
+            }
+            break
+          case this.filterType === 'Airdrop' :
+            if (this.filterAirdrop !== 'Все Airdrop' && !this.taskProps[taskType].airdrops.has(this.filterAirdrop)) {
+              return;
+            }
+            break
+        }
+
+        out.push(taskType)
+      })
+      return out
+    },
+    getTaskList() {
+
+      this.networks = []
+      this.airdrops = []
+      this.taskJobs = []
+
+      this.jobSet = new Set<TaskJob>()
+      this.airdropSet = new Set<Airdrop>()
+      this.networkSet = new Set<Network>()
+
+      this.taskTypes.forEach((taskType) => {
+
+        this.jobSet.add(this.taskProps[taskType].job)
+        this.taskProps[taskType].airdrops.forEach((airdrop) => {
+          this.airdropSet.add(airdrop)
+        })
+
+        taskProps[taskType].networks.forEach((network) => {
+          this.networkSet.add(network)
+        })
+      })
+
+      for (const airdrop of this.airdropSet.values()) {
+        this.airdrops.push(airdrop)
+      }
+
+      for (const network of this.networkSet.values()) {
+        this.networks.push(network)
+      }
+
+      for (const job of this.jobSet.values()) {
+        this.taskJobs.push(job)
+      }
+    },
+    taskSpec(item: TaskArg): TaskSpec {
+      return taskProps[item.taskType]
+    },
     taskDescription(item: TaskArg) {
       let base = ''
       if (!item.task) {
@@ -222,6 +348,8 @@ export default defineComponent({
     },
   },
   created() {
+    this.getTaskList()
+
     if (this.labelValue) {
       this.label = this.labelValue
     }

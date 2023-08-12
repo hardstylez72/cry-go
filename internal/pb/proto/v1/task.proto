@@ -36,6 +36,7 @@ enum TaskType {
   ZkSwap = 22;
   TraderJoeSwap = 23;
   MerklyMintAndBridgeNFT = 24;
+  DeployStarkNetAccount = 25;
 }
 
 
@@ -85,6 +86,19 @@ message MerklyMintAndBridgeNFTTask {
     json_schema: {
       required: [
         "from_network", "to_network", "mint_tx","bridge_tx"
+      ]
+    }
+  };
+}
+
+message DeployStarkNetAccountTask {
+  shared.Network network = 1;
+  optional TaskTx tx = 2;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "network", "tx"
       ]
     }
   };

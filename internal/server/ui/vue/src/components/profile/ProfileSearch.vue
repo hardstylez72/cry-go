@@ -1,39 +1,46 @@
 <template>
-  <v-autocomplete
-    chips="true"
-    closable-chips
-    return-object
-    v-model="selectedProfiles"
-    :loading="profilesLoading"
-    @update:search="searchProfiles"
-    :items="suggestedProfiles"
-    item-title="num"
-    item-value="id"
-    :multiple="multiple"
-    :rules="[required]"
-    ref="label-input"
-    label="Нужно выбрать профили, Например 1-10"
-    density="comfortable"
-    variant="outlined"
-    clearable="true"
-    :disabled="disabled"
-    no-data-text="Петушки не нашлись"
-    :hide-no-data="hideNoData"
-  >
-    <template v-slot:chip="{ props, item }">
-      <v-chip
-        v-bind="props"
-        :text="item.value.num"
-      ></v-chip>
-    </template>
-  </v-autocomplete>
+  <div class="my-2">
+    <v-autocomplete
+      chips="true"
+      closable-chips
+      return-object
+      v-model="selectedProfiles"
+      :loading="profilesLoading"
+      @update:search="searchProfiles"
+      :items="suggestedProfiles"
+      item-title="num"
+      item-value="id"
+      :multiple="multiple"
+      :rules="[required]"
+      ref="label-input"
+      label="Нужно выбрать профили, Например 1-10"
+      density="comfortable"
+      variant="outlined"
+      clearable="true"
+      :disabled="disabled"
+      no-data-text="Петушки не нашлись"
+      :hide-no-data="hideNoData"
+    >
+      <template v-slot:chip="{ props, item }">
+        <v-chip
+          v-bind="props"
+          :text="item.value.num"
+        ></v-chip>
+      </template>
+    </v-autocomplete>
+    <v-radio-group v-model="selectProfileType" inline="" hide-details density="compact" :disabled="disabled">
+      Выберите тип профилей:
+      <v-radio class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
+      <v-radio class="mx-8" :value="ProfileType.StarkNet">StarkNet</v-radio>
+    </v-radio-group>
+  </div>
 </template>
 
 <script lang="ts">
 
 import {defineComponent, PropType} from 'vue';
 import {profileService} from "@/generated/services"
-import {Profile} from "@/generated/profile";
+import {Profile, ProfileType} from "@/generated/profile";
 import {shuffleArray, Timer} from "@/components/helper";
 import {required} from "@/components/tasks/menu/helper";
 
@@ -62,9 +69,13 @@ export default defineComponent({
       suggestedProfiles: [] as Profile[],
       timer: new Timer(),
       hideNoData: false,
+      selectProfileType: ProfileType.EVM
     }
   },
   computed: {
+    ProfileType() {
+      return ProfileType
+    },
     selectedProfiles: {
       set(a: Profile[]) {
         this.$emit('update:modelValue', a)
@@ -87,7 +98,12 @@ export default defineComponent({
           try {
             this.hideNoData = true
             this.profilesLoading = true
-            const res = await profileService.profileServiceSearchProfile({body: {pattern: v}})
+            const res = await profileService.profileServiceSearchProfile({
+              body: {
+                pattern: v,
+                type: this.selectProfileType
+              }
+            })
 
             this.suggestedProfiles = []
             this.suggestedProfiles.push(...res.profiles)
@@ -103,7 +119,12 @@ export default defineComponent({
         } else {
           try {
             this.profilesLoading = true
-            const res = await profileService.profileServiceSearchProfile({body: {pattern: v}})
+            const res = await profileService.profileServiceSearchProfile({
+              body: {
+                pattern: v,
+                type: this.selectProfileType
+              }
+            })
             this.suggestedProfiles = []
             this.suggestedProfiles.push(...res.profiles)
           } finally {
@@ -114,7 +135,7 @@ export default defineComponent({
     },
   },
   async mounted() {
-    const res = await profileService.profileServiceSearchProfile({body: {pattern: ""}})
+    const res = await profileService.profileServiceSearchProfile({body: {pattern: "", type: this.selectProfileType}})
     this.suggestedProfiles = res.profiles
   }
 })

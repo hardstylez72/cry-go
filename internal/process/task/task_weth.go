@@ -78,7 +78,7 @@ func (t *WethTask) Run(ctx context.Context, a *Input) (_ *v1.ProcessTask, err er
 
 	if p.GetTx().GetTxId() == "" {
 		b, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-			WalletAddress: profile.WalletAddr,
+			WalletAddress: profile.WalletAddr.String(),
 			Token:         token,
 		})
 		if err != nil {
@@ -154,7 +154,7 @@ func EstimateWethTaskCost(ctx context.Context, p *v1.WETHTask, profile *halp.Pro
 	}
 
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.WalletAddr,
+		WalletAddress: profile.WalletAddr.String(),
 		Token:         token,
 	})
 	if err != nil {

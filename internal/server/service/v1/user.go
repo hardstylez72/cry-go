@@ -21,7 +21,7 @@ func (s *HelperService) GetUser(ctx context.Context, req *v1.GetUserRequest) (*v
 		return nil, status.New(codes.Unauthenticated, "").Err()
 	}
 
-	settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-09")
+	settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-12")
 	if err != nil {
 		return nil, err
 	}

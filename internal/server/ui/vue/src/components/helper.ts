@@ -241,3 +241,68 @@ export const tokenBridgePair = (n1: Network, n2: Network, t1: Token, t2: Token):
     toNetwork: n2,
   }
 }
+
+export interface network {
+  value: Network
+  name: string
+
+  img: string
+}
+
+export const networkProps: Record<Network, network> = {
+  Etherium: {
+    name: 'Ethereum',
+    img: '/icons/networks/ethereum.svg',
+    value: Network.Etherium,
+  },
+  ZKSYNCERA: {
+    name: 'ZkSync Era',
+    img: '/icons/networks/zksync.svg',
+    value: Network.ZKSYNCERA,
+  },
+  ARBITRUM: {
+    name: 'Arbitrum',
+    img: '/icons/networks/arbitrum.svg',
+    value: Network.ARBITRUM,
+  },
+  OPTIMISM: {
+    name: 'Optimism',
+    img: '/icons/networks/optimism.svg',
+    value: Network.OPTIMISM,
+  },
+  AVALANCHE: {
+    name: 'Avalanche',
+    img: '/icons/networks/avalanche.svg',
+    value: Network.AVALANCHE,
+  },
+  GOERLIETH: {
+    name: 'GoerliETH',
+    img: '/icons/networks/goerli.svg',
+    value: Network.GOERLIETH,
+  },
+  BinanaceBNB: {
+    name: 'BNB',
+    img: '/icons/networks/bsc.svg',
+    value: Network.BinanaceBNB,
+  },
+  POLIGON: {
+    name: 'Polygon',
+    img: '/icons/networks/polygon.svg',
+    value: Network.POLIGON,
+  },
+  ZKSYNCERATESTNET: {
+    name: 'ZkSync Era TestNet',
+    img: '/icons/networks/zksync.svg',
+    value: Network.ZKSYNCERATESTNET,
+  },
+  ZKSYNCLITE: {
+    name: 'ZkSync lite',
+    img: '/icons/networks/zksync.svg',
+    value: Network.ZKSYNCLITE,
+  },
+  StarkNet: {
+    name: 'StarkNet',
+    img: '/icons/starknet.svg',
+    value: Network.StarkNet,
+  }
+}

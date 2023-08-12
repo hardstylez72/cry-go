@@ -84,7 +84,7 @@ func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 	if p.GetTx().GetTxId() == "" {
 
 		b, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-			WalletAddress: profile.WalletAddr,
+			WalletAddress: profile.WalletAddr.String(),
 			Token:         p.FromToken,
 		})
 		if err != nil {
@@ -178,7 +178,7 @@ func EstimateMuteioSwapCost(ctx context.Context, profile *halp.Profile, p *v1.Mu
 		return nil, err
 	}
 
-	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: wallet.WalletAddr, Token: p.FromToken})
+	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: wallet.WalletAddr.String(), Token: p.FromToken})
 	if err != nil {
 		return nil, err
 	}

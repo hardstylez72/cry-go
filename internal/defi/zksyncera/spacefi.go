@@ -22,7 +22,7 @@ type spaceFiMaker struct {
 
 // site USDC -> ETH https://explorer.zksync.io/tx/0x701ffd2a41613c5ecc6a1cb10ea19b742404a6b0bf3d88db82216d51eebf1b88
 // me USDC -> ETH https://explorer.zksync.io/tx/0xee4a8f41ae9f32e69cb3205e88d2493ebedd9deac86b6cea9c247d896dafe590
-func (c *Client) SpaceFiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error) {
+func (c *Client) SpaceFiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	return c.GenericSwap(ctx, &spaceFiMaker{c}, req)
 }
 

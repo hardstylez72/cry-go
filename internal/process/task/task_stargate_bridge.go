@@ -154,8 +154,8 @@ func (t *StargateTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 }
 
 type SwapRes struct {
-	Swap      *defi.Transaction
-	Allowance *defi.Transaction
+	Swap      *bozdo.Transaction
+	Allowance *bozdo.Transaction
 	Swapper   defi.StargateSwapper
 }
 
@@ -203,7 +203,7 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 		return nil, nil, err
 	}
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.WalletAddr,
+		WalletAddress: profile.WalletAddr.String(),
 		Token:         p.FromToken,
 	})
 	if err != nil {
@@ -309,7 +309,7 @@ func EstimateStargateBridgeSwapCost(ctx context.Context, p *v1.StargateBridgeTas
 	}
 
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.WalletAddr,
+		WalletAddress: profile.WalletAddr.String(),
 		Token:         p.FromToken,
 	})
 	if err != nil {

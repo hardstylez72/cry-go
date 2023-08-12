@@ -274,7 +274,8 @@ export enum Network {
   'GOERLIETH' = 'GOERLIETH',
   'ZKSYNCERA' = 'ZKSYNCERA',
   'ZKSYNCERATESTNET' = 'ZKSYNCERATESTNET',
-  'ZKSYNCLITE' = 'ZKSYNCLITE'
+  'ZKSYNCLITE' = 'ZKSYNCLITE',
+  'StarkNet' = 'StarkNet'
 }
 
 export enum Token {

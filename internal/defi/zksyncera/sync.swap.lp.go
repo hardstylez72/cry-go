@@ -27,9 +27,9 @@ type SyncSwapLiquidityReq struct {
 }
 
 type SyncSwapLiquidityRes struct {
-	SwapTx           *defi.Transaction
-	ApproveATxHash   *defi.Transaction
-	ApproveBTxHash   *defi.Transaction
+	SwapTx           *bozdo.Transaction
+	ApproveATxHash   *bozdo.Transaction
+	ApproveBTxHash   *bozdo.Transaction
 	EstimatedGasCost *bozdo.EstimatedGasCost
 }
 

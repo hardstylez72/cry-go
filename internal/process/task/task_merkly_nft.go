@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
@@ -81,14 +82,13 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateMerklyMintCost")
 		}
-		res, nftId, _, gas, err := MerklyMintNFT(taskContext, profile, p, client, estimation)
+		res, _, _, gas, err := MerklyMintNFT(taskContext, profile, p, client, estimation)
 		if err != nil {
 			return nil, errors.Wrap(err, "MerklyMintNFT")
 		}
 
 		p.MintTx = NewTx(res.Tx, gas)
-		tmp := nftId.String()
-		p.NftId = &tmp
+
 		if err := a.AddTx(ctx, res.ApproveTx); err != nil {
 			return nil, err
 		}
@@ -107,6 +107,29 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 			return nil, err
 		}
 	}
+
+	nftId, err := client.GetMerklyNFTId(ctx, common.HexToHash(p.GetMintTx().GetTxId()))
+	if err != nil {
+		tx := p.MintTx
+		if tx.RetryCount > 10 {
+			tx.TxCompleted = false
+			tx.RetryCount = 0
+			tx.TxId = ""
+			if err := a.UpdateTask(ctx, task); err != nil {
+				return nil, err
+			}
+		} else {
+			tx.RetryCount++
+			if err := a.UpdateTask(ctx, task); err != nil {
+				return nil, err
+			}
+			return a.Task, nil
+		}
+
+		return nil, err
+	}
+	tmp := nftId.String()
+	p.NftId = &tmp
 
 	// bridge
 	if p.GetBridgeTx().GetTxId() == "" {
@@ -150,7 +173,7 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 	return task, nil
 }
 
-func MerklyMintNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMintAndBridgeNFTTask, client defi.MintAndBridgeNFT, estimation *v1.EstimationTx) (_ *defi.DefaultRes, nftId *big.Int, fee *big.Int, _ *bozdo.Gas, _ error) {
+func MerklyMintNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMintAndBridgeNFTTask, client defi.MintAndBridgeNFT, estimation *v1.EstimationTx) (_ *bozdo.DefaultRes, nftId *big.Int, fee *big.Int, _ *bozdo.Gas, _ error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.FromNetwork)
 	if err != nil {
@@ -194,7 +217,7 @@ func MerklyMintNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMintA
 	return res, nftId, fee, Gas, nil
 }
 
-func MerklyBridgeNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMintAndBridgeNFTTask, client defi.MintAndBridgeNFT, estimation *v1.EstimationTx) (*defi.DefaultRes, *bozdo.Gas, error) {
+func MerklyBridgeNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMintAndBridgeNFTTask, client defi.MintAndBridgeNFT, estimation *v1.EstimationTx) (*bozdo.DefaultRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.FromNetwork)
 	if err != nil {

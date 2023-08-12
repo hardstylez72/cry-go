@@ -157,7 +157,8 @@
         "GOERLIETH",
         "ZKSYNCERA",
         "ZKSYNCERATESTNET",
-        "ZKSYNCLITE"
+        "ZKSYNCLITE",
+        "StarkNet"
       ],
       "default": "ARBITRUM"
     },

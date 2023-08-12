@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 )
 
 type LP interface {
@@ -16,35 +17,35 @@ type LP interface {
 }
 
 type MaverickSwapper interface {
-	MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
+	MaverickSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error)
 	defi.Networker
 }
 
 type SpaceFiSwapper interface {
-	SpaceFiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
+	SpaceFiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error)
 	defi.Networker
 }
 type VelocoreSwapper interface {
-	VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
+	VelocoreSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error)
 	defi.Networker
 }
 
 type IzumiSwapper interface {
-	IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
+	IzumiSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error)
 	defi.Networker
 }
 
 type VeSyncSwapper interface {
-	VeSyncSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
+	VeSyncSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error)
 	defi.Networker
 }
 
 type EzkaliburSwapper interface {
-	EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
+	EzkaliburSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error)
 	defi.Networker
 }
 
 type ZkSwapper interface {
-	ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*defi.DefaultRes, error)
+	ZkSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error)
 	defi.Networker
 }
