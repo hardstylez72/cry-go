@@ -49,6 +49,7 @@ import MenuTaskMerklyNFT from "@/components/tasks/menu/MenuTaskMerklyNFT.vue";
 import TaskMerklyNFT from "@/components/tasks/block/TaskMerklyNFT.vue";
 import TaskDeployStarkNetAccount from "@/components/tasks/block/DeployStarkNetAccount.vue";
 import DeployStarkNetAccount from "@/components/tasks/menu/DeployStarkNetAccount.vue";
+import {ProfileType} from "@/generated/profile";
 
 
 export interface TaskArg {
@@ -74,6 +75,8 @@ export interface TaskSpec {
 
   airdrops: Set<Airdrop>
   job: TaskJob
+
+  profileType: Set<ProfileType>
 }
 
 export enum TaskJob {
@@ -139,7 +142,8 @@ const deprecated: TaskSpec = {
   },
   job: TaskJob.Other,
   networks: new Set<Network>(allNetworks),
-  airdrops: new Set<Airdrop>()
+  airdrops: new Set<Airdrop>(),
+  profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
 }
 
 export const taskProps: Record<TaskType, TaskSpec> = {
@@ -160,7 +164,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Other,
     networks: new Set<Network>(allNetworks),
-    airdrops: new Set<Airdrop>(Universal)
+    airdrops: new Set<Airdrop>(Universal),
+    profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
   },
   StargateBridge: {
     deprecated: false,
@@ -185,7 +190,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       Network.ARBITRUM,
       Network.ZKSYNCERA]),
     job: TaskJob.Bridge,
-    airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   WithdrawExchange: {
     deprecated: false,
@@ -204,7 +210,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Exchange,
     networks: new Set<Network>(allNetworks),
-    airdrops: new Set<Airdrop>(Universal)
+    airdrops: new Set<Airdrop>(Universal),
+    profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
   },
   OkexDeposit: {
     deprecated: false,
@@ -223,7 +230,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Exchange,
     networks: new Set<Network>(allNetworks),
-    airdrops: new Set<Airdrop>(Universal)
+    airdrops: new Set<Airdrop>(Universal),
+    profileType: new Set([ProfileType.EVM])
   },
   TestNetBridgeSwap: {
     deprecated: false,
@@ -242,7 +250,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Bridge,
     networks: new Set<Network>([Network.ARBITRUM]),
-    airdrops: new Set<Airdrop>([Airdrop.LayerZero])
+    airdrops: new Set<Airdrop>([Airdrop.LayerZero]),
+    profileType: new Set([ProfileType.EVM])
   },
   SnapshotVote: {
     deprecated: false,
@@ -258,11 +267,11 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       img: '/icons/snapshot.png',
       link: 'https://snapshot.org/#/',
       op: 'vote',
-
     },
     job: TaskJob.Other,
     networks: new Set<Network>([Network.ARBITRUM]),
-    airdrops: new Set<Airdrop>(Universal)
+    airdrops: new Set<Airdrop>(Universal),
+    profileType: new Set([ProfileType.EVM])
   },
   SyncSwap: {
     deprecated: false,
@@ -281,7 +290,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     networks: new Set<Network>([Network.ZKSYNCERA]),
     job: TaskJob.Swap,
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   ZkSyncOfficialBridgeToEthereum: {
     deprecated: false,
@@ -300,7 +310,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Bridge,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   Mock: deprecated,
   OkexBinance: deprecated,
@@ -322,7 +333,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Bridge,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>(Universal)
+    airdrops: new Set<Airdrop>(Universal),
+    profileType: new Set([ProfileType.EVM])
   },
   ZkSyncOfficialBridgeFromEthereum: {
     deprecated: false,
@@ -341,7 +353,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Bridge,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   WETH: {
     deprecated: false,
@@ -359,7 +372,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   MuteioSwap: {
     deprecated: false,
@@ -378,7 +392,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   SyncSwapLP: {
     deprecated: false,
@@ -397,7 +412,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.LP,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   MaverickSwap: {
     deprecated: false,
@@ -416,7 +432,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync, Airdrop.LayerZero])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync, Airdrop.LayerZero]),
+    profileType: new Set([ProfileType.EVM])
   },
   SpaceFISwap: {
     deprecated: false,
@@ -435,7 +452,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   VelocoreSwap: {
     deprecated: false,
@@ -454,7 +472,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   IzumiSwap: {
     deprecated: false,
@@ -473,7 +492,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   VeSyncSwap: {
     deprecated: false,
@@ -492,7 +512,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   EzkaliburSwap: {
     deprecated: false,
@@ -511,7 +532,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   ZkSwap: {
     deprecated: false,
@@ -530,7 +552,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   TraderJoeSwap: {
     deprecated: false,
@@ -549,7 +572,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Swap,
     networks: new Set<Network>([Network.ARBITRUM]),
-    airdrops: new Set<Airdrop>(Universal)
+    airdrops: new Set<Airdrop>(Universal),
+    profileType: new Set([ProfileType.EVM])
   },
   MerklyMintAndBridgeNFT: {
     deprecated: false,
@@ -568,7 +592,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.NFT,
     networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync])
+    airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
   DeployStarkNetAccount: {
     deprecated: false,
@@ -587,7 +612,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     },
     job: TaskJob.Other,
     networks: new Set<Network>([Network.StarkNet]),
-    airdrops: new Set<Airdrop>([Airdrop.StarkNet])
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.StarkNet])
   },
 }
 

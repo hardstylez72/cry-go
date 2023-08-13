@@ -21,8 +21,8 @@ import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";
 import {getAmountSend, getStatusColor} from "@/components/tasks/menu/helper";
 import {link} from "@/components/tasks/links";
-import GasOptions from "@/components/tasks/menu/TaskDetails.vue";
-import MenuTaskSettings from "@/components/tasks/menu/MenuTaskSettings.vue";
+import GasOptions from "@/components/tasks/menu/Details.vue";
+import MenuTaskSettings from "@/components/tasks/menu/Settings.vue";
 import {taskProps} from "../tasks";
 
 export default defineComponent({

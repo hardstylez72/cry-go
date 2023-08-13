@@ -47,6 +47,14 @@ import {required} from "@/components/tasks/menu/helper";
 export default defineComponent({
   name: "ProfileSearch",
   emits: ['update:modelValue'],
+  watch: {
+    selectProfileType: {
+      handler() {
+        this.selectedProfiles = []
+        this.searchProfiles()
+      }
+    }
+  },
   props: {
     multiple: {
       type: Boolean,

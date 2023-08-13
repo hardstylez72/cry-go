@@ -1,13 +1,18 @@
 <template>
   <v-row class="mx-5">
     <v-col cols="5" v-if="!isMobile">
-      <div style="position: fixed; font-size: 18px; width: 30%">
+      <v-card style="position: fixed; font-size: 18px; width: 30%" class="px-1 py-1">
+        Сценарий
         <ol>
-          <li v-for="(item) in tasks" class="my-2">
-            <b>{{ item.taskType }}</b> <span>{{ taskDescription(item) }}</span>
+          <li v-for="(item, index) in tasks" class="my-2 d-inline-flex">
+            {{ index + 1 }}) <b>{{ item.taskType }}</b>
+            <a target="_blank" :href="taskSpec(item).service.link" class="mx-1">
+              <v-img style="background-color: lightgray" height="22px" :src="taskSpec(item).service.img"/>
+            </a>
+            <span>{{ taskDescription(item) }}</span>
           </li>
         </ol>
-      </div>
+      </v-card>
     </v-col>
 
     <v-col>
@@ -32,32 +37,31 @@
         @end="orderChanged"
         item-key="weight"
         :animation="100"
-        :componentData="componentData"
         handle=".handle"
       >
         <template #item="{element}">
           <v-row class="d-flex justify-space-between">
             <v-col>
               <v-card>
-                <v-card-title v-if="!disable" class="d-flex justify-space-between px-0 align-center">
+                <div class="d-inline-flex my-1 mx-1">
+                  Доступна для типов профилей: [
+                  <div v-for="t of taskSpec(element).profileType.values()"><b>{{ t }}</b></div>
+                  ]
+                </div>
+
+                <v-card-title class="d-flex justify-space-between px-0 align-center">
                   <div class="d-inline-flex align-center">
-                    <h4>
+                    <h4 v-if="!disable">
                       <v-icon icon="mdi-dots-vertical" class="handle" @click="() => {}"/>
-                      {{ `${element.weight}) ${element.taskType}` }}
                     </h4>
+                    <h4 class="mx-2">{{ `${element.weight}) ${element.taskType}` }}</h4>
                     <a target="_blank" :href="taskSpec(element).service.link" class="mx-1">
                       <v-img height="22px" :src="taskSpec(element).service.img"/>
                     </a>
                   </div>
 
-                  <v-icon icon="mdi-close" @click="taskDeleted(element.weight)"></v-icon>
+                  <v-icon v-if="!disable" icon="mdi-close" @click="taskDeleted(element.weight)"></v-icon>
                 </v-card-title>
-                <v-card-title v-else class="px-2">
-                  <h4>
-                    {{ `${element.weight}) ${element.taskType}` }}
-                  </h4>
-                </v-card-title>
-
                 <component
                   @taskChanged="taskChanged"
                   style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;"

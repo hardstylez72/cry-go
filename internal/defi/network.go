@@ -18,6 +18,6 @@ func (c *EtheriumClient) SuggestGasPrice(ctx context.Context) (*big.Int, error) 
 }
 
 func (c *EtheriumClient) GetPublicKey(pk string) string {
-	t, _ := NewWalletTransactor(pk)
+	t, _ := newWalletTransactor(pk)
 	return t.WalletAddrHR
 }

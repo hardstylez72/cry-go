@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/exchange"
 	"github.com/hardstylez72/cry/internal/exchange/binance"
 	"github.com/hardstylez72/cry/internal/exchange/okex"
@@ -27,13 +27,15 @@ type WithdrawerService struct {
 	repository        repository.WithdrawerRepository
 	userRepository    repository.UserRepository
 	profileRepository repository.ProfileRepository
+	starkNetClient    *starknet.Client
 }
 
-func NewWithdrawerService(repository repository.WithdrawerRepository, userRepository repository.UserRepository, profileRepository repository.ProfileRepository) *WithdrawerService {
+func NewWithdrawerService(repository repository.WithdrawerRepository, userRepository repository.UserRepository, profileRepository repository.ProfileRepository, starkNetClient *starknet.Client) *WithdrawerService {
 	return &WithdrawerService{
 		repository:        repository,
 		userRepository:    userRepository,
 		profileRepository: profileRepository,
+		starkNetClient:    starkNetClient,
 	}
 }
 
@@ -433,16 +435,15 @@ func (s *WithdrawerService) Withdraw(ctx context.Context, req *v1.WithdrawReq) (
 		}, nil
 	}
 
-	wallet, err := defi.NewWalletTransactor(string(profile.MmskPk))
+	p, err := profile.ToPB(s.starkNetClient)
 	if err != nil {
 		e := err.Error()
 		return &v1.WithdrawRes{
 			ErrorMessage: &e,
 		}, nil
 	}
-
 	res, err := wd.Withdraw(ctx, &exchange.WithdrawRequest{
-		ToAddress: wallet.WalletAddrHR,
+		ToAddress: p.MmskId,
 		Amount:    req.Amount,
 		Network:   req.Network,
 		Token:     req.Token,

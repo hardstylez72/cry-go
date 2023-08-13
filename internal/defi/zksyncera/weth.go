@@ -27,7 +27,7 @@ func (c *Client) WrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRes,
 
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewWalletTransactor")
+		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
 	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
@@ -78,7 +78,7 @@ func (c *Client) UnWrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRe
 
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewWalletTransactor")
+		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
 	w, err := accounts.NewWallet(wtx.Signer, c.Provider)

@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/exchange"
 	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -120,7 +119,7 @@ func (t *WithdrawExchange) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 		}
 	}
 
-	profile, err := a.ProfileRepository.GetProfile(ctx, a.ProfileId)
+	profile, err := a.Halper.Profile(ctx, a.ProfileId)
 	if err != nil {
 		return nil, errors.Wrap(err, "ProfileRepository.GetProfile")
 	}
@@ -130,20 +129,15 @@ func (t *WithdrawExchange) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 		return nil, errors.Wrap(err, "WithdrawerRepository.GetWithdrawer")
 	}
 
-	exchangeWithdrawer, err := uniclient.NewExchangeWithdrawer(withdrawer, profile)
+	exchangeWithdrawer, err := uniclient.NewExchangeWithdrawer(withdrawer, profile.DB)
 	if err != nil {
 		return nil, errors.Wrap(err, "uniclient.NewExchangeWithdrawer")
-	}
-
-	transactor, err := defi.NewWalletTransactor(string(profile.MmskPk))
-	if err != nil {
-		return nil, errors.Wrap(err, "defi.NewWalletTransactor")
 	}
 
 	if p.UseExternalAddr != nil && *p.UseExternalAddr {
 
 	} else {
-		p.WithdrawAddr = &transactor.WalletAddrHR
+		p.WithdrawAddr = &profile.Addr
 	}
 
 	if p.SendAllCoins != nil && *p.SendAllCoins {

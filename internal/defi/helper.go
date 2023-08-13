@@ -65,6 +65,9 @@ func EthToUsd(e *big.Float, price float64) *big.Float {
 }
 
 func WEIToEther(wei *big.Int) *big.Float {
+	if wei == nil {
+		return big.NewFloat(0)
+	}
 	return new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(params.Ether))
 }
 
@@ -73,11 +76,6 @@ func CastFloatToEtherWEI(wei float64) *big.Int {
 	i, _ := f.Int64()
 
 	return big.NewInt(i)
-}
-
-func WEIToUSD(wei *big.Int) *big.Float {
-	eth := new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(params.Ether))
-	return new(big.Float).Mul(eth, big.NewFloat(ETHPrice))
 }
 
 func WeiToToken(wei *big.Int, token Token) *big.Float {

@@ -14,7 +14,7 @@ import (
 
 type TestNetBridgeSwapReq struct {
 	Network Network
-	Wallet  *WalletTransactor
+	PK      string
 	Amount  *big.Int
 	Gas     *GasLimit
 }
@@ -34,7 +34,7 @@ func (r *TestNetBridgeSwapReq) Validate() error {
 		return errors.New("empty request")
 	}
 
-	if r.Wallet == nil {
+	if r.PK == "" {
 		return errors.New("wallet is empty")
 	}
 
@@ -98,6 +98,10 @@ func (c *EtheriumClient) TestNetBridgeSwap(ctx context.Context, req *TestNetBrid
 		return nil, errors.Wrap(err, "TestNetBridgeSwap")
 	}
 
+	tr, err := newWalletTransactor(req.PK)
+	if err != nil {
+		return nil, err
+	}
 	trx, err := testnetbridge.NewTestnetbridgeTransactor(c.Cfg.Dict.TestNetBridgeSwapAddress, c.Cli)
 	if err != nil {
 		return nil, err
@@ -108,7 +112,7 @@ func (c *EtheriumClient) TestNetBridgeSwap(ctx context.Context, req *TestNetBrid
 		return nil, err
 	}
 
-	opt, err := bind.NewKeyedTransactorWithChainID(req.Wallet.PrivateKey, chainID)
+	opt, err := bind.NewKeyedTransactorWithChainID(tr.PrivateKey, chainID)
 	if err != nil {
 		return nil, errors.Wrap(err, "bind.NewKeyedTransactorWithChainID")
 	}
@@ -120,7 +124,7 @@ func (c *EtheriumClient) TestNetBridgeSwap(ctx context.Context, req *TestNetBrid
 
 	fee, err := c.GetStargateBridgeFee(ctx, &GetStargateBridgeFeeReq{
 		ToChain: v1.Network_AVALANCHE,
-		Wallet:  req.Wallet.WalletAddr,
+		Wallet:  tr.WalletAddr,
 	})
 	if err != nil {
 		return nil, err
@@ -128,7 +132,7 @@ func (c *EtheriumClient) TestNetBridgeSwap(ctx context.Context, req *TestNetBrid
 
 	opt.Value = big.NewInt(0).Add(req.Amount, fee.Fee1)
 
-	tx, err := trx.SwapAndBridge(opt, req.Amount, goerliEthAmount, dstChainId, req.Wallet.WalletAddr, req.Wallet.WalletAddr, zeroPaymentAddr, nil)
+	tx, err := trx.SwapAndBridge(opt, req.Amount, goerliEthAmount, dstChainId, tr.WalletAddr, tr.WalletAddr, zeroPaymentAddr, nil)
 	if err != nil {
 		return nil, err
 	}

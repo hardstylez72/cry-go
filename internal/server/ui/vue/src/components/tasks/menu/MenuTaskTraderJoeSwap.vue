@@ -29,8 +29,8 @@ import {ProcessStatus} from "@/generated/process";
 import {getAmountSend} from "./helper";
 import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
-import GasOptions from "@/components/tasks/menu/TaskDetails.vue";
-import MenuTaskSettings from "@/components/tasks/menu/MenuTaskSettings.vue";
+import GasOptions from "@/components/tasks/menu/Details.vue";
+import MenuTaskSettings from "@/components/tasks/menu/Settings.vue";
 
 export default defineComponent({
   name: "MenuTaskTraderJoeSwap",

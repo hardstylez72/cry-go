@@ -349,16 +349,6 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 		return nil, err
 	}
 
-	dispatcher := process.NewDispatcher(
-		processRepository,
-		runner,
-		snapshotService,
-		settingsService,
-		payService,
-		orbiterService,
-	)
-	go dispatcher.RunDispatcher(ctx)
-
 	starknetNewClient, err := starknet.NewClient(&starknet.ClientConfig{
 		HttpCli:     &http.Client{},
 		RPCEndpoint: starknet.MainnetRPC,
@@ -367,10 +357,21 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 		return nil, err
 	}
 
+	dispatcher := process.NewDispatcher(
+		processRepository,
+		runner,
+		snapshotService,
+		settingsService,
+		payService,
+		orbiterService,
+		starknetNewClient,
+	)
+	go dispatcher.RunDispatcher(ctx)
+
 	return &services{
 		profileService:       v1.NewProfileService(profileRepository, settingsService, starknetNewClient),
 		helperService:        v1.NewHelperService(settingsService, profileRepository, userRepository, payService, statRepository, processRepository, tgBot),
-		withdrawerService:    v1.NewWithdrawerService(withdrawerRepository, userRepository, profileRepository),
+		withdrawerService:    v1.NewWithdrawerService(withdrawerRepository, userRepository, profileRepository, starknetNewClient),
 		flowService:          v1.NewFlowService(flowRepository),
 		processService:       v1.NewProcessService(processRepository, dispatcher, flowRepository, settingsService),
 		settingsService:      v1.NewSettingsService(settingsService),

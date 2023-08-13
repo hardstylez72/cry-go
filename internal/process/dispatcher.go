@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/lib"
 	"github.com/hardstylez72/cry/internal/log"
 	"github.com/hardstylez72/cry/internal/orbiter"
@@ -44,6 +45,7 @@ type Dispatcher struct {
 	haalp           *halp.Halp
 	payService      *pay.Service
 	orbiterService  *orbiter.Service
+	starknetcClient *starknet.Client
 }
 
 func NewDispatcher(
@@ -53,6 +55,7 @@ func NewDispatcher(
 	settingsService *settings.Service,
 	payService *pay.Service,
 	orbiterService *orbiter.Service,
+	starknetcClient *starknet.Client,
 ) *Dispatcher {
 	d := &Dispatcher{
 		pTable:          lib.NewMap[processId, *pTable](),
@@ -66,9 +69,10 @@ func NewDispatcher(
 			ActiveProfiles:  NewCounter(),
 			ActiveTasks:     NewCounter(),
 		},
-		haalp:          halp.NewHalp(runner.profileRepository, settingsService),
-		payService:     payService,
-		orbiterService: orbiterService,
+		haalp:           halp.NewHalp(runner.profileRepository, settingsService, starknetcClient),
+		payService:      payService,
+		orbiterService:  orbiterService,
+		starknetcClient: starknetcClient,
 	}
 
 	return d
@@ -163,6 +167,10 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 		}
 		out = append(out, e1)
 		return out, nil
+	case v1.TaskType_DeployStarkNetAccount:
+		p := t.Task.Task.(*v1.Task_DeployStarkNetAccountTask).DeployStarkNetAccountTask
+		e, err = task.EstimateDeployStarkNetAccountCost(ctx, profile, p, nil)
+
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
 	}

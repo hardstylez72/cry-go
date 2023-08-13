@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository"
@@ -17,13 +18,17 @@ import (
 type Halp struct {
 	profileRepository repository.ProfileRepository
 	settingsService   *settings.Service
+	starknetClient    *starknet.Client
 }
 
-func NewHalp(profileRepository repository.ProfileRepository,
-	settingsService *settings.Service) *Halp {
+func NewHalp(
+	profileRepository repository.ProfileRepository,
+	settingsService *settings.Service,
+	starknetClient *starknet.Client) *Halp {
 	return &Halp{
 		profileRepository: profileRepository,
 		settingsService:   settingsService,
+		starknetClient:    starknetClient,
 	}
 }
 
@@ -34,9 +39,12 @@ type Profile struct {
 	Id          string
 	DB          *repository.Profile
 	ProxyString string
-	WalletAddr  common.Address
-	WalletPK    string
-	Wallet      *defi.WalletTransactor
+	//deprecated
+	WalletAddr common.Address
+	WalletPK   string
+	Addr       string
+	//deprecated
+	Wallet *defi.WalletTransactor
 }
 
 func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) {
@@ -51,7 +59,7 @@ func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) 
 		proxyString = profile.Proxy.String
 	}
 
-	tx, err := defi.NewWalletTransactor(string(profile.MmskPk))
+	p, err := profile.ToPB(h.starknetClient)
 	if err != nil {
 		return nil, err
 	}
@@ -59,12 +67,11 @@ func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) 
 		UserAgent:   profile.UserAgent,
 		DB:          profile,
 		ProxyString: proxyString,
-		WalletAddr:  tx.WalletAddr,
-		WalletPK:    tx.PK,
-		Wallet:      tx,
+		WalletPK:    string(profile.MmskPk),
 		Id:          profileId,
 		UserId:      profile.UserId,
 		h:           h,
+		Addr:        p.MmskId,
 	}, nil
 }
 
@@ -106,30 +113,20 @@ func (p *Settings) EraWallet() (*zksyncera.WalletTransactor, error) {
 	return wallet, nil
 }
 
-func (p *Profile) EthWallet() (*defi.WalletTransactor, error) {
-
-	wallet, err := defi.NewWalletTransactor(string(p.DB.MmskPk))
-	if err != nil {
-		return nil, err
-	}
-
-	return wallet, nil
-}
-
-func (p *Settings) GetWalletAddr() (*common.Address, error) {
-	var walletAddr common.Address
+func (p *Settings) GetWalletAddr() (*string, error) {
+	var walletAddr string
 	if p.Source.Network == v1.Network_ZKSYNCERA || p.Source.GetNetwork() == v1.Network_ZKSYNCLITE {
 		w, err := p.EraWallet()
 		if err != nil {
 			return nil, err
 		}
-		walletAddr = w.WalletAddr
+		walletAddr = w.WalletAddr.String()
 	} else {
-		w, err := p.p.EthWallet()
+		w, err := defi.GetEMVPublicKey(string(p.p.DB.MmskPk))
 		if err != nil {
 			return nil, err
 		}
-		walletAddr = w.WalletAddr
+		walletAddr = w
 	}
 	return &walletAddr, nil
 }

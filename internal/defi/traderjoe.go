@@ -18,7 +18,7 @@ func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq)
 
 	result := &bozdo.DefaultRes{}
 
-	tr, err := NewWalletTransactor(req.WalletPK)
+	tr, err := newWalletTransactor(req.WalletPK)
 	if err != nil {
 		return nil, err
 	}

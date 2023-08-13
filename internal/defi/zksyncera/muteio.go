@@ -49,7 +49,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewWalletTransactor")
+		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
 	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
@@ -114,7 +114,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewWalletTransactor")
+		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
 	w, err := accounts.NewWallet(wtx.Signer, c.Provider)

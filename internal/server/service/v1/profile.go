@@ -119,11 +119,11 @@ func (s *ProfileService) CreateProfile(ctx context.Context, req *v1.CreateProfil
 
 	switch req.Type {
 	case v1.ProfileType_EVM:
-		w, err := defi.NewWalletTransactor(req.MmskPk)
+		w, err := defi.GetEMVPublicKey(req.MmskPk)
 		if err != nil {
 			return nil, errors.New("invalid pk")
 		}
-		a.MmskId = []byte(w.WalletAddrHR)
+		a.MmskId = []byte(w)
 	case v1.ProfileType_StarkNet:
 		publicKey, err := starknet.GetPublicKeyHash(req.MmskPk)
 		if err != nil {
@@ -233,7 +233,7 @@ func (s *ProfileService) SearchProfile(ctx context.Context, req *v1.SearchProfil
 		return nil, err
 	}
 
-	profiles, err := s.repository.SearchProfile(ctx, req.Pattern, userId)
+	profiles, err := s.repository.SearchProfile(ctx, req.Pattern, userId, req.GetType().String())
 	if err != nil {
 		return nil, err
 	}

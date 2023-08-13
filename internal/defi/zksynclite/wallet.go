@@ -1,4 +1,4 @@
-package defi
+package zksynclite
 
 import (
 	"crypto/ecdsa"
@@ -16,14 +16,6 @@ type WalletTransactor struct {
 	WalletAddrHR string
 	PK           string
 	PKb          []byte
-}
-
-func GetEMVPublicKey(s string) (string, error) {
-	w, err := newWalletTransactor(s)
-	if err != nil {
-		return "", err
-	}
-	return w.WalletAddrHR, nil
 }
 
 func newWalletTransactor(privateKey string) (*WalletTransactor, error) {

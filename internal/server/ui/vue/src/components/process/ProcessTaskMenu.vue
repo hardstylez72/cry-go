@@ -23,8 +23,14 @@
 
           <span class="d-flex justify-space-between">
             <div>
-               <h3>{{ task.task.taskType }}
-                 <StatusCard :status="task.status"/>
+               <h3 class="d-inline-flex">
+                   {{ taskSpec(task.task.taskType).service.name }}
+                   <a target="_blank" :href="taskSpec(task.task.taskType).service.link" class="mx-1">
+                    <v-img height="22px" :src="taskSpec(task.task.taskType).service.img"/>
+                   </a>
+               </h3>
+              <div>
+               <StatusCard :status="task.status"/>
                <v-menu v-model="details" :close-on-back="false" :close-on-content-click="false"
                        location="end" width="400px">
                 <template v-slot:activator="{ props }">
@@ -39,13 +45,14 @@
                     <div>{{ getDescription }}</div></v-card-text>
                 </v-card>
               </v-menu>
-                 </h3>
+              </div>
             </div>
             <v-icon icon="mdi-close" @click="menu = false"/>
           </span>
 
           <br/>
-          <component :is="getTaskMenuComponent" :task="task.task" :status="task.status"/>
+          <component :is="getTaskMenuComponent" :task="task.task" :status="task.status"
+          />
           <br/>
           <div v-if="getRecords.length > 0">History:</div>
 
@@ -94,8 +101,8 @@ import ViewFlow from "@/components/flow/ViewFlow.vue";
 import StatusCard from "@/components/StatusCard.vue";
 import {Delay, formatTime, GetStatusColor, GetStatusText} from "@/components/helper";
 import dayjs from "dayjs";
-import {estimatedTaskMap, menuTaskComponentMap} from '@/components/tasks/tasks'
-import EstimateTask from "@/components/tasks/menu/EstimateTask.vue";
+import {estimatedTaskMap, menuTaskComponentMap, TaskArg, taskProps, TaskSpec} from '@/components/tasks/tasks'
+import EstimateTask from "@/components/tasks/menu/Estimate.vue";
 import Support from "@/components/Support.vue";
 
 export default defineComponent({
@@ -236,6 +243,9 @@ export default defineComponent({
         return true
       }
       return false
+    },
+    taskSpec(item: TaskType): TaskSpec {
+      return taskProps[item]
     },
     async loadHistory() {
       if (!this.menu) {

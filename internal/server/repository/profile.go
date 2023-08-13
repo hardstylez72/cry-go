@@ -56,11 +56,11 @@ func (a *Profile) ToPB(starkNetClient *starknet.Client) (*v1.Profile, error) {
 	publicKey := ""
 	switch pType {
 	case v1.ProfileType_EVM:
-		transactor, err := defi.NewWalletTransactor(string(a.MmskPk))
+		pub, err := defi.GetEMVPublicKey(string(a.MmskPk))
 		if err != nil {
 			return nil, err
 		}
-		publicKey = transactor.WalletAddrHR
+		publicKey = pub
 	case v1.ProfileType_StarkNet:
 		publicKey = starkNetClient.GetPublicKey(string(a.MmskPk))
 	}
@@ -222,15 +222,15 @@ where p.id not in (select profile_id from okex_deposit_addr_profile) and p.user_
 
 	return out, nil
 }
-func (r *pgRepository) SearchProfile(ctx context.Context, pattern, userId string) ([]Profile, error) {
+func (r *pgRepository) SearchProfile(ctx context.Context, pattern, userId, profileType string) ([]Profile, error) {
 
 	q := ``
 	out := make([]Profile, 0)
 
 	if pattern == "" || pattern == "*" {
-		q := Join(`select `, prfh.Cols(), ` from profiles where user_id = $1 and deleted_at is null order by num asc limit 10`)
+		q := Join(`select `, prfh.Cols(), ` from profiles where user_id = $1 and type = $2 and deleted_at is null order by num asc limit 10`)
 
-		if err := r.conn.SelectContext(ctx, &out, q, userId); err != nil {
+		if err := r.conn.SelectContext(ctx, &out, q, userId, profileType); err != nil {
 			return nil, err
 		}
 	} else if strings.Contains(pattern, "-") {
@@ -249,9 +249,9 @@ func (r *pgRepository) SearchProfile(ctx context.Context, pattern, userId string
 			return nil, errors.New("mask is D-D")
 		}
 
-		q := Join(`select `, prfh.Cols(), ` from profiles where user_id = $1 and num >= $2 and num <= $3 and deleted_at is null order by num asc limit 100`)
+		q := Join(`select `, prfh.Cols(), ` from profiles where user_id = $1 and num >= $2 and num <= $3 and deleted_at is null and type = $4 order by num asc limit 100`)
 
-		if err := r.conn.SelectContext(ctx, &out, q, userId, from, to); err != nil {
+		if err := r.conn.SelectContext(ctx, &out, q, userId, from, to, profileType); err != nil {
 			return nil, err
 		}
 	} else {
@@ -260,9 +260,9 @@ func (r *pgRepository) SearchProfile(ctx context.Context, pattern, userId string
 			return nil, errors.New("mask is D")
 		}
 
-		q = Join(`select `, prfh.Cols(), ` from profiles where user_id = $1 and num = $2 and deleted_at is null`)
+		q = Join(`select `, prfh.Cols(), ` from profiles where user_id = $1 and num = $2 and deleted_at is null and type = $3`)
 
-		if err := r.conn.SelectContext(ctx, &out, q, userId, num); err != nil {
+		if err := r.conn.SelectContext(ctx, &out, q, userId, num, profileType); err != nil {
 			return nil, err
 		}
 	}

@@ -55,14 +55,14 @@ func (s *HelperService) EstimateStargateBridgeFee(ctx context.Context, req *v1.E
 	return nil, errors.New("deprecated")
 }
 func (s *HelperService) ValidatePK(ctx context.Context, req *v1.ValidatePKRequest) (*v1.ValidatePKResponse, error) {
-	w, err := defi.NewWalletTransactor(req.Pk)
+	w, err := defi.GetEMVPublicKey(req.Pk)
 	if err != nil {
 		return &v1.ValidatePKResponse{
 			Valid:    false,
 			WalletId: nil,
 		}, nil
 	}
-	addr := w.WalletAddr.String()
+	addr := w
 	return &v1.ValidatePKResponse{
 		Valid:    true,
 		WalletId: &addr,

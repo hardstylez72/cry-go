@@ -23,7 +23,7 @@ import (
 func (c *Client) BridgeToEthereumNetwork(ctx context.Context, req *L1L2BridgeReq) (*L1L2BridgeRes, error) {
 	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewWalletTransactor")
+		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
 	w, err := accounts.NewWallet(wtx.Signer, c.Provider)

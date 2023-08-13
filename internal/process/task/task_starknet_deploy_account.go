@@ -119,6 +119,14 @@ func DeployStarkNetAccount(ctx context.Context, profile *halp.Profile, p *v1.Dep
 		}
 	}
 
+	isDeployed, err := client.IsAccountDeployed(ctx, profile.WalletPK)
+	if err != nil {
+		return nil, nil, err
+	}
+	if *isDeployed {
+		return nil, nil, errors.New("account already deployed on starknet")
+	}
+
 	balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
 		WalletAddress: client.GetPublicKey(profile.WalletPK),
 		Token:         v1.Token_ETH,
@@ -133,7 +141,7 @@ func DeployStarkNetAccount(ctx context.Context, profile *halp.Profile, p *v1.Dep
 		Gas = nil
 	} else {
 		if balance.Float == 0 {
-			return nil, nil, ErrUserHasNoBalance
+			return nil, nil, ErrAccountIsZero
 		}
 
 		gas, err := GasManager(estimation, s.Source, p.Network)

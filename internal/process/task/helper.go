@@ -14,15 +14,23 @@ import (
 
 func GasStation(ecost *bozdo.EstimatedGasCost, network v1.Network) *v1.EstimationTx {
 	result := &v1.EstimationTx{}
-	result.GasLimit = defi.AmountUni(ecost.GasLimit, network)
-	result.GasPrice = defi.AmountUni(ecost.GasPrice, network)
-	result.Gas = defi.AmountUni(ecost.TotalGasWei, network)
+	switch ecost.Type {
+	case bozdo.TxTypeStarkNet:
+		result.Gas = defi.AmountUni(ecost.TotalGasWei, network)
+		result.GasValuePercent = ""
+		result.Name = ecost.Name
+		result.Details = CastDetails(ecost.Details)
+		return result
+	default:
+		result.GasLimit = defi.AmountUni(ecost.GasLimit, network)
+		result.GasPrice = defi.AmountUni(ecost.GasPrice, network)
+		result.Gas = defi.AmountUni(ecost.TotalGasWei, network)
 
-	result.GasValuePercent = ""
-	result.Name = ecost.Name
-	result.Details = CastDetails(ecost.Details)
-
-	return result
+		result.GasValuePercent = ""
+		result.Name = ecost.Name
+		result.Details = CastDetails(ecost.Details)
+		return result
+	}
 }
 
 func ResolveNetworkTokenAmount(balance, gas, value *big.Int) *big.Int {

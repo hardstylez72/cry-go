@@ -14,7 +14,7 @@
 
 import {defineComponent} from 'vue';
 import {Network} from "@/generated/flow";
-import SettingsNetwork from "@/components/settings/SettingsNetwork.vue";
+import SettingsNetwork from "@/components/settings/Network.vue";
 import WEIInputField from "@/components/WEIInputField.vue";
 import Loader from "@/components/Loader.vue";
 import NavBar from "@/components/NavBar.vue";

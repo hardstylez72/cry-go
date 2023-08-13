@@ -141,7 +141,7 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 					SettingsService:      d.settingsService,
 					Snapshot:             d.snapshotService,
 					User:                 u,
-					Halper:               halp.NewHalp(d.runner.profileRepository, d.settingsService),
+					Halper:               halp.NewHalp(d.runner.profileRepository, d.settingsService, d.starknetcClient),
 					PayService:           d.payService,
 					Orbiter:              d.orbiterService,
 				})

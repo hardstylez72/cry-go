@@ -1,7 +1,4 @@
 <template>
-  <a target="_blank" :href="spec.service.link">
-    <v-img height="22px" :src="spec.service.img"/>
-    {{ spec.service.name }}</a>
   <MenuTaskSettings :network="item.network"/>
   <div><b>Status: </b> <span :style="'color: ' + getStatusColor(getStatus)">{{ getStatus }}</span></div>
   <div>Network: <b>{{ item.network }}</b></div>
@@ -15,7 +12,7 @@ import {ProcessStatus} from "@/generated/process";
 import {getStatusColor} from "@/components/tasks/menu/helper";
 import {link} from "@/components/tasks/links";
 import {TaskSpec} from "@/components/tasks/tasks";
-import MenuTaskSettings from "@/components/tasks/menu/MenuTaskSettings.vue";
+import MenuTaskSettings from "@/components/tasks/menu/Settings.vue";
 
 
 interface Proposal {

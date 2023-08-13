@@ -174,7 +174,7 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 
 	wtx, err := NewWalletTransactor(r.Pk, c.NetworkId)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewWalletTransactor")
+		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
 	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
@@ -265,7 +265,7 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 
 	wtx, err := NewWalletTransactor(r.Pk, c.NetworkId)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewWalletTransactor")
+		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
 	w, err := accounts.NewWallet(wtx.Signer, c.Provider)

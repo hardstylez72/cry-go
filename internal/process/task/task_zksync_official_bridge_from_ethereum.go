@@ -72,7 +72,7 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Run(ctx context.Context, a *Input
 		return nil, err
 	}
 
-	ethClient, _, err := NewEthClient(taskContext, a.Halper, a.ProfileId, v1.Network_Etherium)
+	ethClient, err := NewEthClient(taskContext, a.Halper, a.ProfileId, v1.Network_Etherium)
 	if err != nil {
 		return nil, err
 	}
@@ -187,27 +187,22 @@ func EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx context.Context, profile *h
 	}, nil
 }
 
-func NewEthClient(ctx context.Context, halper *halp.Halp, profileId string, n v1.Network) (defi.Networker, *defi.WalletTransactor, error) {
+func NewEthClient(ctx context.Context, halper *halp.Halp, profileId string, n v1.Network) (defi.Networker, error) {
 
 	profile, err := halper.Profile(ctx, profileId)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	s, err := profile.GetNetworkSettings(ctx, n)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	swapper, err := uniclient.NewBaseClient(n, s.BaseConfig())
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	wallet, err := defi.NewWalletTransactor(profile.WalletPK)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return swapper, wallet, nil
+	return swapper, nil
 }

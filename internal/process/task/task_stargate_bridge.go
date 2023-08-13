@@ -75,7 +75,7 @@ func (t *StargateTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 		return nil, err
 	}
 
-	client, _, err := NewSwapper(taskContext, a)
+	client, err := NewSwapper(taskContext, a)
 	if err != nil {
 		return nil, err
 	}
@@ -159,16 +159,16 @@ type SwapRes struct {
 	Swapper   defi.StargateSwapper
 }
 
-func NewSwapper(ctx context.Context, a *Input) (defi.StargateSwapper, *defi.WalletTransactor, error) {
+func NewSwapper(ctx context.Context, a *Input) (defi.StargateSwapper, error) {
 
 	l, ok := a.Task.Task.Task.(*v1.Task_StargateBridgeTask)
 	if !ok {
-		return nil, nil, errors.New("panic.a.Task.Task.Task.(*v1.Task_StargateBridgeTask) call an ambulance!")
+		return nil, errors.New("panic.a.Task.Task.Task.(*v1.Task_StargateBridgeTask) call an ambulance!")
 	}
 
 	profile, err := a.ProfileRepository.GetProfile(ctx, a.ProfileId)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	proxyString := ""
@@ -178,7 +178,7 @@ func NewSwapper(ctx context.Context, a *Input) (defi.StargateSwapper, *defi.Wall
 
 	stgs, err := a.SettingsService.GetSettings(ctx, a.UserId, l.StargateBridgeTask.FromNetwork)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	swapper, err := uniclient.NewStargateSwapper(l.StargateBridgeTask.FromNetwork, &uniclient.BaseClientConfig{
@@ -186,14 +186,10 @@ func NewSwapper(ctx context.Context, a *Input) (defi.StargateSwapper, *defi.Wall
 		RPCEndpoint: stgs.RpcEndpoint,
 	})
 	if err != nil {
-		return nil, nil, err
-	}
-	wallet, err := defi.NewWalletTransactor(string(profile.MmskPk))
-	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return swapper, wallet, nil
+	return swapper, nil
 }
 
 func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapper defi.StargateSwapper, profile *halp.Profile, estimation *v1.EstimationTx) (*SwapRes, *bozdo.Gas, error) {
@@ -253,19 +249,32 @@ type Tx struct {
 }
 
 func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network) (*bozdo.Gas, error) {
+
+	if e.GasLimit == nil {
+		e.GasLimit = &v1.AmUni{}
+	}
 	limit, ok := big.NewInt(0).SetString(e.GasLimit.Wei, 10)
 	if !ok {
 		log.Log.Error("GasLimit: " + e.GasLimit.Wei)
+		limit = big.NewInt(0)
 	}
 
+	if e.GasPrice == nil {
+		e.GasPrice = &v1.AmUni{}
+	}
 	gasPrice, ok := big.NewInt(0).SetString(e.GasPrice.Wei, 10)
 	if !ok {
 		log.Log.Error("GasPrice: " + e.GasPrice.Wei)
+		gasPrice = big.NewInt(0)
 	}
 
+	if e.Gas == nil {
+		e.Gas = &v1.AmUni{}
+	}
 	totalGas, ok := big.NewInt(0).SetString(e.Gas.Wei, 10)
 	if !ok {
 		log.Log.Error("Gas total: " + e.Gas.Wei)
+		totalGas = big.NewInt(0)
 	}
 
 	beforeMultiplier := big.NewInt(totalGas.Int64())

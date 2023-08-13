@@ -67,11 +67,6 @@ func (t *TestNetBridgeSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessT
 		return nil, err
 	}
 
-	wallet, err := defi.NewWalletTransactor(string(profile.MmskPk))
-	if err != nil {
-		return nil, err
-	}
-
 	proxyString := ""
 	if profile.Proxy.Valid {
 		proxyString = profile.Proxy.String
@@ -95,7 +90,7 @@ func (t *TestNetBridgeSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessT
 
 		res, err := client.TestNetBridgeSwap(taskContext, &defi.TestNetBridgeSwapReq{
 			Network: p.Network,
-			Wallet:  wallet,
+			PK:      string(profile.MmskPk),
 			Amount:  amountWei,
 		})
 		if err != nil {

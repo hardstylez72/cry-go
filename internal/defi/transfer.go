@@ -34,7 +34,7 @@ func (c *EtheriumClient) Transfer(ctx context.Context, r *TransferReq) (*Transfe
 		return nil, err
 	}
 
-	wallet, err := NewWalletTransactor(r.Pk)
+	wallet, err := newWalletTransactor(r.Pk)
 	if err != nil {
 		return nil, err
 	}

@@ -30,7 +30,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		return nil, err
 	}
 
-	wt, err := NewWalletTransactor(req.WalletPk)
+	wt, err := newWalletTransactor(req.WalletPk)
 	if err != nil {
 		return nil, err
 	}

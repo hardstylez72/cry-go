@@ -92,8 +92,8 @@ func (c *ProfileRepositoryCrypto) DeleteProfile(ctx context.Context, req *v1.Del
 	return c.source.DeleteProfile(ctx, req)
 }
 
-func (c *ProfileRepositoryCrypto) SearchProfile(ctx context.Context, pattern, userId string) ([]Profile, error) {
-	list, err := c.source.SearchProfile(ctx, pattern, userId)
+func (c *ProfileRepositoryCrypto) SearchProfile(ctx context.Context, pattern, userId, profileType string) ([]Profile, error) {
+	list, err := c.source.SearchProfile(ctx, pattern, userId, profileType)
 	if err != nil {
 		return nil, err
 	}

@@ -130,7 +130,7 @@ export default defineComponent({
   },
   methods: {
     slippageAvailable(t: TaskType) {
-      return taskProps[t].networks.some(n => n === this.network.value)
+      return taskProps[t].networks.has(this.network.value)
     },
     taskUpdated(taskType: TaskType, p: TaskSettings) {
       this.taskMap.set(taskType, p)
