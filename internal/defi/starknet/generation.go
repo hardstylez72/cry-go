@@ -1,8 +1,8 @@
 package starknet
 
 import (
-	"github.com/dontpanicdao/caigo"
-	"github.com/dontpanicdao/caigo/types"
+	starknetgo "github.com/hardstylez72/cry/starknet.go"
+	"github.com/hardstylez72/cry/starknet.go/types"
 	"github.com/pkg/errors"
 )
 
@@ -12,12 +12,12 @@ type Account struct {
 }
 
 func DegenerateAccount() (*Account, error) {
-	pk, err := caigo.Curve.GetRandomPrivateKey()
+	pk, err := starknetgo.Curve.GetRandomPrivateKey()
 	if err != nil {
 		return nil, err
 	}
 
-	x, _, err := caigo.Curve.PrivateToPoint(pk)
+	x, _, err := starknetgo.Curve.PrivateToPoint(pk)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func GetPublicKeyHash(pk string) (string, error) {
 		return "", errors.New("can not cast to big.Int")
 	}
 
-	x, _, err := caigo.Curve.PrivateToPoint(pkb)
+	x, _, err := starknetgo.Curve.PrivateToPoint(pkb)
 	if err != nil {
 		return "", err
 	}

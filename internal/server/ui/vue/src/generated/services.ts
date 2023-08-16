@@ -31,7 +31,7 @@ if (import.meta.env.DEV) {
 
 export const instance = axios.create({
   baseURL: import.meta.env.DEV ? 'http://localhost:8083/' : '/',
-  timeout: 30000,
+  timeout: 60000,
   withCredentials: true,
   // transformRequest: [
   //   (data, headers) => {

@@ -64,4 +64,5 @@ var SlippageMap = map[v1.TaskType]SlippagePercent{
 	v1.TaskType_VelocoreSwap:   SlippagePercent05,
 	v1.TaskType_VeSyncSwap:     SlippagePercent01,
 	v1.TaskType_ZkSwap:         SlippagePercent05,
+	v1.TaskType_Swap10k:        SlippagePercent05,
 }

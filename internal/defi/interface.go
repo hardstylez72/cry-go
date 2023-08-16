@@ -19,7 +19,7 @@ type Networker interface {
 	GetNetworkId() *big.Int
 	WaitTxComplete(ctx context.Context, tx string) error
 	Balancer
-	GetPublicKey(pk string) string
+	GetPublicKey(pk string) (string, error)
 }
 
 type Balancer interface {

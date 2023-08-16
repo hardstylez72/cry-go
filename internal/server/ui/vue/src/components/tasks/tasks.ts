@@ -10,7 +10,7 @@ import TaskTestNetBridgeSwap from "@/components/tasks/block/TaskTestNetBridgeSwa
 import TaskSnapshotVote from "@/components/tasks/block/TaskSnapshotVote.vue";
 import TaskSyncSwap from "@/components/tasks/block/TaskSyncSwap.vue";
 import MenuTaskSyncSwap from "@/components/tasks/menu/MenuTaskSyncSwap.vue";
-import MenuDelayTask from "@/components/tasks/menu/Delay.vue";
+import MenuDelayTask from "@/components/tasks/menu/DelayMenu.vue";
 import MenuExchangeWithdraw from "@/components/tasks/menu/ExchangeWithdraw.vue";
 import MenuOkexDeposit from "@/components/tasks/menu/OkexDeposit.vue";
 import MenuSnapshotTask from "@/components/tasks/menu/Snapshot.vue";
@@ -50,6 +50,8 @@ import TaskMerklyNFT from "@/components/tasks/block/TaskMerklyNFT.vue";
 import TaskDeployStarkNetAccount from "@/components/tasks/block/DeployStarkNetAccount.vue";
 import DeployStarkNetAccount from "@/components/tasks/menu/DeployStarkNetAccount.vue";
 import {ProfileType} from "@/generated/profile";
+import swap10k from "@/components/tasks/block/swap10k.vue";
+import swap10kMenu from "@/components/tasks/menu/swap10kMenu.vue";
 
 
 export interface TaskArg {
@@ -611,6 +613,26 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       op: 'deploy account',
     },
     job: TaskJob.Other,
+    networks: new Set<Network>([Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.StarkNet])
+  },
+  Swap10k: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.swap10k
+      return ''
+    },
+    component: swap10k,
+    menu: swap10kMenu,
+    service: {
+      name: '10kswap',
+      link: 'https://10kswap.com/swap',
+      img: '/icons/10kswap.png',
+      op: 'swap',
+    },
+    job: TaskJob.Swap,
     networks: new Set<Network>([Network.StarkNet]),
     airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
     profileType: new Set([ProfileType.StarkNet])

@@ -56,7 +56,10 @@ func (c *Client) GetNetworkId() *big.Int {
 	return c.Cfg.networkId
 }
 
-func (c *Client) GetPublicKey(pk string) string {
-	w, _ := newWalletTransactor(pk)
-	return w.WalletAddrHR
+func (c *Client) GetPublicKey(pk string) (string, error) {
+	w, err := newWalletTransactor(pk)
+	if err != nil {
+		return "", err
+	}
+	return w.WalletAddrHR, nil
 }

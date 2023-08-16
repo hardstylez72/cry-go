@@ -761,7 +761,8 @@
         "ZkSwap",
         "TraderJoeSwap",
         "MerklyMintAndBridgeNFT",
-        "DeployStarkNetAccount"
+        "DeployStarkNetAccount",
+        "Swap10k"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

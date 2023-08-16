@@ -312,8 +312,10 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 		go func(balancer defi.Networker, i int) {
 			defer wg.Done()
 
-			pubKey := balancer.GetPublicKey(string(profile.MmskPk))
-
+			pubKey, err := balancer.GetPublicKey(string(profile.MmskPk))
+			if err != nil {
+				return
+			}
 			b, err := balancer.GetBalance(ctx, &defi.GetBalanceReq{
 				WalletAddress: pubKey,
 				Token:         tokens[i],

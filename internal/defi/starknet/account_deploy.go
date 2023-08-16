@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/dontpanicdao/caigo/gateway"
-	"github.com/dontpanicdao/caigo/types"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/starknet/halper"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/hardstylez72/cry/starknet.go/gateway"
+	"github.com/hardstylez72/cry/starknet.go/types"
 	"github.com/pkg/errors"
 )
 
@@ -20,7 +20,7 @@ type DeployAccountReq struct {
 }
 
 func (c *Client) IsAccountDeployed(ctx context.Context, pk string) (*bool, error) {
-	res, err := c.HalperService.IsAccountDeployed(ctx, &halper.IsAccountDeployedReq{
+	res, err := c.halper.IsAccountDeployed(ctx, &halper.IsAccountDeployedReq{
 		ChainRPC:   MainnetRPC,
 		PrivateKey: pk,
 		Proxy:      c.cfg.Proxy,
@@ -38,7 +38,7 @@ func (c *Client) DeployAccount(ctx context.Context, req *DeployAccountReq) (*Dep
 
 	res := &DeployAccountRes{}
 
-	tx, err := c.HalperService.DeployAccount(ctx, &halper.DeployAccountReq{
+	tx, err := c.halper.DeployAccount(ctx, &halper.DeployAccountReq{
 		ChainRPC:     MainnetRPC,
 		PrivateKey:   req.PK,
 		Proxy:        c.cfg.Proxy,

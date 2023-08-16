@@ -204,7 +204,7 @@ func EstimateZkSyncOfficialBridgeToEthSwapCost(ctx context.Context, profile *hal
 		return nil, err
 	}
 
-	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.WalletAddr.String(), Token: v1.Token_ETH})
+	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.Addr, Token: v1.Token_ETH})
 	if err != nil {
 		return nil, err
 	}

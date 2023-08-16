@@ -37,6 +37,7 @@ enum TaskType {
   TraderJoeSwap = 23;
   MerklyMintAndBridgeNFT = 24;
   DeployStarkNetAccount = 25;
+  Swap10k = 26;
 }
 
 
@@ -47,6 +48,23 @@ message TxDetail {
     json_schema: {
       required: [
         "key", "value"
+      ]
+    }
+  };
+}
+
+message DefaultSwap {
+  shared.Amount amount = 1;
+  shared.Network network = 2;
+  shared.Token from_token = 3;
+  shared.Token to_token = 4;
+
+  optional TaskTx tx = 5;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "amount", "network", "from_token","to_token"
       ]
     }
   };

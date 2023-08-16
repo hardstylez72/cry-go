@@ -3,21 +3,21 @@
     <div>
       <v-dialog
         v-model="menu"
-        width="auto"
         height="auto"
         :close-on-content-click="false"
         :close-on-back="false"
         persistent="true"
         location="center"
         location-strategy="static"
+        min-width="320px"
       >
         <template v-slot:activator="{ props }">
-          <v-btn class="ml-3" variant="flat" height="18px" width="100px" @click="openSettings">Settings</v-btn>
+          <v-btn class="ml-3" variant="flat" height="18px" width="120px" @click="openSettings">Настройки</v-btn>
         </template>
 
         <v-card class="px-4 py-4">
           <v-card-title class="d-flex justify-space-between">
-            <div>Gas settings</div>
+            <div>Настройки</div>
             <v-icon icon="mdi-close" @click="menu = false"/>
           </v-card-title>
           <v-card-text>

@@ -44,7 +44,6 @@ deploy-prod:
 send-prod:
 	rsync --progress -re ssh ./build/ root@$(prod):/root/app/cry/
 	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml build --force"
-	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml pull"
 	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml up -d"
 
 
@@ -52,3 +51,11 @@ local:
 	docker-compose -f docker-compose.local.yml up -d
 	go run ./cmd/service/main.go
 
+
+pull-dev:
+	ssh -t root@$(dev) "docker-compose -f /root/app/cry/docker-compose.yaml pull"
+	ssh -t root@$(dev) "docker-compose -f /root/app/cry/docker-compose.yaml up -d"
+
+pull-prod:
+	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml pull"
+	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml up -d"

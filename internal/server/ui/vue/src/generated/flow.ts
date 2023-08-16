@@ -275,6 +275,23 @@ export interface CreateFlowResponse {
   flow: flow_Flow;
 }
 
+export interface DefaultSwap {
+  /**  */
+  amount: Amount;
+
+  /**  */
+  network: Network;
+
+  /**  */
+  fromToken: Token;
+
+  /**  */
+  toToken: Token;
+
+  /**  */
+  tx?: TaskTx;
+}
+
 export interface DelayTask {
   /**  */
   duration: string;
@@ -741,6 +758,9 @@ export interface Task {
 
   /**  */
   deployStarkNetAccountTask?: DeployStarkNetAccountTask;
+
+  /**  */
+  swap10k?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1024,7 +1044,8 @@ export enum TaskType {
   'ZkSwap' = 'ZkSwap',
   'TraderJoeSwap' = 'TraderJoeSwap',
   'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT',
-  'DeployStarkNetAccount' = 'DeployStarkNetAccount'
+  'DeployStarkNetAccount' = 'DeployStarkNetAccount',
+  'Swap10k' = 'Swap10k'
 }
 
 export enum Token {

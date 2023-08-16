@@ -3,15 +3,54 @@
     <v-col cols="5" v-if="!isMobile">
       <v-card style="position: fixed; font-size: 18px; width: 30%" class="px-1 py-1">
         Сценарий
-        <ol>
-          <li v-for="(item, index) in tasks" class="my-2 d-inline-flex">
-            {{ index + 1 }}) <b>{{ item.taskType }}</b>
-            <a target="_blank" :href="taskSpec(item).service.link" class="mx-1">
-              <v-img style="background-color: lightgray" height="22px" :src="taskSpec(item).service.img"/>
-            </a>
-            <span>{{ taskDescription(item) }}</span>
-          </li>
-        </ol>
+        <draggable
+          v-model="tasks"
+          @start="drag=true"
+          @end="orderChanged"
+          item-key="weight"
+          ghost-class="ghost"
+          :animation="500"
+          handle=".handle"
+          class="list-group"
+        >
+          <template #item="{element}">
+            <div class="handle my-2 elevation-1 py-1 px-1" style="cursor: pointer">
+              <a style="text-decoration: none; color: black" :href="`#${element.weight}`">
+                <div class="d-inline-flex">
+                  {{ element.weight }})
+                  <a target="_blank" :href="taskSpec(element).service.link" class="mx-1">
+                    <v-img style="background-color: lightgray" height="22px" :src="taskSpec(element).service.img"/>
+                  </a>
+                  <b>{{ element.taskType }}</b>
+                </div>
+                <span>{{ taskDescription(element) }}</span>
+                <v-icon v-if="!disable" icon="mdi-close" @click="taskDeleted(element.weight)"></v-icon>
+              </a>
+            </div>
+          </template>
+        </draggable>
+        <v-menu
+          location-strategy="connected"
+          max-width="700px"
+          location="left"
+          v-model="menu"
+          persistent="true"
+          no-click-animation
+          transition="false"
+          :close-on-content-click="false"
+          :close-on-back="false">
+          <template v-slot:activator="{ props }">
+            <v-btn rounded="false" width="100%" v-bind="props" :disabled="disable">Добавить задачу</v-btn>
+          </template>
+          <v-card>
+            <div class="d-flex justify-end">
+              <v-icon icon="mdi-close" @click="menu = false"></v-icon>
+            </div>
+            <TaskSelector v-if="!disable" @task-selected="addStep"/>
+          </v-card>
+        </v-menu>
+
+
       </v-card>
     </v-col>
 
@@ -30,6 +69,7 @@
           ></v-text-field>
         </v-col>
       </v-row>
+
 
       <draggable
         v-model="tasks"
@@ -54,7 +94,7 @@
                     <h4 v-if="!disable">
                       <v-icon icon="mdi-dots-vertical" class="handle" @click="() => {}"/>
                     </h4>
-                    <h4 class="mx-2">{{ `${element.weight}) ${element.taskType}` }}</h4>
+                    <a><h4 :id="element.weight" class="mx-2">{{ `${element.weight}) ${element.taskType}` }}</h4></a>
                     <a target="_blank" :href="taskSpec(element).service.link" class="mx-1">
                       <v-img height="22px" :src="taskSpec(element).service.img"/>
                     </a>
@@ -76,47 +116,8 @@
           </v-row>
         </template>
       </draggable>
+      <TaskSelector v-if="!disable && isMobile" @task-selected="addStep"/>
 
-
-      <v-row v-if="!disable">
-        <v-container>
-          <v-card cols="12"
-                  style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;">
-            <v-col cols="12">
-              <div class="d-inline-flex align-center">{{ `Тип фильтра: ` }}
-                <v-radio-group inline="true" v-model="filterType" hide-details>
-                  <v-radio v-for="item in Filters" :value="item" :label="item"/>
-                </v-radio-group>
-              </div>
-              <div>Значения фильтра:
-                <v-radio-group v-if="filterType === 'Сеть'" v-model="filterNetwork" inline="true">
-                  <v-chip density="compact" size="5px" value="Все сети" @click="filterNetwork = 'Все сети'">{{
-                      "Все сети"
-                    }}
-                  </v-chip>
-                  <v-chip v-for="network in networks" @click="filterNetwork = network" :value="network"
-                          density="compact" class="mx-1 my-1">
-                    <v-img height="22px" :src="networkProps[network].img"/>
-                    {{ networkProps[network].name }}
-                  </v-chip>
-                </v-radio-group>
-                <v-radio-group v-if="filterType === 'Airdrop'" v-model="filterAirdrop" inline="true">
-                  <v-radio value="Все Airdrop" label="Все Airdrop"/>
-                  <v-radio v-for="airdrop in airdrops" :value="airdrop" :label="airdrop"></v-radio>
-                </v-radio-group>
-
-              </div>
-              <div v-for="job in taskJobs" class="d-flex flex-wrap">
-                <v-divider class="my-1"/>
-                <b>{{ job }}</b>
-                <div v-for="tt in filterTasksByJob(job)">
-                  <TaskChip class="mx-1 my-1" @click="addStep(tt)" :task-type="tt"/>
-                </div>
-              </div>
-            </v-col>
-          </v-card>
-        </v-container>
-      </v-row>
     </v-col>
   </v-row>
 
@@ -130,6 +131,7 @@ import {taskComponentMap, TaskArg, taskTypes, taskProps, TaskJob, TaskSpec, Aird
 import draggable from 'vuedraggable'
 import TaskChip from "@/components/tasks/TaskChip.vue";
 import {networkProps} from "@/components/helper";
+import TaskSelector from "@/components/flow/TaskSelector.vue";
 
 
 export default defineComponent({
@@ -152,6 +154,7 @@ export default defineComponent({
     },
   },
   components: {
+    TaskSelector,
     TaskChip,
     draggable,
   },
@@ -203,6 +206,7 @@ export default defineComponent({
   emits: ['flowChanged'],
   data() {
     return {
+      menu: false,
       selectErrorMessage: "",
       drag: false,
       label: "",
@@ -416,7 +420,10 @@ export default defineComponent({
 
 
 <style>
-
+.ghost {
+  opacity: 0.7;
+  background: #c8ebfb;
+}
 
 </style>
 

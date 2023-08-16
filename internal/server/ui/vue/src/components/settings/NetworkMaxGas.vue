@@ -1,8 +1,9 @@
 <template>
+  <div>Ограничитель газа</div>
   <v-slider
     v-model="multiplier"
     density="compact"
-    label="Ограничитель газа"
+    label=""
     :min="getMin"
     step="1000"
     :max="getMax"
@@ -12,9 +13,10 @@
   >
     <template v-slot:append>
 
-      <v-tooltip text="Ограничение максимальной стоимости транзакции после использования мультипликатора">
+      <v-tooltip v-model="hint"
+                 text="Ограничение максимальной стоимости транзакции после использования мультипликатора">
         <template v-slot:activator="{ props }">
-          <v-icon v-bind="props" icon="mdi-information-outline"></v-icon>
+          <v-icon v-bind="props" @click="hint=true" icon="mdi-information-outline"></v-icon>
         </template>
       </v-tooltip>
 
@@ -50,7 +52,8 @@ export default defineComponent({
   data() {
     return {
       priceUSD: "-1",
-      timer: new Timer()
+      timer: new Timer(),
+      hint: false
     }
   },
   computed: {

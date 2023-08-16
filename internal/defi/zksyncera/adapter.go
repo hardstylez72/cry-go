@@ -33,9 +33,12 @@ type GetBalanceRes struct {
 	Float         float64
 }
 
-func (c *Client) GetPublicKey(pk string) string {
-	w, _ := NewWalletTransactor(pk, big.NewInt(324))
-	return w.WalletAddrHR
+func (c *Client) GetPublicKey(pk string) (string, error) {
+	w, err := NewWalletTransactor(pk, big.NewInt(324))
+	if err != nil {
+		return "", err
+	}
+	return w.WalletAddrHR, nil
 }
 
 func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi.GetBalanceRes, error) {

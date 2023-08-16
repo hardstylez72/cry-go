@@ -121,6 +121,7 @@ message Task {
     task.TraderJoeSwapTask traderJoeSwapTask = 27;
     task.MerklyMintAndBridgeNFTTask merklyMintAndBridgeNFTTask = 28;
     task.DeployStarkNetAccountTask deployStarkNetAccountTask = 29;
+    task.DefaultSwap swap10k = 30;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

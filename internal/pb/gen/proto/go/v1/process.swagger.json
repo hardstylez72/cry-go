@@ -602,6 +602,32 @@
         "process"
       ]
     },
+    "DefaultSwap": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/Amount"
+        },
+        "network": {
+          "$ref": "#/definitions/Network"
+        },
+        "fromToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "toToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "tx": {
+          "$ref": "#/definitions/TaskTx"
+        }
+      },
+      "required": [
+        "amount",
+        "network",
+        "fromToken",
+        "toToken"
+      ]
+    },
     "DelayTask": {
       "type": "object",
       "properties": {
@@ -1807,6 +1833,9 @@
         },
         "deployStarkNetAccountTask": {
           "$ref": "#/definitions/DeployStarkNetAccountTask"
+        },
+        "swap10k": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -1896,7 +1925,8 @@
         "ZkSwap",
         "TraderJoeSwap",
         "MerklyMintAndBridgeNFT",
-        "DeployStarkNetAccount"
+        "DeployStarkNetAccount",
+        "Swap10k"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

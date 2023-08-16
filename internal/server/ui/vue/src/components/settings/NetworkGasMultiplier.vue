@@ -1,8 +1,9 @@
 <template>
+  <div>Множитель газа</div>
   <v-slider
     v-model="multiplier"
     density="compact"
-    label="Множитель газа"
+    label=""
     min="0.1"
     max="1"
     persistent-hint
@@ -11,9 +12,9 @@
   >
     <template v-slot:append>
 
-      <v-tooltip text="Tooltip">
+      <v-tooltip v-model="hint">
         <template v-slot:activator="{ props }">
-          <v-icon v-bind="props" icon="mdi-information-outline"></v-icon>
+          <v-icon v-bind="props" @click="hint = true" icon="mdi-information-outline"></v-icon>
         </template>
         <div>
           Мультипликатор газа, позволяет уменьшать газ за странзакцию.
@@ -54,7 +55,9 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   data() {
-    return {}
+    return {
+      hint: false
+    }
   },
   computed: {
     Network() {

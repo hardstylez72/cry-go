@@ -163,7 +163,7 @@ func Swap(ctx context.Context, a *v1.SyncSwapTask, swapper defi.SyncSwapper, pro
 	}
 
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.WalletAddr.String(),
+		WalletAddress: profile.Addr,
 		Token:         a.FromToken,
 	})
 	if err != nil {

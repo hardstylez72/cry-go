@@ -170,6 +170,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_DeployStarkNetAccount:
 		p := t.Task.Task.(*v1.Task_DeployStarkNetAccountTask).DeployStarkNetAccountTask
 		e, err = task.EstimateDeployStarkNetAccountCost(ctx, profile, p, nil)
+	case v1.TaskType_Swap10k:
+		p := t.Task.Task.(*v1.Task_Swap10K).Swap10K
+		e, err = task.EstimateSwap10kCost(ctx, profile, p, nil)
 
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")

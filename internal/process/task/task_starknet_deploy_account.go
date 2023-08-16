@@ -128,7 +128,7 @@ func DeployStarkNetAccount(ctx context.Context, profile *halp.Profile, p *v1.Dep
 	}
 
 	balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: client.GetPublicKey(profile.WalletPK),
+		WalletAddress: profile.Addr,
 		Token:         v1.Token_ETH,
 	})
 	if err != nil {

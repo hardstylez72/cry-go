@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -22,7 +23,7 @@ type Config struct {
 
 func NewService(c *Config) *Service {
 	return &Service{
-		cli: &http.Client{},
+		cli: &http.Client{Timeout: time.Minute * 2},
 		c:   c,
 	}
 }
@@ -36,6 +37,37 @@ func (s *Service) IsAccountDeployed(ctx context.Context, req *IsAccountDeployedR
 }
 func (s *Service) DeployAccount(ctx context.Context, req *DeployAccountReq) (*DeployAccountRes, error) {
 	return Request[DeployAccountReq, DeployAccountRes](ctx, s.cli, s.c.Host+"/starknet/deploy_account", req)
+}
+
+type DefaultSwapReq struct {
+	Proxy        string `json:"proxy"`
+	ChainRPC     string `json:"chainRPC"`
+	PrivateKey   string `json:"privateKey"`
+	FromToken    string `json:"fromToken"`
+	ToToken      string `json:"toToken"`
+	Amount       string `json:"amount"`
+	EstimateOnly bool   `json:"estimateOnly"`
+	Fee          string `json:"fee"`
+}
+
+type DefaultSwapRes struct {
+	ApproveTx *string `json:"approveTxId"`
+	SwapTx    *string `json:"swapTxId"`
+	Fee       *string `json:"maxFee"`
+	Error     *string `json:"error"`
+}
+
+func (s *Service) Swap10k(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error) {
+	res, err := Request[DefaultSwapReq, DefaultSwapRes](ctx, s.cli, s.c.Host+"/starknet/10k_swap", req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.Error != nil {
+		return nil, errors.New(*res.Error)
+	}
+
+	return res, nil
 }
 
 func Request[REQ any, RES any](ctx context.Context, c *http.Client, url string, req *REQ) (*RES, error) {

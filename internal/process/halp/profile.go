@@ -4,7 +4,6 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
@@ -39,12 +38,9 @@ type Profile struct {
 	Id          string
 	DB          *repository.Profile
 	ProxyString string
-	//deprecated
-	WalletAddr common.Address
-	WalletPK   string
-	Addr       string
-	//deprecated
-	Wallet *defi.WalletTransactor
+	WalletPK    string
+	Addr        string
+	Type        v1.ProfileType
 }
 
 func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) {
@@ -72,6 +68,7 @@ func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) 
 		UserId:      profile.UserId,
 		h:           h,
 		Addr:        p.MmskId,
+		Type:        p.Type,
 	}, nil
 }
 

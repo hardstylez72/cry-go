@@ -84,7 +84,7 @@ func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 	if p.GetTx().GetTxId() == "" {
 
 		b, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-			WalletAddress: profile.WalletAddr.String(),
+			WalletAddress: profile.Addr,
 			Token:         p.FromToken,
 		})
 		if err != nil {

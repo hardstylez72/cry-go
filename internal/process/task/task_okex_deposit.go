@@ -98,7 +98,7 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		}
 
 		b, err := client.GetBalance(taskContext, &defi.GetBalanceReq{
-			WalletAddress: profile.WalletAddr.String(),
+			WalletAddress: profile.Addr,
 			Token:         p.Token,
 		})
 		if err != nil {

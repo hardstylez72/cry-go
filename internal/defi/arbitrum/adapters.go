@@ -54,6 +54,6 @@ func (c *Client) TraderJoeSwap(ctx context.Context, req *defi.DefaultSwapReq) (*
 	return c.defi.TraderJoeSwap(ctx, req)
 }
 
-func (c *Client) GetPublicKey(pk string) string {
+func (c *Client) GetPublicKey(pk string) (string, error) {
 	return c.defi.GetPublicKey(pk)
 }

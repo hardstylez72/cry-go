@@ -60,6 +60,6 @@ type L1L2BridgeRes struct {
 	EstimatedGasCost *bozdo.EstimatedGasCost
 }
 
-func (c *Client) GetPublicKey(pk string) string {
+func (c *Client) GetPublicKey(pk string) (string, error) {
 	return c.defi.GetPublicKey(pk)
 }

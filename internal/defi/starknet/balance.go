@@ -4,9 +4,12 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/dontpanicdao/caigo/types"
 	"github.com/hardstylez72/cry/internal/defi"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/hardstylez72/cry/starknet.go/felt"
+	"github.com/hardstylez72/cry/starknet.go/rpc"
+	"github.com/hardstylez72/cry/starknet.go/types"
+	"github.com/hardstylez72/cry/starknet.go/utils"
 )
 
 func (c *Client) GetNetworkToken() v1.Token {
@@ -25,13 +28,27 @@ func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi
 		return nil, defi.ErrTokenNotSupportedFn(req.Token)
 	}
 
-	tx := types.FunctionCall{
-		ContractAddress:    types.HexToHash(ca),
-		EntryPointSelector: "balanceOf",
-		Calldata:           []string{req.WalletAddress},
+	addrFelt, err := utils.HexToFelt(ca)
+	if err != nil {
+		return nil, err
 	}
 
-	res, err := c.GW.Call(ctx, tx, "")
+	selectorFelt := types.GetSelectorFromNameFelt("balanceOf")
+	if err != nil {
+		return nil, err
+	}
+
+	wFelt, err := utils.HexToFelt(req.WalletAddress)
+	if err != nil {
+		return nil, err
+	}
+	tx := rpc.FunctionCall{
+		ContractAddress:    addrFelt,
+		EntryPointSelector: selectorFelt,
+		Calldata:           []*felt.Felt{wFelt},
+	}
+
+	res, err := c.GWP.Call(ctx, tx, rpc.BlockID{Tag: "latest"})
 	if err != nil {
 		return nil, err
 	}
@@ -69,12 +86,13 @@ func (c *Client) getBalance(wei *big.Int, req *defi.GetBalanceReq) *defi.GetBala
 		}
 	}
 
-	// todo:///
+	f, _ := defi.WeiToToken(wei, req.Token).Float64()
+
 	return &defi.GetBalanceRes{
 		Req:           req,
 		WEI:           wei,
-		ETHER:         nil,
-		HumanReadable: "",
-		Float:         0,
+		ETHER:         defi.WeiToToken(wei, req.Token),
+		HumanReadable: defi.WeiToToken(wei, req.Token).String(),
+		Float:         f,
 	}
 }

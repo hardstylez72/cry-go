@@ -621,5 +621,6 @@ export enum TaskType {
   'ZkSwap' = 'ZkSwap',
   'TraderJoeSwap' = 'TraderJoeSwap',
   'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT',
-  'DeployStarkNetAccount' = 'DeployStarkNetAccount'
+  'DeployStarkNetAccount' = 'DeployStarkNetAccount',
+  'Swap10k' = 'Swap10k'
 }

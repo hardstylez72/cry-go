@@ -38,4 +38,5 @@ type HalperService interface {
 	IsAccountDeployed(ctx context.Context, req *IsAccountDeployedReq) (*IsAccountDeployedRes, error)
 	DeployAccount(ctx context.Context, req *DeployAccountReq) (*DeployAccountRes, error)
 	AccountPubKey(ctx context.Context, req *AccountPubKeyReq) (*AccountPubKeyRes, error)
+	Swap10k(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error)
 }

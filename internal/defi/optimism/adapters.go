@@ -48,6 +48,6 @@ func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) 
 	return c.defi.OrbiterBridge(ctx, req)
 }
 
-func (c *Client) GetPublicKey(pk string) string {
+func (c *Client) GetPublicKey(pk string) (string, error) {
 	return c.defi.GetPublicKey(pk)
 }

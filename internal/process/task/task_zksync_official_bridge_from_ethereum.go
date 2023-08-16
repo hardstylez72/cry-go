@@ -117,7 +117,7 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a
 	p := l.ZkSyncOfficialBridgeFromEthereumTask
 
 	b, err := ethClient.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.WalletAddr.String(),
+		WalletAddress: profile.Addr,
 		Token:         v1.Token_ETH,
 	})
 	if err != nil {
@@ -160,7 +160,7 @@ func EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx context.Context, profile *h
 		return nil, err
 	}
 
-	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.WalletAddr.String(), Token: v1.Token_ETH})
+	b, err := client.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.Addr, Token: v1.Token_ETH})
 	if err != nil {
 		return nil, err
 	}

@@ -33,6 +33,7 @@ const (
 	CodeApprove  TxCode = "approve"
 	CodeContract TxCode = "contract"
 	CodeTransfer TxCode = "transfer"
+	CodeSwap     TxCode = "swap"
 )
 
 type Transaction struct {

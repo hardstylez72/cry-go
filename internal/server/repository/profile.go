@@ -62,7 +62,11 @@ func (a *Profile) ToPB(starkNetClient *starknet.Client) (*v1.Profile, error) {
 		}
 		publicKey = pub
 	case v1.ProfileType_StarkNet:
-		publicKey = starkNetClient.GetPublicKey(string(a.MmskPk))
+		pub, err := starkNetClient.GetPublicKey(string(a.MmskPk))
+		if err != nil {
+			return nil, err
+		}
+		publicKey = pub
 	}
 
 	p := &v1.Profile{

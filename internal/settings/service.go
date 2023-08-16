@@ -88,12 +88,12 @@ func (s *Service) ResolveSettings(ctx context.Context, userId string, network v1
 		}
 	}
 
-	resolved, err := resolveSettings(current, network, force)
+	before, err := json.Marshal(current)
 	if err != nil {
 		return nil, err
 	}
 
-	before, err := json.Marshal(current)
+	resolved, err := resolveSettings(current, network, force)
 	if err != nil {
 		return nil, err
 	}

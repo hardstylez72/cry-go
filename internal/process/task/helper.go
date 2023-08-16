@@ -16,7 +16,10 @@ func GasStation(ecost *bozdo.EstimatedGasCost, network v1.Network) *v1.Estimatio
 	result := &v1.EstimationTx{}
 	switch ecost.Type {
 	case bozdo.TxTypeStarkNet:
+		result.GasLimit = defi.AmountUni(ecost.TotalGasWei, network)
+		result.GasPrice = defi.AmountUni(big.NewInt(1), network)
 		result.Gas = defi.AmountUni(ecost.TotalGasWei, network)
+
 		result.GasValuePercent = ""
 		result.Name = ecost.Name
 		result.Details = CastDetails(ecost.Details)
