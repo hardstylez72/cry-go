@@ -20,14 +20,8 @@ func (t *WethTask) Stop() error {
 	return nil
 }
 
-func (t *WethTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *WethTask) Type() v1.TaskType {
+	return v1.TaskType_WETH
 }
 
 var ErrWethTaskError = errors.New("weith task error")

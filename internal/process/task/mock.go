@@ -16,10 +16,9 @@ func (t *mockTask) Stop() error {
 	return nil
 }
 
-func (t *mockTask) Reset(ctx context.Context, a *Input) error {
-	return nil
+func (t *mockTask) Type() v1.TaskType {
+	return v1.TaskType_Mock
 }
-
 func (t *mockTask) Run(ctx context.Context, arg *Input) (*v1.ProcessTask, error) {
 	_, cancel := context.WithTimeout(ctx, taskTimeout)
 	defer cancel()

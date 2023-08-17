@@ -51,9 +51,13 @@ import TaskDeployStarkNetAccount from "@/components/tasks/block/DeployStarkNetAc
 import DeployStarkNetAccount from "@/components/tasks/menu/DeployStarkNetAccount.vue";
 import {ProfileType} from "@/generated/profile";
 import swap10k from "@/components/tasks/block/swap10k.vue";
-import swap10kMenu from "@/components/tasks/menu/swap10kMenu.vue";
+import swap10kMenu from "@/components/tasks/menu/MenuSwap10k.vue";
 import TaskPancakeSwap from "@/components/tasks/block/TaskPancakeSwap.vue";
 import PancakeSwap from "@/components/tasks/menu/PancakeSwap.vue";
+import SithSwap from "@/components/tasks/block/SithSwap.vue";
+import MenuSithSwap from "@/components/tasks/menu/MenuSithSwap.vue";
+import MenuJediSwap from "@/components/tasks/menu/MenuJediSwap.vue";
+import JediSwap from "@/components/tasks/block/JediSwap.vue";
 
 
 export interface TaskArg {
@@ -658,6 +662,46 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     networks: new Set<Network>([Network.ZKSYNCERA]),
     airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
     profileType: new Set([ProfileType.EVM])
+  },
+  SithSwap: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.sithSwapTask
+      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+    },
+    component: SithSwap,
+    menu: MenuSithSwap,
+    service: {
+      name: 'SythSwap',
+      link: 'https://sithswap.com/',
+      img: '/icons/sithswap.png',
+      op: 'swap',
+    },
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.StarkNet])
+  },
+  JediSwap: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.jediSwapTask
+      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+    },
+    component: JediSwap,
+    menu: MenuJediSwap,
+    service: {
+      name: 'JediSwap',
+      link: 'https://app.jediswap.xyz/#/swap',
+      img: '/icons/jediswap.png',
+      op: 'swap',
+    },
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.StarkNet])
   },
 }
 

@@ -21,14 +21,8 @@ func (t *SyncSwapLPTask) Stop() error {
 	return nil
 }
 
-func (t *SyncSwapLPTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *SyncSwapLPTask) Type() v1.TaskType {
+	return v1.TaskType_SyncSwapLP
 }
 
 func (t *SyncSwapLPTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

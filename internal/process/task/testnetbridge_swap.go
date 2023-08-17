@@ -20,8 +20,8 @@ func (t *TestNetBridgeSwapTask) Stop() error {
 	return nil
 }
 
-func (t *TestNetBridgeSwapTask) Reset(ctx context.Context, a *Input) error {
-	return nil
+func (t *TestNetBridgeSwapTask) Type() v1.TaskType {
+	return v1.TaskType_TestNetBridgeSwap
 }
 
 func (t *TestNetBridgeSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

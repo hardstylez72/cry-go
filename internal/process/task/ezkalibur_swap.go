@@ -21,14 +21,8 @@ func (t *EzkaliburSwapTask) Stop() error {
 	return nil
 }
 
-func (t *EzkaliburSwapTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *EzkaliburSwapTask) Type() v1.TaskType {
+	return v1.TaskType_EzkaliburSwap
 }
 
 func (t *EzkaliburSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

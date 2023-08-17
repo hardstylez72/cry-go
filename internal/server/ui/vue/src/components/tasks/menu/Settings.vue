@@ -10,6 +10,7 @@
         location="center"
         location-strategy="static"
         min-width="320px"
+        max-width="700px"
       >
         <template v-slot:activator="{ props }">
           <v-btn class="ml-3" variant="flat" height="18px" width="120px" @click="openSettings">Настройки</v-btn>

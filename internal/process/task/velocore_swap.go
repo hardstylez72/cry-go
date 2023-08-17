@@ -21,14 +21,8 @@ func (t *VelocoreSwapTask) Stop() error {
 	return nil
 }
 
-func (t *VelocoreSwapTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *VelocoreSwapTask) Type() v1.TaskType {
+	return v1.TaskType_VelocoreSwap
 }
 
 func (t *VelocoreSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

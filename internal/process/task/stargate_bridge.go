@@ -24,25 +24,8 @@ func (t *StargateTask) Stop() error {
 	return nil
 }
 
-func (t *StargateTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-	l, ok := a.Task.Task.Task.(*v1.Task_StargateBridgeTask)
-	if !ok {
-		return errors.New("panic.a.Task.Task.Task.(*v1.Task_StargateBridgeTask) call an ambulance!")
-	}
-
-	p := l.StargateBridgeTask
-
-	p.Fee = nil
-	p.TxId = nil
-	p.TxCompleted = nil
-	p.LzscanUrl = nil
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *StargateTask) Type() v1.TaskType {
+	return v1.TaskType_StargateBridge
 }
 
 func (t *StargateTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

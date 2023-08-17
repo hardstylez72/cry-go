@@ -23,6 +23,7 @@
     "roboto-fontface": "*",
     "simple-code-editor": "^2.0.8",
     "vue": "^3.2.38",
+    "vue-facing-decorator": "^3.0.1",
     "vue-router": "^4.0.0",
     "vue3-json-viewer": "^2.2.2",
     "vuedraggable": "^4.1.0",

@@ -21,14 +21,8 @@ func (t *MuteioSwapTask) Stop() error {
 	return nil
 }
 
-func (t *MuteioSwapTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *MuteioSwapTask) Type() v1.TaskType {
+	return v1.TaskType_MuteioSwap
 }
 
 func (t *MuteioSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

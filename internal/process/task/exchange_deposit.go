@@ -26,24 +26,8 @@ func (t *OkexDepositTask) Stop() error {
 	return nil
 }
 
-func (t *OkexDepositTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-	l, ok := task.Task.Task.(*v1.Task_OkexDepositTask)
-	if !ok {
-		return errors.New("a.Task.Task.Task.(*v1.OkexDepositTask) call an ambulance!")
-	}
-	p := l.OkexDepositTask
-
-	p.TxId = nil
-	p.TxComplete = nil
-	p.SubMainTransfer = nil
-	p.Address = nil
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *OkexDepositTask) Type() v1.TaskType {
+	return v1.TaskType_OkexDeposit
 }
 
 func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

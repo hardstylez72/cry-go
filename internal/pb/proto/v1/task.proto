@@ -39,6 +39,8 @@ enum TaskType {
   DeployStarkNetAccount = 25;
   Swap10k = 26;
   PancakeSwap = 27;
+  SithSwap = 28;
+  JediSwap = 29;
 }
 
 
@@ -61,6 +63,7 @@ message DefaultSwap {
   shared.Token to_token = 4;
 
   optional TaskTx tx = 5;
+  optional TaskTx  approveTx = 6;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {

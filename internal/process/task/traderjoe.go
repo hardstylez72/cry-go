@@ -22,14 +22,8 @@ func (t *TraderJoeSwapTask) Stop() error {
 	return nil
 }
 
-func (t *TraderJoeSwapTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *TraderJoeSwapTask) Type() v1.TaskType {
+	return v1.TaskType_TraderJoeSwap
 }
 
 func (t *TraderJoeSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

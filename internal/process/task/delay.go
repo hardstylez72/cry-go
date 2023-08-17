@@ -19,21 +19,8 @@ func (t *taskDelay) Stop() error {
 	return nil
 }
 
-func (t *taskDelay) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-	l, ok := task.Task.Task.(*v1.Task_DelayTask)
-	if !ok {
-		return errors.New("a.Task.Task.Task.(*v1.Task_StargateBridgeTask) call an ambulance!")
-	}
-	p := l.DelayTask
-
-	p.WaitFor = nil
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *taskDelay) Type() v1.TaskType {
+	return v1.TaskType_Delay
 }
 
 func (t *taskDelay) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

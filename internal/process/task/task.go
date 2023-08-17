@@ -52,8 +52,8 @@ type EstimateSyncSwapCostReq struct {
 
 type Tasker interface {
 	Run(ctx context.Context, arg *Input) (*v1.ProcessTask, error)
-	Reset(ctx context.Context, arg *Input) error
 	Stop() error
+	Type() v1.TaskType
 }
 
 const (
@@ -83,6 +83,8 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_DeployStarkNetAccount,
 	v1.TaskType_Swap10k,
 	v1.TaskType_PancakeSwap,
+	v1.TaskType_SithSwap,
+	v1.TaskType_JediSwap,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -117,8 +119,34 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_TraderJoeSwap:                    &Wrap{Tasker: &TraderJoeSwapTask{}},
 	v1.TaskType_MerklyMintAndBridgeNFT:           &Wrap{Tasker: &MerklyMintAndBridgeNFTTask{}},
 	v1.TaskType_DeployStarkNetAccount:            &Wrap{Tasker: &DeployStarkNetAccountTask{}},
-	v1.TaskType_Swap10k:                          &Wrap{Tasker: &Swap10kTask{}},
-	v1.TaskType_PancakeSwap:                      &Wrap{Tasker: &PancakeSwapTask{}},
+	v1.TaskType_Swap10k: &Wrap{Tasker: &Swap10kTask{
+		NewStarkNetSwapTask(v1.TaskType_Swap10k, func(a *Input) (*v1.DefaultSwap, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_Swap10K)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_IzumiSwapTask) call an ambulance!")
+			}
+			return l.Swap10K, nil
+		}),
+	}},
+	v1.TaskType_PancakeSwap: &Wrap{Tasker: &PancakeSwapTask{}},
+	v1.TaskType_SithSwap: &Wrap{Tasker: &Swap10kTask{
+		NewStarkNetSwapTask(v1.TaskType_SithSwap, func(a *Input) (*v1.DefaultSwap, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_SithSwapTask)
+			if !ok {
+				return nil, errors.New("Task.(*v1.SithSwapTask) call an ambulance!")
+			}
+			return l.SithSwapTask, nil
+		}),
+	}},
+	v1.TaskType_JediSwap: &Wrap{Tasker: &JediTask{
+		NewStarkNetSwapTask(v1.TaskType_JediSwap, func(a *Input) (*v1.DefaultSwap, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_JediSwapTask)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_JediSwapTask) call an ambulance!")
+			}
+			return l.JediSwapTask, nil
+		}),
+	}},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -287,6 +315,18 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 		}
 		return Marshal(t.PancakeSwapTask)
 
+	case v1.TaskType_SithSwap:
+		t, ok := m.Task.(*v1.Task_SithSwapTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_SithSwapTask)")
+		}
+		return Marshal(t.SithSwapTask)
+	case v1.TaskType_JediSwap:
+		t, ok := m.Task.(*v1.Task_JediSwapTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_JediSwapTask)")
+		}
+		return Marshal(t.JediSwapTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}
@@ -307,9 +347,8 @@ type Wrap struct {
 func (w *Wrap) Stop() error {
 	return w.Tasker.Stop()
 }
-
-func (w *Wrap) Reset(ctx context.Context, arg *Input) error {
-	return w.Tasker.Reset(ctx, arg)
+func (w *Wrap) Type() v1.TaskType {
+	return w.Tasker.Type()
 }
 
 type TaskUpdater interface {

@@ -52,6 +52,10 @@ func ResolveNetworkTokenAmount(balance, gas, value *big.Int) *big.Int {
 
 func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, networker defi.Networker, updater TaskUpdater) error {
 	if ptx != nil && ptx.TxId != "" {
+		if ptx.TxId == AlreadyApproved {
+			return nil
+		}
+
 		tx := ptx
 		if err := networker.WaitTxComplete(ctx, tx.TxId); err != nil {
 			if errors.Is(err, defi.ErrTxStatusFailed) {
@@ -115,7 +119,7 @@ func (a *Input) AddTx2(ctx context.Context, transactions ...*v1.TaskTx) error {
 
 	for i := range transactions {
 		tx := transactions[i]
-		if tx == nil || tx.TxCompleted == false {
+		if tx == nil || tx.TxId == AlreadyApproved {
 			continue
 		}
 		txDb := &repository.Transaction{
@@ -165,6 +169,25 @@ func (a *Input) AddTx(ctx context.Context, transactions ...*bozdo.Transaction) e
 
 func TransactionAdd(ctx context.Context, rep repository.TransactionRepository, tx *repository.Transaction) error {
 	return rep.TransactionAdd(ctx, tx)
+}
+
+func NewStarkNetApproveTx(id string) *v1.TaskTx {
+
+	n := v1.Network_StarkNet
+	code := bozdo.CodeApprove
+	url := "https://starkscan.co/tx/" + id
+
+	txx := &v1.TaskTx{
+		TxCompleted: false,
+		TxId:        id,
+		RetryCount:  0,
+		Url:         &url,
+		Network:     &n,
+		Code:        &code,
+		Details:     CastDetails(nil),
+	}
+
+	return txx
 }
 
 func NewTx(tx *bozdo.Transaction, gas *bozdo.Gas) *v1.TaskTx {

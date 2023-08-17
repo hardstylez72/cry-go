@@ -2,7 +2,9 @@ package task
 
 import (
 	"fmt"
+	"math/big"
 
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
@@ -14,5 +16,8 @@ var (
 	ErrUserHasNoBalance              = errors.New("User has not enough balance. visit billing page please")
 	ErrProfileHasNoConnectedOkexAddr = errors.New("Profile is not connected to okex deposit wallet")
 	ErrTransactionIsNotReady         = errors.New("transaction is not ready")
-	ErrAccountIsZero                 = errors.New("account has no balance")
+	ErrAccountIsZero                 = errors.New("profile has Insufficient balance")
+	ErrProfileHasInsufficientBalance = func(token v1.Token, want, have *big.Int) error {
+		return errors.Wrap(ErrAccountIsZero, fmt.Sprintf("want: %s have: %s of %s", want.String(), have.String(), token.String()))
+	}
 )

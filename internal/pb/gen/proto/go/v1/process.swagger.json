@@ -619,6 +619,9 @@
         },
         "tx": {
           "$ref": "#/definitions/TaskTx"
+        },
+        "approveTx": {
+          "$ref": "#/definitions/TaskTx"
         }
       },
       "required": [
@@ -1839,6 +1842,12 @@
         },
         "pancakeSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "sithSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
+        },
+        "jediSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -1930,7 +1939,9 @@
         "MerklyMintAndBridgeNFT",
         "DeployStarkNetAccount",
         "Swap10k",
-        "PancakeSwap"
+        "PancakeSwap",
+        "SithSwap",
+        "JediSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

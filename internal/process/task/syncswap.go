@@ -21,24 +21,8 @@ func (t *SyncSwapTask) Stop() error {
 	return nil
 }
 
-func (t *SyncSwapTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-	l, ok := a.Task.Task.Task.(*v1.Task_SyncSwapTask)
-	if !ok {
-		return errors.New("panic.a.Task.Task.Task.(*v1.Task_SyncSwapTask) call an ambulance!")
-	}
-
-	p := l.SyncSwapTask
-
-	p.TxId = nil
-	p.TxCompleted = nil
-	p.SwapCompleted = nil
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *SyncSwapTask) Type() v1.TaskType {
+	return v1.TaskType_SyncSwap
 }
 
 func (t *SyncSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

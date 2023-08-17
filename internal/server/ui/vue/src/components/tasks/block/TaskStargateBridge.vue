@@ -111,8 +111,9 @@ export default defineComponent({
         }
         this.item.fromToken = this.pair.from
         this.item.toToken = this.pair.to
-        this.item.fromNetwork = this.pair.fromNetwork
-        this.item.toNetwork = this.pair.toNetwork
+        this.toNetwork = this.pair.toNetwork
+        this.fromNetwork = this.pair.fromNetwork
+
       },
     },
     item: {
@@ -266,6 +267,7 @@ export default defineComponent({
             this.pair = tokenBridgePair(this.item.fromNetwork, this.item.toNetwork, this.item.fromToken, this.item.toToken)
           }
 
+          console.log('this.pair', this.pair)
           this.$emit('taskChanged', this.getTask())
         }
       }

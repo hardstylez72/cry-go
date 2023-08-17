@@ -67,6 +67,22 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Swap (ETH <-> USDC)',
           quest: ''
+        },
+        {
+          name: taskProps.SithSwap.service.name,
+          link: taskProps.SithSwap.service.link,
+          img: taskProps.SithSwap.service.img,
+          status: Status.integrated,
+          action: 'Swap (ETH <-> USDC)',
+          quest: ''
+        },
+        {
+          name: taskProps.JediSwap.service.name,
+          link: taskProps.JediSwap.service.link,
+          img: taskProps.JediSwap.service.img,
+          status: Status.integrated,
+          action: 'Swap (ETH <-> USDC)',
+          quest: ''
         }
       ],
     }

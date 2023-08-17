@@ -763,7 +763,9 @@
         "MerklyMintAndBridgeNFT",
         "DeployStarkNetAccount",
         "Swap10k",
-        "PancakeSwap"
+        "PancakeSwap",
+        "SithSwap",
+        "JediSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

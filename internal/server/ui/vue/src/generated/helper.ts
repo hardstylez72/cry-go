@@ -623,5 +623,7 @@ export enum TaskType {
   'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT',
   'DeployStarkNetAccount' = 'DeployStarkNetAccount',
   'Swap10k' = 'Swap10k',
-  'PancakeSwap' = 'PancakeSwap'
+  'PancakeSwap' = 'PancakeSwap',
+  'SithSwap' = 'SithSwap',
+  'JediSwap' = 'JediSwap'
 }

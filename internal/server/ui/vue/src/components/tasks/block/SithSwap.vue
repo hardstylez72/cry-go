@@ -40,14 +40,20 @@
 </template>
 
 <script lang="ts">
-import {Task, TaskType, Token} from "@/generated/flow";
+import {DefaultSwap, MaverickSwapTask, Network, SpaceFiSwapTask, Task, TaskType, Token} from "@/generated/flow";
+import {defineComponent, PropType} from "vue";
+import WEIInputField from "@/components/WEIInputField.vue";
+import AmountInput from "@/components/tasks/AmountInput.vue";
+import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
+import {required} from "@/components/tasks/menu/helper";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
+import DefaultSwapMenu from "@/components/tasks/menu/DefaultSwapMenu.js";
 import TaskDefaultSwap from "@/components/tasks/block/TaskDefaultSwap.js";
-import {Component} from "vue-facing-decorator";
+import {Component, toNative} from "vue-facing-decorator";
 
-@Component({name: 'Swap10k'})
-class Swap10k extends TaskDefaultSwap {
+@Component({name: 'SithSwap'})
+class SithSwap extends TaskDefaultSwap {
 
   pairs: SwapPair[] = [
     tokenSwapPair(Token.ETH, Token.USDC),
@@ -55,16 +61,16 @@ class Swap10k extends TaskDefaultSwap {
   ]
 
   created() {
-    if (this.task?.swap10k) {
-      this.item = this.task.swap10k
+    if (this.task?.sithSwapTask) {
+      this.item = this.task.sithSwapTask
     }
   }
 
   getTask(): Task {
-    const taskType = TaskType.Swap10k
+    const taskType = TaskType.SithSwap
     const task = {
       weight: this.weight.toString(),
-      swap10k: this.item,
+      sithSwapTask: this.item,
       taskType: taskType,
       description: "",
     }
@@ -74,8 +80,8 @@ class Swap10k extends TaskDefaultSwap {
 
   syncTask() {
     if (this.task) {
-      if (this.task.swap10k) {
-        this.item = this.task.swap10k
+      if (this.task.sithSwapTask) {
+        this.item = this.task.sithSwapTask
         this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
         this.$emit('taskChanged', this.getTask())
       }
@@ -83,7 +89,7 @@ class Swap10k extends TaskDefaultSwap {
   }
 }
 
-export default Swap10k
+export default SithSwap
 
 </script>
 

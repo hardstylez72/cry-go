@@ -34,9 +34,29 @@ type AccountPubKeyRes struct {
 	PublicKey string `json:"publicKey"`
 }
 
+type BaseTx struct {
+	ChainRPC   string `json:"chainRPC"`
+	PrivateKey string `json:"privateKey"`
+	Proxy      string `json:"proxy"`
+}
+
+type ApproveReq struct {
+	BaseTx
+
+	Spender string `json:"spender"`
+	Amount  string `json:"amount"`
+	Token   string `json:"token"`
+}
+
+type ApproveRes struct {
+	Error *string `json:"error"`
+	TxId  *string `json:"txId"`
+}
+
 type HalperService interface {
 	IsAccountDeployed(ctx context.Context, req *IsAccountDeployedReq) (*IsAccountDeployedRes, error)
 	DeployAccount(ctx context.Context, req *DeployAccountReq) (*DeployAccountRes, error)
 	AccountPubKey(ctx context.Context, req *AccountPubKeyReq) (*AccountPubKeyRes, error)
-	Swap10k(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error)
+	Swap(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error)
+	Approve(ctx context.Context, req *ApproveReq) (*ApproveRes, error)
 }

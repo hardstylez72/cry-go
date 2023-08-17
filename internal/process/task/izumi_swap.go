@@ -21,16 +21,9 @@ func (t *IzumiSwapTask) Stop() error {
 	return nil
 }
 
-func (t *IzumiSwapTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *IzumiSwapTask) Type() v1.TaskType {
+	return v1.TaskType_IzumiSwap
 }
-
 func (t *IzumiSwapTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {
 
 	taskContext, cancel := context.WithTimeout(ctx, taskTimeout)

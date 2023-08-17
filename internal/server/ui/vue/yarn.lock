@@ -2245,6 +2245,11 @@ vue-eslint-parser@^9.0.0, vue-eslint-parser@^9.0.1:
     lodash "^4.17.21"
     semver "^7.3.6"
 
+vue-facing-decorator@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/vue-facing-decorator/-/vue-facing-decorator-3.0.1.tgz#6407018823a7be44e8b7739ad5dfd099494dd7a8"
+  integrity sha512-M3YEABlSEllDlnEHL86/c0v9jbLdcy9BORYe/b4dcP4Sp6Y3xd3p0lCVJ+kIQ2lHKkVWyeyVaFZCbnjuWr0Peg==
+
 vue-functional-data-merge@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/vue-functional-data-merge/-/vue-functional-data-merge-3.1.0.tgz#08a7797583b7f35680587f8a1d51d729aa1dc657"

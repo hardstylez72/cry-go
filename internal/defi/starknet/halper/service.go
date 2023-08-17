@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/pkg/errors"
 )
 
@@ -28,6 +29,10 @@ func NewService(c *Config) *Service {
 	}
 }
 
+func (s *Service) Approve(ctx context.Context, req *ApproveReq) (*ApproveRes, error) {
+	return Request[ApproveReq, ApproveRes](ctx, s.cli, s.c.Host+"/starknet/approve", req)
+}
+
 func (s *Service) AccountPubKey(ctx context.Context, req *AccountPubKeyReq) (*AccountPubKeyRes, error) {
 	return Request[AccountPubKeyReq, AccountPubKeyRes](ctx, s.cli, s.c.Host+"/starknet/account_pub", req)
 }
@@ -40,14 +45,16 @@ func (s *Service) DeployAccount(ctx context.Context, req *DeployAccountReq) (*De
 }
 
 type DefaultSwapReq struct {
-	Proxy        string `json:"proxy"`
-	ChainRPC     string `json:"chainRPC"`
-	PrivateKey   string `json:"privateKey"`
-	FromToken    string `json:"fromToken"`
-	ToToken      string `json:"toToken"`
-	Amount       string `json:"amount"`
-	EstimateOnly bool   `json:"estimateOnly"`
-	Fee          string `json:"fee"`
+	Proxy        string               `json:"proxy"`
+	ChainRPC     string               `json:"chainRPC"`
+	PrivateKey   string               `json:"privateKey"`
+	FromToken    string               `json:"fromToken"`
+	ToToken      string               `json:"toToken"`
+	Amount       string               `json:"amount"`
+	EstimateOnly bool                 `json:"estimateOnly"`
+	Fee          string               `json:"fee"`
+	Slippage     defi.SlippagePercent `json:"slippage"`
+	Platform     string               `json:"platform"`
 }
 
 type DefaultSwapRes struct {
@@ -57,8 +64,8 @@ type DefaultSwapRes struct {
 	Error     *string `json:"error"`
 }
 
-func (s *Service) Swap10k(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error) {
-	res, err := Request[DefaultSwapReq, DefaultSwapRes](ctx, s.cli, s.c.Host+"/starknet/10k_swap", req)
+func (s *Service) Swap(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error) {
+	res, err := Request[DefaultSwapReq, DefaultSwapRes](ctx, s.cli, s.c.Host+"/starknet/swap", req)
 	if err != nil {
 		return nil, err
 	}

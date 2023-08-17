@@ -290,6 +290,9 @@ export interface DefaultSwap {
 
   /**  */
   tx?: TaskTx;
+
+  /**  */
+  approveTx?: TaskTx;
 }
 
 export interface DelayTask {
@@ -764,6 +767,12 @@ export interface Task {
 
   /**  */
   pancakeSwapTask?: DefaultSwap;
+
+  /**  */
+  sithSwapTask?: DefaultSwap;
+
+  /**  */
+  jediSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1049,7 +1058,9 @@ export enum TaskType {
   'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT',
   'DeployStarkNetAccount' = 'DeployStarkNetAccount',
   'Swap10k' = 'Swap10k',
-  'PancakeSwap' = 'PancakeSwap'
+  'PancakeSwap' = 'PancakeSwap',
+  'SithSwap' = 'SithSwap',
+  'JediSwap' = 'JediSwap'
 }
 
 export enum Token {

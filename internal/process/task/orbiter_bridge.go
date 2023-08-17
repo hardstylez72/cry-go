@@ -21,20 +21,8 @@ func (t *OrbiterBridgeTask) Stop() error {
 	return nil
 }
 
-func (t *OrbiterBridgeTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-	//l, ok := a.Task.Task.Task.(*v1.Task_OrbiterBridgeTask)
-	//if !ok {
-	//	return errors.New("panic.a.Task.Task.Task.(*v1.Task_OrbiterBridgeTask) call an ambulance!")
-	//}
-	//
-	//p := l.OrbiterBridgeTask
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *OrbiterBridgeTask) Type() v1.TaskType {
+	return v1.TaskType_OrbiterBridge
 }
 
 func (t *OrbiterBridgeTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

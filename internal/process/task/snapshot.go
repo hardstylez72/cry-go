@@ -21,21 +21,8 @@ func (t *SnapshotVoteTask) Stop() error {
 	return nil
 }
 
-func (t *SnapshotVoteTask) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-	l, ok := task.Task.Task.(*v1.Task_SnapshotVoteTask)
-	if !ok {
-		return errors.New("a.Task.Task.Task.(*v1.Task_SnapshotVoteTask) call an ambulance!")
-	}
-	p := l.SnapshotVoteTask
-
-	p.Proposal = nil
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *SnapshotVoteTask) Type() v1.TaskType {
+	return v1.TaskType_SnapshotVote
 }
 
 func (t *SnapshotVoteTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

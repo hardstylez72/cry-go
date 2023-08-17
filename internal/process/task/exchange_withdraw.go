@@ -2,7 +2,6 @@ package task
 
 import (
 	"context"
-	"time"
 
 	"github.com/hardstylez72/cry/internal/exchange"
 	"github.com/hardstylez72/cry/internal/lib"
@@ -16,31 +15,13 @@ type WithdrawExchange struct {
 	cancel func()
 }
 
-func (t *WithdrawExchange) SetTimeout(td time.Duration) {
-
-}
-
 func (t *WithdrawExchange) Stop() error {
 	t.cancel()
 	return nil
 }
 
-func (t *WithdrawExchange) Reset(ctx context.Context, a *Input) error {
-	task := a.Task
-	l, ok := task.Task.Task.(*v1.Task_WithdrawExchangeTask)
-	if !ok {
-		return errors.New("a.Task.Task.Task.(*v1.Task_WithdrawExchangeTask) call an ambulance!")
-	}
-	p := l.WithdrawExchangeTask
-
-	p.TxId = nil
-	p.WithdrawOrderId = nil
-
-	if err := a.UpdateTask(ctx, task); err != nil {
-		return err
-	}
-
-	return nil
+func (t *WithdrawExchange) Type() v1.TaskType {
+	return v1.TaskType_WithdrawExchange
 }
 
 func (t *WithdrawExchange) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {

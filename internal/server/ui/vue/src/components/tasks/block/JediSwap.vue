@@ -40,31 +40,31 @@
 </template>
 
 <script lang="ts">
-import {Task, TaskType, Token} from "@/generated/flow";
+import {DefaultSwap, MaverickSwapTask, Network, SpaceFiSwapTask, Task, TaskType, Token} from "@/generated/flow";
+import {defineComponent, PropType} from "vue";
+import WEIInputField from "@/components/WEIInputField.vue";
+import AmountInput from "@/components/tasks/AmountInput.vue";
+import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
+import {required} from "@/components/tasks/menu/helper";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
+import DefaultSwapMenu from "@/components/tasks/menu/DefaultSwapMenu.js";
 import TaskDefaultSwap from "@/components/tasks/block/TaskDefaultSwap.js";
-import {Component} from "vue-facing-decorator";
+import {Component, toNative} from "vue-facing-decorator";
 
-@Component({name: 'Swap10k'})
-class Swap10k extends TaskDefaultSwap {
+@Component({name: 'JediSwap'})
+export default class JediSwap extends TaskDefaultSwap {
 
   pairs: SwapPair[] = [
     tokenSwapPair(Token.ETH, Token.USDC),
     tokenSwapPair(Token.USDC, Token.ETH),
   ]
 
-  created() {
-    if (this.task?.swap10k) {
-      this.item = this.task.swap10k
-    }
-  }
-
   getTask(): Task {
-    const taskType = TaskType.Swap10k
+    const taskType = TaskType.JediSwap
     const task = {
       weight: this.weight.toString(),
-      swap10k: this.item,
+      jediSwapTask: this.item,
       taskType: taskType,
       description: "",
     }
@@ -74,16 +74,22 @@ class Swap10k extends TaskDefaultSwap {
 
   syncTask() {
     if (this.task) {
-      if (this.task.swap10k) {
-        this.item = this.task.swap10k
+      if (this.task.jediSwapTask) {
+        this.item = this.task.jediSwapTask
         this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
         this.$emit('taskChanged', this.getTask())
       }
     }
   }
+
+  created() {
+    if (this.task?.jediSwapTask) {
+      this.item = this.task.jediSwapTask
+    }
+  }
+
 }
 
-export default Swap10k
 
 </script>
 
