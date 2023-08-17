@@ -29,7 +29,7 @@ func signSessionKey(privateKey, accountAddress, counterAddress, selector, sessio
 	)
 }
 
-// func (ap *AccountManager) ExecuteWithSessionKey(counterAddress, selector string, provider *rpc.Provider) (string, error) {
+// func (ap *AccountManager) ExecuteWithSessionKey(counterAddress, selector string, provider *rpc.rpcL2) (string, error) {
 // 	sessionPrivateKey, _ := starknetgo.Curve.GetRandomPrivateKey()
 // 	sessionPublicKey, _, _ := starknetgo.Curve.PrivateToPoint(sessionPrivateKey)
 

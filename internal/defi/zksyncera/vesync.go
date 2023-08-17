@@ -31,7 +31,7 @@ func (c *veSyncMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) 
 	if err != nil {
 		return nil, err
 	}
-	call, err := vesyncrouter.NewStorageCaller(c.Cfg.VeSync.Router, c.Provider)
+	call, err := vesyncrouter.NewStorageCaller(c.Cfg.VeSync.Router, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}

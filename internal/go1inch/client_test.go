@@ -9,7 +9,7 @@ import (
 
 func TestName(t *testing.T) {
 	c := NewClient(&Config{
-		//HttpCli: tests.GetConfig().Cli,
+		//HttpCli: tests.GetConfig().CliL1,
 	})
 
 	res, _, err := c.ApproveSpender(context.Background(), Arbitrum)

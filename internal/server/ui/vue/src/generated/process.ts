@@ -1233,6 +1233,9 @@ export interface Task {
 
   /**  */
   swap10k?: DefaultSwap;
+
+  /**  */
+  pancakeSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1545,7 +1548,8 @@ export enum TaskType {
   'TraderJoeSwap' = 'TraderJoeSwap',
   'MerklyMintAndBridgeNFT' = 'MerklyMintAndBridgeNFT',
   'DeployStarkNetAccount' = 'DeployStarkNetAccount',
-  'Swap10k' = 'Swap10k'
+  'Swap10k' = 'Swap10k',
+  'PancakeSwap' = 'PancakeSwap'
 }
 
 export enum Token {

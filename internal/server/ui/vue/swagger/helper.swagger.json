@@ -762,7 +762,8 @@
         "TraderJoeSwap",
         "MerklyMintAndBridgeNFT",
         "DeployStarkNetAccount",
-        "Swap10k"
+        "Swap10k",
+        "PancakeSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

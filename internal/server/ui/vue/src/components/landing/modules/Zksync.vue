@@ -167,6 +167,14 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Mint and Bridge NFT',
           quest: ''
+        },
+        {
+          name: taskProps.PancakeSwap.service.name,
+          link: taskProps.PancakeSwap.service.link,
+          img: taskProps.PancakeSwap.service.img,
+          status: Status.integrated,
+          action: 'Swap (ETH <-> USDC)',
+          quest: ''
         }
       ],
       links: [

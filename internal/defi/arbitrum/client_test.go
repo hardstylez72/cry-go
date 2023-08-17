@@ -42,7 +42,7 @@ func Test(t *testing.T) {
 	//assert.NotNil(t, res)
 	//println(r.TxViewFn(res.Tx.Hash().String()))
 
-	//logs, err := r.defi.Cli.FilterLogs(context.Background(), ethereum.FilterQuery{
+	//logs, err := r.defi.CliL1.FilterLogs(context.Background(), ethereum.FilterQuery{
 	//	BlockHash: nil,
 	//	FromBlock: nil,
 	//	ToBlock:   nil,
@@ -52,7 +52,7 @@ func Test(t *testing.T) {
 	//
 	//assert.NoError(t, err)
 	//assert.NotNil(t, logs)
-	//tx, _, _ := r.defi.Cli.TransactionByHash(context.Background(), common.HexToHash("0x2693486b5ce16b8d6514c899158470df323f061ba131506559c1ddce39710e19"))
+	//tx, _, _ := r.defi.CliL1.TransactionByHash(context.Background(), common.HexToHash("0x2693486b5ce16b8d6514c899158470df323f061ba131506559c1ddce39710e19"))
 
 	// gas limit 1655806
 	// gas fee cap 200000000
@@ -60,7 +60,7 @@ func Test(t *testing.T) {
 	// value 248791766200233
 	//assert.NotNil(t, tx)
 	//println(1)
-	//h, err := r.defi.Cli.HeaderByNumber(context.Background(), nil)
+	//h, err := r.defi.CliL1.HeaderByNumber(context.Background(), nil)
 	//assert.NoError(t, err)
 	//assert.NotNil(t, h)
 

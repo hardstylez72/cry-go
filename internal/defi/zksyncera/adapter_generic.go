@@ -7,7 +7,6 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
 type TxSwapMaker interface {
@@ -42,7 +41,7 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 	}
 	result.ApproveTx = tokenLimitChecker.ApproveTx
 
-	tx := utils.CreateFunctionCallTransaction(
+	tx := CreateFunctionCallTransaction(
 		transactor.WalletAddr,
 		txData.ContractAddr,
 		big.NewInt(0),
@@ -63,9 +62,9 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
@@ -96,7 +95,7 @@ func (c *Client) GenericBridge(ctx context.Context, maker TxBridgeMaker, req *de
 	}
 	result.ApproveTx = tokenLimitChecker.ApproveTx
 
-	tx := utils.CreateFunctionCallTransaction(
+	tx := CreateFunctionCallTransaction(
 		transactor.WalletAddr,
 		txData.ContractAddr,
 		nil,
@@ -117,9 +116,9 @@ func (c *Client) GenericBridge(ctx context.Context, maker TxBridgeMaker, req *de
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)

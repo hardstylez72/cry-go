@@ -41,7 +41,7 @@ func (p *Proxy) GetIpStat(ctx context.Context) (*GetIpStatRes, error) {
 	}
 	res, err := p.Cli.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "p.Cli.Do")
+		return nil, errors.Wrap(err, "p.CliL1.Do")
 	}
 	if res.Body != nil {
 		defer res.Body.Close()
@@ -71,7 +71,7 @@ func (p *Proxy) GetIp(ctx context.Context) (*GetIpRes, error) {
 
 	res, err := p.Cli.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "p.Cli.Do")
+		return nil, errors.Wrap(err, "p.CliL1.Do")
 	}
 
 	if res.Body != nil {

@@ -11,7 +11,6 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/contracts/erc_20"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/accounts"
 )
 
 type TokenLimitCheckerReq struct {
@@ -88,7 +87,7 @@ func (c *Client) TokenAllowed(ctx context.Context, req *AllowedReq) (*AllowedRes
 		return nil, defi.ErrTokenNotSupportedFn(req.Token)
 	}
 
-	caller, err := erc_20.NewStorageCaller(addr, c.Provider)
+	caller, err := erc_20.NewStorageCaller(addr, c.ClientL2)
 	if err != nil {
 		return nil, errors.Wrap(err, "stg.NewStgCaller")
 	}
@@ -150,16 +149,19 @@ func (c *Client) TokenApprove(ctx context.Context, req *ApproveReq) (*ApproveRes
 		return nil, err
 	}
 
-	signer, err := accounts.NewEthSignerFromRawPrivateKey(req.Wallet.PKb, c.NetworkId.Int64())
-	if err != nil {
-		return nil, err
-	}
-	w, err := accounts.NewWallet(signer, c.Provider)
+	w, wtx, err := c.Wallet(req.Wallet.PK)
 	if err != nil {
 		return nil, err
 	}
 
-	hash, err := w.Execute(addr, data, nil, nil)
+	call := CreateFunctionCallTransaction(w.Address(), addr, nil, big.NewInt(0), nil, data, nil, nil)
+
+	tx, _, err := c.Make712Tx(ctx, call, nil, wtx.Signer)
+	if err != nil {
+		return nil, err
+	}
+
+	hash, err := c.ClientL2.SendRawTransaction(ctx, tx)
 	if err != nil {
 		return nil, errors.Wrap(err, "caller.Allowance")
 	}

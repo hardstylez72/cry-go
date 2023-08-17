@@ -7,7 +7,7 @@ import (
 
 func TestService(t *testing.T) {
 	//cfg := tests.GetConfig()
-	//c := NewService(cfg.BinanceKey, cfg.BinanceSecret, cfg.Cli)
+	//c := NewService(cfg.BinanceKey, cfg.BinanceSecret, cfg.CliL1)
 	//
 	//c.GetWithDrawOptions(context.Background())
 	//t.Run("assets", func(t *testing.T) {

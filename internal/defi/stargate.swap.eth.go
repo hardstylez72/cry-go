@@ -146,7 +146,7 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 
 	return &StargateBridgeSwapEthRes{
 		Tx:    tx,
-		ECost: Estimate(tx, l1Gasfee, "bridge", details),
+		ECost: Estimate(tx, bozdo.BigIntSum(l1Gasfee, fee.Fee1), "bridge", details),
 	}, nil
 }
 

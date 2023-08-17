@@ -11,7 +11,6 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/syncswaprouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
 type SyncSwapLiquidityReq struct {
@@ -136,7 +135,7 @@ func (c *Client) syncSwapLiquidityXXXETHAdd(ctx context.Context, req *SyncSwapLi
 		println("0x" + common.Bytes2Hex(data))
 	}
 
-	tx := utils.CreateFunctionCallTransaction(
+	tx := CreateFunctionCallTransaction(
 		transactor.WalletAddr,
 		c.Cfg.SyncSwap.RouterSwap,
 		big.NewInt(0),
@@ -157,9 +156,9 @@ func (c *Client) syncSwapLiquidityXXXETHAdd(ctx context.Context, req *SyncSwapLi
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	result.SwapTx = c.NewTx(hash, defi.CodeContract, nil)
@@ -224,7 +223,7 @@ func (c *Client) syncSwapLiquidityXXXETHRemove(ctx context.Context, req *SyncSwa
 		println("0x" + common.Bytes2Hex(data))
 	}
 
-	tx := utils.CreateFunctionCallTransaction(
+	tx := CreateFunctionCallTransaction(
 		transactor.WalletAddr,
 		c.Cfg.SyncSwap.RouterSwap,
 		big.NewInt(0),
@@ -245,9 +244,9 @@ func (c *Client) syncSwapLiquidityXXXETHRemove(ctx context.Context, req *SyncSwa
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	result.SwapTx = c.NewTx(hash, defi.CodeContract, nil)

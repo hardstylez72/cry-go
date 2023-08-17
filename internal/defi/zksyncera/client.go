@@ -11,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	"github.com/hardstylez72/cry/internal/defi/etherium"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera/scan"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -36,8 +35,10 @@ type Muteio struct {
 }
 
 type Client struct {
-	EthRpc    *rpc.Client
-	Provider  *clients.DefaultProvider
+	rpcL2     *rpc.Client
+	rpcL1     *rpc.Client
+	ClientL2  clients.Client
+	ClientL1  *ethclient.Client
 	NetworkId *big.Int
 	Cfg       *Config
 	scanner   scan.Scanner
@@ -187,7 +188,7 @@ func NewMainNetClient(c *ClientConfig) (*Client, error) {
 		v1.Token_MAV:   common.HexToAddress("0x787c09494Ec8Bcb24DcAf8659E7d5D69979eE508"),
 		v1.Token_SPACE: common.HexToAddress("0x47260090cE5e83454d5f05A0AbbB2C953835f777"),
 		v1.Token_VC:    common.HexToAddress("0x85D84c774CF8e9fF85342684b0E795Df72A24908"),
-		v1.Token_IZI:   common.HexToAddress("16a9494e257703797d747540f01683952547ee5b"),
+		v1.Token_IZI:   common.HexToAddress("0x16a9494e257703797d747540f01683952547ee5b"),
 	}
 
 	muteio := Muteio{
@@ -265,36 +266,33 @@ func newClient(
 		config = c
 	}
 
-	provider, err := clients.NewDefaultProvider(c.RPCEndpoint)
+	rpcL2Client, err := rpc.DialOptions(context.Background(), c.RPCEndpoint, rpc.WithHTTPClient(config.HttpCli))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to connect to blockchain node: "+c.RPCEndpoint)
 	}
 
-	rpcClient, err := rpc.DialOptions(context.Background(), c.RPCEndpoint, rpc.WithHTTPClient(config.HttpCli))
+	rpcL1Client, err := rpc.DialOptions(context.Background(), "https://rpc.ankr.com/eth", rpc.WithHTTPClient(config.HttpCli))
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ETH: "+c.RPCEndpoint)
 	}
-
-	provider.Client = ethclient.NewClient(rpcClient)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	chainId, err := provider.ChainID(ctx)
+	clientL2 := clients.NewClient(rpcL2Client)
+	chainId, err := clientL2.ChainID(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	ethRpc, err := rpc.DialOptions(context.Background(), etherium.MainNetURL, rpc.WithHTTPClient(config.HttpCli))
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to connect to ETH: "+c.RPCEndpoint)
-	}
+	clientL1 := ethclient.NewClient(rpcL1Client)
 
 	return &Client{
-		EthRpc:    ethRpc,
-		Provider:  provider,
+		rpcL2:     rpcL2Client,
+		rpcL1:     rpcL1Client,
+		ClientL2:  clientL2,
+		ClientL1:  clientL1,
 		NetworkId: chainId,
-		scanner:   scanner,
 		Cfg: &Config{
 			Weth:      tm[v1.Token_WETH],
 			Network:   n,
@@ -314,6 +312,7 @@ func newClient(
 			Ezkalibur: ezkalibur,
 			ZkSwap:    ZkSwap,
 		},
+		scanner: scanner,
 	}, nil
 }
 

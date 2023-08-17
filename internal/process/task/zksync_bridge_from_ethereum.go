@@ -23,13 +23,6 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Stop() error {
 
 func (t *ZksyncOfficialBridgeFromEthereumTask) Reset(ctx context.Context, a *Input) error {
 	task := a.Task
-	//l, ok := a.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask)
-	//if !ok {
-	//	return errors.New("panic.a.Task.Task.Task.(*v1.Task_SyncSwapTask) call an ambulance!")
-	//}
-	//
-	//p := l.SyncSwapTask
-
 	if err := a.UpdateTask(ctx, task); err != nil {
 		return err
 	}
@@ -171,19 +164,21 @@ func EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx context.Context, profile *h
 	}
 
 	res, err := client.BridgeFromEthereumNetwork(ctx, &zksyncera.L1L2BridgeReq{
-		Amount:   am,
-		WalletPK: profile.WalletPK,
+		Amount:       am,
+		WalletPK:     profile.WalletPK,
+		EstimateOnly: true,
+		Gas:          nil,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	return &v1.EstimationTx{
-		Balance:  defi.AmountUni(b.WEI, network),
-		Value:    defi.AmountUni(am, network),
-		Gas:      defi.AmountUni(res.EstimatedGasCost.TotalGasWei, network),
-		GasLimit: defi.AmountUni(res.EstimatedGasCost.GasLimit, network),
-		GasPrice: defi.AmountUni(res.EstimatedGasCost.GasPrice, network),
+		Balance:  defi.AmountUni(b.WEI, v1.Network_Etherium),
+		Value:    defi.AmountUni(am, v1.Network_Etherium),
+		Gas:      defi.AmountUni(res.EstimatedGasCost.TotalGasWei, v1.Network_Etherium),
+		GasLimit: defi.AmountUni(res.EstimatedGasCost.GasLimit, v1.Network_Etherium),
+		GasPrice: defi.AmountUni(res.EstimatedGasCost.GasPrice, v1.Network_Etherium),
 	}, nil
 }
 

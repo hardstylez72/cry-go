@@ -220,6 +220,10 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 		am = ResolveNetworkTokenAmount(b.WEI, &gas.TotalGas, am)
 	}
 
+	println("balance: " + defi.WEIToEther(b.WEI).String())
+	println("amount: " + defi.WEIToEther(am).String())
+	println("diff: " + defi.WEIToEther(new(big.Int).Sub(b.WEI, am)).String())
+
 	swap, err := swapper.StargateBridgeSwap(ctx, &defi.DefaultBridgeReq{
 		FromNetwork: p.FromNetwork,
 		ToNetwork:   p.ToNetwork,

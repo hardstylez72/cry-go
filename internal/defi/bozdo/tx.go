@@ -73,6 +73,7 @@ type TxType = string
 const TxTypeLegacy = "legacy"
 const TxTypeDynamic = "legacy"
 const TxTypeStarkNet = "starkNet"
+const TxTypeOptimism = "optimism"
 
 type EstimatedGasCost struct {
 	Type        TxType
@@ -81,6 +82,7 @@ type EstimatedGasCost struct {
 	GasPrice    *big.Int
 	TotalGasWei *big.Int
 	Details     []TxDetail
+	ExtraFee    *big.Int
 }
 
 type Gas struct {

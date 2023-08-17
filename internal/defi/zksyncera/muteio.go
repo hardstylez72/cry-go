@@ -13,8 +13,6 @@ import (
 	muteiorouter "github.com/hardstylez72/cry/internal/defi/contracts/zksyncera/muteio"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/accounts"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
 func (c *Client) MuteIOSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
@@ -47,17 +45,11 @@ func (c *Client) MuteIOSwap(ctx context.Context, req *defi.DefaultSwapReq) (*boz
 // my
 func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 
-	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
+	w, wtx, err := c.Wallet(req.WalletPK)
 	if err != nil {
 		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
-	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
-	if err != nil {
-		return nil, errors.Wrap(err, "zksync2.NewWallet")
-	}
-	//t, _ := muteiorouter.NewStorageTransactor()
-	//t.SwapExactTokensForETHSupportingFeeOnTransferTokens()
 	muteiorouterabi, err := muteiorouter.StorageMetaData.GetAbi()
 	if err != nil {
 		return nil, err
@@ -70,7 +62,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 
 	min := req.Amount
 	path := []common.Address{c.Cfg.TokenMap[req.FromToken], c.Cfg.Weth}
-	to := w.GetAddress()
+	to := w.Address()
 	deadline := new(big.Int).SetInt64(time.Now().Add(time.Second * 20).Unix())
 	stableMap := []bool{false, false}
 
@@ -79,8 +71,8 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 		return nil, fmt.Errorf("failed to pack withdraw function: %w", err)
 	}
 
-	tx := utils.CreateFunctionCallTransaction(
-		w.GetAddress(),
+	tx := CreateFunctionCallTransaction(
+		w.Address(),
 		c.Cfg.Muteio.RouterSwap,
 		big.NewInt(0),
 		big.NewInt(0),
@@ -100,9 +92,9 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
 
@@ -117,9 +109,9 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
-	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
+	w, wtx, err := c.Wallet(req.WalletPK)
 	if err != nil {
-		return nil, errors.Wrap(err, "zksync2.NewWallet")
+		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
 	muteiorouterabi, err := muteiorouter.StorageMetaData.GetAbi()
@@ -149,8 +141,8 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 
 	value = bozdo.BigIntSum(value, fee)
 
-	tx := utils.CreateFunctionCallTransaction(
-		w.GetAddress(),
+	tx := CreateFunctionCallTransaction(
+		w.Address(),
 		c.Cfg.Muteio.RouterSwap,
 		big.NewInt(0),
 		big.NewInt(0),
@@ -170,9 +162,9 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
 
@@ -180,7 +172,7 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 }
 
 func (c *Client) MuteIoPairFee(ctx context.Context, req *defi.DefaultSwapReq) (AmountOut *big.Int, Stable bool, Fee *big.Int, err error) {
-	caller, err := muteiorouter.NewStorageCaller(c.Cfg.Muteio.RouterSwap, c.Provider)
+	caller, err := muteiorouter.NewStorageCaller(c.Cfg.Muteio.RouterSwap, c.ClientL2)
 	if err != nil {
 		return nil, false, nil, err
 	}

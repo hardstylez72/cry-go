@@ -120,9 +120,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_OrbiterBridge:
 		p := t.Task.Task.(*v1.Task_OrbiterBridgeTask).OrbiterBridgeTask
 		e, err = task.EstimateOrbiterBridgeCost(ctx, d.orbiterService, profile, p)
-	//case v1.TaskType_ZkSyncOfficialBridgeFromEthereum:
-	//	p := arg.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask).ZkSyncOfficialBridgeFromEthereumTask
-	//	return task.EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx, profile, p)
+	case v1.TaskType_ZkSyncOfficialBridgeFromEthereum:
+		p := t.Task.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask).ZkSyncOfficialBridgeFromEthereumTask
+		e, err = task.EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx, profile, p)
 	case v1.TaskType_WETH:
 		p := t.Task.Task.(*v1.Task_WETHTask).WETHTask
 		e, err = task.EstimateWethTaskCost(ctx, p, profile)
@@ -173,7 +173,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_Swap10k:
 		p := t.Task.Task.(*v1.Task_Swap10K).Swap10K
 		e, err = task.EstimateSwap10kCost(ctx, profile, p, nil)
-
+	case v1.TaskType_PancakeSwap:
+		p := t.Task.Task.(*v1.Task_PancakeSwapTask).PancakeSwapTask
+		e, err = task.EstimatePancakeSwapCost(ctx, profile, p, nil)
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
 	}

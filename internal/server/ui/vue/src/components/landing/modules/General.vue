@@ -1,5 +1,6 @@
 <template>
   <Exchange/>
+  <StarkNet/>
   <Zksync/>
   <LayerZero/>
   <Other/>
@@ -13,11 +14,12 @@ import Orbiter from "@/components/landing/modules/Other.vue";
 import LayerZero from "@/components/landing/modules/LayerZero.vue";
 import Exchange from "@/components/landing/modules/Exchange.vue";
 import Other from "@/components/landing/modules/Other.vue";
+import StarkNet from "@/components/landing/modules/StarkNet.vue";
 
 
 export default defineComponent({
   name: "General",
-  components: {Other, Exchange, LayerZero, Orbiter, Zksync},
+  components: {StarkNet, Other, Exchange, LayerZero, Orbiter, Zksync},
   created() {
   },
 })

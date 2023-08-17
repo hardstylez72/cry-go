@@ -27,7 +27,7 @@ func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapRe
 	if err != nil {
 		return nil, err
 	}
-	call, err := ezkaliburrouter.NewStorageCaller(c.Cfg.Ezkalibur.Router, c.Provider)
+	call, err := ezkaliburrouter.NewStorageCaller(c.Cfg.Ezkalibur.Router, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}

@@ -13,7 +13,6 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/startgatemavrouter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
-	"github.com/zksync-sdk/zksync2-go/accounts"
 )
 
 type stargateBridgeMaker struct {
@@ -135,31 +134,23 @@ type GetStargateBridgeFeeRes struct {
 func (m stargateBridgeMaker) GetStargateBridgeFee(ctx context.Context, req *GetStargateBridgeFeeReq) (*GetStargateBridgeFeeRes, error) {
 
 	c := m.source
-	chainID, err := c.Provider.ChainID(ctx)
-	if err != nil {
-		return nil, err
-	}
-	es, err := accounts.NewEthSignerFromRawPrivateKey(common.Hex2Bytes(req.WalletPK), chainID.Int64())
-	if err != nil {
-		return nil, err
-	}
 
-	w, err := accounts.NewWallet(es, c.Provider)
+	w, _, err := c.Wallet(req.WalletPK)
 	if err != nil {
 		return nil, errors.Wrap(err, "zksync2.NewWallet")
 	}
 
-	provider, err := w.CreateEthereumProvider(c.EthRpc)
+	provider := c.ClientL1
 	if err != nil {
 		return nil, errors.Wrap(err, "CreateEthereumProvider")
 	}
 
-	trx, err := router.NewRouterCaller(common.HexToAddress("0x8731d54E9D02c286767d56ac03e8037C07e01e98"), provider.GetClient())
+	trx, err := router.NewRouterCaller(common.HexToAddress("0x8731d54E9D02c286767d56ac03e8037C07e01e98"), provider)
 	if err != nil {
 		return nil, err
 	}
 
-	toAddress := w.GetAddress().Bytes()
+	toAddress := w.Address().Bytes()
 	payload := common.HexToAddress("0").Bytes()
 	distChain, ok := layerzero.LayerZeroChainMap[req.ToChain]
 	if !ok {

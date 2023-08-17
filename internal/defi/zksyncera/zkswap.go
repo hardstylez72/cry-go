@@ -32,7 +32,7 @@ func (c *zkSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) 
 	if err != nil {
 		return nil, err
 	}
-	call, err := zkswaprouter.NewStorageCaller(c.Cfg.ZkSwap.Router, c.Provider)
+	call, err := zkswaprouter.NewStorageCaller(c.Cfg.ZkSwap.Router, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}

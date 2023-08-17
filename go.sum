@@ -662,8 +662,8 @@ github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5t
 github.com/yusufpapurcu/wmi v1.2.3 h1:E1ctvB7uKFMOJw3fdOW32DwGE9I7t++CRUEMKvFoFiw=
 github.com/yusufpapurcu/wmi v1.2.3/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
-github.com/zksync-sdk/zksync2-go v0.2.0 h1:gF5UrR+3LTOhdUvIxA8K0r9NryKh36sevSdioB7d5/k=
-github.com/zksync-sdk/zksync2-go v0.2.0/go.mod h1:sdzmWj4WFXOff/O7FWyVuDpV01HtyotwI+TQsRnUNqo=
+github.com/zksync-sdk/zksync2-go v0.3.0 h1:mUps7924G/f+mG+u0R8zeM8fB+kiYOBN4bK+wTeszEk=
+github.com/zksync-sdk/zksync2-go v0.3.0/go.mod h1:sdzmWj4WFXOff/O7FWyVuDpV01HtyotwI+TQsRnUNqo=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=

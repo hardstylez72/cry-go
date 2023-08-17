@@ -52,7 +52,7 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 		return nil, defi.ErrTokenNotSupportedFn(req.ToToken)
 	}
 
-	izumiquotertr, err := izumiquoter.NewStorageCaller(c.Cfg.IZUMI.Quoter, c.Provider)
+	izumiquotertr, err := izumiquoter.NewStorageCaller(c.Cfg.IZUMI.Quoter, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}

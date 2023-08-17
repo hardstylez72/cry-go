@@ -82,7 +82,7 @@ func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
 	var err error
 	fmt.Println("Polling until transaction is accepted on L2...")
 	for !acceptedOnL2 {
-		_, receipt, err = c.GW.WaitForTransaction(ctx, tx, 5, 10)
+		_, receipt, err = c.GW.WaitForTransaction(ctx, tx, 5, 30)
 		if err != nil {
 			return fmt.Errorf("Transaction Failure (%s): can't poll to desired status: %s", tx, err.Error())
 		}

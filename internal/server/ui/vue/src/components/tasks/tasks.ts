@@ -52,6 +52,8 @@ import DeployStarkNetAccount from "@/components/tasks/menu/DeployStarkNetAccount
 import {ProfileType} from "@/generated/profile";
 import swap10k from "@/components/tasks/block/swap10k.vue";
 import swap10kMenu from "@/components/tasks/menu/swap10kMenu.vue";
+import TaskPancakeSwap from "@/components/tasks/block/TaskPancakeSwap.vue";
+import PancakeSwap from "@/components/tasks/menu/PancakeSwap.vue";
 
 
 export interface TaskArg {
@@ -340,7 +342,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   },
   ZkSyncOfficialBridgeFromEthereum: {
     deprecated: false,
-    canBeEstimated: false,
+    canBeEstimated: true,
     menu: MenuZkSyncOfficialBridgeFromEth,
     component: TaskZkSyncOfficialBridgeFromEth,
     descFn(task) {
@@ -636,6 +638,26 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     networks: new Set<Network>([Network.StarkNet]),
     airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
     profileType: new Set([ProfileType.StarkNet])
+  },
+  PancakeSwap: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.pancakeSwapTask
+      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+    },
+    component: TaskPancakeSwap,
+    menu: PancakeSwap,
+    service: {
+      name: 'PancakeSwap',
+      link: 'https://pancakeswap.finance/',
+      img: '/icons/pancake.ico',
+      op: 'swap',
+    },
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
   },
 }
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/weth"
@@ -25,14 +25,9 @@ func (c *Client) SwapWETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRes
 
 func (c *Client) WrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRes, error) {
 
-	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
+	w, wtx, err := c.Wallet(req.WalletPK)
 	if err != nil {
-		return nil, errors.Wrap(err, "newWalletTransactor")
-	}
-
-	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
-	if err != nil {
-		return nil, errors.Wrap(err, "zksync2.NewWallet")
+		return nil, err
 	}
 
 	wethabi, err := weth.StorageMetaData.GetAbi()
@@ -45,15 +40,22 @@ func (c *Client) WrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRes,
 		return nil, fmt.Errorf("failed to pack withdraw function: %w", err)
 	}
 
-	tx := utils.CreateFunctionCallTransaction(
-		w.GetAddress(),
-		c.Cfg.Weth,
-		big.NewInt(0),
-		big.NewInt(0),
-		req.Amount,
-		data,
-		nil, nil,
-	)
+	tx := &types.CallMsg{
+		CallMsg: ethereum.CallMsg{
+			From:       w.Address(),
+			To:         &c.Cfg.Weth,
+			Gas:        0,
+			GasPrice:   big.NewInt(0),
+			GasFeeCap:  nil,
+			GasTipCap:  nil,
+			Value:      req.Amount,
+			Data:       data,
+			AccessList: nil,
+		},
+		Meta: &types.Eip712Meta{
+			GasPerPubdata: utils.NewBig(utils.DefaultGasPerPubdataLimit.Int64()),
+		},
+	}
 
 	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, wtx.Signer)
 	if err != nil {
@@ -66,24 +68,20 @@ func (c *Client) WrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRes,
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
 
 	return result, nil
 }
+
 func (c *Client) UnWrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRes, error) {
 
-	wtx, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
+	w, wtx, err := c.Wallet(req.WalletPK)
 	if err != nil {
-		return nil, errors.Wrap(err, "newWalletTransactor")
-	}
-
-	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
-	if err != nil {
-		return nil, errors.Wrap(err, "zksync2.NewWallet")
+		return nil, err
 	}
 
 	wethabi, err := weth.StorageMetaData.GetAbi()
@@ -96,15 +94,22 @@ func (c *Client) UnWrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRe
 		return nil, fmt.Errorf("failed to pack withdraw function: %w", err)
 	}
 
-	tx := utils.CreateFunctionCallTransaction(
-		w.GetAddress(),
-		c.Cfg.Weth,
-		big.NewInt(0),
-		big.NewInt(0),
-		nil,
-		data,
-		nil, nil,
-	)
+	tx := &types.CallMsg{
+		CallMsg: ethereum.CallMsg{
+			From:       w.Address(),
+			To:         &c.Cfg.Weth,
+			Gas:        0,
+			GasPrice:   big.NewInt(0),
+			GasFeeCap:  nil,
+			GasTipCap:  nil,
+			Value:      nil,
+			Data:       data,
+			AccessList: nil,
+		},
+		Meta: &types.Eip712Meta{
+			GasPerPubdata: utils.NewBig(utils.DefaultGasPerPubdataLimit.Int64()),
+		},
+	}
 
 	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, wtx.Signer)
 	if err != nil {
@@ -117,17 +122,17 @@ func (c *Client) UnWrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRe
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
 
 	return result, nil
 }
 
-func (c *Client) Make712Tx(ctx context.Context, tx *types.Transaction, gasOpt *bozdo.Gas, signer *accounts.DefaultEthSigner) ([]byte, *bozdo.EstimatedGasCost, error) {
-	nonce, err := c.Provider.NonceAt(ctx, tx.From, nil)
+func (c *Client) Make712Tx(ctx context.Context, tx *types.CallMsg, gasOpt *bozdo.Gas, signer *accounts.BaseSigner) ([]byte, *bozdo.EstimatedGasCost, error) {
+	nonce, err := c.ClientL2.NonceAt(ctx, tx.From, nil)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to GetGasPrice: %w", err)
 	}
@@ -138,12 +143,13 @@ func (c *Client) Make712Tx(ctx context.Context, tx *types.Transaction, gasOpt *b
 		gasPrice = &gasOpt.GasPrice
 		gasPrice = defi.ResolveGasPriceZksync(&gasOpt.MaxGas, gas, gasPrice)
 	} else {
-		gasPrice, err = c.Provider.GetGasPrice()
+		gasPrice, err = c.ClientL2.SuggestGasPrice(ctx)
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to GetGasPrice: %w", err)
 		}
-		tx.GasPrice = (*hexutil.Big)(gasPrice)
-		gas, err = c.Provider.EstimateGas712(tx)
+		tx.GasPrice = gasPrice
+		gasLimit, err := c.ClientL2.EstimateGasL2(ctx, *tx)
+		gas = big.NewInt(0).SetUint64(gasLimit)
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to EstimateGas: %w", err)
 		}
@@ -154,16 +160,16 @@ func (c *Client) Make712Tx(ctx context.Context, tx *types.Transaction, gasOpt *b
 		GasTipCap:  big.NewInt(100_000_000), // TODO: Estimate correct one
 		GasFeeCap:  gasPrice,
 		Gas:        gas,
-		To:         &tx.To,
-		Value:      tx.Value.ToInt(),
+		To:         tx.To,
+		Value:      tx.Value,
 		Data:       tx.Data,
 		AccessList: nil,
 		ChainID:    c.NetworkId,
 		From:       &tx.From,
-		Meta:       tx.Eip712Meta,
+		Meta:       tx.Meta,
 	}
 
-	signature, err := signer.SignTypedData(signer.GetDomain(), prepared)
+	signature, err := signer.SignTypedData(signer.Domain(), prepared)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "Signer.SignTypedData")
 	}

@@ -136,7 +136,7 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 	}, nil
 }
 
-func Estimate(tx *types.Transaction, l1GasFee *big.Int, name string, details []bozdo.TxDetail) *bozdo.EstimatedGasCost {
+func Estimate(tx *types.Transaction, extraFee *big.Int, name string, details []bozdo.TxDetail) *bozdo.EstimatedGasCost {
 	gasLimit := new(big.Int).SetUint64(tx.Gas())
 	gasLimit = bozdo.BigIntSum(gasLimit, bozdo.Percent(gasLimit, 30))
 
@@ -144,18 +144,22 @@ func Estimate(tx *types.Transaction, l1GasFee *big.Int, name string, details []b
 		fee := bozdo.BigIntSum(tx.GasFeeCap())
 
 		return &bozdo.EstimatedGasCost{
+			Name:        "bridge",
 			GasLimit:    gasLimit,
 			GasPrice:    fee,
-			TotalGasWei: new(big.Int).Mul(bozdo.BigIntSum(fee, l1GasFee), gasLimit),
+			TotalGasWei: new(big.Int).Mul(bozdo.BigIntSum(fee), gasLimit),
 			Details:     details,
+			ExtraFee:    extraFee,
 		}
 	}
 
 	return &bozdo.EstimatedGasCost{
+		Type:        bozdo.TxTypeLegacy,
+		Name:        name,
 		GasLimit:    gasLimit,
 		GasPrice:    tx.GasPrice(),
 		TotalGasWei: new(big.Int).Mul(gasLimit, tx.GasPrice()),
-		Name:        name,
 		Details:     details,
+		ExtraFee:    extraFee,
 	}
 }

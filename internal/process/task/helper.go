@@ -27,7 +27,11 @@ func GasStation(ecost *bozdo.EstimatedGasCost, network v1.Network) *v1.Estimatio
 	default:
 		result.GasLimit = defi.AmountUni(ecost.GasLimit, network)
 		result.GasPrice = defi.AmountUni(ecost.GasPrice, network)
-		result.Gas = defi.AmountUni(ecost.TotalGasWei, network)
+		totalFee := ecost.TotalGasWei
+		if ecost.ExtraFee != nil {
+			totalFee = new(big.Int).Add(totalFee, ecost.ExtraFee)
+		}
+		result.Gas = defi.AmountUni(totalFee, network)
 
 		result.GasValuePercent = ""
 		result.Name = ecost.Name
@@ -37,12 +41,13 @@ func GasStation(ecost *bozdo.EstimatedGasCost, network v1.Network) *v1.Estimatio
 }
 
 func ResolveNetworkTokenAmount(balance, gas, value *big.Int) *big.Int {
+	gas = bozdo.BigIntSum(bozdo.Percent(gas, 10), gas)
 	need := new(big.Int).Add(gas, value)
 	if need.Cmp(balance) <= 0 {
 		return value
 	}
 
-	return bozdo.Percent(new(big.Int).Sub(balance, gas), 99)
+	return new(big.Int).Sub(balance, gas)
 }
 
 func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, networker defi.Networker, updater TaskUpdater) error {

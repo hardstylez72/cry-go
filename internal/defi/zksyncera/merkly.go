@@ -4,19 +4,18 @@ import (
 	"context"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
 	"github.com/pkg/errors"
-	zkTypes "github.com/zksync-sdk/zksync2-go/types"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
 func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, *big.Int, *big.Int, error) {
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
-		Cli:      c.Provider.GetClient(),
+		Cli:      c.ClientL2,
 		Network:  c.Cfg.Network,
 		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
 	}
@@ -33,7 +32,7 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 		return nil, nil, nil, err
 	}
 
-	tx := utils.CreateFunctionCallTransaction(
+	tx := CreateFunctionCallTransaction(
 		transactor.WalletAddr,
 		txData.ContractAddr,
 		big.NewInt(0),
@@ -56,9 +55,9 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 		return result, mintId, txData.Value, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, nil, nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
@@ -68,7 +67,7 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error) {
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
-		Cli:      c.Provider.GetClient(),
+		Cli:      c.ClientL2,
 		Network:  c.Cfg.Network,
 		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
 	}
@@ -90,7 +89,7 @@ func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) 
 
 	result := &bozdo.DefaultRes{}
 
-	tx := utils.CreateFunctionCallTransaction(
+	tx := CreateFunctionCallTransaction(
 		transactor.WalletAddr,
 		txData.ContractAddr,
 		big.NewInt(0),
@@ -113,9 +112,9 @@ func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) 
 		return result, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(raw)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
@@ -127,20 +126,20 @@ func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.I
 
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
-		Cli:      c.Provider.GetClient(),
+		Cli:      c.ClientL2,
 		Network:  c.Cfg.Network,
 		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
 	}
 
 	maxId := big.NewInt(1999999)
 	minId := big.NewInt(1000000)
-	tx, err := c.Provider.GetTransaction(txHash)
+	tx, _, err := c.ClientL2.TransactionByHash(ctx, txHash)
 	if err != nil {
 		return nil, err
 	}
 
-	logs, err := c.Provider.GetLogs(zkTypes.FilterQuery{
-		BlockHash: &tx.BlockHash,
+	logs, err := c.ClientL2.FilterLogsL2(ctx, ethereum.FilterQuery{
+		BlockHash: tx.BlockHash,
 		Addresses: []common.Address{tx.To},
 	})
 	if err != nil {

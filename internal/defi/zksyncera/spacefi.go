@@ -36,7 +36,7 @@ func (c *spaceFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 	if err != nil {
 		return nil, err
 	}
-	call, err := spacefirouter.NewStorageCaller(c.Cfg.SpaceFI.Router, c.Provider)
+	call, err := spacefirouter.NewStorageCaller(c.Cfg.SpaceFI.Router, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}

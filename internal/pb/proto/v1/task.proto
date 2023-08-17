@@ -38,6 +38,7 @@ enum TaskType {
   MerklyMintAndBridgeNFT = 24;
   DeployStarkNetAccount = 25;
   Swap10k = 26;
+  PancakeSwap = 27;
 }
 
 

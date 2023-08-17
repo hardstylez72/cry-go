@@ -26,7 +26,7 @@ type getSyncSwapFeeRes struct {
 }
 
 func (c *Client) getSyncSwapFee(ctx context.Context, req *getSyncSwapFeeReq) (*getSyncSwapFeeRes, error) {
-	cstorage, err := syncswappoolfactory.NewStorageCaller(c.Cfg.SyncSwap.ClassicPoolFactory, c.Provider)
+	cstorage, err := syncswappoolfactory.NewStorageCaller(c.Cfg.SyncSwap.ClassicPoolFactory, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *Client) getAmountOut(ctx context.Context, req *getAmountOutReq) (*big.I
 		return nil, err
 	}
 	opt := &bind.CallOpts{Context: ctx}
-	trx, err := syncswapclassicpool.NewStorageCaller(*poolAddr, c.Provider)
+	trx, err := syncswapclassicpool.NewStorageCaller(*poolAddr, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (c *Client) getAmountOut(ctx context.Context, req *getAmountOutReq) (*big.I
 
 func (c *Client) syncSwapPoolRates(ctx context.Context, addr common.Address) (*big.Float, *big.Float, error) {
 	opt := &bind.CallOpts{Context: ctx}
-	trx, err := syncswapclassicpool.NewStorageCaller(addr, c.Provider)
+	trx, err := syncswapclassicpool.NewStorageCaller(addr, c.ClientL2)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -123,7 +123,7 @@ func (c *Client) GetSyncSwapPool(ctx context.Context, req *GetSyncSwapPoolReq) (
 		return nil, defi.ErrTokenNotSupportedFn(req.B)
 	}
 
-	cstorage, err := syncswappoolfactory.NewStorageCaller(c.Cfg.SyncSwap.ClassicPoolFactory, c.Provider)
+	cstorage, err := syncswappoolfactory.NewStorageCaller(c.Cfg.SyncSwap.ClassicPoolFactory, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (c *Client) GetSyncSwapPool(ctx context.Context, req *GetSyncSwapPoolReq) (
 }
 
 func (c *Client) SyncSwapLPBalance(ctx context.Context, pool, user common.Address) (*big.Int, error) {
-	trx, err := syncswapclassicpool.NewStorageCaller(pool, c.Provider)
+	trx, err := syncswapclassicpool.NewStorageCaller(pool, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}

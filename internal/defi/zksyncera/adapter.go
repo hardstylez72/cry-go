@@ -16,8 +16,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/zksync-sdk/zksync2-go/accounts"
 	"github.com/zksync-sdk/zksync2-go/contracts/erc20"
-	"github.com/zksync-sdk/zksync2-go/types"
-	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
 type GetBalanceReq struct {
@@ -44,7 +42,7 @@ func (c *Client) GetPublicKey(pk string) (string, error) {
 func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi.GetBalanceRes, error) {
 
 	if req.Token == c.Cfg.MainToken {
-		b, err := c.Provider.GetClient().BalanceAt(ctx, common.HexToAddress(req.WalletAddress), nil)
+		b, err := c.ClientL2.BalanceAt(ctx, common.HexToAddress(req.WalletAddress), nil)
 		if err != nil {
 			return nil, err
 		}
@@ -64,7 +62,7 @@ func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi
 		return nil, defi.ErrTokenNotSupportedFn(req.Token)
 	}
 
-	token, err := erc20.NewIERC20(ta, c.Provider)
+	token, err := erc20.NewIERC20(ta, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}
@@ -98,12 +96,8 @@ func (c *Client) GetNetworkId() *big.Int {
 	return c.NetworkId
 }
 
-func (c *Client) SuggestGasPrice(ctx context.Context) (*big.Int, error) {
-	return c.Provider.SuggestGasPrice(ctx)
-}
-
 func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
-	res, err := c.Provider.WaitMined(ctx, common.HexToHash(tx))
+	res, err := c.ClientL2.WaitMined(ctx, common.HexToHash(tx))
 	if err != nil {
 		return err
 	}
@@ -180,7 +174,7 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
-	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
+	w, err := accounts.NewWallet(wtx.PKb, &c.ClientL2, c.ClientL1)
 	if err != nil {
 		return nil, errors.Wrap(err, "zksync2.NewWallet")
 	}
@@ -194,8 +188,8 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 	if err != nil {
 		return nil, fmt.Errorf("failed to pack withdraw function: %w", err)
 	}
-	tx := utils.CreateFunctionCallTransaction(
-		w.GetAddress(),
+	tx := CreateFunctionCallTransaction(
+		w.Address(),
 		to,
 		big.NewInt(0),
 		big.NewInt(0),
@@ -204,57 +198,23 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 		nil, nil,
 	)
 
-	gas, err := c.Provider.EstimateGas712(tx)
+	raw, estimate, err := c.Make712Tx(ctx, tx, r.Gas, wtx.Signer)
 	if err != nil {
-		return nil, fmt.Errorf("failed to EstimateGas: %w", err)
+		return nil, errors.Wrap(err, "Make712Tx")
 	}
 
-	gasPrice, err := c.Provider.GetGasPrice()
-	if err != nil {
-		return nil, fmt.Errorf("failed to GetGasPrice: %w", err)
-	}
-
-	nonce, err := c.Provider.NonceAt(ctx, w.GetAddress(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to GetGasPrice: %w", err)
-	}
-
-	prepared := &types.Transaction712{
-		Nonce:      new(big.Int).SetUint64(nonce),
-		GasTipCap:  big.NewInt(100_000_000),
-		GasFeeCap:  gasPrice,
-		Gas:        gas,
-		To:         &tx.To,
-		Value:      tx.Value.ToInt(),
-		Data:       tx.Data,
-		AccessList: nil,
-		ChainID:    c.NetworkId,
-		From:       &tx.From,
-		Meta:       tx.Eip712Meta,
-	}
-
-	signature, err := wtx.Signer.SignTypedData(wtx.Signer.GetDomain(), prepared)
-	if err != nil {
-		return nil, errors.Wrap(err, "Signer.SignTypedData")
-	}
-	rawTx, err := prepared.RLPValues(signature)
-	if err != nil {
-		return nil, errors.Wrap(err, "prepared.RLPValues")
-	}
-
-	res.ECost = &bozdo.EstimatedGasCost{
-		GasLimit:    gas,
-		GasPrice:    gasPrice,
-		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas.Uint64()),
-	}
+	res.ECost = estimate
 
 	if r.EstimateOnly {
 		return res, nil
 	}
+	if r.EstimateOnly {
+		return res, nil
+	}
 
-	hash, err := c.Provider.SendRawTransaction(rawTx)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	res.Tx = c.NewTx(hash, defi.CodeTransfer, nil)
@@ -271,13 +231,13 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 		return nil, errors.Wrap(err, "newWalletTransactor")
 	}
 
-	w, err := accounts.NewWallet(wtx.Signer, c.Provider)
+	w, err := accounts.NewWallet(wtx.PKb, &c.ClientL2, c.ClientL1)
 	if err != nil {
 		return nil, errors.Wrap(err, "zksync2.NewWallet")
 	}
 
-	tx := utils.CreateFunctionCallTransaction(
-		w.GetAddress(),
+	tx := CreateFunctionCallTransaction(
+		w.Address(),
 		r.ToAddr,
 		big.NewInt(0),
 		big.NewInt(0),
@@ -286,57 +246,29 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 		nil, nil,
 	)
 
-	gas, err := c.Provider.EstimateGas712(tx)
+	raw, estimate, err := c.Make712Tx(ctx, tx, r.Gas, wtx.Signer)
 	if err != nil {
-		return nil, fmt.Errorf("failed to EstimateGas: %w", err)
+		return nil, errors.Wrap(err, "Make712Tx")
 	}
 
-	gasPrice, err := c.Provider.GetGasPrice()
-	if err != nil {
-		return nil, fmt.Errorf("failed to GetGasPrice: %w", err)
+	res.ECost = estimate
+
+	if r.EstimateOnly {
+		return res, nil
+	}
+	if r.EstimateOnly {
+		return res, nil
 	}
 
-	nonce, err := c.Provider.NonceAt(ctx, w.GetAddress(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to GetGasPrice: %w", err)
-	}
-
-	prepared := &types.Transaction712{
-		Nonce:      new(big.Int).SetUint64(nonce),
-		GasTipCap:  big.NewInt(100000000),
-		GasFeeCap:  gasPrice,
-		Gas:        gas,
-		To:         &tx.To,
-		Value:      tx.Value.ToInt(),
-		Data:       tx.Data,
-		AccessList: nil,
-		ChainID:    c.NetworkId,
-		From:       &tx.From,
-		Meta:       tx.Eip712Meta,
-	}
-
-	signature, err := wtx.Signer.SignTypedData(wtx.Signer.GetDomain(), prepared)
-	if err != nil {
-		return nil, errors.Wrap(err, "Signer.SignTypedData")
-	}
-	rawTx, err := prepared.RLPValues(signature)
-	if err != nil {
-		return nil, errors.Wrap(err, "prepared.RLPValues")
-	}
-
-	res.ECost = &bozdo.EstimatedGasCost{
-		GasLimit:    gas,
-		GasPrice:    gasPrice,
-		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas.Uint64()),
-	}
+	res.ECost = estimate
 
 	if r.EstimateOnly {
 		return res, nil
 	}
 
-	hash, err := c.Provider.SendRawTransaction(rawTx)
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, errors.Wrap(err, "Provider.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	res.Tx = c.NewTx(hash, defi.CodeTransfer, nil)

@@ -1048,6 +1048,9 @@
         },
         "swap10k": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "pancakeSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -1138,7 +1141,8 @@
         "TraderJoeSwap",
         "MerklyMintAndBridgeNFT",
         "DeployStarkNetAccount",
-        "Swap10k"
+        "Swap10k",
+        "PancakeSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

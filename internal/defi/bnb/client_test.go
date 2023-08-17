@@ -17,11 +17,11 @@ func Test(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, h)
 
-	//tx, penging, err := r.defi.Cli.TransactionByHash(context.Background(), common.HexToHash("0x02433465f2e9a56484dea517b4ab932ca1d5970451ea8cef90499713eb447021"))
+	//tx, penging, err := r.defi.CliL1.TransactionByHash(context.Background(), common.HexToHash("0x02433465f2e9a56484dea517b4ab932ca1d5970451ea8cef90499713eb447021"))
 	//assert.NoError(t, err)
 	//assert.NotNil(t, penging)
 	//assert.NotNil(t, tx)
-	//rec, err := bind.WaitMined(context.Background(), r.defi.Cli, tx)
+	//rec, err := bind.WaitMined(context.Background(), r.defi.CliL1, tx)
 	//assert.NotNil(t, rec)
 	//assert.NotNil(t, err)
 	//t.Run("balance", func(t *testing.T) {
