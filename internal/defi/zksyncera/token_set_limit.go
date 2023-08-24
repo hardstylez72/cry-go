@@ -50,10 +50,19 @@ func (c *Client) TokenLimitChecker(ctx context.Context, req *TokenLimitCheckerRe
 	}
 
 	if req.Amount.Cmp(allowed.Allowance) == 1 {
+
+		b, err := c.GetBalance(ctx, &defi.GetBalanceReq{
+			WalletAddress: tx.WalletAddrHR,
+			Token:         req.Token,
+		})
+		if err != nil {
+			return nil, err
+		}
+
 		tx, err := c.TokenApprove(ctx, &ApproveReq{
 			Token:       req.Token,
 			Wallet:      tx,
-			Amount:      req.Amount,
+			Amount:      b.WEI,
 			SpenderAddr: req.SpenderAddr,
 		})
 		if err != nil {

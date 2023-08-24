@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import {AmUni, Network, SyncSwapTask, Task, TaskType, Token} from "@/generated/flow";
+import {AmUni, Network, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import {helperService, processService} from "@/generated/services";
 import {Delay, Timer} from "@/components/helper";

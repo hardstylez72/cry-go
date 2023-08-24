@@ -59,3 +59,15 @@ pull-dev:
 pull-prod:
 	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml pull"
 	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml up -d"
+
+standalone:
+	rm -rf build
+	mkdir build
+	go generate ./...
+	go version
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./build/cry ./cmd/service/main.go
+	upx ./build/cry --best --lzma
+	cp -r internal/server/migrations ./build/
+	cp Dockerfile ./build/Dockerfile
+	cp standalone.sh ./build/standalone.sh
+

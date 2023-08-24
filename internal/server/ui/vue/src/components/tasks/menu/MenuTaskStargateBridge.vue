@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import {AmUni, Network, StargateBridgeTask, SyncSwapTask, Task, TaskType, Token} from "@/generated/flow";
+import {AmUni, Network, StargateBridgeTask, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";
 import {getAmountSend, getStatusColor} from "@/components/tasks/menu/helper";

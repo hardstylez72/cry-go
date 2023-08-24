@@ -192,7 +192,7 @@ func listFlows(ctx context.Context, conn *sqlx.DB, userId string) ([]*v1.Flow, e
 
 		p, err := out[i].ToPB()
 		if err != nil {
-			return nil, err
+			continue
 		}
 
 		tmp = append(tmp, p)

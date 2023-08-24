@@ -28,7 +28,9 @@ export default defineConfig({
     }),
   ],
   define: {
-    'process.env': {},
+    'process.env': {
+      STANDALONE: true
+    },
   },
   resolve: {
     alias: {

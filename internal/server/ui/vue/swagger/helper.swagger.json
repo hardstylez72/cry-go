@@ -765,7 +765,9 @@
         "Swap10k",
         "PancakeSwap",
         "SithSwap",
-        "JediSwap"
+        "JediSwap",
+        "MySwap",
+        "ProtossSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

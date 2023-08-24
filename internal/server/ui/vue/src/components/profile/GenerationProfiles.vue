@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" min-width="350px" width="auto" height="auto" location="center"
+  <v-dialog v-model="dialog" min-width="400px" width="auto" height="auto" location="center"
             :close-on-back="false"
             :close-on-content-click="false"
             persistent="true">
@@ -8,7 +8,8 @@
         <v-tooltip
           activator="parent"
           location="bottom"
-          width="300px"
+          min-width="300px"
+          width="auto"
           text="Позволяет быстро сгенерировать профили, удобно пользоваться в ознакомительных целях и не только"
         />
         Генерация
@@ -25,6 +26,7 @@
         <v-tab value="1">Количество</v-tab>
         <v-tab value="2">Proxy</v-tab>
         <v-tab value="3">Названия</v-tab>
+        <v-tab value="4">Результат</v-tab>
       </v-tabs>
 
       <v-form ref="form">
@@ -68,7 +70,6 @@
               <v-btn @click="tab='3'" variant="flat">Далее</v-btn>
             </v-card-actions>
           </v-window-item>
-
           <v-window-item value="3">
             <v-card-text>
               <v-text-field
@@ -98,6 +99,22 @@
               <v-btn @click="generate" variant="flat">Генерация</v-btn>
             </v-card-actions>
           </v-window-item>
+          <v-window-item value="4">
+            <v-card-text>
+              <v-textarea
+                label="Сохраните данные к себе"
+                variant="outlined"
+                type="text"
+                :rules="[validateLabels]"
+                v-model="preview"
+                :messages="labelMessage"
+                auto-grow
+              />
+            </v-card-text>
+            <v-card-actions class="d-flex justify-end">
+              <v-btn @click="reset" variant="outlined">Дальше</v-btn>
+            </v-card-actions>
+          </v-window-item>
         </v-window>
       </v-form>
     </v-card>
@@ -111,7 +128,7 @@ import {defineComponent, PropType} from 'vue';
 //@ts-ignore
 import Papa from 'papaparse';
 import {helperService, instance, profileService} from "@/generated/services";
-import {ProfileType} from "@/generated/profile";
+import {ProfileSubType, ProfileType} from "@/generated/profile";
 
 
 export default defineComponent({
@@ -119,6 +136,10 @@ export default defineComponent({
     profileType: {
       required: true,
       type: String as PropType<ProfileType>,
+    },
+    profileSubType: {
+      required: true,
+      type: String as PropType<ProfileSubType>,
     },
     loading: {
       required: false,
@@ -132,9 +153,12 @@ export default defineComponent({
     }
   },
   watch: {
+    profileSubType: {
+      handler() {
+      }
+    },
     profileType: {
       handler() {
-        console.log('ProfileType', this.ProfileType)
       }
     },
     tab: {
@@ -153,11 +177,6 @@ export default defineComponent({
         this.labelText = this.makeLabels()
       }
     },
-    // count: {
-    //   handler() {
-    //     this.touch()
-    //   }
-    // }
   },
   emits: ['generated'],
   name: "GenerationProfiles",
@@ -178,6 +197,8 @@ export default defineComponent({
       labelPrefix: 'gen_',
       labelStarts: 1,
       labelMessage: '',
+
+      preview: '',
     }
   },
   methods: {
@@ -229,6 +250,8 @@ export default defineComponent({
       this.labelMessage = ''
       this.labelPrefix = 'gen_'
       this.labelStarts = 1
+
+      this.preview = ''
     },
     async validate(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
@@ -303,9 +326,12 @@ export default defineComponent({
       const res = await profileService.profileServiceGenerateProfiles({
         body: {
           count: this.count.toString(),
-          type: this.profileType
+          type: this.profileType,
+          subType: this.profileSubType
         }
       })
+
+      this.preview = res.preview
 
       const result = Papa.parse<string[]>(res.text, {skipEmptyLines: true, delimitersToGuess: [';', ',']})
 
@@ -327,8 +353,8 @@ export default defineComponent({
         text += `${line[0]}, ${line[1]}, ${line[2]} \r\n`
       })
 
+      this.tab = '4'
       this.$emit('generated', text)
-      this.reset()
     },
   },
   created() {

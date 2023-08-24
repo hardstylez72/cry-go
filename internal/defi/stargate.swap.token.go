@@ -58,7 +58,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
 	}
 
-	fee.Fee1 = bozdo.BigIntSum(fee.Fee1, bozdo.Percent(fee.Fee1, 30))
+	fee.Fee1 = bozdo.BigIntSum(fee.Fee1, bozdo.Percent(fee.Fee1, layerzero.LayerZeroBoostPercent))
 
 	opt.Value = fee.Fee1
 	destChainId := layerzero.LayerZeroChainMap[req.DestChain]

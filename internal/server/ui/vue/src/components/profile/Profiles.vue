@@ -64,6 +64,10 @@
                   item.mmskId
                 }}
               </v-col>
+              <v-col class="font-italic" style="font-size: 14px">{{
+                  item.subType
+                }}
+              </v-col>
               <v-col>
                 <i v-if="item.label">({{ item.label }})</i>
               </v-col>

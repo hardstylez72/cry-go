@@ -10,6 +10,7 @@ import (
 	"github.com/hardstylez72/cry/internal/pay"
 	"github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
+	"github.com/hardstylez72/cry/internal/server/config"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/snapshot"
@@ -17,6 +18,8 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
 type Input struct {
@@ -57,7 +60,8 @@ type Tasker interface {
 }
 
 const (
-	taskTimeout = time.Minute * 2
+	taskTimeout         = time.Minute * 2
+	taskStarkNetTimeout = time.Minute * 10
 )
 
 var PayableTasks = []v1.TaskType{
@@ -85,6 +89,8 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_PancakeSwap,
 	v1.TaskType_SithSwap,
 	v1.TaskType_JediSwap,
+	v1.TaskType_MySwap,
+	v1.TaskType_ProtossSwap,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -102,51 +108,29 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_TestNetBridgeSwap:                &Wrap{Tasker: &TestNetBridgeSwapTask{}},
 	v1.TaskType_SnapshotVote:                     &Wrap{Tasker: &SnapshotVoteTask{}},
 	v1.TaskType_OkexBinance:                      &Wrap{Tasker: &mockTask{}},
-	v1.TaskType_SyncSwap:                         &Wrap{Tasker: &SyncSwapTask{}},
+	v1.TaskType_SyncSwap:                         &Wrap{Tasker: NewSyncSwapTask()},
 	v1.TaskType_ZkSyncOfficialBridgeToEthereum:   &Wrap{Tasker: &ZksyncOfficialBridgeToEthereumTask{}},
 	v1.TaskType_OrbiterBridge:                    &Wrap{Tasker: &OrbiterBridgeTask{}},
 	v1.TaskType_ZkSyncOfficialBridgeFromEthereum: &Wrap{Tasker: &ZksyncOfficialBridgeFromEthereumTask{}},
 	v1.TaskType_WETH:                             &Wrap{Tasker: &WethTask{}},
-	v1.TaskType_MuteioSwap:                       &Wrap{Tasker: &MuteioSwapTask{}},
+	v1.TaskType_MuteioSwap:                       &Wrap{Tasker: NewMuteioSwapTask()},
 	v1.TaskType_SyncSwapLP:                       &Wrap{Tasker: &SyncSwapLPTask{}},
-	v1.TaskType_MaverickSwap:                     &Wrap{Tasker: &MaverickSwapTask{}},
-	v1.TaskType_SpaceFISwap:                      &Wrap{Tasker: &SpaceFiSwapTask{}},
-	v1.TaskType_VelocoreSwap:                     &Wrap{Tasker: &VelocoreSwapTask{}},
-	v1.TaskType_IzumiSwap:                        &Wrap{Tasker: &IzumiSwapTask{}},
-	v1.TaskType_VeSyncSwap:                       &Wrap{Tasker: &VeSyncSwapTask{}},
-	v1.TaskType_EzkaliburSwap:                    &Wrap{Tasker: &EzkaliburSwapTask{}},
-	v1.TaskType_ZkSwap:                           &Wrap{Tasker: &ZkSwapTask{}},
-	v1.TaskType_TraderJoeSwap:                    &Wrap{Tasker: &TraderJoeSwapTask{}},
+	v1.TaskType_MaverickSwap:                     &Wrap{Tasker: NewMaverickSwapTask()},
+	v1.TaskType_SpaceFISwap:                      &Wrap{Tasker: NewSpaceFiSwapTask()},
+	v1.TaskType_VelocoreSwap:                     &Wrap{Tasker: NewVelocoreSwapTask()},
+	v1.TaskType_IzumiSwap:                        &Wrap{Tasker: NewIzumiSwapTask()},
+	v1.TaskType_VeSyncSwap:                       &Wrap{Tasker: NewVeSyncSwapTask()},
+	v1.TaskType_EzkaliburSwap:                    &Wrap{Tasker: NewEzkaliburSwapTask()},
+	v1.TaskType_ZkSwap:                           &Wrap{Tasker: NewZkSwapTask()},
+	v1.TaskType_TraderJoeSwap:                    &Wrap{Tasker: NewTraderJoeSwapTask()},
 	v1.TaskType_MerklyMintAndBridgeNFT:           &Wrap{Tasker: &MerklyMintAndBridgeNFTTask{}},
 	v1.TaskType_DeployStarkNetAccount:            &Wrap{Tasker: &DeployStarkNetAccountTask{}},
-	v1.TaskType_Swap10k: &Wrap{Tasker: &Swap10kTask{
-		NewStarkNetSwapTask(v1.TaskType_Swap10k, func(a *Input) (*v1.DefaultSwap, error) {
-			l, ok := a.Task.Task.Task.(*v1.Task_Swap10K)
-			if !ok {
-				return nil, errors.New("Task.(*v1.Task_IzumiSwapTask) call an ambulance!")
-			}
-			return l.Swap10K, nil
-		}),
-	}},
-	v1.TaskType_PancakeSwap: &Wrap{Tasker: &PancakeSwapTask{}},
-	v1.TaskType_SithSwap: &Wrap{Tasker: &Swap10kTask{
-		NewStarkNetSwapTask(v1.TaskType_SithSwap, func(a *Input) (*v1.DefaultSwap, error) {
-			l, ok := a.Task.Task.Task.(*v1.Task_SithSwapTask)
-			if !ok {
-				return nil, errors.New("Task.(*v1.SithSwapTask) call an ambulance!")
-			}
-			return l.SithSwapTask, nil
-		}),
-	}},
-	v1.TaskType_JediSwap: &Wrap{Tasker: &JediTask{
-		NewStarkNetSwapTask(v1.TaskType_JediSwap, func(a *Input) (*v1.DefaultSwap, error) {
-			l, ok := a.Task.Task.Task.(*v1.Task_JediSwapTask)
-			if !ok {
-				return nil, errors.New("Task.(*v1.Task_JediSwapTask) call an ambulance!")
-			}
-			return l.JediSwapTask, nil
-		}),
-	}},
+	v1.TaskType_Swap10k:                          &Wrap{Tasker: NewSwap10kSwapTask()},
+	v1.TaskType_PancakeSwap:                      &Wrap{Tasker: NewPancakeSwapTask()},
+	v1.TaskType_SithSwap:                         &Wrap{Tasker: NewSithSwapTask()},
+	v1.TaskType_JediSwap:                         &Wrap{Tasker: NewJediSwapTask()},
+	v1.TaskType_MySwap:                           &Wrap{Tasker: NewMySwapSwapTask()},
+	v1.TaskType_ProtossSwap:                      &Wrap{Tasker: NewProtossSwapTask()},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -327,6 +311,18 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_JediSwapTask)")
 		}
 		return Marshal(t.JediSwapTask)
+	case v1.TaskType_MySwap:
+		t, ok := m.Task.(*v1.Task_MySwapTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_MySwapTask)")
+		}
+		return Marshal(t.MySwapTask)
+	case v1.TaskType_ProtossSwap:
+		t, ok := m.Task.(*v1.Task_ProtosSwapTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_ProtosSwapTask)")
+		}
+		return Marshal(t.ProtosSwapTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}
@@ -408,6 +404,13 @@ func UpdateTask(ctx context.Context, after *v1.ProcessTask, d repository.Process
 
 func (w *Wrap) Run(ctx context.Context, a *Input) (task *v1.ProcessTask, err error) {
 
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("task panic: %+v", r))
+			task = nil
+		}
+	}()
+
 	if IsPayableTask(a.Task.Task.TaskType) {
 		funds, err := a.PayService.FundsServiceClient.GetFunds(ctx, &paycli.GetFundsReq{
 			Login: a.User.Email,
@@ -477,4 +480,38 @@ func (w *Wrap) Run(ctx context.Context, a *Input) (task *v1.ProcessTask, err err
 	}
 
 	return task, err
+}
+
+func IsPayableTask(t v1.TaskType) bool {
+
+	if config.CFG.Env == config.Local {
+		return true
+	}
+
+	for _, tt := range PayableTasks {
+		if t == tt {
+			return true
+		}
+	}
+	return false
+}
+
+func NeedPay(before, after *v1.ProcessTask) bool {
+	if before.Status == after.Status {
+		return false
+	}
+
+	if after.Status == v1.ProcessStatus_StatusDone {
+		return false
+	}
+
+	if !IsPayableTask(after.Task.TaskType) {
+		return false
+	}
+
+	return true
+}
+
+func Marshal(m proto.Message) ([]byte, error) {
+	return protojson.MarshalOptions{Multiline: true, UseEnumNumbers: false, UseProtoNames: false, EmitUnpopulated: true}.Marshal(m)
 }

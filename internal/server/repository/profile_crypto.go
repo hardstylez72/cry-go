@@ -24,7 +24,7 @@ func NewProfileRepositoryCrypto(source ProfileRepository, userRepository UserRep
 
 func (c *ProfileRepositoryCrypto) CreateProfile(ctx context.Context, req *Profile) error {
 
-	mmskPk, err := lib.Encrypt(req.UserId, c.lazanya, req.MmskPk)
+	pk, err := lib.Encrypt(req.UserId, c.lazanya, req.MmskPk)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,14 @@ func (c *ProfileRepositoryCrypto) CreateProfile(ctx context.Context, req *Profil
 	h.Write(req.MmskId)
 	req.MmskId = h.Sum(nil)
 
-	req.MmskPk = mmskPk
+	req.MmskPk = pk
+
+	seed, err := lib.Encrypt(req.UserId, c.lazanya, req.Seed)
+	if err != nil {
+		return err
+	}
+
+	req.Seed = seed
 
 	return c.source.CreateProfile(ctx, req)
 }
@@ -46,6 +53,11 @@ func (c *ProfileRepositoryCrypto) SearchNotConnectedOkexDepositProfile(ctx conte
 
 	for i := range list {
 		list[i].MmskPk, err = lib.Decrypt(userId, c.lazanya, list[i].MmskPk)
+		if err != nil {
+			return nil, err
+		}
+
+		list[i].Seed, err = lib.Decrypt(userId, c.lazanya, list[i].Seed)
 		if err != nil {
 			return nil, err
 		}
@@ -66,6 +78,10 @@ func (c *ProfileRepositoryCrypto) ListProfiles(ctx context.Context, userId strin
 		if err != nil {
 			return nil, err
 		}
+		list[i].Seed, err = lib.Decrypt(userId, c.lazanya, list[i].Seed)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return list, nil
@@ -80,6 +96,11 @@ func (c *ProfileRepositoryCrypto) ExportProfiles(ctx context.Context, userId str
 
 	for i := range list {
 		list[i].MmskPk, err = lib.Decrypt(userId, c.lazanya, list[i].MmskPk)
+		if err != nil {
+			return nil, err
+		}
+
+		list[i].Seed, err = lib.Decrypt(userId, c.lazanya, list[i].Seed)
 		if err != nil {
 			return nil, err
 		}
@@ -102,6 +123,11 @@ func (c *ProfileRepositoryCrypto) SearchProfile(ctx context.Context, pattern, us
 		if err != nil {
 			return nil, err
 		}
+
+		list[i].Seed, err = lib.Decrypt(userId, c.lazanya, list[i].Seed)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return list, nil
@@ -117,6 +143,12 @@ func (c *ProfileRepositoryCrypto) GetProfile(ctx context.Context, id string) (*P
 	if err != nil {
 		return nil, err
 	}
+
+	p.Seed, err = lib.Decrypt(p.UserId, c.lazanya, p.Seed)
+	if err != nil {
+		return nil, err
+	}
+
 	return p, nil
 }
 

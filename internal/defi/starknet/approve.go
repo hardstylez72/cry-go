@@ -14,6 +14,7 @@ type ApproveReq struct {
 	PK          string
 	Amount      *big.Int
 	SpenderAddr string
+	SubType     v1.ProfileSubType
 }
 
 type ApproveRes struct {
@@ -30,6 +31,7 @@ func (c *Client) Approve(ctx context.Context, req *ApproveReq) (*ApproveRes, err
 		Spender: req.SpenderAddr,
 		Amount:  req.Amount.String(),
 		Token:   req.Token.String(),
+		SubType: req.SubType.String(),
 	})
 	if err != nil {
 		return nil, err

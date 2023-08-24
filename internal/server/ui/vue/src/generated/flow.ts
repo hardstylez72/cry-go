@@ -275,6 +275,26 @@ export interface CreateFlowResponse {
   flow: flow_Flow;
 }
 
+export interface DefaultLP {
+  /**  */
+  amount: Amount;
+
+  /**  */
+  network: Network;
+
+  /**  */
+  a: Token;
+
+  /**  */
+  b: Token;
+
+  /**  */
+  tx?: TaskTx;
+
+  /**  */
+  add: boolean;
+}
+
 export interface DefaultSwap {
   /**  */
   amount: Amount;
@@ -330,23 +350,6 @@ export interface DeployStarkNetAccountTask {
   tx: TaskTx;
 }
 
-export interface EzkaliburSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  tx?: TaskTx;
-}
-
 export interface GetFlowRequest {
   /**  */
   id: string;
@@ -357,45 +360,11 @@ export interface GetFlowResponse {
   flow: flow_Flow;
 }
 
-export interface IzumiSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  tx?: TaskTx;
-}
-
 export interface ListFlowRequest {}
 
 export interface ListFlowResponse {
   /**  */
   flows: flow_Flow[];
-}
-
-export interface MaverickSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  tx?: TaskTx;
 }
 
 export interface MerklyMintAndBridgeNFTTask {
@@ -419,23 +388,6 @@ export interface MerklyMintAndBridgeNFTTask {
 }
 
 export interface MockTask {}
-
-export interface MuteioSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  tx?: TaskTx;
-}
 
 export interface OkexBinanaceTask {
   /**  */
@@ -532,23 +484,6 @@ export interface SnapshotVoteTask {
   proposal: object;
 }
 
-export interface SpaceFiSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  tx?: TaskTx;
-}
-
 export interface StargateBridgeTask {
   /**  */
   fromNetwork: Network;
@@ -625,55 +560,6 @@ export interface Swap1inchTask {
   swapCompleted?: boolean;
 }
 
-export interface SyncSwapLPTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  a: Token;
-
-  /**  */
-  b: Token;
-
-  /**  */
-  tx?: TaskTx;
-
-  /**  */
-  add: boolean;
-}
-
-export interface SyncSwapTask {
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  amount: Amount;
-
-  /**  */
-  amountKind: string;
-
-  /**  */
-  txId?: string;
-
-  /**  */
-  txCompleted?: boolean;
-
-  /**  */
-  swapCompleted?: boolean;
-
-  /**  */
-  tx?: TaskTx;
-}
-
 export interface Task {
   /**  */
   weight: string;
@@ -712,7 +598,7 @@ export interface Task {
   swap1inchTask?: Swap1inchTask;
 
   /**  */
-  syncSwapTask?: SyncSwapTask;
+  syncSwapTask?: DefaultSwap;
 
   /**  */
   zkSyncOfficialBridgeToEthereumTask?: ZkSyncOfficialBridgeToEthereumTask;
@@ -727,34 +613,34 @@ export interface Task {
   wETHTask?: WETHTask;
 
   /**  */
-  muteioSwapTask?: MuteioSwapTask;
+  muteioSwapTask?: DefaultSwap;
 
   /**  */
-  syncSwapLPTask?: SyncSwapLPTask;
+  syncSwapLPTask?: DefaultLP;
 
   /**  */
-  maverickSwapTask?: MaverickSwapTask;
+  maverickSwapTask?: DefaultSwap;
 
   /**  */
-  spaceFiSwapTask?: SpaceFiSwapTask;
+  spaceFiSwapTask?: DefaultSwap;
 
   /**  */
-  velocoreSwapTask?: VelocoreSwapTask;
+  velocoreSwapTask?: DefaultSwap;
 
   /**  */
-  izumiSwapTask?: IzumiSwapTask;
+  izumiSwapTask?: DefaultSwap;
 
   /**  */
-  veSyncSwapTask?: VeSyncSwapTask;
+  veSyncSwapTask?: DefaultSwap;
 
   /**  */
-  ezkaliburSwapTask?: EzkaliburSwapTask;
+  ezkaliburSwapTask?: DefaultSwap;
 
   /**  */
-  zkSwapTask?: ZkSwapTask;
+  zkSwapTask?: DefaultSwap;
 
   /**  */
-  traderJoeSwapTask?: TraderJoeSwapTask;
+  traderJoeSwapTask?: DefaultSwap;
 
   /**  */
   merklyMintAndBridgeNFTTask?: MerklyMintAndBridgeNFTTask;
@@ -773,6 +659,12 @@ export interface Task {
 
   /**  */
   jediSwapTask?: DefaultSwap;
+
+  /**  */
+  mySwapTask?: DefaultSwap;
+
+  /**  */
+  protosSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -808,6 +700,12 @@ export interface TaskTx {
 
   /**  */
   details: TxDetail[];
+
+  /**  */
+  ts?: string;
+
+  /**  */
+  completeTs?: string;
 }
 
 export interface TestNetBridgeSwapTask {
@@ -822,23 +720,6 @@ export interface TestNetBridgeSwapTask {
 
   /**  */
   amount?: string;
-
-  /**  */
-  tx?: TaskTx;
-}
-
-export interface TraderJoeSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
 
   /**  */
   tx?: TaskTx;
@@ -860,40 +741,6 @@ export interface UpdateFlowRequest {
 export interface UpdateFlowResponse {
   /**  */
   flow: flow_Flow;
-}
-
-export interface VeSyncSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  tx?: TaskTx;
-}
-
-export interface VelocoreSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  tx?: TaskTx;
 }
 
 export interface WETHTask {
@@ -943,23 +790,6 @@ export interface WithdrawExchangeTask {
 
   /**  */
   sendAllCoins?: boolean;
-}
-
-export interface ZkSwapTask {
-  /**  */
-  amount: Amount;
-
-  /**  */
-  network: Network;
-
-  /**  */
-  fromToken: Token;
-
-  /**  */
-  toToken: Token;
-
-  /**  */
-  tx?: TaskTx;
 }
 
 export interface ZkSyncOfficialBridgeFromEthereumTask {
@@ -1060,7 +890,9 @@ export enum TaskType {
   'Swap10k' = 'Swap10k',
   'PancakeSwap' = 'PancakeSwap',
   'SithSwap' = 'SithSwap',
-  'JediSwap' = 'JediSwap'
+  'JediSwap' = 'JediSwap',
+  'MySwap' = 'MySwap',
+  'ProtossSwap' = 'ProtossSwap'
 }
 
 export enum Token {

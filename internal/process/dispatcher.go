@@ -110,7 +110,7 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	switch t.Task.TaskType {
 	case v1.TaskType_SyncSwap:
 		p := t.Task.Task.(*v1.Task_SyncSwapTask).SyncSwapTask
-		e, err = task.EstimateSyncSwapCost(ctx, profile, p)
+		e, err = task.NewSyncSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_ZkSyncOfficialBridgeToEthereum:
 		p := t.Task.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask).ZkSyncOfficialBridgeToEthereumTask
 		e, err = task.EstimateZkSyncOfficialBridgeToEthSwapCost(ctx, profile, p)
@@ -128,7 +128,7 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 		e, err = task.EstimateWethTaskCost(ctx, p, profile)
 	case v1.TaskType_MuteioSwap:
 		p := t.Task.Task.(*v1.Task_MuteioSwapTask).MuteioSwapTask
-		e, err = task.EstimateMuteioSwapCost(ctx, profile, p)
+		e, err = task.NewMuteioSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_OkexDeposit:
 		p := t.Task.Task.(*v1.Task_OkexDepositTask).OkexDepositTask
 		e, err = task.EstimateOkexDepositCost(ctx, profile, p, d.runner.withdrawerRepository)
@@ -137,28 +137,28 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 		e, err = task.EstimateSyncSwapLPCost(ctx, profile, p, nil)
 	case v1.TaskType_MaverickSwap:
 		p := t.Task.Task.(*v1.Task_MaverickSwapTask).MaverickSwapTask
-		e, err = task.EstimateMaverickSwapCost(ctx, profile, p, nil)
+		e, err = task.NewMaverickSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_SpaceFISwap:
 		p := t.Task.Task.(*v1.Task_SpaceFiSwapTask).SpaceFiSwapTask
-		e, err = task.EstimateSpaceFiSwapCost(ctx, profile, p, nil)
+		e, err = task.NewSpaceFiSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_VelocoreSwap:
 		p := t.Task.Task.(*v1.Task_VelocoreSwapTask).VelocoreSwapTask
-		e, err = task.EstimateVelocoreSwapCost(ctx, profile, p, nil)
+		e, err = task.NewVelocoreSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_IzumiSwap:
 		p := t.Task.Task.(*v1.Task_IzumiSwapTask).IzumiSwapTask
-		e, err = task.EstimateIzumiSwapCost(ctx, profile, p, nil)
+		e, err = task.NewIzumiSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_VeSyncSwap:
 		p := t.Task.Task.(*v1.Task_VeSyncSwapTask).VeSyncSwapTask
-		e, err = task.EstimateVeSyncSwapCost(ctx, profile, p, nil)
+		e, err = task.NewVeSyncSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_EzkaliburSwap:
 		p := t.Task.Task.(*v1.Task_EzkaliburSwapTask).EzkaliburSwapTask
-		e, err = task.EstimateEzkaliburSwapCost(ctx, profile, p, nil)
+		e, err = task.NewEzkaliburSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_ZkSwap:
 		p := t.Task.Task.(*v1.Task_ZkSwapTask).ZkSwapTask
-		e, err = task.EstimateZkSwapCost(ctx, profile, p, nil)
+		e, err = task.NewZkSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_TraderJoeSwap:
 		p := t.Task.Task.(*v1.Task_TraderJoeSwapTask).TraderJoeSwapTask
-		e, err = task.EstimateTraderJoeSwapCost(ctx, profile, p, nil)
+		e, err = task.NewTraderJoeSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_MerklyMintAndBridgeNFT:
 		p := t.Task.Task.(*v1.Task_MerklyMintAndBridgeNFTTask).MerklyMintAndBridgeNFTTask
 		e1, _, err := task.EstimateMerklyMintCost(ctx, profile, p, nil)
@@ -175,13 +175,19 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 		e, err = (&task.StarketSwapHalper{v1.TaskType_Swap10k}).EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_PancakeSwap:
 		p := t.Task.Task.(*v1.Task_PancakeSwapTask).PancakeSwapTask
-		e, err = task.EstimatePancakeSwapCost(ctx, profile, p, nil)
+		e, err = task.NewPancakeSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_SithSwap:
 		p := t.Task.Task.(*v1.Task_SithSwapTask).SithSwapTask
 		e, err = (&task.StarketSwapHalper{v1.TaskType_SithSwap}).EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_JediSwap:
 		p := t.Task.Task.(*v1.Task_JediSwapTask).JediSwapTask
 		e, err = (&task.StarketSwapHalper{v1.TaskType_JediSwap}).EstimateCost(ctx, profile, p, nil)
+	case v1.TaskType_MySwap:
+		p := t.Task.Task.(*v1.Task_MySwapTask).MySwapTask
+		e, err = (&task.StarketSwapHalper{v1.TaskType_MySwap}).EstimateCost(ctx, profile, p, nil)
+	case v1.TaskType_ProtossSwap:
+		p := t.Task.Task.(*v1.Task_ProtosSwapTask).ProtosSwapTask
+		e, err = (&task.StarketSwapHalper{v1.TaskType_ProtossSwap}).EstimateCost(ctx, profile, p, nil)
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
 	}

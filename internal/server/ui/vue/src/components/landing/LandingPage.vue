@@ -34,8 +34,69 @@
       </ol>
     </div>
 
-
-    <v-expansion-panels class="mt-4">
+    <v-expansion-panels class="mt-4" v-if="standalone">
+      <v-expansion-panel
+        key="var"
+        title="Возможности"
+      >
+        <v-expansion-panel-text>
+          <div>
+            <ul>
+              <li>Удобная генерация новых evm аккаунтов (1, 10, 100, 1000 штук и более)</li>
+              <li>Возможность импортировать существующие emv аккаунты пачкой в 2 клика</li>
+              <li>Возможность закрепить за каждым аккаунтов socks-5 proxy, который позволит скрыть ip, и выполнять все
+                активности
+                через proxy
+              </li>
+              <li>Интерактивный просмотр баланса в 1 клик</li>
+              <li>Удобное пополнение баланса с биржи в 4 клика</li>
+              <li>Интеграция с binance и okex</li>
+              <li>Создание своего сценария активностей с помощью конструктора</li>
+              <li>Запуск сценария для выбранных аккаунтов</li>
+              <li>Возможность регулировать настройки газа. Ограничение на максимальный газ и урезание газа с помощью
+                множителя
+              </li>
+              <li>Удобная работа с ошибками, возможность интерактивной работы с процессами.
+                Можно останавливать, запускать, пропускать, и повторно выполнять шаги в которых возникла ошибка
+              </li>
+              <li>Можно получать уведомления с помощью бота в телеграме о ходе процессов</li>
+              <li>Оценка стоимости транзакции в 1 клик как в метамаске</li>
+            </ul>
+          </div>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+      <v-expansion-panel
+        key="airdrop"
+        title="Интеграции"
+      >
+        <v-expansion-panel-text>
+          <General/>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+      <v-expansion-panel title="О доверии">
+        <v-expansion-panel-text>
+          <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/watch?v=UZFfwq_0tw0"
+            srcdoc="<style>*{padding:0;margin:0;overflow:hidden}
+    html,body{height:100%}
+    img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}
+    span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}
+    </style>
+    <a href=https://www.youtube.com/embed/UZFfwq_0tw0?autoplay=1>
+    <img src=https://img.youtube.com/vi/UZFfwq_0tw0/hqdefault.jpg alt='Demo video'>
+    <span>▶</span>
+    </a>"
+            frameborder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            title="Demo video">
+          </iframe>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
+    <v-expansion-panels v-else class="mt-4">
       <v-expansion-panel
         key="sec"
         title="Безопасность"
@@ -155,8 +216,6 @@
           <General/>
         </v-expansion-panel-text>
       </v-expansion-panel>
-
-
       <v-expansion-panel
         v-for="i in items"
         :key="i.title"
@@ -183,6 +242,9 @@ export default defineComponent({
   components: {General, Login, NavBar},
   methods: {},
   computed: {
+    standalone(): boolean {
+      return import.meta.env.STANDALONE
+    },
     userLoggedIn(): boolean {
       return this.userStore.login
     },
@@ -194,7 +256,7 @@ export default defineComponent({
       items: [
         {
           title: 'Поддерживаемые сети',
-          details: 'Ethereum, Binance BNB, Optimism, Arbitrum, Polygon, ZkSync ERA, ZkSync lite, Avalanche'
+          details: 'Ethereum, Binance BNB, Optimism, Arbitrum, Polygon, ZkSync ERA, ZkSync lite, Avalanche, StarkNet'
         },
       ]
     }

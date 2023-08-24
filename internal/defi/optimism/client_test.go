@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +14,7 @@ func Test(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 
-	err = r.WaitTxComplete(context.Background(), common.HexToHash("0x7cab0567babe1a02a0b1beb7aeb3cf6f601ad1e54cacab92f6429d7f44b48741"))
+	err = r.WaitTxComplete(context.Background(), "0x7cab0567babe1a02a0b1beb7aeb3cf6f601ad1e54cacab92f6429d7f44b48741")
 	h, err := r.defi.Cli.HeaderByNumber(context.Background(), nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, h)

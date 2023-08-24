@@ -15,11 +15,14 @@
 
         <div class="d-flex justify-space-between">
           <div>
-            <a class="pr-5" :href="`https://debank.com/profile/${profile.mmskId}`" target="_blank">Debank</a>
-            <TopUpProfile :profile-id="profileId"/>
+            <i class="mx-2">{{ profile.subType }}</i>
+            <i class="mx-2" v-if="profile.type === ProfileType.StarkNet &&!deployed && !loading">not deployed</i>
+            <v-icon icon="mdi-eye" @click="addrShow = true" v-if="!addrShow"/>
           </div>
           <v-icon icon="mdi-close" @click="menu = false"/>
         </div>
+
+        <div v-if="addrShow" class="my-2">{{ profile.mmskId }}</div>
 
         <div class="d-flex justify-space-between" v-if="this.profile.type === ProfileType.StarkNet">
           <div>
@@ -69,6 +72,10 @@
             </div>
           </div>
         </div>
+        <v-card-actions class="d-flex justify-end">
+          <a class="pr-5" :href="`https://debank.com/profile/${profile.mmskId}`" target="_blank">Debank</a>
+          <TopUpProfile :profile-id="profileId"/>
+        </v-card-actions>
       </v-card>
     </template>
   </v-menu>
@@ -102,6 +109,9 @@ export default defineComponent({
   },
   data() {
     return {
+      loading: false,
+      deployed: false,
+      addrShow: false,
       profile: {} as Profile,
       menu: false,
       transactionsLoading: false,
@@ -133,8 +143,17 @@ export default defineComponent({
       }
     },
     async loadProfile() {
-      const res = await profileService.profileServiceGetProfile({body: {profileId: this.profileId}})
-      this.profile = res.profile
+      this.loading = true
+      try {
+        const res = await profileService.profileServiceGetProfile({body: {profileId: this.profileId}})
+        this.profile = res.profile
+
+        const deployed = await profileService.profileServiceStarkNetAccountDeployed({body: {profileId: this.profileId}})
+        this.deployed = deployed.deployed
+      } finally {
+        this.loading = false
+      }
+
     }
   },
 })

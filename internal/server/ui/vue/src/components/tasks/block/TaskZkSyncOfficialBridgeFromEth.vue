@@ -37,7 +37,6 @@
 <script lang="ts">
 import {
   Network,
-  SyncSwapTask,
   Task,
   TaskType,
   Token,

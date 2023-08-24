@@ -15,14 +15,8 @@
 <script lang="ts">
 import {
   AmUni,
-  MaverickSwapTask, MerklyMintAndBridgeNFTTask,
-  Network,
-  SpaceFiSwapTask,
-  SyncSwapTask,
+  MerklyMintAndBridgeNFTTask,
   Task,
-  TaskType,
-  Token, TraderJoeSwapTask,
-  VelocoreSwapTask
 } from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";

@@ -121,7 +121,7 @@ func (m *Maker) MakeBridgeTx(ctx context.Context, req *MakeBridgeTxReq) (*bozdo.
 	if err != nil {
 		return nil, err
 	}
-	f.NativeFee = bozdo.BigIntSum(f.NativeFee, bozdo.Percent(f.NativeFee, 20))
+	f.NativeFee = bozdo.BigIntSum(f.NativeFee, bozdo.Percent(f.NativeFee, layerzero.LayerZeroBoostPercent))
 	a, err := MinterMetaData.GetAbi()
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import {AmUni, Network, SyncSwapTask, Task, TaskType, Token, WETHTask} from "@/generated/flow";
+import {AmUni, Network, Task, TaskType, Token, WETHTask} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";
 import {getAmountSend} from "./helper";

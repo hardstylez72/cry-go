@@ -8,6 +8,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/hardstylez72/cry/internal/process/halp"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/pkg/errors"
 )
@@ -52,10 +53,6 @@ func ResolveNetworkTokenAmount(balance, gas, value *big.Int) *big.Int {
 
 func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, networker defi.Networker, updater TaskUpdater) error {
 	if ptx != nil && ptx.TxId != "" {
-		if ptx.TxId == AlreadyApproved {
-			return nil
-		}
-
 		tx := ptx
 		if err := networker.WaitTxComplete(ctx, tx.TxId); err != nil {
 			if errors.Is(err, defi.ErrTxStatusFailed) {
@@ -84,6 +81,20 @@ func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, n
 				return ErrTransactionIsNotReady
 			}
 			return err
+		}
+
+		if tx.CompleteTs == 0 {
+			tx.CompleteTs = time.Now().Unix()
+		}
+
+		if err := updater.UpdateTask(ctx, task); err != nil {
+			return err
+		}
+
+		if tx.GetNetwork() == v1.Network_StarkNet {
+			if !starkNetTxReady(tx, 60*4) {
+				return ErrTransactionIsNotReady
+			}
 		}
 
 		tx.TxCompleted = true
@@ -119,7 +130,7 @@ func (a *Input) AddTx2(ctx context.Context, transactions ...*v1.TaskTx) error {
 
 	for i := range transactions {
 		tx := transactions[i]
-		if tx == nil || tx.TxId == AlreadyApproved {
+		if tx == nil {
 			continue
 		}
 		txDb := &repository.Transaction{
@@ -185,9 +196,68 @@ func NewStarkNetApproveTx(id string) *v1.TaskTx {
 		Network:     &n,
 		Code:        &code,
 		Details:     CastDetails(nil),
+		Ts:          time.Now().Unix(),
 	}
 
 	return txx
+}
+
+func BalanceSnapshotBefore(ctx context.Context, client defi.Networker, token v1.Token, profile *halp.Profile) ([]bozdo.TxDetail, error) {
+
+	result := make([]bozdo.TxDetail, 0)
+
+	if client.GetNetworkToken().String() != token.String() {
+		bToken, err := client.GetBalance(ctx, &defi.GetBalanceReq{
+			WalletAddress: profile.Addr,
+			Token:         token,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, bozdo.NewTokenBalanceBefore(bToken.WEI, client.Network(), token))
+	}
+
+	bToken, err := client.GetBalance(ctx, &defi.GetBalanceReq{
+		WalletAddress: profile.Addr,
+		Token:         client.GetNetworkToken(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	result = append(result, bozdo.NewNativeBalanceBefore(bToken.WEI, client.Network(), client.GetNetworkToken()))
+
+	return result, nil
+}
+
+func BalanceSnapshotAfter(ctx context.Context, client defi.Networker, token v1.Token, profile *halp.Profile) ([]bozdo.TxDetail, error) {
+
+	result := make([]bozdo.TxDetail, 0)
+
+	if client.GetNetworkToken().String() != token.String() {
+		bToken, err := client.GetBalance(ctx, &defi.GetBalanceReq{
+			WalletAddress: profile.Addr,
+			Token:         token,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, bozdo.NewTokenBalanceAfter(bToken.WEI, client.Network(), token))
+	}
+
+	bToken, err := client.GetBalance(ctx, &defi.GetBalanceReq{
+		WalletAddress: profile.Addr,
+		Token:         client.GetNetworkToken(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	result = append(result, bozdo.NewNativeBalanceAfter(bToken.WEI, client.Network(), client.GetNetworkToken()))
+
+	return result, nil
 }
 
 func NewTx(tx *bozdo.Transaction, gas *bozdo.Gas) *v1.TaskTx {
@@ -203,12 +273,14 @@ func NewTx(tx *bozdo.Transaction, gas *bozdo.Gas) *v1.TaskTx {
 		Network:     &tx.Network,
 		Code:        &tx.Code,
 		Details:     CastDetails(tx.Details),
+		Ts:          time.Now().Unix(),
+		CompleteTs:  0,
 	}
 
 	if gas != nil {
-		txx.GasEstimated = defi.AmountUni(&gas.GasBeforeMultiplier, gas.Network)
+		//txx.GasEstimated = defi.AmountUni(&gas.GasBeforeMultiplier, gas.Network)
 		txx.GasResult = defi.AmountUni(&gas.TotalGas, gas.Network)
-		txx.GasLimit = defi.AmountUni(&gas.MaxGas, gas.Network)
+		//txx.GasLimit = defi.AmountUni(&gas.MaxGas, gas.Network)
 		m := float32(gas.GasMultiplier)
 		txx.Multiplier = &m
 	}

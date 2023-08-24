@@ -19,7 +19,8 @@ type Networker interface {
 	GetNetworkId() *big.Int
 	WaitTxComplete(ctx context.Context, tx string) error
 	Balancer
-	GetPublicKey(pk string) (string, error)
+	GetPublicKey(pk string, subType v1.ProfileSubType) (string, error)
+	Network() v1.Network
 }
 
 type Balancer interface {
@@ -43,24 +44,14 @@ type TestNetworkBridgeSwapper interface {
 	TestNetBridgeSwap(ctx context.Context, req *TestNetBridgeSwapReq) (*TestNetBridgeSwapRes, error)
 }
 
-type TraderJoeSwap interface {
+type Swapper interface {
 	Networker
-	TraderJoeSwap(ctx context.Context, req *DefaultSwapReq) (*bozdo.DefaultRes, error)
+	Swap(ctx context.Context, req *DefaultSwapReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)
 }
 
 type OrbiterSwapper interface {
 	Transfer
 	OrbiterBridge(ctx context.Context, req *OrbiterBridgeReq) (*OrbiterBridgeRes, error)
-}
-
-type SyncSwapReq struct {
-	Network      v1.Network
-	Amount       *big.Int
-	FromToken    v1.Token
-	ToToken      v1.Token
-	WalletPK     string
-	EstimateOnly bool
-	Gas          *bozdo.Gas
 }
 
 type DefaultSwapReq struct {
@@ -73,9 +64,8 @@ type DefaultSwapReq struct {
 	Gas          *bozdo.Gas
 	Slippage     SlippagePercent
 	Debug        bool
+	SubType      v1.ProfileSubType
 }
-
-type SyncSwapRes = bozdo.DefaultRes
 
 type DefaultBridgeReq struct {
 	FromNetwork  v1.Network
@@ -106,11 +96,6 @@ func (c *EtheriumClient) NewTx(id common.Hash, code TxCode, details []bozdo.TxDe
 		Url:     c.TxViewFn(id.String()),
 		Details: details,
 	}
-}
-
-type SyncSwapper interface {
-	Networker
-	SyncSwap(ctx context.Context, req *DefaultSwapReq) (*bozdo.DefaultRes, error)
 }
 
 type ZkSyncOfficialWithdrawalEtherium interface {

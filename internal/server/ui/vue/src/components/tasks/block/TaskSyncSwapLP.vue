@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import {Network, SyncSwapLPTask, SyncSwapTask, Task, TaskType, Token} from "@/generated/flow";
+import {DefaultLP, Network, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import WEIInputField from "@/components/WEIInputField.vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
@@ -145,7 +145,7 @@ export default defineComponent({
         },
         a: Token.USDC,
         b: Token.ETH,
-      } as SyncSwapLPTask,
+      } as DefaultLP,
     }
   },
   methods: {

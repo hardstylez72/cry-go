@@ -16,7 +16,6 @@ type AllowedReq struct {
 	Token       Token
 	WalletAddr  common.Address
 	SpenderAddr common.Address
-	Retry       int
 }
 
 type AllowedRes struct {
@@ -52,7 +51,6 @@ type ApproveReq struct {
 	Wallet      *WalletTransactor
 	Amount      *big.Int
 	SpenderAddr common.Address
-	Retry       int
 }
 
 type ApproveRes struct {
@@ -92,10 +90,19 @@ func (c *EtheriumClient) TokenLimitChecker(ctx context.Context, req *TokenLimitC
 	}
 
 	if req.Amount.Cmp(allowed.Allowance) == 1 {
+
+		b, err := c.GetBalance(ctx, &GetBalanceReq{
+			WalletAddress: req.Wallet.WalletAddrHR,
+			Token:         req.Token,
+		})
+		if err != nil {
+			return nil, err
+		}
+
 		tx, err := c.TokenApprove(ctx, &ApproveReq{
 			Token:       req.Token,
 			Wallet:      req.Wallet,
-			Amount:      req.Amount,
+			Amount:      b.WEI,
 			SpenderAddr: req.SpenderAddr,
 		})
 		if err != nil {

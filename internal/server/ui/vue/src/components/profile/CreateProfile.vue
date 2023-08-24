@@ -48,14 +48,36 @@
         Добавить
       </v-btn>
 
-      <GenerationProfiles @generated="generated" :demo="demo" :loading="loading" :profile-type="selectProfileType"/>
+      <GenerationProfiles @generated="generated" :profile-sub-type="selectProfileSubType" :demo="demo"
+                          :loading="loading" :profile-type="selectProfileType"/>
       <div class="mr-9 d-flex justify-start">
-        <v-radio-group v-model="selectProfileType" inline="true" hide-details density="compact" :disabled="needSave">
+        <v-radio-group
+          class="my-2"
+          v-model="selectProfileType"
+          inline="true"
+          hide-details
+          density="compact"
+          :disabled="needSave">
           Выберите тип профилей:
           <v-radio class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
           <v-radio class="mx-8" :value="ProfileType.StarkNet">StarkNet</v-radio>
         </v-radio-group>
+
+
       </div>
+      <v-radio-group
+        class="my-2"
+        v-model="selectProfileSubType"
+        inline="true"
+        hide-details
+        density="compact"
+        :disabled="needSave">
+        Выберите тип аккаунта:
+        <v-radio v-for="item in profileSubTypes" style="margin-left: 50px; margin-right: 50px" :value="item">{{
+            item
+          }}
+        </v-radio>
+      </v-radio-group>
       <v-textarea
         auto-grow
         density="compact"
@@ -87,10 +109,10 @@
 import {defineComponent} from 'vue';
 //@ts-ignore
 import Papa from 'papaparse';
-import {helperService, instance, profileService} from "@/generated/services";
+import {helperService, profileService} from "@/generated/services";
 import GenerationProfiles from "@/components/profile/GenerationProfiles.vue";
 import NavBar from "@/components/NavBar.vue";
-import {ProfileType} from "@/generated/profile";
+import {ProfileSubType, ProfileType} from "@/generated/profile";
 
 
 interface Item {
@@ -105,10 +127,21 @@ export default defineComponent({
   watch: {
     selectProfileType: {
       handler() {
+        if (this.selectProfileType === ProfileType.EVM) {
+          this.profileSubTypes = [ProfileSubType.Metamask]
+        }
+        if (this.selectProfileType === ProfileType.StarkNet) {
+          this.profileSubTypes = [ProfileSubType.UrgentX, ProfileSubType.Braavos]
+        }
+
+        this.selectProfileSubType = this.profileSubTypes[0]
       }
     }
   },
   computed: {
+    ProfileSubType() {
+      return ProfileSubType
+    },
     ProfileType() {
       return ProfileType
     }
@@ -134,7 +167,9 @@ export default defineComponent({
       generateCount: 10,
       errorMessage: '',
       text: '',
-      selectProfileType: ProfileType.EVM
+      selectProfileType: ProfileType.EVM,
+      selectProfileSubType: ProfileSubType.Metamask,
+      profileSubTypes: [ProfileSubType.Metamask] as ProfileSubType[]
     }
   },
   methods: {
@@ -196,6 +231,7 @@ export default defineComponent({
               mmskPk: item.pk,
               label: item.label ? item.label : '',
               type: this.selectProfileType,
+              subType: this.selectProfileSubType
             }
           })
           item.status = 'ok'

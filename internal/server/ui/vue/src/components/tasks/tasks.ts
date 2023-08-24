@@ -8,8 +8,8 @@ import TaskExchangeWithdraw from "@/components/tasks/block/TaskExchangeWithdraw.
 import TaskOkexDeposit from "@/components/tasks/block/TaskOkexDeposit.vue";
 import TaskTestNetBridgeSwap from "@/components/tasks/block/TaskTestNetBridgeSwap.vue";
 import TaskSnapshotVote from "@/components/tasks/block/TaskSnapshotVote.vue";
-import TaskSyncSwap from "@/components/tasks/block/TaskSyncSwap.vue";
-import MenuTaskSyncSwap from "@/components/tasks/menu/MenuTaskSyncSwap.vue";
+import TaskSyncSwap from "@/components/tasks/block/SyncSwap.vue";
+import MenuTaskSyncSwap from "@/components/tasks/menu/MenuSyncSwap.vue";
 import MenuDelayTask from "@/components/tasks/menu/DelayMenu.vue";
 import MenuExchangeWithdraw from "@/components/tasks/menu/ExchangeWithdraw.vue";
 import MenuOkexDeposit from "@/components/tasks/menu/OkexDeposit.vue";
@@ -24,27 +24,27 @@ import TaskZkSyncOfficialBridgeFromEth from "@/components/tasks/block/TaskZkSync
 import MenuZkSyncOfficialBridgeFromEth from "@/components/tasks/menu/MenuZkSyncOfficialBridgeFromEth.vue";
 import TaskWethSwap from "@/components/tasks/block/TaskWethSwap.vue";
 import MenuTaskWethSwap from "@/components/tasks/menu/MenuTaskWethSwap.vue";
-import TaskMuteIoSwap from "@/components/tasks/block/TaskMuteIoSwap.vue";
-import MenuTaskMuteioSwap from "@/components/tasks/menu/MenuTaskMuteioSwap.vue";
+import TaskMuteIoSwap from "@/components/tasks/block/MuteIoSwap.vue";
+import MenuTaskMuteioSwap from "@/components/tasks/menu/MenuMuteioSwap.vue";
 import {humanDuration} from "@/components/helper";
 import TaskSyncSwapLP from "@/components/tasks/block/TaskSyncSwapLP.vue";
 import MenuTaskSyncSwapLP from "@/components/tasks/menu/MenuTaskSyncSwapLP.vue";
-import TaskMaverickSwap from "@/components/tasks/block/TaskMaverickSwap.vue";
-import MenuTaskMaverickSwap from "@/components/tasks/menu/MenuTaskMaverickSwap.vue";
-import TaskSpaceFiSwap from "@/components/tasks/block/TaskSpaceFiSwap.vue";
-import MenuTaskSpaceFiSwap from "@/components/tasks/menu/MenuTaskSpaceFiSwap.vue";
-import TaskVelocoreSwap from "@/components/tasks/block/TaskVelocoreSwap.vue";
-import MenuTaskVelocoreSwap from "@/components/tasks/menu/MenuTaskVelocoreSwap.vue";
-import TaskIzumiSwap from "@/components/tasks/block/TaskIzumiSwap.vue";
-import MenuTaskIzumiSwap from "@/components/tasks/menu/MenuTaskIzumiSwap.vue";
-import TaskVeSyncSwap from "@/components/tasks/block/TaskVeSyncSwap.vue";
-import MenuTaskVeSyncSwap from "@/components/tasks/menu/MenuTaskVeSyncSwap.vue";
-import TaskEzkaliburSwap from "@/components/tasks/block/TaskEzkaliburSwap.vue";
-import MenuTaskEzkaliburSwap from "@/components/tasks/menu/MenuTaskEzkaliburSwap.vue";
-import TaskZkSwap from "@/components/tasks/block/TaskZkSwap.vue";
-import MenuTaskZkSwap from "@/components/tasks/menu/MenuTaskZkSwap.vue";
-import TaskTraderJoeSwap from "@/components/tasks/block/TaskTraderJoeSwap.vue";
-import MenuTaskTraderJoeSwap from "@/components/tasks/menu/MenuTaskTraderJoeSwap.vue";
+import TaskMaverickSwap from "@/components/tasks/block/MaverickSwap.vue";
+import MenuTaskMaverickSwap from "@/components/tasks/menu/MenuMaverickSwap.vue";
+import TaskSpaceFiSwap from "@/components/tasks/block/SpaceFiSwap.vue";
+import MenuTaskSpaceFiSwap from "@/components/tasks/menu/MenuSpaceFiSwap.vue";
+import TaskVelocoreSwap from "@/components/tasks/block/VelocoreSwap.vue";
+import MenuTaskVelocoreSwap from "@/components/tasks/menu/MenuVelocoreSwap.vue";
+import TaskIzumiSwap from "@/components/tasks/block/IzumiSwap.vue";
+import MenuTaskIzumiSwap from "@/components/tasks/menu/MenuIzumiSwap.vue";
+import TaskVeSyncSwap from "@/components/tasks/block/VeSyncSwap.vue";
+import MenuTaskVeSyncSwap from "@/components/tasks/menu/MenuVeSyncSwap.vue";
+import TaskEzkaliburSwap from "@/components/tasks/block/EzkaliburSwap.vue";
+import MenuTaskEzkaliburSwap from "@/components/tasks/menu/MenuEzkaliburSwap.vue";
+import TaskZkSwap from "@/components/tasks/block/ZkSwap.vue";
+import MenuTaskZkSwap from "@/components/tasks/menu/MenuZkSwap.vue";
+import TaskTraderJoeSwap from "@/components/tasks/block/TraderJoeSwap.vue";
+import MenuTaskTraderJoeSwap from "@/components/tasks/menu/MenuTraderJoeSwap.vue";
 import MenuTaskMerklyNFT from "@/components/tasks/menu/MenuTaskMerklyNFT.vue";
 import TaskMerklyNFT from "@/components/tasks/block/TaskMerklyNFT.vue";
 import TaskDeployStarkNetAccount from "@/components/tasks/block/DeployStarkNetAccount.vue";
@@ -52,12 +52,16 @@ import DeployStarkNetAccount from "@/components/tasks/menu/DeployStarkNetAccount
 import {ProfileType} from "@/generated/profile";
 import swap10k from "@/components/tasks/block/swap10k.vue";
 import swap10kMenu from "@/components/tasks/menu/MenuSwap10k.vue";
-import TaskPancakeSwap from "@/components/tasks/block/TaskPancakeSwap.vue";
-import PancakeSwap from "@/components/tasks/menu/PancakeSwap.vue";
+import TaskPancakeSwap from "@/components/tasks/block/PancakeSwap.vue";
+import PancakeSwap from "@/components/tasks/menu/MenuPancakeSwap.vue";
 import SithSwap from "@/components/tasks/block/SithSwap.vue";
 import MenuSithSwap from "@/components/tasks/menu/MenuSithSwap.vue";
 import MenuJediSwap from "@/components/tasks/menu/MenuJediSwap.vue";
 import JediSwap from "@/components/tasks/block/JediSwap.vue";
+import MySwap from "@/components/tasks/block/MySwap.vue";
+import MenuMySwap from "@/components/tasks/menu/MenuMySwap.vue";
+import MenuProtossSwap from "@/components/tasks/menu/MenuProtossSwap.vue";
+import ProtossSwap from "@/components/tasks/block/ProtossSwap.vue";
 
 
 export interface TaskArg {
@@ -696,6 +700,46 @@ export const taskProps: Record<TaskType, TaskSpec> = {
       name: 'JediSwap',
       link: 'https://app.jediswap.xyz/#/swap',
       img: '/icons/jediswap.png',
+      op: 'swap',
+    },
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.StarkNet])
+  },
+  MySwap: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.mySwapTask
+      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+    },
+    component: MySwap,
+    menu: MenuMySwap,
+    service: {
+      name: 'MySwap',
+      link: 'https://www.myswap.xyz/#/swap',
+      img: '/icons/myswap.svg',
+      op: 'swap',
+    },
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.StarkNet])
+  },
+  ProtossSwap: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.protosSwapTask
+      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+    },
+    component: ProtossSwap,
+    menu: MenuProtossSwap,
+    service: {
+      name: 'ProtossSwap',
+      link: 'https://www.protoss.org/',
+      img: '/icons/protossSwap.png',
       op: 'swap',
     },
     job: TaskJob.Swap,

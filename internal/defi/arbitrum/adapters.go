@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
 
 func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi.GetBalanceRes, error) {
@@ -50,10 +51,14 @@ func (c *Client) TestNetBridgeSwap(ctx context.Context, req *defi.TestNetBridgeS
 func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) (*defi.OrbiterBridgeRes, error) {
 	return c.defi.OrbiterBridge(ctx, req)
 }
-func (c *Client) TraderJoeSwap(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
-	return c.defi.TraderJoeSwap(ctx, req)
+func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
+	return c.defi.Swapper(ctx, req, taskType)
 }
 
-func (c *Client) GetPublicKey(pk string) (string, error) {
+func (c *Client) GetPublicKey(pk string, subType v1.ProfileSubType) (string, error) {
 	return c.defi.GetPublicKey(pk)
+}
+
+func (c *Client) Network() v1.Network {
+	return c.defi.Cfg.Network
 }

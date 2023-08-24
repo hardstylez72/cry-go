@@ -20,9 +20,17 @@ func (c *Client) SithSwapRouterAddress() string {
 func (c *Client) JediSwapRouterAddress() string {
 	return "0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023"
 }
+
+func (c *Client) MySwapRouterAddress() string {
+	return "0x010884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28"
+}
+
+func (c *Client) ProtosSwapRouterAddress() string {
+	return "0x07a0922657e550ba1ef76531454cb6d203d4d168153a0f05671492982c2f7741"
+}
 func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, platform v1.TaskType) (*bozdo.DefaultRes, error) {
 
-	res, err := c.halper.Swap(ctx, c.CastHalperSwapReq(req, platform))
+	res, err := c.halper.Swap(ctx, c.castHalperSwapReq(req, platform))
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +66,7 @@ func (c *Client) CastHalperSwapRes(res *halper.DefaultSwapRes) *bozdo.DefaultRes
 
 	return result
 }
-func (c *Client) CastHalperSwapReq(req *defi.DefaultSwapReq, platform v1.TaskType) *halper.DefaultSwapReq {
+func (c *Client) castHalperSwapReq(req *defi.DefaultSwapReq, platform v1.TaskType) *halper.DefaultSwapReq {
 	result := &halper.DefaultSwapReq{
 		Proxy:        c.cfg.Proxy,
 		ChainRPC:     gateway.MAINNET_BASE,
@@ -69,6 +77,7 @@ func (c *Client) CastHalperSwapReq(req *defi.DefaultSwapReq, platform v1.TaskTyp
 		EstimateOnly: req.EstimateOnly,
 		Slippage:     req.Slippage,
 		Platform:     platform.String(),
+		SubType:      req.SubType.String(),
 	}
 
 	if req.Gas.RuleSet() {

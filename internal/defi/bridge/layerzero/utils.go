@@ -13,6 +13,8 @@ const (
 	TypeFuncSwap uint8 = 1
 )
 
+const LayerZeroBoostPercent = 5
+
 var LayerZeroChainMap = map[v1.Network]uint16{
 	v1.Network_Etherium:    101,
 	v1.Network_BinanaceBNB: 102,

@@ -269,6 +269,36 @@
         "flow"
       ]
     },
+    "DefaultLP": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/Amount"
+        },
+        "network": {
+          "$ref": "#/definitions/Network"
+        },
+        "a": {
+          "$ref": "#/definitions/Token"
+        },
+        "b": {
+          "$ref": "#/definitions/Token"
+        },
+        "tx": {
+          "$ref": "#/definitions/TaskTx"
+        },
+        "add": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "amount",
+        "network",
+        "a",
+        "b",
+        "add"
+      ]
+    },
     "DefaultSwap": {
       "type": "object",
       "properties": {
@@ -358,32 +388,6 @@
         "tx"
       ]
     },
-    "EzkaliburSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
-      ]
-    },
     "GetFlowRequest": {
       "type": "object",
       "properties": {
@@ -406,32 +410,6 @@
         "flow"
       ]
     },
-    "IzumiSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
-      ]
-    },
     "ListFlowRequest": {
       "type": "object"
     },
@@ -448,32 +426,6 @@
       },
       "required": [
         "flows"
-      ]
-    },
-    "MaverickSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
       ]
     },
     "MerklyMintAndBridgeNFTTask": {
@@ -509,32 +461,6 @@
     "MockTask": {
       "type": "object",
       "title": "deprecated"
-    },
-    "MuteioSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
-      ]
     },
     "Network": {
       "type": "string",
@@ -733,32 +659,6 @@
         "space"
       ]
     },
-    "SpaceFiSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
-      ]
-    },
     "StargateBridgeTask": {
       "type": "object",
       "properties": {
@@ -882,79 +782,6 @@
         "amount"
       ]
     },
-    "SyncSwapLPTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "a": {
-          "$ref": "#/definitions/Token"
-        },
-        "b": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        },
-        "add": {
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "a",
-        "b",
-        "add"
-      ]
-    },
-    "SyncSwapTask": {
-      "type": "object",
-      "properties": {
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "amountKind": {
-          "type": "string",
-          "title": "deprecated"
-        },
-        "txId": {
-          "type": "string",
-          "title": "deprecated"
-        },
-        "txCompleted": {
-          "type": "boolean",
-          "title": "deprecated"
-        },
-        "swapCompleted": {
-          "type": "boolean",
-          "title": "deprecated"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "network",
-        "fromToken",
-        "toToken",
-        "amount",
-        "amountKind"
-      ]
-    },
     "Task": {
       "type": "object",
       "properties": {
@@ -999,7 +826,7 @@
           "title": "deprecated"
         },
         "syncSwapTask": {
-          "$ref": "#/definitions/SyncSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "zkSyncOfficialBridgeToEthereumTask": {
           "$ref": "#/definitions/ZkSyncOfficialBridgeToEthereumTask"
@@ -1014,34 +841,34 @@
           "$ref": "#/definitions/WETHTask"
         },
         "muteioSwapTask": {
-          "$ref": "#/definitions/MuteioSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "syncSwapLPTask": {
-          "$ref": "#/definitions/SyncSwapLPTask"
+          "$ref": "#/definitions/DefaultLP"
         },
         "maverickSwapTask": {
-          "$ref": "#/definitions/MaverickSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "spaceFiSwapTask": {
-          "$ref": "#/definitions/SpaceFiSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "velocoreSwapTask": {
-          "$ref": "#/definitions/VelocoreSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "izumiSwapTask": {
-          "$ref": "#/definitions/IzumiSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "veSyncSwapTask": {
-          "$ref": "#/definitions/VeSyncSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "ezkaliburSwapTask": {
-          "$ref": "#/definitions/EzkaliburSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "zkSwapTask": {
-          "$ref": "#/definitions/ZkSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "traderJoeSwapTask": {
-          "$ref": "#/definitions/TraderJoeSwapTask"
+          "$ref": "#/definitions/DefaultSwap"
         },
         "merklyMintAndBridgeNFTTask": {
           "$ref": "#/definitions/MerklyMintAndBridgeNFTTask"
@@ -1059,6 +886,12 @@
           "$ref": "#/definitions/DefaultSwap"
         },
         "jediSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
+        },
+        "mySwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
+        },
+        "protosSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
         }
       },
@@ -1094,13 +927,16 @@
           "title": "mandatory"
         },
         "gasEstimated": {
-          "$ref": "#/definitions/AmUni"
+          "$ref": "#/definitions/AmUni",
+          "title": "deprecated"
         },
         "gasResult": {
-          "$ref": "#/definitions/AmUni"
+          "$ref": "#/definitions/AmUni",
+          "title": "deprecated"
         },
         "gasLimit": {
-          "$ref": "#/definitions/AmUni"
+          "$ref": "#/definitions/AmUni",
+          "title": "deprecated"
         },
         "multiplier": {
           "type": "number",
@@ -1112,6 +948,14 @@
             "type": "object",
             "$ref": "#/definitions/TxDetail"
           }
+        },
+        "ts": {
+          "type": "string",
+          "format": "int64"
+        },
+        "completeTs": {
+          "type": "string",
+          "format": "int64"
         }
       },
       "required": [
@@ -1153,7 +997,9 @@
         "Swap10k",
         "PancakeSwap",
         "SithSwap",
-        "JediSwap"
+        "JediSwap",
+        "MySwap",
+        "ProtossSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -1205,32 +1051,6 @@
       ],
       "default": "USDT"
     },
-    "TraderJoeSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
-      ]
-    },
     "TxDetail": {
       "type": "object",
       "properties": {
@@ -1266,58 +1086,6 @@
       },
       "required": [
         "flow"
-      ]
-    },
-    "VeSyncSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
-      ]
-    },
-    "VelocoreSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
       ]
     },
     "WETHTask": {
@@ -1386,32 +1154,6 @@
         "amountMax",
         "token",
         "withdrawOrderId"
-      ]
-    },
-    "ZkSwapTask": {
-      "type": "object",
-      "properties": {
-        "amount": {
-          "$ref": "#/definitions/Amount"
-        },
-        "network": {
-          "$ref": "#/definitions/Network"
-        },
-        "fromToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "toToken": {
-          "$ref": "#/definitions/Token"
-        },
-        "tx": {
-          "$ref": "#/definitions/TaskTx"
-        }
-      },
-      "required": [
-        "amount",
-        "network",
-        "fromToken",
-        "toToken"
       ]
     },
     "ZkSyncOfficialBridgeFromEthereumTask": {

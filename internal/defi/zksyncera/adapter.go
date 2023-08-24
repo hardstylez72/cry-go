@@ -31,7 +31,7 @@ type GetBalanceRes struct {
 	Float         float64
 }
 
-func (c *Client) GetPublicKey(pk string) (string, error) {
+func (c *Client) GetPublicKey(pk string, subType v1.ProfileSubType) (string, error) {
 	w, err := NewWalletTransactor(pk, big.NewInt(324))
 	if err != nil {
 		return "", err
@@ -278,4 +278,8 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 
 func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.DefaultRes, error) {
 	return c.StargateBridge(ctx, req)
+}
+
+func (c *Client) Network() v1.Network {
+	return c.Cfg.Network
 }

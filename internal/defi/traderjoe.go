@@ -10,9 +10,19 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/traderjoe"
 	"github.com/pkg/errors"
 )
+
+func (c *EtheriumClient) Swapper(ctx context.Context, req *DefaultSwapReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
+	switch taskType {
+	case v1.TaskType_TraderJoeSwap:
+		return c.TraderJoeSwap(ctx, req)
+	default:
+		return nil, errors.New("unsupported task type: " + taskType.String())
+	}
+}
 
 func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq) (*bozdo.DefaultRes, error) {
 
@@ -137,8 +147,4 @@ func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq)
 	result.Tx = c.NewTx(tx.Hash(), CodeContract, nil)
 
 	return result, nil
-}
-
-func (c *EtheriumClient) MakeTx() {
-
 }

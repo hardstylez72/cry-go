@@ -40,15 +40,9 @@
 </template>
 
 <script lang="ts">
-import {DefaultSwap, MaverickSwapTask, Network, SpaceFiSwapTask, Task, TaskType, Token} from "@/generated/flow";
-import {defineComponent, PropType} from "vue";
-import WEIInputField from "@/components/WEIInputField.vue";
-import AmountInput from "@/components/tasks/AmountInput.vue";
-import {link} from "@/components/tasks/links";
+import {Task, TaskType, Token} from "@/generated/flow";
 import {taskProps} from "@/components/tasks/tasks";
-import {required} from "@/components/tasks/menu/helper";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
-import DefaultSwapMenu from "@/components/tasks/menu/DefaultSwapMenu.js";
 import TaskDefaultSwap from "@/components/tasks/block/TaskDefaultSwap.js";
 import {Component, toNative} from "vue-facing-decorator";
 

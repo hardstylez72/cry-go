@@ -29,6 +29,10 @@ func NewService(c *Config) *Service {
 	}
 }
 
+func (s *Service) Generate(ctx context.Context, req *GenerateReq) (*[]AccountGenerated, error) {
+	return Request[GenerateReq, []AccountGenerated](ctx, s.cli, s.c.Host+"/starknet/generate", req)
+}
+
 func (s *Service) Approve(ctx context.Context, req *ApproveReq) (*ApproveRes, error) {
 	return Request[ApproveReq, ApproveRes](ctx, s.cli, s.c.Host+"/starknet/approve", req)
 }
@@ -55,6 +59,7 @@ type DefaultSwapReq struct {
 	Fee          string               `json:"fee"`
 	Slippage     defi.SlippagePercent `json:"slippage"`
 	Platform     string               `json:"platform"`
+	SubType      string               `json:"account"`
 }
 
 type DefaultSwapRes struct {

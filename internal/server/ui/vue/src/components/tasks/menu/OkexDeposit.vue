@@ -1,4 +1,7 @@
 <template>
+  <div class="d-inline-flex">
+    <MenuTaskSettings :network="item.network"/>
+  </div>
   <div><b>Network:</b> {{ item.network }}</div>
   <div><b>Token:</b> {{ item.token }}</div>
   <div v-if="item.address"><b>Okex wallet address:</b> {{ item.address }}</div>
@@ -13,10 +16,11 @@ import {formatTime, humanDuration} from "@/components/helper";
 import {ProcessStatus} from "@/generated/process";
 import {getStatusColor} from "@/components/tasks/menu/helper";
 import GasOptions from "@/components/tasks/menu/Details.vue";
+import MenuTaskSettings from "@/components/tasks/menu/Settings.vue";
 
 export default defineComponent({
   name: "MenuDelayTask",
-  components: {GasOptions},
+  components: {MenuTaskSettings, GasOptions},
   props: {
     task: {
       type: Object as PropType<Task>,
@@ -50,6 +54,10 @@ export default defineComponent({
 
       if (this.status == ProcessStatus.StatusDone) {
         return 'completed'
+      }
+
+      if (this.status == ProcessStatus.StatusReady) {
+        return 'not started'
       }
 
       if (!this.item.tx) {

@@ -41,6 +41,8 @@ enum TaskType {
   PancakeSwap = 27;
   SithSwap = 28;
   JediSwap = 29;
+  MySwap = 30;
+  ProtossSwap = 31;
 }
 
 
@@ -81,11 +83,14 @@ message TaskTx {
   optional string url = 4; //mandatory
   optional shared.Network  network = 5;  //mandatory
   optional string code = 6;  //mandatory
-  optional shared.AmUni gas_estimated = 7;
-  optional shared.AmUni gas_result = 8;
-  optional shared.AmUni gas_limit = 9;
+  optional shared.AmUni gas_estimated = 7; //deprecated
+  optional shared.AmUni gas_result = 8; //deprecated
+  optional shared.AmUni gas_limit = 9; //deprecated
   optional float multiplier = 10;
   repeated TxDetail details = 11;
+  int64 ts = 12;
+  int64 complete_ts = 13;
+
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
@@ -126,7 +131,7 @@ message DeployStarkNetAccountTask {
   };
 }
 
-message SyncSwapLPTask {
+message DefaultLP {
   shared.Amount amount = 1;
   shared.Network network = 2;
   shared.Token a = 3;
@@ -142,162 +147,6 @@ message SyncSwapLPTask {
     }
   };
 }
-
-message TraderJoeSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-message ZkSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-message EzkaliburSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-message IzumiSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-message VeSyncSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-message VelocoreSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-
-message SpaceFiSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-message MaverickSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-message MuteioSwapTask {
-  shared.Amount amount = 1;
-  shared.Network network = 2;
-  shared.Token from_token = 3;
-  shared.Token to_token = 4;
-
-  optional TaskTx tx = 5;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "amount", "network", "from_token","to_token"
-      ]
-    }
-  };
-}
-
-
 
 message WETHTask {
   shared.Amount amount = 1;
@@ -369,31 +218,6 @@ message ZkSyncOfficialBridgeToEthereumTask {
   };
 }
 
-message SyncSwapTask {
-  shared.Network network = 1;
-  shared.Token from_token = 2;
-  shared.Token to_token = 3;
-
-  shared.Amount amount = 4;
-  string amount_kind = 5; //deprecated
-
-  optional string txId = 6;//deprecated
-  optional bool   tx_completed = 7;//deprecated
-  optional bool swap_completed = 8;//deprecated
-  optional TaskTx tx = 9;
-
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: [
-        "network",
-        "from_token",
-        "to_token",
-        "amount",
-        "amount_kind"
-      ]
-    }
-  };
-}
 
 message Swap1inchTask {
   shared.Network network = 1;

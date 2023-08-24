@@ -333,6 +333,28 @@ export class ProfileService {
   /**
    *
    */
+  profileServiceStarkNetAccountDeployed(
+    params: {
+      /**  */
+      body: StarkNetAccountDeployedReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<StarkNetAccountDeployedRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/profile/starknet/deployed';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   profileServiceUpdateProfile(
     params: {
       /**  */
@@ -386,6 +408,9 @@ export interface CreateProfileRequest {
 
   /**  */
   type: ProfileType;
+
+  /**  */
+  subType: ProfileSubType;
 }
 
 export interface CreateProfileResponse {
@@ -413,11 +438,17 @@ export interface GenerateProfilesReq {
 
   /**  */
   type: ProfileType;
+
+  /**  */
+  subType: ProfileSubType;
 }
 
 export interface GenerateProfilesRes {
   /**  */
   text: string;
+
+  /**  */
+  preview: string;
 }
 
 export interface GetBalanceRequest {
@@ -497,6 +528,9 @@ export interface Profile {
 
   /**  */
   type: ProfileType;
+
+  /**  */
+  subType: ProfileSubType;
 }
 
 export interface SearchProfileRequest {
@@ -517,6 +551,16 @@ export interface SearchProfilesNotConnectedToOkexDepositRequest {}
 export interface SearchProfilesNotConnectedToOkexDepositResponse {
   /**  */
   profiles: Profile[];
+}
+
+export interface StarkNetAccountDeployedReq {
+  /**  */
+  profileId: string;
+}
+
+export interface StarkNetAccountDeployedRes {
+  /**  */
+  deployed: boolean;
 }
 
 export interface UpdateProfileRequest {
@@ -569,6 +613,12 @@ export enum Network {
   'ZKSYNCERATESTNET' = 'ZKSYNCERATESTNET',
   'ZKSYNCLITE' = 'ZKSYNCLITE',
   'StarkNet' = 'StarkNet'
+}
+
+export enum ProfileSubType {
+  'Metamask' = 'Metamask',
+  'UrgentX' = 'UrgentX',
+  'Braavos' = 'Braavos'
 }
 
 export enum ProfileType {

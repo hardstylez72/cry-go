@@ -29,6 +29,8 @@ type Profile struct {
 	MmskId    []byte         `db:"mmsk_id"`
 	DeletedAt sql.NullTime   `db:"deleted_at"`
 	Type      string         `db:"type"`
+	SubType   string         `db:"sub_type"`
+	Seed      []byte         `db:"seed"`
 }
 
 var ProfileCols = []string{
@@ -44,6 +46,8 @@ var ProfileCols = []string{
 	"mmsk_id",
 	"deleted_at",
 	"type",
+	"sub_type",
+	"seed",
 }
 
 var (
@@ -53,6 +57,7 @@ var (
 func (a *Profile) ToPB(starkNetClient *starknet.Client) (*v1.Profile, error) {
 
 	pType := v1.ProfileType(v1.ProfileType_value[a.Type])
+	SubType := v1.ProfileSubType(v1.ProfileSubType_value[a.SubType])
 	publicKey := ""
 	switch pType {
 	case v1.ProfileType_EVM:
@@ -62,7 +67,7 @@ func (a *Profile) ToPB(starkNetClient *starknet.Client) (*v1.Profile, error) {
 		}
 		publicKey = pub
 	case v1.ProfileType_StarkNet:
-		pub, err := starkNetClient.GetPublicKey(string(a.MmskPk))
+		pub, err := starkNetClient.GetPublicKey(string(a.MmskPk), SubType)
 		if err != nil {
 			return nil, err
 		}
@@ -79,6 +84,7 @@ func (a *Profile) ToPB(starkNetClient *starknet.Client) (*v1.Profile, error) {
 		UserAgent: a.UserAgent,
 		Num:       a.Num,
 		Type:      pType,
+		SubType:   SubType,
 	}
 
 	if a.Proxy.Valid {

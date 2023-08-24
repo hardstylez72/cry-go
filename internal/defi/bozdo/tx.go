@@ -117,9 +117,30 @@ func NewOpimismFeeDetails(s *big.Int, network v1.Network, token v1.Token) TxDeta
 	}
 }
 
+func NewNativeBalanceBefore(s *big.Int, network v1.Network, token v1.Token) TxDetail {
+	return TxDetail{
+		Key:   TxDetailKeyNativeBalanceBefore,
+		Value: CastUSD(s, network, token) + " USD",
+	}
+}
+
+func NewNativeBalanceAfter(s *big.Int, network v1.Network, token v1.Token) TxDetail {
+	return TxDetail{
+		Key:   TxDetailKeyNativeBalanceAfter,
+		Value: CastUSD(s, network, token) + " USD",
+	}
+}
+
+func NewTokenBalanceAfter(s *big.Int, network v1.Network, token v1.Token) TxDetail {
+	return TxDetail{
+		Key:   TxDetailKeyTokenBalanceAfter,
+		Value: CastUSD(s, network, token) + " USD",
+	}
+}
+
 func NewTokenBalanceBefore(s *big.Int, network v1.Network, token v1.Token) TxDetail {
 	return TxDetail{
-		Key:   TxDetailKeyProtocolFee,
+		Key:   TxDetailKeyTokenBalanceBefore,
 		Value: CastUSD(s, network, token) + " USD",
 	}
 }

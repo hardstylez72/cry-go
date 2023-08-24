@@ -41,6 +41,7 @@ type Profile struct {
 	WalletPK    string
 	Addr        string
 	Type        v1.ProfileType
+	SubType     v1.ProfileSubType
 }
 
 func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) {
@@ -69,6 +70,7 @@ func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) 
 		h:           h,
 		Addr:        p.MmskId,
 		Type:        p.Type,
+		SubType:     p.SubType,
 	}, nil
 }
 

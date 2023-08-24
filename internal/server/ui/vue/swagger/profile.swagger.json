@@ -336,6 +336,38 @@
         ]
       }
     },
+    "/api/gw/v1/profile/starknet/deployed": {
+      "post": {
+        "operationId": "ProfileService_StarkNetAccountDeployed",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/StarkNetAccountDeployedRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StarkNetAccountDeployedReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
     "/api/gw/v1/profile/update": {
       "post": {
         "operationId": "ProfileService_UpdateProfile",
@@ -421,12 +453,16 @@
         },
         "type": {
           "$ref": "#/definitions/ProfileType"
+        },
+        "subType": {
+          "$ref": "#/definitions/ProfileSubType"
         }
       },
       "required": [
         "label",
         "mmskPk",
-        "type"
+        "type",
+        "subType"
       ]
     },
     "CreateProfileResponse": {
@@ -477,11 +513,15 @@
         },
         "type": {
           "$ref": "#/definitions/ProfileType"
+        },
+        "subType": {
+          "$ref": "#/definitions/ProfileSubType"
         }
       },
       "required": [
         "count",
-        "type"
+        "type",
+        "subType"
       ]
     },
     "GenerateProfilesRes": {
@@ -489,10 +529,14 @@
       "properties": {
         "text": {
           "type": "string"
+        },
+        "preview": {
+          "type": "string"
         }
       },
       "required": [
-        "text"
+        "text",
+        "preview"
       ]
     },
     "GetBalanceRequest": {
@@ -649,6 +693,9 @@
         },
         "type": {
           "$ref": "#/definitions/ProfileType"
+        },
+        "subType": {
+          "$ref": "#/definitions/ProfileSubType"
         }
       },
       "required": [
@@ -659,8 +706,18 @@
         "mmskId",
         "userAgent",
         "num",
-        "type"
+        "type",
+        "subType"
       ]
+    },
+    "ProfileSubType": {
+      "type": "string",
+      "enum": [
+        "Metamask",
+        "UrgentX",
+        "Braavos"
+      ],
+      "default": "Metamask"
     },
     "ProfileType": {
       "type": "string",
@@ -716,6 +773,28 @@
       },
       "required": [
         "profiles"
+      ]
+    },
+    "StarkNetAccountDeployedReq": {
+      "type": "object",
+      "properties": {
+        "profileId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "profileId"
+      ]
+    },
+    "StarkNetAccountDeployedRes": {
+      "type": "object",
+      "properties": {
+        "deployed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "deployed"
       ]
     },
     "Status": {

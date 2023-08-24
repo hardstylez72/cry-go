@@ -105,7 +105,7 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 	nftId, err := client.GetMerklyNFTId(ctx, common.HexToHash(p.GetMintTx().GetTxId()))
 	if err != nil {
 		tx := p.MintTx
-		if tx.RetryCount > 10 {
+		if tx.RetryCount > 20 {
 			tx.TxCompleted = false
 			tx.RetryCount = 0
 			tx.TxId = ""

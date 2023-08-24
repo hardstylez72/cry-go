@@ -33,6 +33,7 @@ type ProfileServiceClient interface {
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*GetProfileResponse, error)
 	ExportProfiles(ctx context.Context, in *ExportProfilesReq, opts ...grpc.CallOption) (*ExportProfilesRes, error)
 	GenerateProfiles(ctx context.Context, in *GenerateProfilesReq, opts ...grpc.CallOption) (*GenerateProfilesRes, error)
+	StarkNetAccountDeployed(ctx context.Context, in *StarkNetAccountDeployedReq, opts ...grpc.CallOption) (*StarkNetAccountDeployedRes, error)
 }
 
 type profileServiceClient struct {
@@ -142,6 +143,15 @@ func (c *profileServiceClient) GenerateProfiles(ctx context.Context, in *Generat
 	return out, nil
 }
 
+func (c *profileServiceClient) StarkNetAccountDeployed(ctx context.Context, in *StarkNetAccountDeployedReq, opts ...grpc.CallOption) (*StarkNetAccountDeployedRes, error) {
+	out := new(StarkNetAccountDeployedRes)
+	err := c.cc.Invoke(ctx, "/profile.ProfileService/StarkNetAccountDeployed", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility
@@ -157,6 +167,7 @@ type ProfileServiceServer interface {
 	GetProfile(context.Context, *GetProfileRequest) (*GetProfileResponse, error)
 	ExportProfiles(context.Context, *ExportProfilesReq) (*ExportProfilesRes, error)
 	GenerateProfiles(context.Context, *GenerateProfilesReq) (*GenerateProfilesRes, error)
+	StarkNetAccountDeployed(context.Context, *StarkNetAccountDeployedReq) (*StarkNetAccountDeployedRes, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -196,6 +207,9 @@ func (UnimplementedProfileServiceServer) ExportProfiles(context.Context, *Export
 }
 func (UnimplementedProfileServiceServer) GenerateProfiles(context.Context, *GenerateProfilesReq) (*GenerateProfilesRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateProfiles not implemented")
+}
+func (UnimplementedProfileServiceServer) StarkNetAccountDeployed(context.Context, *StarkNetAccountDeployedReq) (*StarkNetAccountDeployedRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StarkNetAccountDeployed not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 
@@ -408,6 +422,24 @@ func _ProfileService_GenerateProfiles_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_StarkNetAccountDeployed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StarkNetAccountDeployedReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).StarkNetAccountDeployed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.ProfileService/StarkNetAccountDeployed",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).StarkNetAccountDeployed(ctx, req.(*StarkNetAccountDeployedReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -458,6 +490,10 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GenerateProfiles",
 			Handler:    _ProfileService_GenerateProfiles_Handler,
+		},
+		{
+			MethodName: "StarkNetAccountDeployed",
+			Handler:    _ProfileService_StarkNetAccountDeployed_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

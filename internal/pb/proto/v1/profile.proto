@@ -14,6 +14,12 @@ enum ProfileType {
   StarkNet = 1;
 }
 
+enum ProfileSubType {
+  Metamask  = 0;
+  UrgentX = 1;
+  Braavos = 2;
+}
+
 message Profile {
   string id = 1;
   string label = 2;
@@ -26,10 +32,11 @@ message Profile {
   int64 num = 9;
   optional google.protobuf.Timestamp deleted_at = 10;
   ProfileType type = 11;
+  ProfileSubType sub_type = 12;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id", "label", "meta", "created_at", "mmsk_id", "user_agent", "num", "type"]
+      required: ["id", "label", "meta", "created_at", "mmsk_id", "user_agent", "num", "type", "sub_type"]
     }
   };
 }
@@ -111,23 +118,50 @@ service ProfileService {
       body: "*"
     };
   }
+
+  rpc StarkNetAccountDeployed(StarkNetAccountDeployedReq) returns (StarkNetAccountDeployedRes) {
+    option (google.api.http) = {
+      post:"/api/gw/v1/profile/starknet/deployed",
+      body: "*"
+    };
+  }
+}
+
+message StarkNetAccountDeployedReq {
+  string profile_id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["profile_id"]
+    }
+  };
+}
+
+message StarkNetAccountDeployedRes {
+  bool deployed = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["deployed"]
+    }
+  };
 }
 
 message GenerateProfilesReq {
   int64 count = 1;
   ProfileType type = 2;
+  ProfileSubType sub_type = 3;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["count", "type"]
+      required: ["count", "type", "sub_type"]
     }
   };
 }
 
 message GenerateProfilesRes {
   string text = 1;
+  string preview = 2;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["text"]
+      required: ["text", "preview"]
     }
   };
 }
@@ -287,10 +321,11 @@ message CreateProfileRequest {
   optional string meta = 4;
   optional profile.OkexAccount okex_account = 5;
   ProfileType type = 6;
+  ProfileSubType sub_type = 7;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["label", "mmsk_pk", "type"]
+      required: ["label", "mmsk_pk", "type", "sub_type"]
     }
   };
 }

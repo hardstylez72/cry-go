@@ -16,7 +16,7 @@ func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
 	var err error
 	fmt.Println("Polling until transaction is accepted on L2...")
 	for !acceptedOnL2 {
-		_, receipt, err = c.GW.WaitForTransaction(ctx, tx, 1, 60)
+		_, receipt, err = c.GW.WaitForTransaction(ctx, tx, 5, 60*5)
 		if err != nil {
 			if strings.Contains(err.Error(), "tx not finalized") {
 				return defi.ErrTxNotFound

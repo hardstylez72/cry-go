@@ -208,7 +208,7 @@ func GetOkexDepositAddr(ctx context.Context, profile *halp.Profile, p *v1.OkexDe
 
 	attached, err := withdrawerRepository.GetAttachedAddr(ctx, profile.Id, profile.UserId)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "к профилю не привязан адресс депозита с okex")
 	}
 
 	addr := attached.Addr

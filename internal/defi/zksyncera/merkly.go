@@ -131,7 +131,7 @@ func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.I
 		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
 	}
 
-	maxId := big.NewInt(1999999)
+	//maxId := big.NewInt(1999999)
 	minId := big.NewInt(1000000)
 	tx, _, err := c.ClientL2.TransactionByHash(ctx, txHash)
 	if err != nil {
@@ -152,7 +152,7 @@ func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.I
 		}
 		for _, topic := range log.Topics {
 			topicBig := topic.Big()
-			if maxId.Cmp(topicBig) >= 0 && topicBig.Cmp(minId) >= 0 {
+			if topicBig.Cmp(minId) >= 0 { // &&  maxId.Cmp(topicBig) >= 0
 
 				owner, err := m.GetOwner(ctx, topicBig)
 				if err != nil {

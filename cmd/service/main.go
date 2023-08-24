@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 	"net"
 	"net/http"
 	"time"
@@ -15,20 +13,20 @@ import (
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
 	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/exchange/pub"
-	"github.com/hardstylez72/cry/internal/lib"
 	log "github.com/hardstylez72/cry/internal/log"
 	"github.com/hardstylez72/cry/internal/orbiter"
 	"github.com/hardstylez72/cry/internal/pay"
 	core "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process"
 	"github.com/hardstylez72/cry/internal/server/access"
+	"github.com/hardstylez72/cry/internal/server/api/v1"
 	"github.com/hardstylez72/cry/internal/server/auth"
 	"github.com/hardstylez72/cry/internal/server/config"
 	"github.com/hardstylez72/cry/internal/server/proxy"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/server/repository/pg"
-	"github.com/hardstylez72/cry/internal/server/service/v1"
 	"github.com/hardstylez72/cry/internal/server/ui"
+	"github.com/hardstylez72/cry/internal/server/user"
 	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/snapshot"
 	"github.com/hardstylez72/cry/internal/tg"
@@ -46,12 +44,11 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto"
 )
 
 const (
-	project = "server"
+	project          = "server"
+	StandaloneUserID = "00000000-0000-0000-0000-000000000000"
 )
 
 type (
@@ -112,7 +109,7 @@ func main() {
 		}
 	}()
 
-	if cfg.Env == config.Prod {
+	if cfg.Env == config.Prod || cfg.Standalone {
 		go func() {
 			err := ui.ListenStatic(cfg.StaticPort, "ui/build")
 			if err != nil {
@@ -140,9 +137,7 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 	if err != nil {
 		return err
 	}
-	mux := runtime.NewServeMux(
-		runtime.WithMarshalerOption("application/base64", &CryptoMarshaller{}),
-	)
+	mux := runtime.NewServeMux()
 
 	if err := core.RegisterProfileServiceHandler(ctx, mux, conn); err != nil {
 		return err
@@ -169,57 +164,8 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 		return err
 	}
 
-	ga := auth.NewGoogleOAuth2Controller(auth.Config{
-		RedirectURL:  cfg.App.Schema + "://" + cfg.App.Domain + cfg.App.Port + "/api/gw/google/oauth/callback",
-		ClientID:     cfg.Auth.GoogleClientId,
-		ClientSecret: cfg.Auth.GoogleClientSecret,
-		Scopes:       []string{"email"},
-		UserInfoURL:  "https://www.googleapis.com/oauth2/v2/userinfo",
-		UserRedirects: auth.UserRedirects{
-			OnSuccess: cfg.Auth.RedirectOnSuccess,
-			OnFailure: cfg.Auth.RedirectOnFailure,
-		},
-	}, auth.SessionCookieConfig{
-		Name:   cfg.Auth.CookieName,
-		Domain: cfg.App.Domain,
-		Path:   "/",
-		MaxAge: 60 * 60 * 24 * 30,
-		Secure: false,
-	}, func(ctx context.Context, u auth.CustomUser) (auth.CustomUser, error) {
-		userDB, _, err := s.userRepository.GetOrCreateUser(ctx, &repository.User{
-			Id:     u.Id,
-			Email:  u.Email,
-			Access: u.Access,
-		})
-		if err != nil {
-			return u, err
-		}
-
-		res, err := s.payService.AccountExist(ctx, &paycli.AccountExistReq{Id: userDB.Id})
-		if err != nil {
-			return u, err
-		}
-		if !res.Exist {
-			_, err = s.payService.CreateAccount(ctx, &paycli.CreateAccountReq{Id: userDB.Id, Login: userDB.Email})
-			if err != nil {
-				return u, err
-			}
-		}
-
-		settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-08")
-		if err != nil {
-			return u, err
-		}
-
-		_ = s.userSettingsService.ResolveAllSettings(ctx, userDB.Id, settingsLastUpdateDate)
-
-		return auth.CustomUser{
-			Id:     userDB.Id,
-			Email:  userDB.Email,
-			Access: userDB.Access,
-		}, nil
-	})
 	h := http.Handler(mux)
+
 	if cfg.Env == config.Local {
 		h = cors.Handler(cors.Options{
 			AllowedMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -231,12 +177,28 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 			ExposedHeaders:     []string{"tz"},
 		})(h)
 	}
-	h = Auth(h, ga)
+
+	if cfg.Standalone {
+		register := registerUser(s.userRepository, s.payService, s.userSettingsService)
+		userId := "00000000-0000-0000-0000-000000000000"
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+		_, err := register(ctx, auth.CustomUser{Id: userId, Email: "standalone@standalone"})
+		if err != nil {
+			log.Log.Error("user registration error: " + err.Error())
+		}
+		cancel()
+	} else {
+		h = Auth(h, auth.NewGoogleOAuth2Controller(
+			GoogleAuthConfig(cfg),
+			CookieSettings(cfg),
+			registerUser(s.userRepository, s.payService, s.userSettingsService),
+		))
+	}
 
 	log.Log.Info("Listening grpc-gw server on ", cfg.GWAddr)
 
 	go func() {
-
+		//metrics
 		go func() {
 			for {
 				stat := s.dispatcher.GetStat()
@@ -260,9 +222,20 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 }
 func ListenGRPC(ctx context.Context, port string, s *services) error {
 
+	var authMW func(ctx context.Context) (context.Context, error)
+
+	if config.CFG.Standalone {
+		authMW = func(ctx context.Context) (context.Context, error) {
+			ctx = user.SetUserIdContext(ctx, StandaloneUserID)
+			return ctx, nil
+		}
+	} else {
+		authMW = auth.AuthGRPC
+	}
+
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			grpc_auth.UnaryServerInterceptor(auth.AuthGRPC),
+			grpc_auth.UnaryServerInterceptor(authMW),
 			grpc_auth.UnaryServerInterceptor(access.Access(s.userRepository)),
 			otelgrpc.UnaryServerInterceptor(),
 		)),
@@ -416,6 +389,24 @@ var (
 	})
 )
 
+func AuthStandalone(h http.Handler, s *services) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r.URL.Path == "/api/google/login" || r.URL.Path == "/api/gw/google/oauth/callback" {
+			register := registerUser(s.userRepository, s.payService, s.userSettingsService)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+			_, err := register(ctx, auth.CustomUser{Id: StandaloneUserID, Email: "standalone@standalone"})
+			if err != nil {
+				log.Log.Error("user registration error: " + err.Error())
+			}
+			cancel()
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
+}
 func Auth(h http.Handler, ga *auth.GoogleAuth) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -457,85 +448,63 @@ func tracerProvider(url string, disable bool) (*tracesdk.TracerProvider, error) 
 	return tp, nil
 }
 
-type CryptoMarshaller struct{}
-
-func (*CryptoMarshaller) ContentType(_ interface{}) string {
-	return "application/base64"
-}
-
-// Marshal marshals "v" into JSON
-func (j *CryptoMarshaller) Marshal(v interface{}) ([]byte, error) {
-
-	p, ok := v.(proto.Message)
-	if ok {
-		bjson, err := protojson.MarshalOptions{Multiline: true, UseEnumNumbers: false, UseProtoNames: false, EmitUnpopulated: true}.Marshal(p)
-
+func registerUser(userRepository repository.UserRepository, payService *pay.Service, userSettingsService *settings.Service) func(ctx context.Context, u auth.CustomUser) (auth.CustomUser, error) {
+	return func(ctx context.Context, u auth.CustomUser) (auth.CustomUser, error) {
+		userDB, _, err := userRepository.GetOrCreateUser(ctx, &repository.User{
+			Id:     u.Id,
+			Email:  u.Email,
+			Access: u.Access,
+		})
 		if err != nil {
-			return nil, err
+			return u, err
 		}
 
-		encryptedB, err := lib.AesEncrypt(bjson, []byte(config.CFG.WebIV), []byte(config.CFG.WebKey))
+		res, err := payService.AccountExist(ctx, &paycli.AccountExistReq{Id: userDB.Id})
 		if err != nil {
-			return nil, err
+			return u, err
 		}
-		return encryptedB, nil
-	} else {
-		println(1)
-	}
+		if !res.Exist {
+			_, err = payService.CreateAccount(ctx, &paycli.CreateAccountReq{Id: userDB.Id, Login: userDB.Email})
+			if err != nil {
+				return u, err
+			}
+		}
 
-	return nil, errors.New("CryptoMarshaller.Marshal pizda")
+		settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-08")
+		if err != nil {
+			return u, err
+		}
+
+		_ = userSettingsService.ResolveAllSettings(ctx, userDB.Id, settingsLastUpdateDate)
+
+		return auth.CustomUser{
+			Id:     userDB.Id,
+			Email:  userDB.Email,
+			Access: userDB.Access,
+		}, nil
+	}
 }
 
-// Unmarshal unmarshals JSON data into "v".
-func (j *CryptoMarshaller) Unmarshal(data []byte, v interface{}) error {
-
-	p, ok := v.(proto.Message)
-	if !ok {
-		return errors.New("CryptoMarshaller.Unmarshal pizda")
+func GoogleAuthConfig(cfg *config.Config) auth.Config {
+	return auth.Config{
+		RedirectURL:  cfg.App.Schema + "://" + cfg.App.Domain + cfg.App.Port + "/api/gw/google/oauth/callback",
+		ClientID:     cfg.Auth.GoogleClientId,
+		ClientSecret: cfg.Auth.GoogleClientSecret,
+		Scopes:       []string{"email"},
+		UserInfoURL:  "https://www.googleapis.com/oauth2/v2/userinfo",
+		UserRedirects: auth.UserRedirects{
+			OnSuccess: cfg.Auth.RedirectOnSuccess,
+			OnFailure: cfg.Auth.RedirectOnFailure,
+		},
 	}
-
-	decrypted, err := lib.AesDecrypt(data, []byte(config.CFG.WebIV), []byte(config.CFG.WebKey))
-	if err != nil {
-		return err
-	}
-	err = protojson.UnmarshalOptions{DiscardUnknown: true}.Unmarshal(decrypted, p)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
-func (d *Decoder) Decode(val interface{}) error {
-
-	b, err := io.ReadAll(d.reader)
-	if err != nil {
-		return err
+func CookieSettings(cfg *config.Config) auth.SessionCookieConfig {
+	return auth.SessionCookieConfig{
+		Name:   cfg.Auth.CookieName,
+		Domain: cfg.App.Domain,
+		Path:   "/",
+		MaxAge: 60 * 60 * 24 * 30,
+		Secure: false,
 	}
-
-	m := &CryptoMarshaller{}
-
-	if err := m.Unmarshal(b, val); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-type Decoder struct {
-	reader io.Reader
-}
-
-// NewDecoder returns a Decoder which reads JSON stream from "r".
-func (j *CryptoMarshaller) NewDecoder(r io.Reader) runtime.Decoder {
-	return &Decoder{r}
-}
-
-// NewEncoder returns an Encoder which writes JSON stream into "w".
-func (j *CryptoMarshaller) NewEncoder(w io.Writer) runtime.Encoder {
-	return json.NewEncoder(w)
-}
-
-// Delimiter for newline encoded JSON streams.
-func (j *CryptoMarshaller) Delimiter() []byte {
-	return []byte("\n")
 }

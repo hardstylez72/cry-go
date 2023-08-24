@@ -19,6 +19,7 @@ type Client struct {
 	GW          *gateway.Gateway
 	GWP         *rpc.Provider
 	NetworkId   string
+	network     v1.Network
 	cfg         *ClientConfig
 	halper      halper.HalperService
 	txViewFn    func(s string) string
@@ -76,6 +77,7 @@ func NewClient(cfg *ClientConfig) (*Client, error) {
 			return "https://starkscan.co/tx/" + txId
 		},
 		NativeToken: v1.Token_ETH,
+		network:     v1.Network_StarkNet,
 		TokenMap: map[v1.Token]string{
 			v1.Token_ETH:  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
 			v1.Token_USDC: "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
@@ -87,10 +89,10 @@ func (c *Client) TxViewFn(id string) string {
 	return c.txViewFn(id)
 }
 
-func (c *Client) GetPublicKey(pk string) (string, error) {
+func (c *Client) GetPublicKey(pk string, subType v1.ProfileSubType) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
-	res, err := c.halper.AccountPubKey(ctx, &halper.AccountPubKeyReq{PrivateKey: pk})
+	res, err := c.halper.AccountPubKey(ctx, &halper.AccountPubKeyReq{PrivateKey: pk, SubType: subType.String()})
 	if err != nil {
 		return "", err
 	}
@@ -106,4 +108,8 @@ func (c *Client) GetPublicKey(pk string) (string, error) {
 	}
 
 	return res.PublicKey, nil
+}
+
+func (c *Client) Network() v1.Network {
+	return c.network
 }

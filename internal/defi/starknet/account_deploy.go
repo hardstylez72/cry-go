@@ -11,16 +11,18 @@ import (
 )
 
 type DeployAccountReq struct {
-	PK string
+	PK      string
+	SubType v1.ProfileSubType
 
 	bozdo.BaseReq
 }
 
-func (c *Client) IsAccountDeployed(ctx context.Context, pk string) (*bool, error) {
+func (c *Client) IsAccountDeployed(ctx context.Context, pk string, sub v1.ProfileSubType) (*bool, error) {
 	res, err := c.halper.IsAccountDeployed(ctx, &halper.IsAccountDeployedReq{
 		ChainRPC:   MainnetRPC,
 		PrivateKey: pk,
 		Proxy:      c.cfg.Proxy,
+		SubType:    sub.String(),
 	})
 	if err != nil {
 		return nil, err
@@ -40,6 +42,7 @@ func (c *Client) DeployAccount(ctx context.Context, req *DeployAccountReq) (*Dep
 		PrivateKey:   req.PK,
 		Proxy:        c.cfg.Proxy,
 		EstimateOnly: req.EstimateOnly,
+		SubType:      req.SubType.String(),
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "DeployAccount error happened")

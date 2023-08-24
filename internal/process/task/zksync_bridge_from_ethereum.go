@@ -97,6 +97,11 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Run(ctx context.Context, a *Input
 
 func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a *Input, client *zksyncera.Client, profile *halp.Profile, ethClient defi.Networker) (*bozdo.Transaction, error) {
 
+	s, err := profile.GetNetworkSettings(ctx, v1.Network_Etherium)
+	if err != nil {
+		return nil, err
+	}
+
 	l, ok := a.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask)
 	if !ok {
 		return nil, errors.New("panic.a.Task.Task.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask) call an ambulance!")
@@ -120,6 +125,18 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a
 	if err != nil {
 		return nil, err
 	}
+
+	estimate, err := EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx, profile, p)
+	if err != nil {
+		return nil, err
+	}
+
+	gas, err := GasManager(estimate, s.Source, v1.Network_Etherium)
+	if err != nil {
+		return nil, err
+	}
+
+	am = ResolveNetworkTokenAmount(b.WEI, &gas.TotalGas, am)
 
 	res, err := client.BridgeFromEthereumNetwork(ctx, &zksyncera.L1L2BridgeReq{
 		Amount:   am,

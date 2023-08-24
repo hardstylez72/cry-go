@@ -74,7 +74,7 @@ func (t *DeployStarkNetAccountTask) Run(ctx context.Context, a *Input) (*v1.Proc
 		}
 
 		p.Tx = NewTx(res.Tx, gas)
-		if err := a.AddTx(ctx, res.ApproveTx); err != nil {
+		if err := a.AddTx2(ctx, p.Tx); err != nil {
 			return nil, err
 		}
 
@@ -84,9 +84,6 @@ func (t *DeployStarkNetAccountTask) Run(ctx context.Context, a *Input) (*v1.Proc
 	}
 
 	if err := WaitTxComplete(taskContext, p.Tx, task, client, a); err != nil {
-		return nil, err
-	}
-	if err := a.AddTx2(ctx, p.Tx); err != nil {
 		return nil, err
 	}
 
@@ -113,7 +110,7 @@ func DeployStarkNetAccount(ctx context.Context, profile *halp.Profile, p *v1.Dep
 		}
 	}
 
-	isDeployed, err := client.IsAccountDeployed(ctx, profile.WalletPK)
+	isDeployed, err := client.IsAccountDeployed(ctx, profile.WalletPK, profile.SubType)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -146,7 +143,8 @@ func DeployStarkNetAccount(ctx context.Context, profile *halp.Profile, p *v1.Dep
 	}
 
 	res, err := client.DeployAccount(ctx, &starknet.DeployAccountReq{
-		PK: profile.WalletPK,
+		PK:      profile.WalletPK,
+		SubType: profile.SubType,
 		BaseReq: bozdo.BaseReq{
 			EstimateOnly: estimateOnly,
 			Gas:          nil,

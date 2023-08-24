@@ -102,7 +102,7 @@ func (t *SyncSwapLPTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, er
 	return task, nil
 }
 
-func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask, client zksyncera.LP, estimation *v1.EstimationTx) (*zksyncera.SyncSwapLiquidityRes, *bozdo.Gas, error) {
+func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.DefaultLP, client zksyncera.LP, estimation *v1.EstimationTx) (*zksyncera.SyncSwapLiquidityRes, *bozdo.Gas, error) {
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
@@ -182,7 +182,7 @@ func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask
 	return res, Gas, nil
 }
 
-func EstimateSyncSwapLPCost(ctx context.Context, profile *halp.Profile, p *v1.SyncSwapLPTask, client zksyncera.LP) (*v1.EstimationTx, error) {
+func EstimateSyncSwapLPCost(ctx context.Context, profile *halp.Profile, p *v1.DefaultLP, client zksyncera.LP) (*v1.EstimationTx, error) {
 	res, _, err := SyncSwapLP(ctx, profile, p, client, nil)
 	if err != nil {
 		return nil, err

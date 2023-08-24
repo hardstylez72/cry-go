@@ -40,6 +40,12 @@ func (t *taskDelay) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) 
 		if p.WaitFor == nil {
 			var duration time.Duration
 			if p.Random {
+				if p.MinRandom == nil || p.MaxRandom == nil {
+					var tmp int64 = 1
+					p.MinRandom = &tmp
+					p.MaxRandom = &tmp
+				}
+
 				min := time.Duration(*p.MinRandom) * time.Second
 				max := time.Duration(*p.MaxRandom) * time.Second
 				duration = lib.RandDurationRange(min, max)

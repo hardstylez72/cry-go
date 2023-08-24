@@ -35,12 +35,11 @@ type (
 		JaegerServiceName  string
 		PayServiceGRPCAddr string
 
-		WebKey string
-		WebIV  string
-
 		HalperHost string
 
 		AdminEmail string
+
+		Standalone bool
 	}
 
 	App struct {
@@ -86,47 +85,50 @@ func Load() (*Config, error) {
 	}
 	c := &Config{
 		Env:        envFromString(mustenv("ENV")),
-		GRPCAddr:   mustenv("GRPC_ADDR"),
-		GWAddr:     mustenv("GW_ADDR"),
-		StaticPort: mustenv("STATIC_PORT"),
-		ProxyPort:  mustenv("PROXY_PORT"),
+		GRPCAddr:   mayenv("GRPC_ADDR", ":90"),
+		GWAddr:     mayenv("GW_ADDR", ":8083"),
+		StaticPort: mayenv("STATIC_PORT", ":3333"),
+		ProxyPort:  mayenv("PROXY_PORT", ":3334"),
 		Database: Database{
 			Conn: mustenv("POSTGRES_CONN"),
 		},
 		App: App{
-			Domain: mustenv("DOMAIN"),
-			Schema: mustenv("SCHEMA"),
-			Port:   mayend("PORT"),
+			Domain: mayenv("DOMAIN", ""),
+			Schema: mayenv("SCHEMA", ""),
+			Port:   mayenv("PORT", ""),
 		},
 		Auth: Auth{
-			GoogleClientId:     mustenv("GOOGLE_CLIENT_ID"),
-			GoogleClientSecret: mustenv("GOOGLE_CLIENT_SECRET"),
+			GoogleClientId:     mayenv("GOOGLE_CLIENT_ID", ""),
+			GoogleClientSecret: mayenv("GOOGLE_CLIENT_SECRET", ""),
 
-			CookieName:        mustenv("COOKIE_NAME"),
-			RedirectOnSuccess: mustenv("REDIRECT_ON_SUCCESS"),
-			RedirectOnFailure: mustenv("REDIRECT_ON_FAILURE"),
+			CookieName:        mayenv("COOKIE_NAME", ""),
+			RedirectOnSuccess: mayenv("REDIRECT_ON_SUCCESS", ""),
+			RedirectOnFailure: mayenv("REDIRECT_ON_FAILURE", ""),
 		},
 		InstanceId:         uuid.New().String(),
-		MigrationsDir:      mustenv("MIGRATIONS_DIR"),
-		TelegramToken:      mustenv("TELEGRAM_TOKEN"),
+		MigrationsDir:      mayenv("MIGRATIONS_DIR", "/internal/server/migrations"),
+		TelegramToken:      mayenv("TELEGRAM_TOKEN", ""),
 		SnapshotHost:       mustenv("SNAPSHOT_ORG_HOST"),
 		Lazanya:            mustenv("LAZANYA"),
-		PrometheusPort:     mustenv("PROMETHEUS_PORT"),
-		JaegerUrl:          mustenv("JAEGER_URL"),
-		JaegerServiceName:  mustenv("JAEGER_SERVICE_NAME"),
+		PrometheusPort:     mayenv("PROMETHEUS_PORT", ""),
+		JaegerUrl:          mayenv("JAEGER_URL", ""),
+		JaegerServiceName:  mayenv("JAEGER_SERVICE_NAME", "cry-backend"),
 		PayServiceGRPCAddr: mustenv("PAY_SERVICE_GRPC_ADDR"),
-		WebKey:             mayend("WEB_KEY"),
-		WebIV:              mayend("WEB_IV"),
 		HalperHost:         mustenv("HALPER_HOST"),
 		AdminEmail:         mustenv("ADMIN_EMAIL"),
+		Standalone:         mayenv("STANDALONE", "false") == "true",
 	}
 
 	CFG = c
 
 	return c, nil
 }
-func mayend(key string) string {
-	return os.Getenv(key)
+func mayenv(key string, defaultValue string) string {
+	e := os.Getenv(key)
+	if e != "" {
+		return e
+	}
+	return defaultValue
 }
 func mustenv(key string) string {
 	v := os.Getenv(key)

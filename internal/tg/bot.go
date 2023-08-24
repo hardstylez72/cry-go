@@ -19,12 +19,18 @@ type Config struct {
 }
 
 type Bot struct {
-	driver *tgbotapi.BotAPI
-	c      *Config
+	driver   *tgbotapi.BotAPI
+	c        *Config
+	disabled bool
 }
 
 func NewBot(ctx context.Context, c *Config) (*Bot, error) {
 	// get secret key from keyring
+
+	if c.Token == "" {
+		b := &Bot{c: c, disabled: true}
+		return b, nil
+	}
 
 	bot, err := tgbotapi.NewBotAPI(c.Token)
 	if err != nil {
@@ -100,6 +106,11 @@ func NewBot(ctx context.Context, c *Config) (*Bot, error) {
 }
 
 func (b *Bot) ProcessStarted(chatId, processId string) error {
+
+	if b.disabled {
+		return nil
+	}
+
 	chatInt, err := strconv.Atoi(chatId)
 	if err != nil {
 		return err
@@ -120,6 +131,10 @@ func (b *Bot) ProcessStarted(chatId, processId string) error {
 }
 
 func (b *Bot) ProcessFinished(chatId, processId string) error {
+	if b.disabled {
+		return nil
+	}
+
 	chatInt, err := strconv.Atoi(chatId)
 	if err != nil {
 		return err
@@ -140,6 +155,9 @@ func (b *Bot) ProcessFinished(chatId, processId string) error {
 }
 
 func (b *Bot) SendAlert(chatId, processId, text string) error {
+	if b.disabled {
+		return nil
+	}
 	chatInt, err := strconv.Atoi(chatId)
 	if err != nil {
 		return err
@@ -162,6 +180,9 @@ func (b *Bot) SendAlert(chatId, processId, text string) error {
 }
 
 func (b *Bot) SupportMessage(chatId, details, msg string) error {
+	if b.disabled {
+		return nil
+	}
 	chatInt, err := strconv.Atoi(chatId)
 	if err != nil {
 		return err

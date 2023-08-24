@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import {Network, SyncSwapTask, Task, TaskType, Token, ZkSyncOfficialBridgeToEthereumTask} from "@/generated/flow";
+import {Network, Task, TaskType, Token, ZkSyncOfficialBridgeToEthereumTask} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import WEIInputField from "@/components/WEIInputField.vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";

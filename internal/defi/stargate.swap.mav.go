@@ -69,7 +69,7 @@ func (c *EtheriumClient) StargateBridgeSwapMAV(ctx context.Context, req *Default
 
 	details = append(details, bozdo.NewLZFeeDetails(fee.Fee1, c.Cfg.Network, v1.Token_ETH))
 
-	fee.Fee1 = bozdo.BigIntSum(fee.Fee1, bozdo.Percent(fee.Fee1, 2))
+	fee.Fee1 = bozdo.BigIntSum(fee.Fee1, bozdo.Percent(fee.Fee1, layerzero.LayerZeroBoostPercent))
 	opt.Value = fee.Fee1
 	opt.NoSend = req.EstimateOnly
 	opt = c.ResoleGas(ctx, req.Gas, opt)

@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import {AmUni, Network, SyncSwapLPTask, SyncSwapTask, Task, TaskType, Token} from "@/generated/flow";
+import {AmUni, DefaultLP, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";
 import {getAmountSend} from "./helper";
@@ -38,7 +38,7 @@ export default defineComponent({
   },
   data() {
     return {
-      item: {} as SyncSwapLPTask,
+      item: {} as DefaultLP,
     }
   },
   watch: {

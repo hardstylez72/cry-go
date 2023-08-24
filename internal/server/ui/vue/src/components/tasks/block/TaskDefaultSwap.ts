@@ -1,4 +1,4 @@
-import {DefaultSwap, MaverickSwapTask, Network, SpaceFiSwapTask, Task, TaskType, Token} from "@/generated/flow";
+import {DefaultSwap, Network, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType, render} from "vue";
 import WEIInputField from "@/components/WEIInputField.vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";

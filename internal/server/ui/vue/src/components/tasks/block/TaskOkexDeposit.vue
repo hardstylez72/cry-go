@@ -91,6 +91,12 @@ export default defineComponent({
           Token.ETH,
         ]
       }
+      if (this.item.network === Network.ZKSYNCERA) {
+        return [
+          Token.USDC,
+          Token.ETH,
+        ]
+      }
       return [
         Token.USDT,
         Token.USDC,
@@ -108,6 +114,7 @@ export default defineComponent({
         Network.BinanaceBNB,
         Network.OPTIMISM,
         Network.ARBITRUM,
+        Network.ZKSYNCERA,
       ]
     }
   },
