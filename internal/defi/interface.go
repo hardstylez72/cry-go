@@ -126,3 +126,21 @@ type WETH interface {
 	Networker
 	SwapWETH(ctx context.Context, req *WETHReq) (*WETHRes, error)
 }
+
+type LiquidityBridger interface {
+	Networker
+	LiquidityBridge(ctx context.Context, req *LiquidityBridgeReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)
+}
+
+type LiquidityBridgeReq struct {
+	From         v1.Network
+	To           v1.Network
+	Percent      string
+	Token        v1.Token
+	PkFrom       string
+	PkTo         string
+	Proxy        string
+	EstimateOnly bool
+	FromSubType  v1.ProfileSubType
+	ToSubType    v1.ProfileSubType
+}

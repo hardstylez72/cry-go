@@ -127,6 +127,7 @@ message Task {
     task.DefaultSwap jediSwapTask = 33;
     task.DefaultSwap mySwapTask = 34;
     task.DefaultSwap protosSwapTask = 35;
+    task.LiquidityBridgeTask starkNetBridgeTask = 36;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

@@ -1,4 +1,4 @@
-import {DefaultSwap, Network, Task, TaskType, Token} from "@/generated/flow";
+import {DefaultSwap as TaskSignature, Network, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType, render} from "vue";
 import WEIInputField from "@/components/WEIInputField.vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
@@ -57,7 +57,7 @@ import GasOptions from "@/components/tasks/menu/Details.vue";
   components: {AmountInput, WEIInputField},
   emits: ['taskChanged'],
 })
-export default class TaskDefaultSwap extends Vue {
+export default class DefaultSwap extends Vue {
   @Prop weight!: Number
   @Prop disabled!: Boolean
   @Prop task!: Task
@@ -88,7 +88,7 @@ export default class TaskDefaultSwap extends Vue {
   ]
   pair = null as SwapPair | null
   networks: Network[] = [Network.StarkNet]
-  item: DefaultSwap = {
+  item: TaskSignature = {
     network: Network.StarkNet,
     amount: {
       sendAll: true,

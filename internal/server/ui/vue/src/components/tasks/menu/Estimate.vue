@@ -30,7 +30,7 @@
           <div>
             <div><b>gas</b>: {{ getBalance(estimation.gas, true) }}</div>
             <div v-for="d in estimation.details">
-              <b>{{ d.key }}</b> {{ Number(d.value.split(" ")[0]).toPrecision(2) + " " + d.value.split(" ")[1] }}
+              <b>{{ d.key }}</b> {{ Number(d.value.split(" ")[0]).toPrecision(3) + " " + d.value.split(" ")[1] }}
             </div>
             <div><b>gas limit</b>: {{ getBalance(estimation.gasLimit, false) }}</div>
             <div><b>gas price</b>: {{ getBalance(estimation.gasPrice, false) }}</div>
@@ -101,9 +101,9 @@ export default defineComponent({
             token = Token.AVAX
             break
         }
-        return `${Number(am.usd).toPrecision(2)} USD`
+        return `${Number(am.usd).toPrecision(3)} USD`
       }
-      return `${Number(am.gwei).toPrecision(2)} GWEI`
+      return `${Number(am.gwei).toPrecision(3)} GWEI`
     },
     async estimate() {
       try {

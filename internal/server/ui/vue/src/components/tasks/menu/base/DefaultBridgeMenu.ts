@@ -9,26 +9,27 @@ import GasOptions from "@/components/tasks/menu/Details.vue";
 import MenuTaskSettings from "@/components/tasks/menu/Settings.vue";
 
 import {Component, Vue, Prop,} from 'vue-facing-decorator'
-import {getAmountSend} from "./helper";
+import {getAmountSend} from "../helper";
 
 @Component({
   template: `
     <div>
     <div class="d-inline-flex">
-      <MenuTaskSettings :network="item.network"/>
+      <MenuTaskSettings :network="item.fromNetwork"/>
     </div>
-    <div>Network: <b>{{ item.network }}</b></div>
-    <div>Swap: <b>{{ item.fromToken }} to {{ item.toToken }}</b></div>
+    <div>From: <b>{{ item.fromNetwork }}</b></div>
+    <div>To: <b>{{ item.toNetwork }}</b></div>
+    <div>Token: <b>{{ item.token }} </b></div>
     <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>
     <div>Status:
       <span :style="statusColor">{{ getTxStatus }}</span>
-      <GasOptions :item="item.tx" :network="item.network"/>
+      <GasOptions :item="item.tx" :network="item.fromNetwork"/>
     </div>
     </div>`,
-  name: 'DefaultSwapMenu',
+  name: 'DefaultBridgeMenu',
   components: {MenuTaskSettings, GasOptions},
 })
-export default class DefaultSwapMenu extends Vue {
+export default class DefaultBridgeMenu extends Vue {
   @Prop() task!: Task
   @Prop() status!: ProcessStatus
 

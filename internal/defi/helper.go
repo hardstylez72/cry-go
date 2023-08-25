@@ -6,7 +6,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/hardstylez72/cry/internal/exchange/pub"
+	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/pkg/errors"
 )
 
 const ETHPrice = 2000
@@ -116,4 +118,22 @@ func ResolveAmount(amount *v1.Amount, balance *big.Int) (*big.Int, error) {
 	}
 
 	return am, nil
+}
+
+func GetPercent(amount *v1.Amount) (string, error) {
+
+	if amount == nil {
+		return "0", errors.New("invalid amount")
+	}
+
+	switch amount.Kind.(type) {
+	case *v1.Amount_SendAll:
+		return "100", nil
+	case *v1.Amount_SendPercent:
+		percent := amount.Kind.(*v1.Amount_SendPercent)
+		f := math.Round(float64(percent.SendPercent))
+		return lib.FloatToString(f), nil
+	default:
+		return "0", errors.New("invalid amount")
+	}
 }

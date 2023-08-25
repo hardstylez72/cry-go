@@ -43,11 +43,11 @@
 import {DefaultSwap, Network, Task, TaskType, Token} from "@/generated/flow";
 import {taskProps} from "@/components/tasks/tasks";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
-import TaskDefaultSwap from "@/components/tasks/block/TaskDefaultSwap.js";
+import DefaultSwap from "@/components/tasks/block/base/DefaultSwap.js";
 import {Component} from "vue-facing-decorator";
 
 @Component({name: 'TraderJoeSwap'})
-export default class TraderJoeSwap extends TaskDefaultSwap {
+export default class TraderJoeSwap extends DefaultSwap {
 
   networks = [Network.ARBITRUM]
 

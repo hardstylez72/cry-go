@@ -20,6 +20,7 @@ const (
 	TxDetailKeyTokenBalanceAfter   = "TokenBalanceAfter"
 	TxDetailKeyNativeBalanceBefore = "NativeBalanceBefore"
 	TxDetailKeyNativeBalanceAfter  = "NativeBalanceAfter"
+	TxDetailKeyTxFee               = "TxFee"
 )
 
 type TxDetail struct {
@@ -34,6 +35,7 @@ const (
 	CodeContract TxCode = "contract"
 	CodeTransfer TxCode = "transfer"
 	CodeSwap     TxCode = "swap"
+	CodeBridge   TxCode = "bridge"
 )
 
 type Transaction struct {
@@ -94,6 +96,13 @@ type Gas struct {
 	GasLimit            big.Int
 	GasPrice            big.Int
 	TotalGas            big.Int
+}
+
+func NewTxFee(s *big.Int, network v1.Network, token v1.Token) TxDetail {
+	return TxDetail{
+		Key:   TxDetailKeyTxFee,
+		Value: CastUSD(s, network, token) + " USD",
+	}
 }
 
 func NewProtocolFeeDetails(s *big.Int, network v1.Network, token v1.Token) TxDetail {

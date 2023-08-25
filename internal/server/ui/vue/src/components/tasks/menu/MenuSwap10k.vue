@@ -14,7 +14,7 @@
 </template>
 <script lang="ts">
 
-import DefaultSwapMenu from "@/components/tasks/menu/DefaultSwapMenu.js";
+import DefaultSwapMenu from "@/components/tasks/menu/base/DefaultSwapMenu.js";
 import {Component, toNative, mixins} from "vue-facing-decorator";
 
 @Component({

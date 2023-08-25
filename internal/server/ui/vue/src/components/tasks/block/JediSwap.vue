@@ -43,11 +43,11 @@
 import {Task, TaskType, Token} from "@/generated/flow";
 import {taskProps} from "@/components/tasks/tasks";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
-import TaskDefaultSwap from "@/components/tasks/block/TaskDefaultSwap.js";
+import DefaultSwap from "@/components/tasks/block/base/DefaultSwap.js";
 import {Component, toNative} from "vue-facing-decorator";
 
 @Component({name: 'JediSwap'})
-export default class JediSwap extends TaskDefaultSwap {
+export default class JediSwap extends DefaultSwap {
 
   pairs: SwapPair[] = [
     tokenSwapPair(Token.ETH, Token.USDC),

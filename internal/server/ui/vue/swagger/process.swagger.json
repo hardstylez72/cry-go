@@ -935,6 +935,35 @@
         "transactions"
       ]
     },
+    "LiquidityBridgeTask": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/Amount"
+        },
+        "fromNetwork": {
+          "$ref": "#/definitions/Network"
+        },
+        "toNetwork": {
+          "$ref": "#/definitions/Network"
+        },
+        "token": {
+          "$ref": "#/definitions/Token"
+        },
+        "tx": {
+          "$ref": "#/definitions/TaskTx"
+        },
+        "approveTx": {
+          "$ref": "#/definitions/TaskTx"
+        }
+      },
+      "required": [
+        "amount",
+        "fromNetwork",
+        "toNetwork",
+        "token"
+      ]
+    },
     "ListProcessRequest": {
       "type": "object",
       "properties": {
@@ -1681,6 +1710,9 @@
         },
         "protosSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "starkNetBridgeTask": {
+          "$ref": "#/definitions/LiquidityBridgeTask"
         }
       },
       "required": [
@@ -1787,7 +1819,8 @@
         "SithSwap",
         "JediSwap",
         "MySwap",
-        "ProtossSwap"
+        "ProtossSwap",
+        "StarkNetBridge"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

@@ -16,6 +16,7 @@ type ProfileRepository interface {
 	SearchProfile(ctx context.Context, pattern, userId, profileType string) ([]Profile, error)
 	SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string) ([]Profile, error)
 	GetProfile(ctx context.Context, id string) (*Profile, error)
+	GetProfileByNum(ctx context.Context, num int, profileType string) (*Profile, error)
 	ValidateLabel(ctx context.Context, request *ValidateLabelReq) (*bool, error)
 	UpdateProfile(ctx context.Context, req *Profile) error
 	ExportProfiles(ctx context.Context, userId string) ([]Profile, error)

@@ -62,6 +62,8 @@ import MySwap from "@/components/tasks/block/MySwap.vue";
 import MenuMySwap from "@/components/tasks/menu/MenuMySwap.vue";
 import MenuProtossSwap from "@/components/tasks/menu/MenuProtossSwap.vue";
 import ProtossSwap from "@/components/tasks/block/ProtossSwap.vue";
+import StrarkNetBridge from "@/components/tasks/block/StrarkNetBridge.vue";
+import MenuStarkNetBridge from "@/components/tasks/menu/MenuStarkNetBridge.vue";
 
 
 export interface TaskArg {
@@ -747,6 +749,26 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
     profileType: new Set([ProfileType.StarkNet])
   },
+  StarkNetBridge: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.starkNetBridgeTask
+      return ''
+    },
+    component: StrarkNetBridge,
+    menu: MenuStarkNetBridge,
+    service: {
+      name: 'StarkNet liquidity bridge',
+      link: 'https://starkgate.starknet.io/',
+      img: '/icons/starknet.svg',
+      op: 'liquidity bridge',
+    },
+    job: TaskJob.Bridge,
+    networks: new Set<Network>([Network.Etherium, Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.EVM])
+  }
 }
 
 export const getFlow = (flow: flow_Flow): string[] => {

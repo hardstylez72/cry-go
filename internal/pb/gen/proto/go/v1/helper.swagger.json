@@ -767,7 +767,8 @@
         "SithSwap",
         "JediSwap",
         "MySwap",
-        "ProtossSwap"
+        "ProtossSwap",
+        "StarkNetBridge"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

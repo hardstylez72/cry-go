@@ -29,6 +29,10 @@ func NewService(c *Config) *Service {
 	}
 }
 
+func (s *Service) LiquidityBridge(ctx context.Context, req *LiquidityBridgeReq) (*LiquidityBridgeRes, error) {
+	return Request[LiquidityBridgeReq, LiquidityBridgeRes](ctx, s.cli, s.c.Host+"/starknet/liquidity-bridge", req)
+}
+
 func (s *Service) Generate(ctx context.Context, req *GenerateReq) (*[]AccountGenerated, error) {
 	return Request[GenerateReq, []AccountGenerated](ctx, s.cli, s.c.Host+"/starknet/generate", req)
 }

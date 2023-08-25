@@ -188,6 +188,13 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_ProtossSwap:
 		p := t.Task.Task.(*v1.Task_ProtosSwapTask).ProtosSwapTask
 		e, err = (&task.StarketSwapHalper{v1.TaskType_ProtossSwap}).EstimateCost(ctx, profile, p, nil)
+	case v1.TaskType_StarkNetBridge:
+		p := t.Task.Task.(*v1.Task_StarkNetBridgeTask).StarkNetBridgeTask
+		from, to, errr := task.LiquidityBridgeProfiles(ctx, d.haalp, d.runner.profileRepository, p, profile.Num)
+		if errr != nil {
+			return nil, errr
+		}
+		e, err = (&task.DefaultLiquidityBridgeTaskHalper{v1.TaskType_StarkNetBridge}).EstimateCost(ctx, from, to, p, nil, nil)
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
 	}

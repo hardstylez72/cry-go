@@ -679,6 +679,26 @@ export interface GetTaskTransactionsRes {
   transactions: Transaction[];
 }
 
+export interface LiquidityBridgeTask {
+  /**  */
+  amount: Amount;
+
+  /**  */
+  fromNetwork: Network;
+
+  /**  */
+  toNetwork: Network;
+
+  /**  */
+  token: Token;
+
+  /**  */
+  tx?: TaskTx;
+
+  /**  */
+  approveTx?: TaskTx;
+}
+
 export interface ListProcessRequest {
   /**  */
   statuses: ProcessStatus[];
@@ -1137,6 +1157,9 @@ export interface Task {
 
   /**  */
   protosSwapTask?: DefaultSwap;
+
+  /**  */
+  starkNetBridgeTask?: LiquidityBridgeTask;
 }
 
 export interface TaskTx {
@@ -1392,7 +1415,8 @@ export enum TaskType {
   'SithSwap' = 'SithSwap',
   'JediSwap' = 'JediSwap',
   'MySwap' = 'MySwap',
-  'ProtossSwap' = 'ProtossSwap'
+  'ProtossSwap' = 'ProtossSwap',
+  'StarkNetBridge' = 'StarkNetBridge'
 }
 
 export enum Token {

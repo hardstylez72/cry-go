@@ -42,6 +42,7 @@ type Profile struct {
 	Addr        string
 	Type        v1.ProfileType
 	SubType     v1.ProfileSubType
+	Num         int
 }
 
 func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) {
@@ -71,6 +72,7 @@ func (h *Halp) Profile(ctx context.Context, profileId string) (*Profile, error) 
 		Addr:        p.MmskId,
 		Type:        p.Type,
 		SubType:     p.SubType,
+		Num:         int(p.Num),
 	}, nil
 }
 

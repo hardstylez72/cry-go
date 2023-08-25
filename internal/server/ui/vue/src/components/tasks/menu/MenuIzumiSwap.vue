@@ -15,7 +15,7 @@
 
 <script lang="ts">
 
-import DefaultSwapMenu from "@/components/tasks/menu/DefaultSwapMenu.js";
+import DefaultSwapMenu from "@/components/tasks/menu/base/DefaultSwapMenu.js";
 import {Component, toNative} from "vue-facing-decorator";
 
 @Component({name: 'MenuIzumiSwap'})

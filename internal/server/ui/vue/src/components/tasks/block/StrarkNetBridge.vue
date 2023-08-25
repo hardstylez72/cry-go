@@ -1,19 +1,26 @@
 <template>
   <v-card-actions>
     <v-container>
-      <b style="color:red;">Не вздумайте гонять обьемы, проскальзывание 50%. это означает что половину от обьема вы
-        подарите этой платформе</b>
       <v-row>
         <v-col>
           <v-select
-            ref="stargate-bridge-form"
             density="compact"
             variant="outlined"
-            label="network"
+            label="from"
             v-on:change="inputChanged"
             :rules="[required]"
             :items="networks"
-            v-model="item.network"
+            v-model="item.fromNetwork"
+            :disabled="true"
+          />
+          <v-select
+            density="compact"
+            variant="outlined"
+            label="to"
+            v-on:change="inputChanged"
+            :rules="[required]"
+            :items="networks"
+            v-model="item.toNetwork"
             :disabled="true"
           />
         </v-col>
@@ -24,17 +31,16 @@
             label="direction"
             v-on:change="inputChanged"
             :rules="[required]"
-            :items="pairs"
-            v-model="pair"
+            :items="tokens"
+            v-model="item.token"
             :disabled="disabled"
             item-title="name"
-            return-object
           />
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>
+          <AmountInput :coin="item.token" :disabled="disabled" v-model="item.amount"/>
         </v-col>
       </v-row>
     </v-container>
@@ -44,23 +50,23 @@
 <script lang="ts">
 import {Task, TaskType, Token} from "@/generated/flow";
 import {taskProps} from "@/components/tasks/tasks";
-import {SwapPair, tokenSwapPair} from "@/components/helper";
-import DefaultSwap from "@/components/tasks/block/base/DefaultSwap.js";
+import StrarkNetBridgeTask from "@/components/tasks/block/base/DefaultLiquidityBridge.js";
 import {Component} from "vue-facing-decorator";
 
-@Component({name: 'ProtossSwap'})
-export default class ProtossSwap extends DefaultSwap {
+@Component({name: 'StrarkNetBridge'})
+export default class StrarkNetBridge extends StrarkNetBridgeTask {
 
-  pairs: SwapPair[] = [
-    tokenSwapPair(Token.ETH, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.ETH),
-  ]
+  created() {
+    if (this.task?.starkNetBridgeTask) {
+      this.item = this.task.starkNetBridgeTask
+    }
+  }
 
   getTask(): Task {
-    const taskType = TaskType.ProtossSwap
+    const taskType = TaskType.StarkNetBridge
     const task = {
       weight: this.weight.toString(),
-      protosSwapTask: this.item,
+      starkNetBridgeTask: this.item,
       taskType: taskType,
       description: "",
     }
@@ -70,17 +76,10 @@ export default class ProtossSwap extends DefaultSwap {
 
   syncTask() {
     if (this.task) {
-      if (this.task.protosSwapTask) {
-        this.item = this.task.protosSwapTask
-        this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
+      if (this.task.starkNetBridgeTask) {
+        this.item = this.task.starkNetBridgeTask
         this.$emit('taskChanged', this.getTask())
       }
-    }
-  }
-
-  created() {
-    if (this.task?.protosSwapTask) {
-      this.item = this.task.protosSwapTask
     }
   }
 }

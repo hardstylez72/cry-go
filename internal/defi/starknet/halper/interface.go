@@ -70,6 +70,28 @@ type AccountGenerated struct {
 	Pub  string `json:"pub"`
 }
 
+type LiquidityBridgeReq struct {
+	Proxy        string `json:"proxy"`
+	PKEth        string `json:"pkEth"`
+	PKStark      string `json:"pkStark"`
+	Percent      string `json:"percent"`
+	EstimateOnly bool   `json:"estimateOnly"`
+	SubType      string `json:"account"`
+	FromNetwork  string `json:"fromNetwork"`
+	ToNetwork    string `json:"toNetwork"`
+}
+
+type LiquidityBridgeRes struct {
+	Gas struct {
+		Limit string `json:"limit"`
+		Price string `json:"price"`
+		Total string `json:"total"`
+	}
+
+	ContractAddr string
+	TxHash       *string
+}
+
 type HalperService interface {
 	IsAccountDeployed(ctx context.Context, req *IsAccountDeployedReq) (*IsAccountDeployedRes, error)
 	DeployAccount(ctx context.Context, req *DeployAccountReq) (*DeployAccountRes, error)
@@ -77,4 +99,5 @@ type HalperService interface {
 	Swap(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error)
 	Approve(ctx context.Context, req *ApproveReq) (*ApproveRes, error)
 	Generate(ctx context.Context, req *GenerateReq) (*[]AccountGenerated, error)
+	LiquidityBridge(ctx context.Context, req *LiquidityBridgeReq) (*LiquidityBridgeRes, error)
 }

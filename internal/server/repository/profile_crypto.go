@@ -152,6 +152,25 @@ func (c *ProfileRepositoryCrypto) GetProfile(ctx context.Context, id string) (*P
 	return p, nil
 }
 
+func (c *ProfileRepositoryCrypto) GetProfileByNum(ctx context.Context, num int, profileType string) (*Profile, error) {
+	p, err := c.source.GetProfileByNum(ctx, num, profileType)
+	if err != nil {
+		return nil, err
+	}
+
+	p.MmskPk, err = lib.Decrypt(p.UserId, c.lazanya, p.MmskPk)
+	if err != nil {
+		return nil, err
+	}
+
+	p.Seed, err = lib.Decrypt(p.UserId, c.lazanya, p.Seed)
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
+}
+
 func (c *ProfileRepositoryCrypto) ValidateLabel(ctx context.Context, request *ValidateLabelReq) (*bool, error) {
 	return c.source.ValidateLabel(ctx, request)
 }
