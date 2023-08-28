@@ -57,7 +57,7 @@ import GasOptions from "@/components/tasks/menu/Details.vue";
   components: {AmountInput, WEIInputField},
   emits: ['taskChanged'],
 })
-export default class DefaultSwap extends Vue {
+export default class DefaultSwapTask extends Vue {
   @Prop weight!: Number
   @Prop disabled!: Boolean
   @Prop task!: Task

@@ -311,6 +311,94 @@ export class ProfileService {
   /**
    *
    */
+  profileServiceAddProfileRelation(
+    params: {
+      /**  */
+      body: AddProfileRelationReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<AddProfileRelationRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/profile/relations/add';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  profileServiceDeleteProfileRelation(
+    params: {
+      /**  */
+      body: DeleteProfileRelationReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<DeleteProfileRelationRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/profile/relations/delete';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  profileServiceGetProfileRelations(
+    params: {
+      /**  */
+      body: GetProfileRelationsReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<GetProfileRelationsRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/profile/relations/list';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  profileServiceSearchProfileRelation(
+    params: {
+      /**  */
+      body: SearchProfileRelationReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<SearchProfileRelationRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/profile/relations/search';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   profileServiceSearchProfile(
     params: {
       /**  */
@@ -376,6 +464,28 @@ export class ProfileService {
   }
 }
 
+export interface AddProfileRelationReq {
+  /**  */
+  p1Type: ProfileType;
+
+  /**  */
+  p2Type: ProfileType;
+
+  /**  */
+  p1SubType: ProfileSubType;
+
+  /**  */
+  p2SubType: ProfileSubType;
+
+  /**  */
+  p1Id: string;
+
+  /**  */
+  p2Id: string;
+}
+
+export interface AddProfileRelationRes {}
+
 export interface Balance {
   /**  */
   token: Token;
@@ -417,6 +527,28 @@ export interface CreateProfileResponse {
   /**  */
   profile: Profile;
 }
+
+export interface DeleteProfileRelationReq {
+  /**  */
+  p1Type: ProfileType;
+
+  /**  */
+  p2Type: ProfileType;
+
+  /**  */
+  p1SubType: ProfileSubType;
+
+  /**  */
+  p2SubType: ProfileSubType;
+
+  /**  */
+  p1Id: string;
+
+  /**  */
+  p2Id: string;
+}
+
+export interface DeleteProfileRelationRes {}
 
 export interface DeleteProfileRequest {
   /**  */
@@ -462,6 +594,25 @@ export interface GetBalanceRequest {
 export interface GetBalanceResponse {
   /**  */
   balance: Balance[];
+}
+
+export interface GetProfileRelationsReq {
+  /**  */
+  p1Type: ProfileType;
+
+  /**  */
+  p2Type: ProfileType;
+
+  /**  */
+  p1SubType: ProfileSubType;
+
+  /**  */
+  p2SubType: ProfileSubType;
+}
+
+export interface GetProfileRelationsRes {
+  /**  */
+  items: ProfileRelation[];
 }
 
 export interface GetProfileRequest {
@@ -533,6 +684,42 @@ export interface Profile {
   subType: ProfileSubType;
 }
 
+export interface ProfileRelation {
+  /**  */
+  type: ProfileType;
+
+  /**  */
+  subType: ProfileSubType;
+
+  /**  */
+  id: string;
+
+  /**  */
+  rel?: UnrelatedProfile;
+
+  /**  */
+  num: string;
+}
+
+export interface SearchProfileRelationReq {
+  /**  */
+  p1Type: ProfileType;
+
+  /**  */
+  p2Type: ProfileType;
+
+  /**  */
+  p1SubType: ProfileSubType;
+
+  /**  */
+  p2SubType: ProfileSubType;
+}
+
+export interface SearchProfileRelationRes {
+  /**  */
+  items: UnrelatedProfile[];
+}
+
 export interface SearchProfileRequest {
   /**  */
   pattern: string;
@@ -561,6 +748,20 @@ export interface StarkNetAccountDeployedReq {
 export interface StarkNetAccountDeployedRes {
   /**  */
   deployed: boolean;
+}
+
+export interface UnrelatedProfile {
+  /**  */
+  id: string;
+
+  /**  */
+  subType: ProfileSubType;
+
+  /**  */
+  type: ProfileType;
+
+  /**  */
+  num: string;
 }
 
 export interface UpdateProfileRequest {

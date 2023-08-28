@@ -5,6 +5,7 @@ import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "v1/shared.proto";
 import "v1/task.proto";
+import "v1/profile.proto";
 
 package helper;
 option go_package = "grpc/v1";
@@ -244,10 +245,12 @@ message GetUserResponse {
 
 message ValidatePKRequest {
   string pk = 1;
+  profile.ProfileType type = 2;
+  profile.ProfileSubType sub_type = 3;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["pk"]
+      required: ["pk", "type", "sub_type"]
     }
   };
 }

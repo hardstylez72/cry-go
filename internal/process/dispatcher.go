@@ -190,7 +190,7 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 		e, err = (&task.StarketSwapHalper{v1.TaskType_ProtossSwap}).EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_StarkNetBridge:
 		p := t.Task.Task.(*v1.Task_StarkNetBridgeTask).StarkNetBridgeTask
-		from, to, errr := task.LiquidityBridgeProfiles(ctx, d.haalp, d.runner.profileRepository, p, profile.Num)
+		from, to, errr := task.LiquidityBridgeProfiles(ctx, d.haalp, d.runner.profileRepository, p, profile)
 		if errr != nil {
 			return nil, errr
 		}

@@ -22,6 +22,22 @@ func NewProfileRepositoryCrypto(source ProfileRepository, userRepository UserRep
 	}
 }
 
+func (c *ProfileRepositoryCrypto) GetRelatedProfile(ctx context.Context, req *GetRelatedProfileReq) (*string, error) {
+	return c.source.GetRelatedProfile(ctx, req)
+}
+func (c *ProfileRepositoryCrypto) GetProfileRelations(ctx context.Context, req *GetProfileRelationsReq) ([]GetProfileRelationsRes, error) {
+	return c.source.GetProfileRelations(ctx, req)
+}
+func (c *ProfileRepositoryCrypto) AddProfileRelation(ctx context.Context, req *ProfileRelation) error {
+	return c.source.AddProfileRelation(ctx, req)
+}
+func (c *ProfileRepositoryCrypto) DeleteProfileRelation(ctx context.Context, req *ProfileRelation) error {
+	return c.source.DeleteProfileRelation(ctx, req)
+}
+func (c *ProfileRepositoryCrypto) SearchProfilesNotRelated(ctx context.Context, req *SearchProfilesNotRelated) ([]ProfileRel, error) {
+	return c.source.SearchProfilesNotRelated(ctx, req)
+}
+
 func (c *ProfileRepositoryCrypto) CreateProfile(ctx context.Context, req *Profile) error {
 
 	pk, err := lib.Encrypt(req.UserId, c.lazanya, req.MmskPk)
@@ -135,25 +151,6 @@ func (c *ProfileRepositoryCrypto) SearchProfile(ctx context.Context, pattern, us
 
 func (c *ProfileRepositoryCrypto) GetProfile(ctx context.Context, id string) (*Profile, error) {
 	p, err := c.source.GetProfile(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	p.MmskPk, err = lib.Decrypt(p.UserId, c.lazanya, p.MmskPk)
-	if err != nil {
-		return nil, err
-	}
-
-	p.Seed, err = lib.Decrypt(p.UserId, c.lazanya, p.Seed)
-	if err != nil {
-		return nil, err
-	}
-
-	return p, nil
-}
-
-func (c *ProfileRepositoryCrypto) GetProfileByNum(ctx context.Context, num int, profileType string) (*Profile, error) {
-	p, err := c.source.GetProfileByNum(ctx, num, profileType)
 	if err != nil {
 		return nil, err
 	}

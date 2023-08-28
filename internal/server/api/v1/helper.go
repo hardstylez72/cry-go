@@ -7,6 +7,7 @@ import (
 
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/lib"
 	"github.com/hardstylez72/cry/internal/pay"
 	"github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -29,6 +30,7 @@ type HelperService struct {
 	statRepository              repository.StatRepository
 	repositoryProcessRepository repository.ProcessRepository
 	tgBot                       *tg.Bot
+	starkNetClient              *starknet.Client
 }
 
 func NewHelperService(
@@ -39,6 +41,7 @@ func NewHelperService(
 	statRepository repository.StatRepository,
 	repositoryProcessRepository repository.ProcessRepository,
 	tgBot *tg.Bot,
+	starkNetClient *starknet.Client,
 ) *HelperService {
 	return &HelperService{
 		settingsService:             settingsService,
@@ -48,6 +51,7 @@ func NewHelperService(
 		statRepository:              statRepository,
 		repositoryProcessRepository: repositoryProcessRepository,
 		tgBot:                       tgBot,
+		starkNetClient:              starkNetClient,
 	}
 }
 
@@ -55,18 +59,37 @@ func (s *HelperService) EstimateStargateBridgeFee(ctx context.Context, req *v1.E
 	return nil, errors.New("deprecated")
 }
 func (s *HelperService) ValidatePK(ctx context.Context, req *v1.ValidatePKRequest) (*v1.ValidatePKResponse, error) {
-	w, err := defi.GetEMVPublicKey(req.Pk)
-	if err != nil {
+
+	switch req.Type {
+	case v1.ProfileType_EVM:
+		w, err := defi.GetEMVPublicKey(req.Pk)
+		if err != nil {
+			return &v1.ValidatePKResponse{
+				Valid:    false,
+				WalletId: nil,
+			}, nil
+		}
+		addr := w
 		return &v1.ValidatePKResponse{
-			Valid:    false,
-			WalletId: nil,
+			Valid:    true,
+			WalletId: &addr,
 		}, nil
+	case v1.ProfileType_StarkNet:
+		pub, err := s.starkNetClient.GetPublicKey(req.GetPk(), req.SubType)
+		if err != nil {
+			return &v1.ValidatePKResponse{
+				Valid:    false,
+				WalletId: nil,
+			}, nil
+		}
+		addr := pub
+		return &v1.ValidatePKResponse{
+			Valid:    true,
+			WalletId: &addr,
+		}, nil
+	default:
+		return nil, errors.New("invalid pk")
 	}
-	addr := w
-	return &v1.ValidatePKResponse{
-		Valid:    true,
-		WalletId: &addr,
-	}, nil
 }
 func (s *HelperService) ValidateProxy(ctx context.Context, req *v1.ValidateProxyRequest) (*v1.ValidateProxyResponse, error) {
 

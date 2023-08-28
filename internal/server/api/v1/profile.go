@@ -479,3 +479,119 @@ func (s *ProfileService) StarkNetAccountDeployed(ctx context.Context, req *v1.St
 
 	return &v1.StarkNetAccountDeployedRes{Deployed: *deployed}, nil
 }
+
+func (s *ProfileService) GetProfileRelations(ctx context.Context, req *v1.GetProfileRelationsReq) (*v1.GetProfileRelationsRes, error) {
+	userId, err := user.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	r := &repository.GetProfileRelationsReq{
+		P1Type:    req.GetP1Type(),
+		P2Type:    req.P2Type,
+		P1SubType: req.P1SubType,
+		P2SubType: req.P2SubType,
+		UserId:    userId,
+	}
+
+	res, err := s.repository.GetProfileRelations(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+
+	tmp := []*v1.ProfileRelation{}
+
+	for _, r := range res {
+		t := &v1.ProfileRelation{
+			Type:    v1.ProfileType(v1.ProfileType_value[r.Type]),
+			SubType: v1.ProfileSubType(v1.ProfileSubType_value[r.SubType]),
+			Id:      r.Id,
+			Num:     r.Num,
+		}
+
+		if r.Related != nil {
+			t.Rel = &v1.UnrelatedProfile{
+				Type:    v1.ProfileType(v1.ProfileType_value[r.Related.Type]),
+				SubType: v1.ProfileSubType(v1.ProfileSubType_value[r.Related.SubType]),
+				Id:      r.Related.Id,
+				Num:     r.Related.Num,
+			}
+		}
+
+		tmp = append(tmp, t)
+	}
+
+	return &v1.GetProfileRelationsRes{Items: tmp}, nil
+
+}
+func (s *ProfileService) DeleteProfileRelation(ctx context.Context, req *v1.DeleteProfileRelationReq) (*v1.DeleteProfileRelationRes, error) {
+	userId, err := user.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repository.DeleteProfileRelation(ctx, &repository.ProfileRelation{
+		P1Id:      req.P1Id,
+		P1SubType: req.P1SubType.String(),
+		P1Type:    req.P1Type.String(),
+		P2Id:      req.P2Id,
+		P2SubType: req.P2SubType.String(),
+		P2Type:    req.P2Type.String(),
+		UserId:    userId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &v1.DeleteProfileRelationRes{}, nil
+}
+func (s *ProfileService) AddProfileRelation(ctx context.Context, req *v1.AddProfileRelationReq) (*v1.AddProfileRelationRes, error) {
+	userId, err := user.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repository.AddProfileRelation(ctx, &repository.ProfileRelation{
+		P1Id:      req.P1Id,
+		P1SubType: req.P1SubType.String(),
+		P1Type:    req.P1Type.String(),
+		P2Id:      req.P2Id,
+		P2SubType: req.P2SubType.String(),
+		P2Type:    req.P2Type.String(),
+		UserId:    userId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &v1.AddProfileRelationRes{}, nil
+}
+func (s *ProfileService) SearchProfileRelation(ctx context.Context, req *v1.SearchProfileRelationReq) (*v1.SearchProfileRelationRes, error) {
+
+	userId, err := user.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := s.repository.SearchProfilesNotRelated(ctx, &repository.SearchProfilesNotRelated{
+		PType:       req.P1Type.String(),
+		PSubType:    req.P1SubType.String(),
+		NotPType:    req.P2Type.String(),
+		NotPSubType: req.P2SubType.String(),
+		UserId:      userId,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	tmp := make([]*v1.UnrelatedProfile, len(res))
+	for i := range tmp {
+		t := res[i]
+		tmp[i] = &v1.UnrelatedProfile{
+			Id:      t.Id,
+			SubType: v1.ProfileSubType(v1.ProfileSubType_value[t.SubType]),
+			Type:    v1.ProfileType(v1.ProfileType_value[t.Type]),
+			Num:     t.Num,
+		}
+	}
+
+	return &v1.SearchProfileRelationRes{Items: tmp}, nil
+}

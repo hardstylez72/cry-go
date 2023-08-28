@@ -291,7 +291,13 @@ export default defineComponent({
       }
 
       try {
-        const pkStat = await helperService.helperServiceValidatePk({body: {pk: item.pk}})
+        const pkStat = await helperService.helperServiceValidatePk({
+          body: {
+            pk: item.pk,
+            type: this.selectProfileType,
+            subType: this.selectProfileSubType,
+          }
+        })
         if (!pkStat.valid) {
           item.status = 'pk invalid'
           return item

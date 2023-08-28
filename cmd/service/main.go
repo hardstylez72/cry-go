@@ -343,7 +343,7 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 
 	return &services{
 		profileService:       v1.NewProfileService(profileRepository, settingsService, starknetNewClient),
-		helperService:        v1.NewHelperService(settingsService, profileRepository, userRepository, payService, statRepository, processRepository, tgBot),
+		helperService:        v1.NewHelperService(settingsService, profileRepository, userRepository, payService, statRepository, processRepository, tgBot, starknetNewClient),
 		withdrawerService:    v1.NewWithdrawerService(withdrawerRepository, userRepository, profileRepository, starknetNewClient),
 		flowService:          v1.NewFlowService(flowRepository),
 		processService:       v1.NewProcessService(processRepository, dispatcher, flowRepository, settingsService),

@@ -549,6 +549,12 @@ export interface TransactionsDailyImpactRes {
 export interface ValidatePKRequest {
   /**  */
   pk: string;
+
+  /**  */
+  type: ProfileType;
+
+  /**  */
+  subType: ProfileSubType;
 }
 
 export interface ValidatePKResponse {
@@ -592,6 +598,17 @@ export enum Network {
   'ZKSYNCERA' = 'ZKSYNCERA',
   'ZKSYNCERATESTNET' = 'ZKSYNCERATESTNET',
   'ZKSYNCLITE' = 'ZKSYNCLITE',
+  'StarkNet' = 'StarkNet'
+}
+
+export enum ProfileSubType {
+  'Metamask' = 'Metamask',
+  'UrgentX' = 'UrgentX',
+  'Braavos' = 'Braavos'
+}
+
+export enum ProfileType {
+  'EVM' = 'EVM',
   'StarkNet' = 'StarkNet'
 }
 

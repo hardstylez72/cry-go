@@ -152,14 +152,6 @@ func CreateProfile(ctx context.Context, conn pg.SqlDriver, req *Profile) error {
 func (r *pgRepository) GetProfile(ctx context.Context, id string) (*Profile, error) {
 	return GetProfile(ctx, r.conn, id)
 }
-func (r *pgRepository) GetProfileByNum(ctx context.Context, num int, profileType string) (*Profile, error) {
-	q := Join(`select `, prfh.Cols(), ` from profiles where num = $1 and type = $2`)
-	var a Profile
-	if err := r.conn.GetContext(ctx, &a, q, num, profileType); err != nil {
-		return nil, pg.PgError(err)
-	}
-	return &a, nil
-}
 func (r *pgRepository) UpdateProfile(ctx context.Context, req *Profile) error {
 	q := `update profiles set
 			meta = :meta,

@@ -16,7 +16,8 @@
         <div class="d-flex justify-space-between">
           <div>
             <i class="mx-2">{{ profile.subType }}</i>
-            <i class="mx-2" v-if="profile.type === ProfileType.StarkNet &&!deployed && !loading">not deployed</i>
+            <b class="mx-2" v-if="profile.type === ProfileType.StarkNet &&!deployed && !loading" style="color: red">not
+              deployed</b>
             <v-icon icon="mdi-eye" @click="addrShow = true" v-if="!addrShow"/>
           </div>
           <v-icon icon="mdi-close" @click="menu = false"/>

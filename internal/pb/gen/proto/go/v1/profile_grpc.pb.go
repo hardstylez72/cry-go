@@ -34,6 +34,10 @@ type ProfileServiceClient interface {
 	ExportProfiles(ctx context.Context, in *ExportProfilesReq, opts ...grpc.CallOption) (*ExportProfilesRes, error)
 	GenerateProfiles(ctx context.Context, in *GenerateProfilesReq, opts ...grpc.CallOption) (*GenerateProfilesRes, error)
 	StarkNetAccountDeployed(ctx context.Context, in *StarkNetAccountDeployedReq, opts ...grpc.CallOption) (*StarkNetAccountDeployedRes, error)
+	GetProfileRelations(ctx context.Context, in *GetProfileRelationsReq, opts ...grpc.CallOption) (*GetProfileRelationsRes, error)
+	DeleteProfileRelation(ctx context.Context, in *DeleteProfileRelationReq, opts ...grpc.CallOption) (*DeleteProfileRelationRes, error)
+	AddProfileRelation(ctx context.Context, in *AddProfileRelationReq, opts ...grpc.CallOption) (*AddProfileRelationRes, error)
+	SearchProfileRelation(ctx context.Context, in *SearchProfileRelationReq, opts ...grpc.CallOption) (*SearchProfileRelationRes, error)
 }
 
 type profileServiceClient struct {
@@ -152,6 +156,42 @@ func (c *profileServiceClient) StarkNetAccountDeployed(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *profileServiceClient) GetProfileRelations(ctx context.Context, in *GetProfileRelationsReq, opts ...grpc.CallOption) (*GetProfileRelationsRes, error) {
+	out := new(GetProfileRelationsRes)
+	err := c.cc.Invoke(ctx, "/profile.ProfileService/GetProfileRelations", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) DeleteProfileRelation(ctx context.Context, in *DeleteProfileRelationReq, opts ...grpc.CallOption) (*DeleteProfileRelationRes, error) {
+	out := new(DeleteProfileRelationRes)
+	err := c.cc.Invoke(ctx, "/profile.ProfileService/DeleteProfileRelation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) AddProfileRelation(ctx context.Context, in *AddProfileRelationReq, opts ...grpc.CallOption) (*AddProfileRelationRes, error) {
+	out := new(AddProfileRelationRes)
+	err := c.cc.Invoke(ctx, "/profile.ProfileService/AddProfileRelation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) SearchProfileRelation(ctx context.Context, in *SearchProfileRelationReq, opts ...grpc.CallOption) (*SearchProfileRelationRes, error) {
+	out := new(SearchProfileRelationRes)
+	err := c.cc.Invoke(ctx, "/profile.ProfileService/SearchProfileRelation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility
@@ -168,6 +208,10 @@ type ProfileServiceServer interface {
 	ExportProfiles(context.Context, *ExportProfilesReq) (*ExportProfilesRes, error)
 	GenerateProfiles(context.Context, *GenerateProfilesReq) (*GenerateProfilesRes, error)
 	StarkNetAccountDeployed(context.Context, *StarkNetAccountDeployedReq) (*StarkNetAccountDeployedRes, error)
+	GetProfileRelations(context.Context, *GetProfileRelationsReq) (*GetProfileRelationsRes, error)
+	DeleteProfileRelation(context.Context, *DeleteProfileRelationReq) (*DeleteProfileRelationRes, error)
+	AddProfileRelation(context.Context, *AddProfileRelationReq) (*AddProfileRelationRes, error)
+	SearchProfileRelation(context.Context, *SearchProfileRelationReq) (*SearchProfileRelationRes, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -210,6 +254,18 @@ func (UnimplementedProfileServiceServer) GenerateProfiles(context.Context, *Gene
 }
 func (UnimplementedProfileServiceServer) StarkNetAccountDeployed(context.Context, *StarkNetAccountDeployedReq) (*StarkNetAccountDeployedRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StarkNetAccountDeployed not implemented")
+}
+func (UnimplementedProfileServiceServer) GetProfileRelations(context.Context, *GetProfileRelationsReq) (*GetProfileRelationsRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProfileRelations not implemented")
+}
+func (UnimplementedProfileServiceServer) DeleteProfileRelation(context.Context, *DeleteProfileRelationReq) (*DeleteProfileRelationRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteProfileRelation not implemented")
+}
+func (UnimplementedProfileServiceServer) AddProfileRelation(context.Context, *AddProfileRelationReq) (*AddProfileRelationRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddProfileRelation not implemented")
+}
+func (UnimplementedProfileServiceServer) SearchProfileRelation(context.Context, *SearchProfileRelationReq) (*SearchProfileRelationRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchProfileRelation not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 
@@ -440,6 +496,78 @@ func _ProfileService_StarkNetAccountDeployed_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_GetProfileRelations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProfileRelationsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).GetProfileRelations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.ProfileService/GetProfileRelations",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).GetProfileRelations(ctx, req.(*GetProfileRelationsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_DeleteProfileRelation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteProfileRelationReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).DeleteProfileRelation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.ProfileService/DeleteProfileRelation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).DeleteProfileRelation(ctx, req.(*DeleteProfileRelationReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_AddProfileRelation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddProfileRelationReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).AddProfileRelation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.ProfileService/AddProfileRelation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).AddProfileRelation(ctx, req.(*AddProfileRelationReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_SearchProfileRelation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchProfileRelationReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).SearchProfileRelation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.ProfileService/SearchProfileRelation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).SearchProfileRelation(ctx, req.(*SearchProfileRelationReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -494,6 +622,22 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StarkNetAccountDeployed",
 			Handler:    _ProfileService_StarkNetAccountDeployed_Handler,
+		},
+		{
+			MethodName: "GetProfileRelations",
+			Handler:    _ProfileService_GetProfileRelations_Handler,
+		},
+		{
+			MethodName: "DeleteProfileRelation",
+			Handler:    _ProfileService_DeleteProfileRelation_Handler,
+		},
+		{
+			MethodName: "AddProfileRelation",
+			Handler:    _ProfileService_AddProfileRelation_Handler,
+		},
+		{
+			MethodName: "SearchProfileRelation",
+			Handler:    _ProfileService_SearchProfileRelation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

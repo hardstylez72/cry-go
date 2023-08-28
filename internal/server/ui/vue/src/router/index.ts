@@ -3,6 +3,11 @@ import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
 
 const routes = [
   {
+    name: 'ProfileRelations',
+    path: '/profile/relations',
+    component: () => import('@/components/profile/Relations.vue'),
+  },
+  {
     name: 'Modules',
     path: '/modules',
     component: () => import('@/components/landing/modules/General.vue'),

@@ -118,13 +118,138 @@ service ProfileService {
       body: "*"
     };
   }
-
   rpc StarkNetAccountDeployed(StarkNetAccountDeployedReq) returns (StarkNetAccountDeployedRes) {
     option (google.api.http) = {
       post:"/api/gw/v1/profile/starknet/deployed",
       body: "*"
     };
   }
+
+  rpc GetProfileRelations(GetProfileRelationsReq) returns (GetProfileRelationsRes) {
+    option (google.api.http) = {
+      post:"/api/gw/v1/profile/relations/list",
+      body: "*"
+    };
+  }
+  rpc DeleteProfileRelation(DeleteProfileRelationReq) returns (DeleteProfileRelationRes) {
+    option (google.api.http) = {
+      post:"/api/gw/v1/profile/relations/delete",
+      body: "*"
+    };
+  }
+  rpc AddProfileRelation(AddProfileRelationReq) returns (AddProfileRelationRes) {
+    option (google.api.http) = {
+      post:"/api/gw/v1/profile/relations/add",
+      body: "*"
+    };
+  }
+  rpc SearchProfileRelation(SearchProfileRelationReq) returns (SearchProfileRelationRes) {
+    option (google.api.http) = {
+      post:"/api/gw/v1/profile/relations/search",
+      body: "*"
+    };
+  }
+
+}
+
+message SearchProfileRelationReq {
+  profile.ProfileType p1_type = 1;
+  profile.ProfileType p2_type = 2;
+  profile.ProfileSubType p1_sub_type = 3;
+  profile.ProfileSubType p2_sub_type = 4;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["p1_type", "p2_type", "p1_sub_type", "p2_sub_type"]
+    }
+  };
+}
+
+message SearchProfileRelationRes {
+  repeated UnrelatedProfile items = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["items"]
+    }
+  };
+}
+
+message UnrelatedProfile {
+  string id = 1;
+  profile.ProfileSubType  sub_type = 2;
+  profile.ProfileType  type = 3;
+  int64  num = 4;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "sub_type", "type", "num"]
+    }
+  };
+}
+
+message AddProfileRelationReq {
+  profile.ProfileType p1_type = 1;
+  profile.ProfileType p2_type = 2;
+  profile.ProfileSubType p1_sub_type = 3;
+  profile.ProfileSubType p2_sub_type = 4;
+  string p1_id = 5;
+  string p2_id = 6;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["p1_type", "p2_type", "p1_sub_type", "p2_sub_type", "p1_id", "p2_id"]
+    }
+  };
+}
+
+message AddProfileRelationRes {
+
+}
+
+message DeleteProfileRelationReq {
+  profile.ProfileType p1_type = 1;
+  profile.ProfileType p2_type = 2;
+  profile.ProfileSubType p1_sub_type = 3;
+  profile.ProfileSubType p2_sub_type = 4;
+  string p1_id = 5;
+  string p2_id = 6;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["p1_type", "p2_type", "p1_sub_type", "p2_sub_type", "p1_id", "p2_id"]
+    }
+  };
+}
+
+message DeleteProfileRelationRes{}
+message GetProfileRelationsReq {
+  profile.ProfileType p1_type = 1;
+  profile.ProfileType p2_type = 2;
+  profile.ProfileSubType p1_sub_type = 3;
+  profile.ProfileSubType p2_sub_type = 4;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["p1_type", "p2_type", "p1_sub_type", "p2_sub_type"]
+    }
+  };
+}
+
+message GetProfileRelationsRes {
+  repeated ProfileRelation items = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["items"]
+    }
+  };
+}
+
+message ProfileRelation {
+  profile.ProfileType type = 1;
+  profile.ProfileSubType sub_type = 2;
+  string id = 3;
+  optional UnrelatedProfile rel = 4;
+  int64 num = 5;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["type", "sub_type", "id", "num"]
+    }
+  };
 }
 
 message StarkNetAccountDeployedReq {

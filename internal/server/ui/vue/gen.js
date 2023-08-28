@@ -2,7 +2,6 @@
 /* eslint-disable */
 const {codegen} = require('swagger-axios-codegen');
 const path = require('path');
-// const {tr} = require("vuetify/locale");
 
 codegen({
   methodNameMode: 'operationId',

@@ -16,10 +16,18 @@ type ProfileRepository interface {
 	SearchProfile(ctx context.Context, pattern, userId, profileType string) ([]Profile, error)
 	SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string) ([]Profile, error)
 	GetProfile(ctx context.Context, id string) (*Profile, error)
-	GetProfileByNum(ctx context.Context, num int, profileType string) (*Profile, error)
 	ValidateLabel(ctx context.Context, request *ValidateLabelReq) (*bool, error)
 	UpdateProfile(ctx context.Context, req *Profile) error
 	ExportProfiles(ctx context.Context, userId string) ([]Profile, error)
+	ProfileRelations
+}
+
+type ProfileRelations interface {
+	GetProfileRelations(ctx context.Context, req *GetProfileRelationsReq) ([]GetProfileRelationsRes, error)
+	AddProfileRelation(ctx context.Context, req *ProfileRelation) error
+	DeleteProfileRelation(ctx context.Context, req *ProfileRelation) error
+	SearchProfilesNotRelated(ctx context.Context, req *SearchProfilesNotRelated) ([]ProfileRel, error)
+	GetRelatedProfile(ctx context.Context, req *GetRelatedProfileReq) (*string, error)
 }
 
 type WithdrawerRepository interface {

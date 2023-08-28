@@ -53,7 +53,7 @@ func (t *StargateTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 		}
 	}
 
-	profie, err := a.Halper.Profile(ctx, a.ProfileId)
+	profile, err := a.Halper.Profile(ctx, a.ProfileId)
 	if err != nil {
 		return nil, err
 	}
@@ -65,12 +65,12 @@ func (t *StargateTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateStargateBridgeSwapCost(taskContext, p, profie)
+		estimation, err := EstimateStargateBridgeSwapCost(taskContext, p, profile)
 		if err != nil {
 			return nil, err
 		}
 
-		res, gas, err := t.Swap(taskContext, p, client, profie, estimation)
+		res, gas, err := t.Swap(taskContext, p, client, profile, estimation)
 		if err != nil {
 			return nil, err
 		}

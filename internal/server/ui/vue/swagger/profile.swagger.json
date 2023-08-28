@@ -304,6 +304,134 @@
         ]
       }
     },
+    "/api/gw/v1/profile/relations/add": {
+      "post": {
+        "operationId": "ProfileService_AddProfileRelation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/AddProfileRelationRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AddProfileRelationReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
+    "/api/gw/v1/profile/relations/delete": {
+      "post": {
+        "operationId": "ProfileService_DeleteProfileRelation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/DeleteProfileRelationRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DeleteProfileRelationReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
+    "/api/gw/v1/profile/relations/list": {
+      "post": {
+        "operationId": "ProfileService_GetProfileRelations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/GetProfileRelationsRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GetProfileRelationsReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
+    "/api/gw/v1/profile/relations/search": {
+      "post": {
+        "operationId": "ProfileService_SearchProfileRelation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/SearchProfileRelationRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SearchProfileRelationReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
     "/api/gw/v1/profile/search": {
       "post": {
         "operationId": "ProfileService_SearchProfile",
@@ -402,6 +530,40 @@
     }
   },
   "definitions": {
+    "AddProfileRelationReq": {
+      "type": "object",
+      "properties": {
+        "p1Type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "p2Type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "p1SubType": {
+          "$ref": "#/definitions/ProfileSubType"
+        },
+        "p2SubType": {
+          "$ref": "#/definitions/ProfileSubType"
+        },
+        "p1Id": {
+          "type": "string"
+        },
+        "p2Id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "p1Type",
+        "p2Type",
+        "p1SubType",
+        "p2SubType",
+        "p1Id",
+        "p2Id"
+      ]
+    },
+    "AddProfileRelationRes": {
+      "type": "object"
+    },
     "Any": {
       "type": "object",
       "properties": {
@@ -475,6 +637,40 @@
       "required": [
         "profile"
       ]
+    },
+    "DeleteProfileRelationReq": {
+      "type": "object",
+      "properties": {
+        "p1Type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "p2Type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "p1SubType": {
+          "$ref": "#/definitions/ProfileSubType"
+        },
+        "p2SubType": {
+          "$ref": "#/definitions/ProfileSubType"
+        },
+        "p1Id": {
+          "type": "string"
+        },
+        "p2Id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "p1Type",
+        "p2Type",
+        "p1SubType",
+        "p2SubType",
+        "p1Id",
+        "p2Id"
+      ]
+    },
+    "DeleteProfileRelationRes": {
+      "type": "object"
     },
     "DeleteProfileRequest": {
       "type": "object",
@@ -567,6 +763,44 @@
       },
       "required": [
         "balance"
+      ]
+    },
+    "GetProfileRelationsReq": {
+      "type": "object",
+      "properties": {
+        "p1Type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "p2Type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "p1SubType": {
+          "$ref": "#/definitions/ProfileSubType"
+        },
+        "p2SubType": {
+          "$ref": "#/definitions/ProfileSubType"
+        }
+      },
+      "required": [
+        "p1Type",
+        "p2Type",
+        "p1SubType",
+        "p2SubType"
+      ]
+    },
+    "GetProfileRelationsRes": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ProfileRelation"
+          }
+        }
+      },
+      "required": [
+        "items"
       ]
     },
     "GetProfileRequest": {
@@ -710,6 +944,33 @@
         "subType"
       ]
     },
+    "ProfileRelation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "subType": {
+          "$ref": "#/definitions/ProfileSubType"
+        },
+        "id": {
+          "type": "string"
+        },
+        "rel": {
+          "$ref": "#/definitions/UnrelatedProfile"
+        },
+        "num": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "type",
+        "subType",
+        "id",
+        "num"
+      ]
+    },
     "ProfileSubType": {
       "type": "string",
       "enum": [
@@ -726,6 +987,44 @@
         "StarkNet"
       ],
       "default": "EVM"
+    },
+    "SearchProfileRelationReq": {
+      "type": "object",
+      "properties": {
+        "p1Type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "p2Type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "p1SubType": {
+          "$ref": "#/definitions/ProfileSubType"
+        },
+        "p2SubType": {
+          "$ref": "#/definitions/ProfileSubType"
+        }
+      },
+      "required": [
+        "p1Type",
+        "p2Type",
+        "p1SubType",
+        "p2SubType"
+      ]
+    },
+    "SearchProfileRelationRes": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/UnrelatedProfile"
+          }
+        }
+      },
+      "required": [
+        "items"
+      ]
     },
     "SearchProfileRequest": {
       "type": "object",
@@ -837,6 +1136,30 @@
         "IZI"
       ],
       "default": "USDT"
+    },
+    "UnrelatedProfile": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "subType": {
+          "$ref": "#/definitions/ProfileSubType"
+        },
+        "type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "num": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "id",
+        "subType",
+        "type",
+        "num"
+      ]
     },
     "UpdateProfileRequest": {
       "type": "object",

@@ -46,7 +46,6 @@ send-prod:
 	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml build --force"
 	ssh -t root@$(prod) "docker-compose -f /root/app/cry/docker-compose.yaml up -d"
 
-
 local:
 	docker-compose -f docker-compose.local.yml up -d
 	go run ./cmd/service/main.go

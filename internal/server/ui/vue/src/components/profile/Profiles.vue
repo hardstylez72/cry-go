@@ -18,7 +18,9 @@
         <v-radio-group v-model="selectProfileType" inline="true" hide-details density="compact">
           <v-radio class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
           <v-radio class="mx-8" :value="ProfileType.StarkNet">StarkNet</v-radio>
+          <v-btn class="mx-2" density="compact" @click="$router.push({name: 'ProfileRelations'})">Связи</v-btn>
         </v-radio-group>
+
         <div>
           <v-checkbox
             density="compact"

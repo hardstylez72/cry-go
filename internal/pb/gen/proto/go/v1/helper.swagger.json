@@ -673,6 +673,23 @@
         "toWallet"
       ]
     },
+    "ProfileSubType": {
+      "type": "string",
+      "enum": [
+        "Metamask",
+        "UrgentX",
+        "Braavos"
+      ],
+      "default": "Metamask"
+    },
+    "ProfileType": {
+      "type": "string",
+      "enum": [
+        "EVM",
+        "StarkNet"
+      ],
+      "default": "EVM"
+    },
     "Status": {
       "type": "object",
       "properties": {
@@ -803,10 +820,18 @@
       "properties": {
         "pk": {
           "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/ProfileType"
+        },
+        "subType": {
+          "$ref": "#/definitions/ProfileSubType"
         }
       },
       "required": [
-        "pk"
+        "pk",
+        "type",
+        "subType"
       ]
     },
     "ValidatePKResponse": {

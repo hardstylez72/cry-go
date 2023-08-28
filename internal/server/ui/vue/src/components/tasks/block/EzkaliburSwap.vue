@@ -43,11 +43,11 @@
 import {DefaultSwap, Network, Task, TaskType, Token} from "@/generated/flow";
 import {taskProps} from "@/components/tasks/tasks";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
-import DefaultSwap from "@/components/tasks/block/base/DefaultSwap.js";
+import DefaultSwapTask from "@/components/tasks/block/base/DefaultSwapTask.js";
 import {Component, toNative} from "vue-facing-decorator";
 
 @Component({name: 'EzkaliburSwap'})
-export default class EzkaliburSwap extends DefaultSwap {
+export default class EzkaliburSwap extends DefaultSwapTask {
 
   networks = [Network.ZKSYNCERA]
 

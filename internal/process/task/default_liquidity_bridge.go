@@ -2,14 +2,12 @@ package task
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
 	"github.com/hardstylez72/cry/internal/server/repository"
-	"github.com/hardstylez72/cry/internal/server/repository/pg"
 	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 )
@@ -55,29 +53,29 @@ func (t *DefaultLiquidityBridgeTask) Type() v1.TaskType {
 	return t.taskType
 }
 
-func LiquidityBridgeProfiles(ctx context.Context, halper *halp.Halp, rep repository.ProfileRepository, p *v1.LiquidityBridgeTask, num int) (from *halp.Profile, to *halp.Profile, err error) {
+func LiquidityBridgeProfiles(ctx context.Context, halper *halp.Halp, rep repository.ProfileRepository, p *v1.LiquidityBridgeTask, profile *halp.Profile) (from *halp.Profile, to *halp.Profile, err error) {
 
 	switch true {
 	case p.FromNetwork == v1.Network_Etherium && p.ToNetwork == v1.Network_StarkNet:
-		fromP, err := rep.GetProfileByNum(ctx, num, v1.ProfileType_EVM.String())
-		if err != nil {
-			if errors.Is(err, pg.EntityNotFound) {
-				return nil, nil, errors.New("EMV profile with num :" + strconv.Itoa(num) + " not found")
-			}
-			return nil, nil, err
+
+		if profile.Type != v1.ProfileType_StarkNet {
+			return nil, nil, errors.New("profile must have starknet type")
 		}
-		from, err = halper.Profile(ctx, fromP.Id)
+
+		id, err := rep.GetRelatedProfile(ctx, &repository.GetRelatedProfileReq{
+			ProfileId:          profile.Id,
+			ProfileType:        profile.Type.String(),
+			ProfileSubType:     profile.SubType.String(),
+			WantProfileType:    v1.ProfileType_EVM.String(),
+			WantProfileSubType: v1.ProfileSubType_Metamask.String(),
+			UserId:             profile.UserId,
+		})
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.New("related EVM profile not found")
 		}
-		toP, err := rep.GetProfileByNum(ctx, num, v1.ProfileType_StarkNet.String())
-		if err != nil {
-			if errors.Is(err, pg.EntityNotFound) {
-				return nil, nil, errors.New("StarkNet profile with num :" + strconv.Itoa(num) + " not found")
-			}
-			return nil, nil, err
-		}
-		to, err = halper.Profile(ctx, toP.Id)
+
+		to := profile
+		from, err = halper.Profile(ctx, *id)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -118,7 +116,7 @@ func (t *DefaultLiquidityBridgeTask) Run(ctx context.Context, a *Input) (*v1.Pro
 		return nil, err
 	}
 
-	from, to, err := LiquidityBridgeProfiles(ctx, a.Halper, a.ProfileRepository, p, profile.Num)
+	from, to, err := LiquidityBridgeProfiles(ctx, a.Halper, a.ProfileRepository, p, profile)
 	if err != nil {
 		return nil, err
 	}
