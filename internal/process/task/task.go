@@ -92,6 +92,8 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_MySwap,
 	v1.TaskType_ProtossSwap,
 	v1.TaskType_StarkNetBridge,
+	v1.TaskType_Dmail,
+	v1.TaskType_StarkNetIdMint,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -133,6 +135,8 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_MySwap:                           &Wrap{Tasker: NewMySwapSwapTask()},
 	v1.TaskType_ProtossSwap:                      &Wrap{Tasker: NewProtossSwapTask()},
 	v1.TaskType_StarkNetBridge:                   &Wrap{Tasker: NewStarkNetBridgeTask()},
+	v1.TaskType_Dmail:                            &Wrap{Tasker: &DmailTask{}},
+	v1.TaskType_StarkNetIdMint:                   &Wrap{Tasker: &MintTask{}},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -300,7 +304,6 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_PancakeSwapTask)")
 		}
 		return Marshal(t.PancakeSwapTask)
-
 	case v1.TaskType_SithSwap:
 		t, ok := m.Task.(*v1.Task_SithSwapTask)
 		if !ok {
@@ -331,6 +334,19 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_StarkNetBridgeTask)")
 		}
 		return Marshal(t.StarkNetBridgeTask)
+	case v1.TaskType_Dmail:
+		t, ok := m.Task.(*v1.Task_DmailTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_DmailTask)")
+		}
+		return Marshal(t.DmailTask)
+	case v1.TaskType_StarkNetIdMint:
+		t, ok := m.Task.(*v1.Task_StarkNetIdMintTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.StarkNetIdMintTask)")
+		}
+		return Marshal(t.StarkNetIdMintTask)
+
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}
@@ -509,15 +525,11 @@ func NeedPay(before, after *v1.ProcessTask) bool {
 		return false
 	}
 
-	if after.Status == v1.ProcessStatus_StatusDone {
-		return false
-	}
-
 	if !IsPayableTask(after.Task.TaskType) {
 		return false
 	}
 
-	return true
+	return after.Status == v1.ProcessStatus_StatusDone
 }
 
 func Marshal(m proto.Message) ([]byte, error) {

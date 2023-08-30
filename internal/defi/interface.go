@@ -144,3 +144,19 @@ type LiquidityBridgeReq struct {
 	FromSubType  v1.ProfileSubType
 	ToSubType    v1.ProfileSubType
 }
+
+type DmailSender interface {
+	SendDmailMessage(ctx context.Context, req *SimpleReq) (*bozdo.DefaultRes, error)
+	Networker
+}
+
+type Minter interface {
+	Mint(ctx context.Context, req *SimpleReq) (*bozdo.DefaultRes, error)
+	Networker
+}
+
+type SimpleReq struct {
+	PK      string
+	SubType v1.ProfileSubType
+	*bozdo.BaseReq
+}

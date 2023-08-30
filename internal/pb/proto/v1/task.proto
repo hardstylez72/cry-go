@@ -44,6 +44,8 @@ enum TaskType {
   MySwap = 30;
   ProtossSwap = 31;
   StarkNetBridge = 32;
+  Dmail = 33;
+  StarkNetIdMint = 34;
 }
 
 
@@ -72,6 +74,20 @@ message LiquidityBridgeTask {
     json_schema: {
       required: [
         "amount", "from_network", "to_network","token"
+      ]
+    }
+  };
+}
+
+message SimpleTask {
+  shared.Network network = 1;
+  optional TaskTx tx = 2;
+  optional TaskTx  approveTx = 3;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "network"
       ]
     }
   };

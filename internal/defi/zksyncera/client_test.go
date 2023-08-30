@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,9 +17,17 @@ func Test(t *testing.T) {
 
 	ctx := context.Background()
 
-	txHash := common.HexToHash("0x3042e032c90adcc87af3db59f258382e775cfdb060b15025b872ed0f8d6ee9a3")
+	res, err := r.SendDmailMessage(ctx, &SendDmailMessageReq{
+		PK: tests.GetConfig().PK,
+		BaseReq: &bozdo.BaseReq{
+			EstimateOnly: true,
+			Gas:          nil,
+			Debug:        true,
+		},
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
 
-	r.GetMerklyNFTId(ctx, txHash)
 	//tx, err := r.rpcL2.GetTransaction(txHash)
 	//
 	//println(tx.To.String())

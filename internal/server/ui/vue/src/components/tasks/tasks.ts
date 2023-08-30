@@ -3,7 +3,7 @@ import {flow_Flow} from "@/generated/process";
 
 
 import TaskStargateBridge from "@/components/tasks/block/TaskStargateBridge.vue";
-import TaskDelay from "@/components/tasks/block/TaskDelay.vue";
+import TaskDelay from "@/components/tasks/block/Delay.vue";
 import TaskExchangeWithdraw from "@/components/tasks/block/TaskExchangeWithdraw.vue";
 import TaskOkexDeposit from "@/components/tasks/block/TaskOkexDeposit.vue";
 import TaskTestNetBridgeSwap from "@/components/tasks/block/TaskTestNetBridgeSwap.vue";
@@ -64,6 +64,10 @@ import MenuProtossSwap from "@/components/tasks/menu/MenuProtossSwap.vue";
 import ProtossSwap from "@/components/tasks/block/ProtossSwap.vue";
 import StrarkNetBridge from "@/components/tasks/block/StrarkNetBridge.vue";
 import MenuStarkNetBridge from "@/components/tasks/menu/MenuStarkNetBridge.vue";
+import Dmail from "@/components/tasks/block/Dmail.vue";
+import MenuDmail from "@/components/tasks/menu/MenuDmail.vue";
+import StarkNetId from "@/components/tasks/block/StarkNetId.vue";
+import MenuStarkNetId from "@/components/tasks/menu/MenuStarkNetId.vue";
 
 
 export interface TaskArg {
@@ -768,6 +772,46 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     networks: new Set<Network>([Network.Etherium, Network.StarkNet]),
     airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
     profileType: new Set([ProfileType.EVM])
+  },
+  Dmail: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.dmailTask
+      return ''
+    },
+    component: Dmail,
+    menu: MenuDmail,
+    service: {
+      name: 'Dmail',
+      link: 'https://dmail.ai/',
+      img: '/icons/dmail.ico',
+      op: 'email send',
+    },
+    job: TaskJob.Other,
+    networks: new Set<Network>([Network.ZKSYNCERA, Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync, Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
+  },
+  StarkNetIdMint: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.starkNetIdMintTask
+      return ''
+    },
+    component: StarkNetId,
+    menu: MenuStarkNetId,
+    service: {
+      name: 'StarkNetId',
+      link: 'https://app.starknet.id/',
+      img: '/icons/starknetid.svg',
+      op: 'mint uniq id',
+    },
+    job: TaskJob.NFT,
+    networks: new Set<Network>([Network.StarkNet]),
+    airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
+    profileType: new Set([ProfileType.StarkNet])
   }
 }
 

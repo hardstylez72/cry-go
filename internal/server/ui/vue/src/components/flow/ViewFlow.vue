@@ -45,7 +45,7 @@ import {flowService, processService, profileService} from "@/generated/services"
 import {flow_Flow as Flow, Task, TaskType} from "@/generated/flow";
 import TaskStargateBridge from "@/components/tasks/block/TaskStargateBridge.vue";
 import {Profile} from "@/generated/profile";
-import TaskDelay from "@/components/tasks/block/TaskDelay.vue";
+import TaskDelay from "@/components/tasks/block/Delay.vue";
 import ProfileCard from "@/components/profile/ProfileCard.vue";
 import {taskComponentMap, TaskArg, taskTypes} from "@/components/tasks/tasks";
 import {Delay, Timer} from "@/components/helper";

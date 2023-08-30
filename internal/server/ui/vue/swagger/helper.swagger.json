@@ -629,7 +629,8 @@
         "ZKSYNCLITE",
         "StarkNet"
       ],
-      "default": "ARBITRUM"
+      "default": "ARBITRUM",
+      "title": "- ZKSYNCERATESTNET: deprecated"
     },
     "Order": {
       "type": "object",
@@ -785,7 +786,9 @@
         "JediSwap",
         "MySwap",
         "ProtossSwap",
-        "StarkNetBridge"
+        "StarkNetBridge",
+        "Dmail",
+        "StarkNetIdMint"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

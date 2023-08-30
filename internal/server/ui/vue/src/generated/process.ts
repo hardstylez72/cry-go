@@ -948,6 +948,17 @@ export interface RetryProcessRequest {
 
 export interface RetryProcessResponse {}
 
+export interface SimpleTask {
+  /**  */
+  network: Network;
+
+  /**  */
+  tx?: TaskTx;
+
+  /**  */
+  approveTx?: TaskTx;
+}
+
 export interface SkipProcessTaskRequest {
   /**  */
   taskId: string;
@@ -1160,6 +1171,12 @@ export interface Task {
 
   /**  */
   starkNetBridgeTask?: LiquidityBridgeTask;
+
+  /**  */
+  dmailTask?: SimpleTask;
+
+  /**  */
+  starkNetIdMintTask?: SimpleTask;
 }
 
 export interface TaskTx {
@@ -1416,7 +1433,9 @@ export enum TaskType {
   'JediSwap' = 'JediSwap',
   'MySwap' = 'MySwap',
   'ProtossSwap' = 'ProtossSwap',
-  'StarkNetBridge' = 'StarkNetBridge'
+  'StarkNetBridge' = 'StarkNetBridge',
+  'Dmail' = 'Dmail',
+  'StarkNetIdMint' = 'StarkNetIdMint'
 }
 
 export enum Token {

@@ -294,7 +294,8 @@
         "ZKSYNCLITE",
         "StarkNet"
       ],
-      "default": "ARBITRUM"
+      "default": "ARBITRUM",
+      "title": "- ZKSYNCERATESTNET: deprecated"
     },
     "Status": {
       "type": "object",

@@ -113,20 +113,7 @@
             Расскажу подробнее о drop-hunter:
             Проект разрабатывается, поддерживается и амнистируется одним человеком.
             <br/>
-            <v-img src="/me.jpg" max-height="600px" class="mt-3"></v-img>
-            <div class="text-center">Вот этот человек, это я, меня зовут Сергей, приятно познакомиться:)</div>
-            <br/>
             Я являюсь профессиональным разработчиком WEB-приложений на протяжении последних 5 лет.
-            <br/>
-            Ссылки на мои соцсети:
-            <a href="https://www.linkedin.com/in/sergey-k-317a80164/" target="_blank" class="d-inline-flex mx-1">
-              <v-img height="20px" src="/icons/linkedin.png" @click=""></v-img>
-              Linkedin
-            </a>
-            <a href="https://t.me/shinybozdo" target="_blank" class="d-inline-flex mx-1">
-              <v-img height="20px" src="/icons/telegram.png" @click=""></v-img>
-              Telegram
-            </a>
             <a href="https://github.com/hardstylez72?tab=repositories" target="_blank" class="d-inline-flex mx-1">
               <v-img height="20px" src="/icons/github.png" @click=""></v-img>
               Github

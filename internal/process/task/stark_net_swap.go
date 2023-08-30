@@ -133,7 +133,7 @@ func (t *StarkNetSwap) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 	}
 
 	if p.GetApproveTx().GetTxId() == "" {
-		txId, err := StarkNetApprove(taskContext, p, client, profile, t.taskType)
+		txId, err := StarkNetApprove(taskContext, p.FromToken, client, profile, t.taskType)
 		if err != nil {
 			return nil, err
 		}
@@ -220,7 +220,7 @@ func (h *StarketSwapHalper) Execute(ctx context.Context, profile *halp.Profile, 
 		}
 	}
 
-	approve, err := StarkNetApprove(ctx, p, client, profile, h.TaskType)
+	approve, err := StarkNetApprove(ctx, p.FromToken, client, profile, h.TaskType)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -299,11 +299,11 @@ func (h *StarketSwapHalper) EstimateCost(ctx context.Context, profile *halp.Prof
 	return GasStation(res.ECost, p.Network), nil
 }
 
-func StarkNetApprove(ctx context.Context, p *v1.DefaultSwap, client *starknet.Client, profile *halp.Profile, taskType v1.TaskType) (*string, error) {
+func StarkNetApprove(ctx context.Context, token v1.Token, client *starknet.Client, profile *halp.Profile, taskType v1.TaskType) (*string, error) {
 
 	balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
 		WalletAddress: profile.Addr,
-		Token:         p.FromToken,
+		Token:         token,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "client.GetBalance")
@@ -321,13 +321,16 @@ func StarkNetApprove(ctx context.Context, p *v1.DefaultSwap, client *starknet.Cl
 		spender = client.MySwapRouterAddress()
 	case v1.TaskType_ProtossSwap:
 		spender = client.ProtosSwapRouterAddress()
-
+	case v1.TaskType_Dmail:
+		spender = "0x0454f0bd015e730e5adbb4f080b075fdbf55654ff41ee336203aa2e1ac4d4309"
+	case v1.TaskType_StarkNetIdMint:
+		spender = "0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af"
 	default:
-		return nil, errors.New("unknown task type: " + taskType.String())
+		return nil, errors.New("StarkNetApprove. unknown task type: " + taskType.String())
 	}
 
 	res, err := client.Approve(ctx, &starknet.ApproveReq{
-		Token:       p.FromToken,
+		Token:       token,
 		PK:          profile.WalletPK,
 		Amount:      balance.WEI,
 		SpenderAddr: spender,

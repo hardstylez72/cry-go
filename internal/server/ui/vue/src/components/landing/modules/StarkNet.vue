@@ -99,6 +99,14 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Swap (ETH <-> USDC)',
           quest: ''
+        },
+        {
+          name: taskProps.StarkNetIdMint.service.name,
+          link: taskProps.StarkNetIdMint.service.link,
+          img: taskProps.StarkNetIdMint.service.img,
+          status: Status.integrated,
+          action: 'Mint StarkNet ID',
+          quest: ''
         }
       ],
     }

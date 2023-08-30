@@ -1,4 +1,4 @@
-import {DefaultSwap as TaskSignature, Network, Task, TaskType, Token} from "@/generated/flow";
+import {DefaultSwap as TaskSignature, Network, SimpleTask, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType, render} from "vue";
 import WEIInputField from "@/components/WEIInputField.vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
@@ -13,13 +13,12 @@ import GasOptions from "@/components/tasks/menu/Details.vue";
 
 @Component({
   inheritAttrs: true,
-  template:`
+  template: `
     <v-card-actions>
     <v-container>
       <v-row>
         <v-col>
           <v-select
-            ref="stargate-bridge-form"
             density="compact"
             variant="outlined"
             label="network"
@@ -30,45 +29,18 @@ import GasOptions from "@/components/tasks/menu/Details.vue";
             :disabled="true"
           />
         </v-col>
-        <v-col>
-          <v-autocomplete
-            density="compact"
-            variant="outlined"
-            label="direction"
-            v-on:change="inputChanged"
-            :rules="[required]"
-            :items="pairs"
-            v-model="pair"
-            :disabled="disabled"
-            item-title="name"
-            return-object
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>
-        </v-col>
       </v-row>
     </v-container>
     </v-card-actions>
   `,
-  name: 'TaskDefaultSwap',
+  name: 'DefaultSimple',
   components: {AmountInput, WEIInputField},
   emits: ['taskChanged'],
 })
-export default class DefaultSwapTask extends Vue {
+export default class DefaultSimple extends Vue {
   @Prop weight!: Number
   @Prop disabled!: Boolean
   @Prop task!: Task
-
-  @Watch('pair', {
-    deep: true,
-  })
-  pairHandler(a, b) {
-    this.item.fromToken = this.pair.from
-    this.item.toToken = this.pair.to
-  }
 
   @Watch('item', {deep: true})
   itemHandler(a, b) {
@@ -82,19 +54,9 @@ export default class DefaultSwapTask extends Vue {
     }
   }
 
-  pairs: SwapPair[] = [
-    tokenSwapPair(Token.ETH, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.ETH),
-  ]
-  pair = null as SwapPair | null
   networks: Network[] = [Network.StarkNet]
-  item: TaskSignature = {
-    network: Network.StarkNet,
-    amount: {
-      sendAll: true,
-    },
-    toToken: Token.USDC,
-    fromToken: Token.ETH,
+  item: SimpleTask = {
+    network: Network.ZKSYNCERA,
   }
 
   get taskProps() {
@@ -112,10 +74,10 @@ export default class DefaultSwapTask extends Vue {
   required
 
   getTask(): Task {
-    const taskType = TaskType.SithSwap
+    const taskType = TaskType.Dmail
     const task = {
       weight: this.weight.toString(),
-      sithSwapTask: this.item,
+      dmailTask: this.item,
       taskType: taskType,
       description: "",
     }
@@ -128,9 +90,8 @@ export default class DefaultSwapTask extends Vue {
 
   syncTask() {
     if (this.task) {
-      if (this.task.sithSwapTask) {
-        this.item = this.task.sithSwapTask
-        this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
+      if (this.task.dmailTask) {
+        this.item = this.task.dmailTask
         this.$emit('taskChanged', this.getTask())
       }
     }

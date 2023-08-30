@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var s = rand.NewSource(time.Now().UnixNano())
+var RandSource = rand.NewSource(time.Now().UnixNano())
 
 func Contains(s []string, t string) bool {
 	for _, ss := range s {

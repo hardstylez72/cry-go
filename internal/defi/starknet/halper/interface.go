@@ -39,10 +39,11 @@ type AccountPubKeyRes struct {
 }
 
 type BaseTx struct {
-	ChainRPC   string `json:"chainRPC"`
-	PrivateKey string `json:"privateKey"`
-	Proxy      string `json:"proxy"`
-	SubType    string `json:"account"`
+	ChainRPC     string `json:"chainRPC"`
+	PrivateKey   string `json:"privateKey"`
+	Proxy        string `json:"proxy"`
+	SubType      string `json:"account"`
+	EstimateOnly bool   `json:"estimateOnly"`
 }
 
 type ApproveReq struct {
@@ -100,4 +101,6 @@ type HalperService interface {
 	Approve(ctx context.Context, req *ApproveReq) (*ApproveRes, error)
 	Generate(ctx context.Context, req *GenerateReq) (*[]AccountGenerated, error)
 	LiquidityBridge(ctx context.Context, req *LiquidityBridgeReq) (*LiquidityBridgeRes, error)
+	SendDmail(ctx context.Context, req *SendDmailReq) (*SendDmailRes, error)
+	Mint(ctx context.Context, req *MintReq) (*MintRes, error)
 }

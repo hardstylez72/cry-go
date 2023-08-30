@@ -113,7 +113,13 @@ export default defineComponent({
           action: 'follow and vote automatic on any guild',
           img: taskProps.SnapshotVote.service.img,
         },
-
+        {
+          name: taskProps.Dmail.service.name,
+          link: taskProps.Dmail.service.link,
+          status: Status.integrated,
+          action: 'send emails',
+          img: taskProps.Dmail.service.img,
+        },
       ],
     }
   }

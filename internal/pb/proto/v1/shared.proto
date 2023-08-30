@@ -16,7 +16,7 @@ enum Network {
   AVALANCHE = 5;
   GOERLIETH = 6;
   ZKSYNCERA = 7;
-  ZKSYNCERATESTNET = 8;
+  ZKSYNCERATESTNET = 8;//deprecated
   ZKSYNCLITE = 9;
   StarkNet = 10;
 }

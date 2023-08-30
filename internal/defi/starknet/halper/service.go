@@ -29,6 +29,29 @@ func NewService(c *Config) *Service {
 	}
 }
 
+type SendDmailReq struct {
+	BaseTx
+}
+
+type SendDmailRes struct {
+	DefaultRes
+}
+
+type MintReq struct {
+	BaseTx
+}
+
+type MintRes struct {
+	DefaultRes
+}
+
+func (s *Service) Mint(ctx context.Context, req *MintReq) (*MintRes, error) {
+	return Request[MintReq, MintRes](ctx, s.cli, s.c.Host+"/starknet/mint", req)
+}
+
+func (s *Service) SendDmail(ctx context.Context, req *SendDmailReq) (*SendDmailRes, error) {
+	return Request[SendDmailReq, SendDmailRes](ctx, s.cli, s.c.Host+"/starknet/dmail", req)
+}
 func (s *Service) LiquidityBridge(ctx context.Context, req *LiquidityBridgeReq) (*LiquidityBridgeRes, error) {
 	return Request[LiquidityBridgeReq, LiquidityBridgeRes](ctx, s.cli, s.c.Host+"/starknet/liquidity-bridge", req)
 }
@@ -71,6 +94,12 @@ type DefaultSwapRes struct {
 	SwapTx    *string `json:"swapTxId"`
 	Fee       *string `json:"maxFee"`
 	Error     *string `json:"error"`
+}
+
+type DefaultRes struct {
+	EstimatedMaxFee string  `json:"estimatedMaxFee"`
+	ContractAddr    *string `json:"contractAddr"`
+	TxHash          *string `json:"txHash"`
 }
 
 func (s *Service) Swap(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error) {

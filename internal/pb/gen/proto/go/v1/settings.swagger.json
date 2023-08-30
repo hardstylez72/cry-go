@@ -160,7 +160,8 @@
         "ZKSYNCLITE",
         "StarkNet"
       ],
-      "default": "ARBITRUM"
+      "default": "ARBITRUM",
+      "title": "- ZKSYNCERATESTNET: deprecated"
     },
     "NetworkSettings": {
       "type": "object",

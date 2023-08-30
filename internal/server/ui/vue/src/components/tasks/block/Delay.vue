@@ -28,33 +28,38 @@
           thumb-label="always"
           hide-details
           :disabled="disabled"
+
         >
           <template v-slot:thumb-label="{ modelValue }">
-            <div style="width: 80px" class="text-center">{{ humanDuration(modelValue) }}</div>
+            <div style="width: 120px" class="text-center">{{ humanDuration(modelValue) }}</div>
           </template>
+
         </v-slider>
       </v-row>
 
-      <v-row v-if="random">
+      <div v-if="random">
+        <div>Рандомная задержка</div>
+        <br/>
         <v-range-slider
           v-model="randomRange"
           density="compact"
-          label="Рандомная задержка"
           :min="1"
           step="10"
           :max="1800"
           persistent-hint
+          label=""
           center-affix
-          thumb-label="always"
           hide-details
           :disabled="disabled"
         >
-          <template v-slot:thumb-label="{ modelValue }">
-            <div style="width: 80px" class="text-center">{{ humanDuration(modelValue) }}
-            </div>
+          <template v-slot:prepend>
+            <div style="width: 60px">{{ humanDuration(randomRange[0]) }}</div>
+          </template>
+          <template v-slot:append>
+            <div style="width: 60px">{{ humanDuration(randomRange[1]) }}</div>
           </template>
         </v-range-slider>
-      </v-row>
+      </div>
     </v-container>
   </v-card-actions>
 </template>

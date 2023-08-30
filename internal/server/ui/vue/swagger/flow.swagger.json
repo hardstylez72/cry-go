@@ -506,7 +506,8 @@
         "ZKSYNCLITE",
         "StarkNet"
       ],
-      "default": "ARBITRUM"
+      "default": "ARBITRUM",
+      "title": "- ZKSYNCERATESTNET: deprecated"
     },
     "OkexBinanaceTask": {
       "type": "object",
@@ -642,6 +643,23 @@
       ],
       "default": "StatusReady",
       "title": "- StatusStop: delete"
+    },
+    "SimpleTask": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "$ref": "#/definitions/Network"
+        },
+        "tx": {
+          "$ref": "#/definitions/TaskTx"
+        },
+        "approveTx": {
+          "$ref": "#/definitions/TaskTx"
+        }
+      },
+      "required": [
+        "network"
+      ]
     },
     "SnapshotVoteProposal": {
       "type": "object",
@@ -925,6 +943,12 @@
         },
         "starkNetBridgeTask": {
           "$ref": "#/definitions/LiquidityBridgeTask"
+        },
+        "dmailTask": {
+          "$ref": "#/definitions/SimpleTask"
+        },
+        "starkNetIdMintTask": {
+          "$ref": "#/definitions/SimpleTask"
         }
       },
       "required": [
@@ -1032,7 +1056,9 @@
         "JediSwap",
         "MySwap",
         "ProtossSwap",
-        "StarkNetBridge"
+        "StarkNetBridge",
+        "Dmail",
+        "StarkNetIdMint"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

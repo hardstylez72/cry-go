@@ -34,7 +34,7 @@ const (
 	Network_AVALANCHE        Network = 5
 	Network_GOERLIETH        Network = 6
 	Network_ZKSYNCERA        Network = 7
-	Network_ZKSYNCERATESTNET Network = 8
+	Network_ZKSYNCERATESTNET Network = 8 //deprecated
 	Network_ZKSYNCLITE       Network = 9
 	Network_StarkNet         Network = 10
 )

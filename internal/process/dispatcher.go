@@ -195,6 +195,13 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 			return nil, errr
 		}
 		e, err = (&task.DefaultLiquidityBridgeTaskHalper{v1.TaskType_StarkNetBridge}).EstimateCost(ctx, from, to, p, nil, nil)
+	case v1.TaskType_Dmail:
+		p := t.Task.Task.(*v1.Task_DmailTask).DmailTask
+		e, err = task.EstimateDmailSwapCost(ctx, p, profile)
+	case v1.TaskType_StarkNetIdMint:
+		p := t.Task.Task.(*v1.Task_StarkNetIdMintTask).StarkNetIdMintTask
+		e, err = task.EstimateMintCost(ctx, p, profile)
+
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
 	}

@@ -20,6 +20,8 @@ func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
 		if err != nil {
 			if strings.Contains(err.Error(), "tx not finalized") {
 				return defi.ErrTxNotFound
+			} else if strings.Contains(err.Error(), "REVERTED") {
+				return defi.ErrTxStatusFailed
 			} else {
 				return fmt.Errorf("Transaction Failure (%s): can't poll to desired status: %s", tx, err.Error())
 			}
