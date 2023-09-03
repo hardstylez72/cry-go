@@ -5,20 +5,14 @@ import (
 	"time"
 )
 
-func RandFloat(v float64, delta int) float64 {
-
-	mind := (100.0 - float64(delta)) / 100.0
-
-	min := v * mind
-	max := v * ((100.0 + float64(delta)) / 100.0)
-
-	randomFloatInRange := min + rand.New(RandSource).Float64()*(max-min)
-	return Round(randomFloatInRange)
+func RandFloatRange(min, max float64) float64 {
+	randomFloatInRange := randFloatRange(min, max)
+	prec := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(2) + 2
+	return Round(randomFloatInRange, prec)
 }
 
-func RandFloatRange(min, max float64) float64 {
-	randomFloatInRange := min + rand.New(RandSource).Float64()*(max-min)
-	return Round(randomFloatInRange)
+func randFloatRange(min, max float64) float64 {
+	return min + rand.New(rand.NewSource(time.Now().UnixNano())).Float64()*(max-min)
 }
 
 func RandDurationRange(min, max time.Duration) time.Duration {
@@ -28,7 +22,7 @@ func RandDurationRange(min, max time.Duration) time.Duration {
 		return time.Duration(mini)
 	}
 
-	d := mini + rand.New(RandSource).Int63n(maxi-mini)
+	d := mini + rand.New(rand.NewSource(time.Now().UnixNano())).Int63n(maxi-mini)
 	delay := time.Duration(d)
 	return delay
 }

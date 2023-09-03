@@ -30,12 +30,13 @@
     </v-form>
 
 
+    <b>EMV </b> <span v-if="emv.length"><b>Networks: </b>{{ emv[0].networks }}</span>
     <v-list max-width="96vw" class="px-5" nav="true">
       <v-list-item
         density="compact"
         variant="plain"
         class="my-0"
-        v-for="item in items"
+        v-for="item in emv"
         :key="item.addr"
         rounded
         height="auto"
@@ -57,6 +58,38 @@
         </v-row>
       </v-list-item>
     </v-list>
+
+    <b>StarkNet </b><span v-if="urgent.length"><b>Networks: </b>{{ urgent[0].networks }}</span>
+    <v-list max-width="96vw" class="px-5" nav="true">
+      <v-list-item
+        density="compact"
+        variant="plain"
+        class="my-0"
+        v-for="(item, i) in urgent"
+        :key="item.addr"
+        rounded
+        height="auto"
+        width="auto"
+        elevation="1"
+        style="border: 0px solid "
+      >
+
+        <v-row align="center">
+
+          <v-col>
+            {{ `${item.addr}` }}
+          </v-col>
+          <v-col>
+            <OkexDepositProfilesStarkNetUrgentX :model-value="urgent[i]" :withdrawer-id="id"
+                                                @updated="OkexWithdrawProfileUpdated"/>
+            <OkexDepositProfilesStarkNetBravos :model-value="braavos[i]" :withdrawer-id="id"
+                                               @updated="OkexWithdrawProfileUpdated"/>
+          </v-col>
+
+        </v-row>
+      </v-list-item>
+    </v-list>
+
   </div>
 </template>
 
@@ -74,8 +107,12 @@ import {
 import ProxyInput from "@/components/ProxyInput.vue";
 import {Profile} from "@/generated/profile";
 import {Timer} from "@/components/helper";
-import OkexWithdrawProfiles from "@/components/exchange.acc/OkexWithdrawProfiles.vue";
+import OkexWithdrawProfiles from "@/components/exchange.acc/OkexDepositProfilesEMV.vue";
 import Loader from "@/components/Loader.vue";
+import OkexDepositProfilesStarkNetUrgentX from "@/components/exchange.acc/OkexDepositProfilesStarkNetUrgentX.vue";
+import OkexDepositProfilesStarkNetBravos from "@/components/exchange.acc/OkexDepositProfilesStarkNetBravos.vue";
+import {mapStores} from "pinia";
+import {useSysStore} from "@/plugins/pinia";
 
 export default defineComponent({
   name: "OkexWithdrawOptionSubAcc",
@@ -90,8 +127,11 @@ export default defineComponent({
 
       return false
     },
+    ...mapStores(useSysStore),
   },
   components: {
+    OkexDepositProfilesStarkNetBravos,
+    OkexDepositProfilesStarkNetUrgentX,
     Loader,
     OkexWithdrawProfiles,
     ProxyInput
@@ -106,7 +146,9 @@ export default defineComponent({
     return {
       updatingError: "" as string | undefined,
       listLoading: false as boolean,
-      items: [] as DepositAddresses[],
+      emv: [] as DepositAddresses[],
+      urgent: [] as DepositAddresses[],
+      braavos: [] as DepositAddresses[],
       withdrawerStatus: "",
       withdrawer: {
         label: '',
@@ -138,10 +180,15 @@ export default defineComponent({
       return valid
     },
     async getWithdrawer() {
-      const res = await withdrawerService.withdrawerServiceGetWithdrawer({body: {withdrawerId: this.id}})
-      this.withdrawer = res.withdrawer
-      this.withdrawerStatus = res.error ? res.error : 'OK'
-      this.originalWithdrawer = Object.assign({}, res.withdrawer)
+      try {
+        const res = await withdrawerService.withdrawerServiceGetWithdrawer({body: {withdrawerId: this.id}})
+        this.withdrawer = res.withdrawer
+        this.withdrawerStatus = res.error ? res.error : 'OK'
+        this.originalWithdrawer = Object.assign({}, res.withdrawer)
+      } catch (e) {
+        this.sysStore.showSnackBar("ошибка при получении данных", true)
+      }
+
     },
     async validateForm(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
@@ -184,7 +231,7 @@ export default defineComponent({
       try {
         this.listLoading = true
         const res = await withdrawerService.withdrawerServiceListDepositAddresses({body: {withdrawerId: this.id}})
-        this.items = res.items.sort((a, b) => {
+        this.emv = res.emv.sort((a, b) => {
           const nameA = a.addr.toUpperCase(); // ignore upper and lowercase
           const nameB = b.addr.toUpperCase(); // ignore upper and lowercase
           if (nameA < nameB) {
@@ -197,6 +244,35 @@ export default defineComponent({
           // names must be equal
           return 0;
         })
+        this.braavos = res.braavos.sort((a, b) => {
+          const nameA = a.addr.toUpperCase(); // ignore upper and lowercase
+          const nameB = b.addr.toUpperCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+
+          // names must be equal
+          return 0;
+        })
+        this.urgent = res.urgentx.sort((a, b) => {
+          const nameA = a.addr.toUpperCase(); // ignore upper and lowercase
+          const nameB = b.addr.toUpperCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+
+          // names must be equal
+          return 0;
+        })
+      } catch (e) {
+        this.sysStore.showSnackBar("ошибка при получении списка адресов с okx", true)
+
       } finally {
         this.listLoading = false
       }

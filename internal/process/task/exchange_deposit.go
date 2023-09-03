@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/exchange/okex"
@@ -69,6 +68,36 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		}
 	}
 
+	//if p.Network == v1.Network_StarkNet {
+	//
+	//	starkClient, err := NewStarkNetClient(profile)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	if p.GetApproveTx().GetTxId() == "" {
+	//
+	//		txId, err := StarkNetApprove(taskContext, p.Token, starkClient, profile, t.Type())
+	//		if err != nil {
+	//			return nil, err
+	//		}
+	//
+	//		if txId != nil {
+	//			p.ApproveTx = NewStarkNetApproveTx(*txId)
+	//			if err := a.AddTx2(ctx, p.ApproveTx); err != nil {
+	//				return nil, err
+	//			}
+	//			if err := a.UpdateTask(ctx, task); err != nil {
+	//				return nil, err
+	//			}
+	//		}
+	//	}
+	//
+	//	if err := WaitTxComplete(taskContext, p.ApproveTx, task, client, a); err != nil {
+	//		return nil, err
+	//	}
+	//}
+
 	if p.GetTx().GetTxId() == "" {
 
 		addr, err := GetOkexDepositAddr(taskContext, profile, p, a.WithdrawerRepository)
@@ -108,16 +137,22 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		}
 
 		res, err := client.Transfer(taskContext, &defi.TransferReq{
-			Pk:     profile.WalletPK,
-			ToAddr: common.HexToAddress(*addr),
-			Token:  p.Token,
-			Amount: am,
+			Pk:           profile.WalletPK,
+			ToAddr:       *addr,
+			Token:        p.Token,
+			Amount:       am,
+			Gas:          gas,
+			PSubType:     profile.SubType,
+			EstimateOnly: false,
 		})
 		if err != nil {
 			return nil, err
 		}
 
 		p.Tx = NewTx(res.Tx, gas)
+		if err := a.AddTx2(ctx, p.Tx); err != nil {
+			return nil, err
+		}
 
 		if err := a.UpdateTask(ctx, task); err != nil {
 			return nil, err
@@ -125,10 +160,6 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 	}
 
 	if err := WaitTxComplete(taskContext, p.Tx, task, client, a); err != nil {
-		return nil, err
-	}
-
-	if err := a.AddTx2(ctx, p.Tx); err != nil {
 		return nil, err
 	}
 
@@ -166,7 +197,7 @@ func (t *OkexDepositTask) OkexSubMainTransfer(ctx context.Context, a *Input) err
 		return err
 	}
 
-	attached, err := a.WithdrawerRepository.GetAttachedAddr(ctx, profile.Id, a.UserId)
+	attached, err := a.WithdrawerRepository.GetAttachedAddr(ctx, profile.Id, a.UserId, profile.SubType)
 	if err != nil {
 		if errors.Is(err, pg.EntityNotFound) {
 			return errors.Wrap(ErrProfileHasNoConnectedOkexAddr, err.Error())
@@ -206,7 +237,7 @@ func (t *OkexDepositTask) OkexSubMainTransfer(ctx context.Context, a *Input) err
 
 func GetOkexDepositAddr(ctx context.Context, profile *halp.Profile, p *v1.OkexDepositTask, withdrawerRepository repository.WithdrawerRepository) (*string, error) {
 
-	attached, err := withdrawerRepository.GetAttachedAddr(ctx, profile.Id, profile.UserId)
+	attached, err := withdrawerRepository.GetAttachedAddr(ctx, profile.Id, profile.UserId, profile.SubType.String())
 	if err != nil {
 		return nil, errors.Wrap(err, "к профилю не привязан адресс депозита с okex")
 	}
@@ -261,11 +292,7 @@ func EstimateOkexDepositCost(ctx context.Context, profile *halp.Profile, p *v1.O
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 
-	w, err := s.GetWalletAddr()
-	if err != nil {
-		return nil, err
-	}
-	walletAddr := *w
+	walletAddr := profile.Addr
 
 	swapper, err := uniclient.NewTransfer(p.Network, s.BaseConfig())
 	if err != nil {
@@ -293,11 +320,12 @@ func EstimateOkexDepositCost(ctx context.Context, profile *halp.Profile, p *v1.O
 
 	swap, err := swapper.Transfer(ctx, &defi.TransferReq{
 		Pk:           profile.WalletPK,
-		ToAddr:       common.HexToAddress(*addr),
+		ToAddr:       *addr,
 		Token:        p.Token,
 		Amount:       bozdo.Percent(am, 90),
 		Gas:          nil,
 		EstimateOnly: true,
+		PSubType:     profile.SubType,
 	})
 	if err != nil {
 		return nil, err

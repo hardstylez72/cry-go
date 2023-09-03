@@ -7,17 +7,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRandFloat(t *testing.T) {
-	prev := -1.0
-	for i := 0; i < 1000; i++ {
-		res := RandFloat(1, 10)
-		if prev != -1 {
-			assert.NotEqual(t, res, prev)
-		}
-		assert.GreaterOrEqual(t, 1.1, res, 0.1)
-		assert.LessOrEqual(t, 0.9, res, 0.1)
-		prev = res
-	}
+func TestRound(t *testing.T) {
+
+	//println(FloatToString(RandFloatRange(0, 1)))
+	//println(FloatToString(RandFloatRange(0.1, 0.2)))
+	println(FloatToString(RandFloatRange(0.02, 0.026)))
+	println(FloatToString(RandFloatRange(0.02, 0.026)))
+	println(FloatToString(RandFloatRange(0.02, 0.026)))
+	println(FloatToString(RandFloatRange(0.02, 0.026)))
+	println(FloatToString(RandFloatRange(0.02, 0.026)))
+
 }
 
 func TestRoundFloat1(t *testing.T) {
@@ -34,7 +33,7 @@ func TestRoundFloat1(t *testing.T) {
 			name: "",
 			args: args{
 				v:    0.001020,
-				prec: 2,
+				prec: 3,
 			},
 			want: 0.001,
 		},
@@ -110,5 +109,43 @@ func TestRandDurationRange(t *testing.T) {
 		assert.GreaterOrEqual(t, res, min)
 		assert.LessOrEqual(t, res, max)
 		prev = res
+	}
+}
+
+func TestRound1(t *testing.T) {
+	type args struct {
+		v float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want float64
+	}{
+		{
+			name: "",
+			args: args{
+				0.0023214,
+			},
+			want: 0.00232,
+		},
+		{
+			name: "",
+			args: args{
+				0.0,
+			},
+			want: 0.0,
+		},
+		{
+			name: "",
+			args: args{
+				0.010204,
+			},
+			want: 0.0102,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, Round(tt.args.v, 3), "Round(%v)", tt.args.v)
+		})
 	}
 }

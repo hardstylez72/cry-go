@@ -1,14 +1,42 @@
 package lib
 
 import (
+	"math"
 	"math/big"
 	"strconv"
 	"strings"
 )
 
-func Round(v float64) float64 {
-	return RoundFloat(v, 2)
+func Round(v float64, prec int) float64 {
+
+	s := FloatToString(v)
+	count := 0
+	out := ""
+	for i := range s {
+		if string(s[i]) == "0" || string(s[i]) == "." {
+			continue
+		}
+		count++
+
+		if count >= prec {
+			out = s[:i+1]
+			break
+		}
+	}
+
+	if count == 0 {
+		return 0
+	}
+
+	f, _ := StringToFloat(out)
+	return f
 }
+
+func roundFloat(val float64, precision uint) float64 {
+	ratio := math.Pow(10, float64(precision))
+	return math.Round(val*ratio) / ratio
+}
+
 func RoundFloat(v float64, prec int) float64 {
 	f := big.NewFloat(v)
 	str := f.String()

@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/hardstylez72/cry/internal/exchange/okex/driver"
+	"github.com/hardstylez72/cry/internal/exchange/okex/driver/api"
+	"github.com/hardstylez72/cry/internal/exchange/okex/driver/requests/rest/account"
+	"github.com/hardstylez72/cry/internal/exchange/okex/driver/requests/rest/funding"
+	"github.com/hardstylez72/cry/internal/exchange/okex/driver/requests/rest/subaccount"
 	"github.com/hardstylez72/cry/internal/lib"
-	"github.com/hardstylez72/okex"
-	_ "github.com/hardstylez72/okex"
-	"github.com/hardstylez72/okex/api"
-	"github.com/hardstylez72/okex/requests/rest/funding"
-	"github.com/hardstylez72/okex/requests/rest/subaccount"
 	"github.com/pkg/errors"
 )
 
@@ -154,7 +154,9 @@ func (s *Service) SubToMain(ctx context.Context, req *SubToMainReq) error {
 	return nil
 }
 func (s *Service) Ping(ctx context.Context) error {
-	_, err := s.cli.Rest.Account.GetConfig(ctx)
+	_, err := s.cli.Rest.Account.GetBalance(ctx, account.GetBalance{
+		Ccy: []string{"ETH"},
+	})
 
 	return err
 }

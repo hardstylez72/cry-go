@@ -1058,7 +1058,15 @@
       ]
     },
     "SearchProfilesNotConnectedToOkexDepositRequest": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "subType": {
+          "$ref": "#/definitions/ProfileSubType"
+        }
+      },
+      "required": [
+        "subType"
+      ]
     },
     "SearchProfilesNotConnectedToOkexDepositResponse": {
       "type": "object",

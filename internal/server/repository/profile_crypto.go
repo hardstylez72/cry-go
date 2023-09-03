@@ -61,8 +61,8 @@ func (c *ProfileRepositoryCrypto) CreateProfile(ctx context.Context, req *Profil
 	return c.source.CreateProfile(ctx, req)
 }
 
-func (c *ProfileRepositoryCrypto) SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string) ([]Profile, error) {
-	list, err := c.source.SearchNotConnectedOkexDepositProfile(ctx, userId)
+func (c *ProfileRepositoryCrypto) SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string, subType v1.ProfileSubType) ([]Profile, error) {
+	list, err := c.source.SearchNotConnectedOkexDepositProfile(ctx, userId, subType)
 	if err != nil {
 		return nil, err
 	}

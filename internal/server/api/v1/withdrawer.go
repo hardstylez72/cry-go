@@ -79,6 +79,7 @@ func (s *WithdrawerService) OkexDepositAddrAttach(ctx context.Context, req *v1.O
 		Addr:         req.OkexDepositAddr,
 		ProfileId:    req.ProfileId,
 		UserId:       userId,
+		SubStype:     req.SubType,
 	})
 
 	if err != nil {
@@ -97,6 +98,7 @@ func (s *WithdrawerService) OkexDepositAddrDetach(ctx context.Context, req *v1.O
 		Addr:         req.OkexDepositAddr,
 		ProfileId:    req.ProfileId,
 		UserId:       userId,
+		SubStype:     req.SubType,
 	})
 
 	if err != nil {
@@ -116,6 +118,24 @@ func (s *WithdrawerService) ListDepositAddresses(ctx context.Context, req *v1.Li
 		return nil, err
 	}
 
+	res, err := s.GetDepositAddrs(ctx, wd, userId)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.ListDepositAddressesResponse{
+		Emv:     res.emv,
+		Braavos: res.braavos,
+		Urgentx: res.urgentx,
+	}, nil
+}
+
+type GetDepositAddrsRes struct {
+	emv     []*v1.DepositAddresses
+	urgentx []*v1.DepositAddresses
+	braavos []*v1.DepositAddresses
+}
+
+func (s *WithdrawerService) GetDepositAddrs(ctx context.Context, wd *repository.Withdrawer, userId string) (*GetDepositAddrsRes, error) {
 	proxyString := ""
 	if wd.Proxy.Valid {
 		proxyString = wd.Proxy.String
@@ -144,34 +164,92 @@ func (s *WithdrawerService) ListDepositAddresses(ctx context.Context, req *v1.Li
 	if err != nil {
 		return nil, err
 	}
-	items := make([]*v1.DepositAddresses, 0)
-	addresses, err := cli.GetDepositAddress(ctx, "USDT")
+
+	addresses, err := cli.GetDepositAddress(ctx, "ETH")
 	if err != nil {
 		return nil, err
 	}
 
-	for _, v := range addresses {
+	emv := make([]*v1.DepositAddresses, 0)
+	urgent := make([]*v1.DepositAddresses, 0)
+	braavos := make([]*v1.DepositAddresses, 0)
 
-		var ProfileId string
-		var ProfileLabel string
-		_, exist := attached[v.Addr]
-		if exist {
-			ProfileId = attached[v.Addr].ProfileId
-			ProfileLabel = attached[v.Addr].ProfileLabel
+	for i := range addresses {
+
+		v := addresses[i]
+		if !strings.Contains(v.Addr, "0x") {
+			continue
 		}
 
-		items = append(items, &v1.DepositAddresses{
-			Addr:         v.Addr,
-			Tag:          &v.Tag,
-			ProfileId:    &ProfileId,
-			ProfileLabel: &ProfileLabel,
-		})
+		if len(v.Addr) == 66 { //starknet
+
+			{
+				val, exist := attached[v.Addr+v1.ProfileSubType_UrgentX.String()]
+				if exist {
+					urgent = append(urgent, &v1.DepositAddresses{
+						Addr:         v.Addr,
+						Tag:          &v.Tag,
+						ProfileId:    &val.ProfileId,
+						ProfileLabel: &val.ProfileLabel,
+						Networks:     v.Networks,
+						SubType:      &val.SubStype,
+					})
+				} else {
+					urgent = append(urgent, &v1.DepositAddresses{
+						Addr:     v.Addr,
+						Networks: v.Networks,
+					})
+				}
+
+			}
+
+			{
+				val, exist := attached[v.Addr+v1.ProfileSubType_Braavos.String()]
+				if exist {
+					braavos = append(braavos, &v1.DepositAddresses{
+						Addr:         v.Addr,
+						Tag:          &v.Tag,
+						ProfileId:    &val.ProfileId,
+						ProfileLabel: &val.ProfileLabel,
+						Networks:     v.Networks,
+						SubType:      &val.SubStype,
+					})
+				} else {
+					braavos = append(braavos, &v1.DepositAddresses{
+						Addr:     v.Addr,
+						Networks: v.Networks,
+					})
+				}
+			}
+
+		} else if len(v.Addr) == 42 { // evm
+
+			val, exist := attached[v.Addr+v1.ProfileSubType_Metamask.String()]
+			if exist {
+				emv = append(emv, &v1.DepositAddresses{
+					Addr:         v.Addr,
+					Tag:          &v.Tag,
+					ProfileId:    &val.ProfileId,
+					ProfileLabel: &val.ProfileLabel,
+					Networks:     v.Networks,
+					SubType:      &val.SubStype,
+				})
+			} else {
+				emv = append(emv, &v1.DepositAddresses{
+					Addr:     v.Addr,
+					Networks: v.Networks,
+				})
+			}
+		}
 	}
 
-	return &v1.ListDepositAddressesResponse{
-		Items: items,
+	return &GetDepositAddrsRes{
+		emv:     emv,
+		urgentx: urgent,
+		braavos: braavos,
 	}, nil
 }
+
 func (s *WithdrawerService) ListSubWithdrawer(ctx context.Context, req *v1.ListSubWithdrawerRequest) (*v1.ListSubWithdrawerResponse, error) {
 
 	userId, err := user.GetUserId(ctx)

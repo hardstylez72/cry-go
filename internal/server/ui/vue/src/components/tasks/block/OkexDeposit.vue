@@ -35,6 +35,7 @@
 import {Network, OkexDepositTask, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
+import {required} from "@/components/tasks/menu/helper";
 
 export default defineComponent({
   name: "TaskOkexDeposit",
@@ -79,7 +80,6 @@ export default defineComponent({
         network: Network.AVALANCHE,
         token: Token.USDT
       } as OkexDepositTask,
-      required: (v: any) => !!v || 'required'
     }
   },
   computed: {
@@ -91,6 +91,13 @@ export default defineComponent({
           Token.ETH,
         ]
       }
+
+      if (this.item.network === Network.StarkNet) {
+        return [
+          Token.ETH,
+        ]
+      }
+
       if (this.item.network === Network.ZKSYNCERA) {
         return [
           Token.USDC,
@@ -104,7 +111,7 @@ export default defineComponent({
     },
     networks(): Network[] {
       if (this.item.token === Token.ETH) {
-        return [Network.ARBITRUM]
+        return [Network.ARBITRUM, Network.StarkNet]
       }
 
       return [
@@ -115,10 +122,12 @@ export default defineComponent({
         Network.OPTIMISM,
         Network.ARBITRUM,
         Network.ZKSYNCERA,
+        Network.StarkNet,
       ]
     }
   },
   methods: {
+    required,
     getTask(): Task {
       return {
         weight: this.weight.toString(),

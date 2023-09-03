@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/contracts/erc_20"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
@@ -19,10 +20,11 @@ type TransferRes struct {
 }
 
 type TransferReq struct {
-	Pk     string
-	ToAddr common.Address
-	Token  Token
-	Amount *big.Int
+	Pk       string
+	ToAddr   string
+	Token    Token
+	Amount   *big.Int
+	PSubType v1.ProfileSubType
 
 	Gas          *bozdo.Gas
 	EstimateOnly bool
@@ -73,7 +75,9 @@ func (c *EtheriumClient) Transfer(ctx context.Context, r *TransferReq) (*Transfe
 		opt.GasPrice = &r.Gas.GasPrice
 	}
 
-	tx, err := trx.Transfer(opt, r.ToAddr, r.Amount)
+	toto := common.HexToAddress(r.ToAddr)
+	
+	tx, err := trx.Transfer(opt, toto, r.Amount)
 	if err != nil {
 		return nil, errors.Wrap(err, "Transfer")
 	}
@@ -113,7 +117,7 @@ func (r *TransferReq) Validate(tm map[Token]common.Address) error {
 
 type TransferMainTokenReq struct {
 	Wallet       *WalletTransactor
-	ToAddr       common.Address
+	ToAddr       string
 	Amount       *big.Int
 	Gas          *bozdo.Gas
 	EstimateOnly bool
@@ -140,9 +144,11 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 
 	data := []byte{}
 
+	tot := common.HexToAddress(r.ToAddr)
+
 	gas, err := c.Cli.EstimateGas(ctx, ethereum.CallMsg{
 		From:       r.Wallet.WalletAddr,
-		To:         &r.ToAddr,
+		To:         &tot,
 		Gas:        0,
 		GasPrice:   gasPrice,
 		GasFeeCap:  nil,
@@ -178,11 +184,13 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 		am = new(big.Int).Sub(b.WEI, MinerGasLegacy(gasPrice, gas))
 	}
 
+	to := common.HexToAddress(r.ToAddr)
+
 	tx := types.NewTx(&types.LegacyTx{
 		Nonce:    nonce,
 		GasPrice: gasPrice,
 		Gas:      gas,
-		To:       &r.ToAddr,
+		To:       &to,
 		Value:    am,
 		Data:     data,
 	})

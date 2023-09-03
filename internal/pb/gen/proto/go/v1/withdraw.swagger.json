@@ -606,10 +606,20 @@
         },
         "profileLabel": {
           "type": "string"
+        },
+        "networks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "subType": {
+          "type": "string"
         }
       },
       "required": [
-        "addr"
+        "addr",
+        "networks"
       ]
     },
     "ExchangeType": {
@@ -775,7 +785,21 @@
     "ListDepositAddressesResponse": {
       "type": "object",
       "properties": {
-        "items": {
+        "emv": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/DepositAddresses"
+          }
+        },
+        "braavos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/DepositAddresses"
+          }
+        },
+        "urgentx": {
           "type": "array",
           "items": {
             "type": "object",
@@ -784,7 +808,9 @@
         }
       },
       "required": [
-        "items"
+        "emv",
+        "braavos",
+        "urgentx"
       ]
     },
     "ListSubWithdrawerRequest": {
@@ -842,12 +868,16 @@
         },
         "withdrawerId": {
           "type": "string"
+        },
+        "subType": {
+          "type": "string"
         }
       },
       "required": [
         "profileId",
         "okexDepositAddr",
-        "withdrawerId"
+        "withdrawerId",
+        "subType"
       ]
     },
     "OkexDepositAddrAttachResponse": {
@@ -864,12 +894,16 @@
         },
         "withdrawerId": {
           "type": "string"
+        },
+        "subType": {
+          "type": "string"
         }
       },
       "required": [
         "profileId",
         "okexDepositAddr",
-        "withdrawerId"
+        "withdrawerId",
+        "subType"
       ]
     },
     "OkexDepositAddrDetachResponse": {

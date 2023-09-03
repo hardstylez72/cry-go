@@ -198,11 +198,12 @@ type OkexDepositAddr struct {
 	ProfileId    string `db:"profile_id"`
 	UserId       string `db:"user_id"`
 	ProfileLabel string `db:"profile_label"`
+	SubStype     string `db:"sub_type"`
 }
 
 func (r *pgRepository) OkexDepositAddrAttach(ctx context.Context, req *OkexDepositAddr) error {
-	q := `insert into okex_deposit_addr_profile (withdrawer_id, okex_deposit_addr, profile_id, user_id) 
-values (:withdrawer_id, :okex_deposit_addr, :profile_id, :user_id)`
+	q := `insert into okex_deposit_addr_profile (withdrawer_id, okex_deposit_addr, profile_id, user_id, sub_type) 
+values (:withdrawer_id, :okex_deposit_addr, :profile_id, :user_id, :sub_type)`
 	if _, err := r.conn.NamedExecContext(ctx, q, req); err != nil {
 		return err
 	}
@@ -214,6 +215,7 @@ func (r *pgRepository) OkexDepositAddrDetach(ctx context.Context, req *OkexDepos
 where  withdrawer_id = :withdrawer_id 
     and okex_deposit_addr = :okex_deposit_addr
     and profile_id = :profile_id
+  	and sub_type = :sub_type
      and user_id = :user_id`
 	if _, err := r.conn.NamedExecContext(ctx, q, req); err != nil {
 		return err
@@ -233,16 +235,16 @@ func (r *pgRepository) ListDepositAddrAttach(ctx context.Context, userId string)
 	m := make(map[Addr]OkexDepositAddr)
 
 	for _, o := range out {
-		m[o.Addr] = o
+		m[o.Addr+o.SubStype] = o
 	}
 	return m, nil
 }
 
-func (r *pgRepository) GetAttachedAddr(ctx context.Context, profileId, userId string) (*OkexDepositAddr, error) {
+func (r *pgRepository) GetAttachedAddr(ctx context.Context, profileId, userId, subType string) (*OkexDepositAddr, error) {
 	q := `select * from okex_deposit_addr_profile 
-             where user_id = $1 and profile_id = $2`
+             where user_id = $1 and profile_id = $2 and sub_type = $3`
 	var addr OkexDepositAddr
-	if err := r.conn.GetContext(ctx, &addr, q, userId, profileId); err != nil {
+	if err := r.conn.GetContext(ctx, &addr, q, userId, profileId, subType); err != nil {
 		return nil, pg.PgError(err)
 	}
 
@@ -250,9 +252,23 @@ func (r *pgRepository) GetAttachedAddr(ctx context.Context, profileId, userId st
 }
 
 func (r *pgRepository) DeleteWithdrawer(ctx context.Context, req *v1.DeleteWithdrawerRequest) (*v1.DeleteWithdrawerResponse, error) {
-	if _, err := r.conn.ExecContext(ctx, "delete from withdrawers where id = $1", req.Id); err != nil {
+
+	tx, err := r.conn.BeginTxx(ctx, nil)
+	if err != nil {
 		return nil, err
 	}
+
+	if _, err := tx.ExecContext(ctx, "delete from withdrawers where prev_id = $1", req.Id); err != nil {
+		return nil, err
+	}
+	if _, err := tx.ExecContext(ctx, "delete from withdrawers where id = $1", req.Id); err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
 

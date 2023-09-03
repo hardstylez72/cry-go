@@ -505,6 +505,12 @@ export interface DepositAddresses {
 
   /**  */
   profileLabel?: string;
+
+  /**  */
+  networks: string[];
+
+  /**  */
+  subType?: string;
 }
 
 export interface ExchangeWithdrawNetwork {
@@ -585,7 +591,13 @@ export interface ListDepositAddressesRequest {
 
 export interface ListDepositAddressesResponse {
   /**  */
-  items: DepositAddresses[];
+  emv: DepositAddresses[];
+
+  /**  */
+  braavos: DepositAddresses[];
+
+  /**  */
+  urgentx: DepositAddresses[];
 }
 
 export interface ListSubWithdrawerRequest {
@@ -614,6 +626,9 @@ export interface OkexDepositAddrAttachRequest {
 
   /**  */
   withdrawerId: string;
+
+  /**  */
+  subType: string;
 }
 
 export interface OkexDepositAddrAttachResponse {}
@@ -627,6 +642,9 @@ export interface OkexDepositAddrDetachRequest {
 
   /**  */
   withdrawerId: string;
+
+  /**  */
+  subType: string;
 }
 
 export interface OkexDepositAddrDetachResponse {}

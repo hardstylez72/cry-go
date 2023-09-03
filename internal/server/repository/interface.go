@@ -14,7 +14,7 @@ type ProfileRepository interface {
 	ListProfiles(ctx context.Context, userId string, profileType string, offset int64) ([]Profile, error)
 	DeleteProfile(ctx context.Context, req *v1.DeleteProfileRequest) (*v1.DeleteProfileResponse, error)
 	SearchProfile(ctx context.Context, pattern, userId, profileType string) ([]Profile, error)
-	SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string) ([]Profile, error)
+	SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string, subType v1.ProfileSubType) ([]Profile, error)
 	GetProfile(ctx context.Context, id string) (*Profile, error)
 	ValidateLabel(ctx context.Context, request *ValidateLabelReq) (*bool, error)
 	UpdateProfile(ctx context.Context, req *Profile) error
@@ -42,8 +42,8 @@ type WithdrawerRepository interface {
 
 	OkexDepositAddrAttach(ctx context.Context, req *OkexDepositAddr) error
 	OkexDepositAddrDetach(ctx context.Context, req *OkexDepositAddr) error
-	ListDepositAddrAttach(ctx context.Context, userId string) (map[Addr]OkexDepositAddr, error)
-	GetAttachedAddr(ctx context.Context, profileId, userId string) (*OkexDepositAddr, error)
+	ListDepositAddrAttach(ctx context.Context, userId string) (map[string]OkexDepositAddr, error)
+	GetAttachedAddr(ctx context.Context, profileId, userId string, subType string) (*OkexDepositAddr, error)
 }
 
 type StatRepository interface {

@@ -139,7 +139,7 @@ func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) 
 
 	res, err := c.Transfer(ctx, &defi.TransferReq{
 		Pk:           req.WalletPk,
-		ToAddr:       common.HexToAddress(opt.MakerReceiverAddr),
+		ToAddr:       (opt.MakerReceiverAddr),
 		Token:        req.FromToken,
 		Amount:       req.Amount,
 		Gas:          req.Gas,
@@ -236,9 +236,11 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 		return nil, errors.Wrap(err, "zksync2.NewWallet")
 	}
 
+	to := common.HexToAddress(r.ToAddr)
+
 	tx := CreateFunctionCallTransaction(
 		w.Address(),
-		r.ToAddr,
+		to,
 		big.NewInt(0),
 		big.NewInt(0),
 		r.Amount,

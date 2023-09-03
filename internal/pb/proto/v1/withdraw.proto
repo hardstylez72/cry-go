@@ -239,9 +239,10 @@ message OkexDepositAddrDetachRequest {
   string profile_id = 1;
   string okex_deposit_addr = 2;
   string withdrawer_id = 3;
+  string sub_type  = 4;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["profile_id", "okex_deposit_addr", "withdrawer_id"]
+      required: ["profile_id", "okex_deposit_addr", "withdrawer_id", "sub_type"]
     }
   };
 }
@@ -253,9 +254,10 @@ message OkexDepositAddrAttachRequest {
   string profile_id = 1;
   string okex_deposit_addr = 2;
   string withdrawer_id = 3;
+  string sub_type  = 4;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["profile_id", "okex_deposit_addr", "withdrawer_id"]
+      required: ["profile_id", "okex_deposit_addr", "withdrawer_id", "sub_type"]
     }
   };
 }
@@ -265,10 +267,12 @@ message OkexDepositAddrAttachResponse {
 }
 
 message ListDepositAddressesResponse {
-  repeated DepositAddresses items = 1;
+  repeated DepositAddresses emv = 1;
+  repeated DepositAddresses braavos = 2;
+  repeated DepositAddresses urgentx = 3;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["items"]
+      required: ["emv", "braavos", "urgentx"]
     }
   };
 }
@@ -278,10 +282,12 @@ message DepositAddresses {
   optional string profile_id = 2;
   optional string tag = 3;
   optional string profile_label = 4;
+  repeated string networks = 5;
+  optional string sub_type = 6;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["addr"]
+      required: ["addr", "networks"]
     }
   };
 }

@@ -71,12 +71,11 @@ func (t *OrbiterBridgeTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 			return nil, err
 		}
 
-		walletAddr, err := s.GetWalletAddr()
 		if err != nil {
 			return nil, err
 		}
 		b, err := client.GetBalance(taskContext, &defi.GetBalanceReq{
-			WalletAddress: *walletAddr,
+			WalletAddress: profile.Addr,
 			Token:         p.FromToken,
 		})
 		if err != nil {
@@ -144,14 +143,8 @@ func EstimateOrbiterBridgeCost(ctx context.Context, orbiterService *orbiter.Serv
 	if err != nil {
 		return nil, err
 	}
-
-	w, err := s.GetWalletAddr()
-	if err != nil {
-		return nil, err
-	}
-	walletAddr := *w
-
-	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: walletAddr, Token: p.FromToken})
+	
+	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.Addr, Token: p.FromToken})
 	if err != nil {
 		return nil, err
 	}

@@ -21,8 +21,8 @@ func NewWithdrawerRepositoryCrypto(source WithdrawerRepository, userRepository U
 	}
 }
 
-func (c *WithdrawerRepositoryCrypto) GetAttachedAddr(ctx context.Context, profileId, userId string) (*OkexDepositAddr, error) {
-	return c.source.GetAttachedAddr(ctx, profileId, userId)
+func (c *WithdrawerRepositoryCrypto) GetAttachedAddr(ctx context.Context, profileId, userId, subType string) (*OkexDepositAddr, error) {
+	return c.source.GetAttachedAddr(ctx, profileId, userId, subType)
 }
 
 func (c *WithdrawerRepositoryCrypto) ListDepositAddrAttach(ctx context.Context, userId string) (map[Addr]OkexDepositAddr, error) {

@@ -222,11 +222,15 @@ func listProfiles(ctx context.Context, conn *sqlx.DB, userId string, profileType
 
 	return out, nil
 }
-func (r *pgRepository) SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string) ([]Profile, error) {
+func (r *pgRepository) SearchNotConnectedOkexDepositProfile(ctx context.Context, userId string, subType v1.ProfileSubType) ([]Profile, error) {
 	q := Join(`select `, prfh.ColsPref(), ` from profiles as p 
-where p.id not in (select profile_id from okex_deposit_addr_profile) and p.user_id = $1 and p.deleted_at is null order by num asc limit 100`)
+where
+	p.id not in (select profile_id from okex_deposit_addr_profile) 
+	and p.user_id = $1 
+	and p.deleted_at is null 
+	and p.sub_type = $2 order by num asc`)
 	out := make([]Profile, 0)
-	if err := r.conn.SelectContext(ctx, &out, q, userId); err != nil {
+	if err := r.conn.SelectContext(ctx, &out, q, userId, subType.String()); err != nil {
 		return nil, err
 	}
 

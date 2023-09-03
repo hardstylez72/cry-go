@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import {TaskType, Token} from "@/generated/flow";
+import {ProfileType} from "@/generated/helper";
 
 
 dayjs.extend(utc)
@@ -305,4 +306,12 @@ export const networkProps: Record<Network, network> = {
     img: '/icons/starknet.svg',
     value: Network.StarkNet,
   }
+}
+
+
+export const profileTitle = (item: any): string => {
+  if (item.type === ProfileType.EVM) {
+    return `${item.num} (${item.type})`
+  }
+  return `${item.num} (${item.type} ${item.subType})`
 }

@@ -39,6 +39,7 @@ type StargateSwapper interface {
 	Networker
 	StargateBridgeSwap(ctx context.Context, req *DefaultBridgeReq) (*bozdo.DefaultRes, error)
 }
+
 type TestNetworkBridgeSwapper interface {
 	Networker
 	TestNetBridgeSwap(ctx context.Context, req *TestNetBridgeSwapReq) (*TestNetBridgeSwapRes, error)

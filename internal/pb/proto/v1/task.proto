@@ -339,6 +339,7 @@ message OkexDepositTask {
 
   optional shared.Amount amount = 9;
   optional TaskTx tx = 10;
+  optional TaskTx approve_tx = 11;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {

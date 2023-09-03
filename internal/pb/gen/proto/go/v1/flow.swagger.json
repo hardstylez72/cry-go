@@ -576,6 +576,9 @@
         },
         "tx": {
           "$ref": "#/definitions/TaskTx"
+        },
+        "approveTx": {
+          "$ref": "#/definitions/TaskTx"
         }
       },
       "required": [

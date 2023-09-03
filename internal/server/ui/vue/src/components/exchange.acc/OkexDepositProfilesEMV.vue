@@ -2,7 +2,7 @@
   <div>
     <v-chip v-if="deposit.profileId" closable close-icon="mdi-close"
             @click:close="remove(deposit.profileId, deposit.addr)">
-      {{ `${deposit.profileLabel}` }}
+      {{ `${deposit.profileLabel} (${deposit.subType})` }}
     </v-chip>
     <span v-else @click="searchProfiles">
     <v-autocomplete
@@ -10,11 +10,11 @@
       v-model="selectedProfile"
       :loading="profilesLoading"
       :items="suggestedProfiles"
-      item-title="num"
+      :item-title="profileTitle"
       item-value="id"
-      label="select profiles"
+      label="Выберите EMV профиль"
       density="compact"
-      no-data-text="no detached profiles"
+      no-data-text="нет свободных EMV профилей"
     />
   </span>
   </div>
@@ -23,16 +23,19 @@
 <script lang="ts">
 
 import {defineComponent, PropType} from 'vue';
-import {helperService, profileService, withdrawerService} from "@/generated/services"
-import {
-  DepositAddresses,
-} from "@/generated/withdraw";
-import {Profile} from "@/generated/profile";
-import {Timer} from "@/components/helper";
+import {profileService, withdrawerService} from "@/generated/services"
+import {DepositAddresses,} from "@/generated/withdraw";
+import {Profile, ProfileSubType} from "@/generated/profile";
+import {profileTitle, Timer} from "@/components/helper";
+import {mapStores} from "pinia";
+import {useSysStore} from "@/plugins/pinia";
 
 export default defineComponent({
-  name: "OkexWithdrawProfiles",
+  name: "OkexDepositProfilesEMV",
   emits: ['update:modelValue', 'updated'],
+  computed: {
+    ...mapStores(useSysStore),
+  },
   props: {
     modelValue: {
       required: true,
@@ -67,35 +70,45 @@ export default defineComponent({
     }
   },
   methods: {
+    profileTitle,
     async remove(profileId: string | undefined, addr: string) {
       try {
         await withdrawerService.withdrawerServiceOkexDepositAddrDetach({
           body: {
             profileId: profileId ? profileId : '',
             okexDepositAddr: addr,
-            withdrawerId: this.withdrawerId
+            withdrawerId: this.withdrawerId,
+            subType: ProfileSubType.Metamask
           }
         })
         this.deposit.profileId = undefined
         this.deposit.profileLabel = undefined
+        this.sysStore.showSnackBar("профиль отвязан от адреса депозита", false)
       } catch (e) {
-
+        this.sysStore.showSnackBar("ошибка при отвязке профиля от адреса депозита", true)
       }
     },
     async attach(p: Profile) {
       if (p && p.id) {
-        await withdrawerService.withdrawerServiceOkexDepositAddrAttach({
-          body: {
-            profileId: p.id,
-            okexDepositAddr: this.deposit.addr,
-            withdrawerId: this.withdrawerId
-          }
-        })
+        try {
+          await withdrawerService.withdrawerServiceOkexDepositAddrAttach({
+            body: {
+              profileId: p.id,
+              okexDepositAddr: this.deposit.addr,
+              withdrawerId: this.withdrawerId,
+              subType: ProfileSubType.Metamask,
+            }
+          })
 
-        this.deposit.profileId = p.id
-        this.deposit.profileLabel = p.label
+          this.deposit.profileId = p.id
+          this.deposit.subType = ProfileSubType.Metamask
+          this.deposit.profileLabel = `${p.num}`
 
-        this.$emit('updated')
+          this.$emit('updated')
+          this.sysStore.showSnackBar("профиль привязан к адресу депозита", false)
+        } catch (e) {
+          this.sysStore.showSnackBar("ошибка при привязке профиля к адресу депозита", true)
+        }
       }
     },
     async searchProfiles() {
@@ -103,9 +116,11 @@ export default defineComponent({
       this.timer.cb(async () => {
         try {
           this.profilesLoading = true
-          const res = await profileService.profileServiceSearchProfilesNotConnectedToOkexDeposit()
+          const res = await profileService.profileServiceSearchProfilesNotConnectedToOkexDeposit({body: {subType: ProfileSubType.Metamask}})
 
           this.suggestedProfiles = res.profiles
+        } catch (e) {
+          this.sysStore.showSnackBar("ошибка при поиске профилей", true)
         } finally {
           this.profilesLoading = false
         }
@@ -114,9 +129,6 @@ export default defineComponent({
   },
   async created() {
     Object.assign(this.deposit, this.modelValue)
-    if (this.modelValue.profileId) {
-      console.log('zuydewfe')
-    }
   }
 })
 

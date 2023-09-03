@@ -8,7 +8,7 @@
       :loading="profilesLoading"
       @update:search="searchProfiles"
       :items="suggestedProfiles"
-      item-title="num"
+      :item-title="profileTitle"
       item-value="id"
       :multiple="multiple"
       :rules="[required]"
@@ -41,7 +41,7 @@
 import {defineComponent, PropType} from 'vue';
 import {profileService} from "@/generated/services"
 import {Profile, ProfileType} from "@/generated/profile";
-import {shuffleArray, Timer} from "@/components/helper";
+import {profileTitle, shuffleArray, Timer} from "@/components/helper";
 import {required} from "@/components/tasks/menu/helper";
 
 export default defineComponent({
@@ -94,6 +94,7 @@ export default defineComponent({
     }
   },
   methods: {
+    profileTitle,
     required,
     async searchProfiles(v: string) {
       this.timer.add(100)

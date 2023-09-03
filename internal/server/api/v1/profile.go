@@ -206,14 +206,14 @@ func (s *ProfileService) DeleteProfile(ctx context.Context, req *v1.DeleteProfil
 	_, _ = s.repository.DeleteProfile(ctx, req)
 	return &v1.DeleteProfileResponse{}, nil
 }
-func (s *ProfileService) SearchProfilesNotConnectedToOkexDeposit(ctx context.Context, _ *v1.SearchProfilesNotConnectedToOkexDepositRequest) (*v1.SearchProfilesNotConnectedToOkexDepositResponse, error) {
+func (s *ProfileService) SearchProfilesNotConnectedToOkexDeposit(ctx context.Context, req *v1.SearchProfilesNotConnectedToOkexDepositRequest) (*v1.SearchProfilesNotConnectedToOkexDepositResponse, error) {
 
 	userId, err := user.GetUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	profiles, err := s.repository.SearchNotConnectedOkexDepositProfile(ctx, userId)
+	profiles, err := s.repository.SearchNotConnectedOkexDepositProfile(ctx, userId, req.SubType)
 	if err != nil {
 		return nil, err
 	}

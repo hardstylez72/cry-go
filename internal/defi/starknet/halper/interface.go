@@ -44,6 +44,7 @@ type BaseTx struct {
 	Proxy        string `json:"proxy"`
 	SubType      string `json:"account"`
 	EstimateOnly bool   `json:"estimateOnly"`
+	MaxFee       string `json:"maxFee"`
 }
 
 type ApproveReq struct {
@@ -103,4 +104,5 @@ type HalperService interface {
 	LiquidityBridge(ctx context.Context, req *LiquidityBridgeReq) (*LiquidityBridgeRes, error)
 	SendDmail(ctx context.Context, req *SendDmailReq) (*SendDmailRes, error)
 	Mint(ctx context.Context, req *MintReq) (*MintRes, error)
+	Transfer(ctx context.Context, req *TransferReq) (*TransferRes, error)
 }

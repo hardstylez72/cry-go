@@ -4,8 +4,8 @@ import {flow_Flow} from "@/generated/process";
 
 import TaskStargateBridge from "@/components/tasks/block/TaskStargateBridge.vue";
 import TaskDelay from "@/components/tasks/block/Delay.vue";
-import TaskExchangeWithdraw from "@/components/tasks/block/TaskExchangeWithdraw.vue";
-import TaskOkexDeposit from "@/components/tasks/block/TaskOkexDeposit.vue";
+import TaskExchangeWithdraw from "@/components/tasks/block/ExchangeWithdraw.vue";
+import TaskOkexDeposit from "@/components/tasks/block/OkexDeposit.vue";
 import TaskTestNetBridgeSwap from "@/components/tasks/block/TaskTestNetBridgeSwap.vue";
 import TaskSnapshotVote from "@/components/tasks/block/TaskSnapshotVote.vue";
 import TaskSyncSwap from "@/components/tasks/block/SyncSwap.vue";

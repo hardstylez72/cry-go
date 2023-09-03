@@ -459,6 +459,9 @@ export interface OkexDepositTask {
 
   /**  */
   tx?: TaskTx;
+
+  /**  */
+  approveTx?: TaskTx;
 }
 
 export interface OrbiterBridgeTask {

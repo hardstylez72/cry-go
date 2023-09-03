@@ -4,7 +4,6 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -112,22 +111,4 @@ func (p *Settings) EraWallet() (*zksyncera.WalletTransactor, error) {
 	}
 
 	return wallet, nil
-}
-
-func (p *Settings) GetWalletAddr() (*string, error) {
-	var walletAddr string
-	if p.Source.Network == v1.Network_ZKSYNCERA || p.Source.GetNetwork() == v1.Network_ZKSYNCLITE {
-		w, err := p.EraWallet()
-		if err != nil {
-			return nil, err
-		}
-		walletAddr = w.WalletAddr.String()
-	} else {
-		w, err := defi.GetEMVPublicKey(string(p.p.DB.MmskPk))
-		if err != nil {
-			return nil, err
-		}
-		walletAddr = w
-	}
-	return &walletAddr, nil
 }

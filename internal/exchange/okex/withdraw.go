@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/hardstylez72/cry/internal/exchange"
+	"github.com/hardstylez72/cry/internal/exchange/okex/driver"
+	"github.com/hardstylez72/cry/internal/exchange/okex/driver/requests/rest/funding"
+	responses "github.com/hardstylez72/cry/internal/exchange/okex/driver/responses/funding"
 	"github.com/hardstylez72/cry/internal/lib"
 	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
-	"github.com/hardstylez72/okex"
-	"github.com/hardstylez72/okex/requests/rest/funding"
-	responses "github.com/hardstylez72/okex/responses/funding"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
@@ -35,6 +35,10 @@ func (s *Service) Withdraw(ctx context.Context, req *exchange.WithdrawRequest) (
 			fee = c.MinFee
 			break
 		}
+	}
+
+	if fee == "" {
+		return nil, errors.New("okex did not send fee value...")
 	}
 
 	am, err := lib.StringToFloat(req.Amount)

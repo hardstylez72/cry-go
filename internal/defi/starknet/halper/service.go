@@ -45,6 +45,20 @@ type MintRes struct {
 	DefaultRes
 }
 
+type TransferReq struct {
+	BaseTx
+	ToAddr string `json:"toAddr"`
+	Token  string `json:"token"`
+	Amount string `json:"amount"`
+}
+
+type TransferRes struct {
+	DefaultRes
+}
+
+func (s *Service) Transfer(ctx context.Context, req *TransferReq) (*TransferRes, error) {
+	return Request[TransferReq, TransferRes](ctx, s.cli, s.c.Host+"/starknet/transfer", req)
+}
 func (s *Service) Mint(ctx context.Context, req *MintReq) (*MintRes, error) {
 	return Request[MintReq, MintRes](ctx, s.cli, s.c.Host+"/starknet/mint", req)
 }

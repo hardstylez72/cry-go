@@ -4,7 +4,6 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/orbiter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -49,7 +48,7 @@ func (c *EtheriumClient) OrbiterBridge(ctx context.Context, req *OrbiterBridgeRe
 
 	res, err := c.Transfer(ctx, &TransferReq{
 		Pk:           req.WalletPk,
-		ToAddr:       common.HexToAddress(opt.MakerReceiverAddr),
+		ToAddr:       opt.MakerReceiverAddr,
 		Token:        req.FromToken,
 		Amount:       req.Amount,
 		Gas:          req.Gas,

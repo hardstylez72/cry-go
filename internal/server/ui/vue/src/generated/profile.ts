@@ -733,7 +733,10 @@ export interface SearchProfileResponse {
   profiles: Profile[];
 }
 
-export interface SearchProfilesNotConnectedToOkexDepositRequest {}
+export interface SearchProfilesNotConnectedToOkexDepositRequest {
+  /**  */
+  subType: ProfileSubType;
+}
 
 export interface SearchProfilesNotConnectedToOkexDepositResponse {
   /**  */
