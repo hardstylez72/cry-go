@@ -160,7 +160,7 @@ func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.DefaultLP, cli
 		am = bozdo.Percent(am, 90)
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, s.Source, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network, v1.TaskType_SyncSwapLP)
 		if err != nil {
 			return nil, nil, err
 		}

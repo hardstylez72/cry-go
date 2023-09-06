@@ -121,6 +121,8 @@ export const humanDuration = (s?: string | Number): string => {
 
 export interface TaskSettings {
   slippage?: string
+  swapRateRatio?: string
+  swapUseExchangeRate?: string
 }
 
 export const castTaskSettingsMap = (a: Object): Map<TaskType, TaskSettings> => {

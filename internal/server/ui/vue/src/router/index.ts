@@ -3,6 +3,16 @@ import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
 
 const routes = [
   {
+    name: 'Stats',
+    path: '/stats',
+    component: () => import('@/components/stats/Stats.vue'),
+  },
+  {
+    name: 'StatSwap',
+    path: '/stats/swap',
+    component: () => import('@/components/stats/Swaps.vue'),
+  },
+  {
     name: 'ProfileRelations',
     path: '/profile/relations',
     component: () => import('@/components/profile/Relations.vue'),

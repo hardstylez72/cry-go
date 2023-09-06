@@ -88,7 +88,7 @@ func (t *WethTask) Run(ctx context.Context, a *Input) (_ *v1.ProcessTask, err er
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateWethTaskCost")
 		}
-		gas, err := GasManager(estimation, s.Source, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network, t.Type())
 		if err != nil {
 			return nil, err
 		}

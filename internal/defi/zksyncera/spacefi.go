@@ -81,6 +81,7 @@ func (c *spaceFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.SpaceFI.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
 
 	} else if req.ToToken == v1.Token_ETH {
@@ -101,6 +102,7 @@ func (c *spaceFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.SpaceFI.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
 	}
 

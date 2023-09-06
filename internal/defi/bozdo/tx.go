@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/hardstylez72/cry/internal/exchange/pub"
+	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
 
@@ -21,6 +22,7 @@ const (
 	TxDetailKeyNativeBalanceBefore = "NativeBalanceBefore"
 	TxDetailKeyNativeBalanceAfter  = "NativeBalanceAfter"
 	TxDetailKeyTxFee               = "TxFee"
+	TxDetailEaxchnageRateRatio     = "RateRatio"
 )
 
 type TxDetail struct {
@@ -60,6 +62,7 @@ type TxData struct {
 	Value        *big.Int
 	ContractAddr common.Address
 	Details      []TxDetail
+	Rate         *float64
 }
 
 type BaseReq struct {
@@ -153,6 +156,15 @@ func NewTokenBalanceBefore(s *big.Int, network v1.Network, token v1.Token) TxDet
 	return TxDetail{
 		Key:   TxDetailKeyTokenBalanceBefore,
 		Value: CastUSD(s, network, token) + " USD",
+	}
+}
+
+func NewSwapRateRatio(exchange, pool float64) TxDetail {
+	ratio := math.Abs(1-exchange/pool) * 100
+
+	return TxDetail{
+		Key:   TxDetailEaxchnageRateRatio,
+		Value: lib.FloatToString(ratio) + " %",
 	}
 }
 

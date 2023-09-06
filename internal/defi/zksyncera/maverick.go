@@ -7,7 +7,6 @@ import (
 	"math/big"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
@@ -84,7 +83,7 @@ func (c *maverickFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapR
 	params := maverickrouter.IRouterExactInputParams{
 		Path:             pathb,
 		Recipient:        recipient,
-		Deadline:         new(big.Int).SetInt64(time.Now().Add(time.Second * 20).Unix()),
+		Deadline:         DefaultDeadLine(),
 		AmountIn:         req.Amount,
 		AmountOutMinimum: amOut,
 	}
@@ -124,6 +123,7 @@ func (c *maverickFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapR
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.Maverick.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
 	}
 
@@ -135,6 +135,7 @@ func (c *maverickFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapR
 		Data:         data,
 		Value:        value,
 		ContractAddr: c.Cfg.Maverick.Router,
+		Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 	}, nil
 }
 

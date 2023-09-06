@@ -35,7 +35,13 @@ func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, platform v1
 		return nil, err
 	}
 
-	return c.CastHalperSwapRes(res), nil
+	result := c.CastHalperSwapRes(res)
+	if req.ExchangeRate != nil {
+		result.TxDetails = append(result.TxDetails, bozdo.NewSwapRateRatio(*req.ExchangeRate, res.Rate))
+	}
+
+	result.ECost.Details = result.TxDetails
+	return result, nil
 }
 
 func (c *Client) CastHalperSwapRes(res *halper.DefaultSwapRes) *bozdo.DefaultRes {

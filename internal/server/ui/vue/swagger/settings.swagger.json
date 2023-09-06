@@ -244,6 +244,12 @@
       "properties": {
         "slippage": {
           "type": "string"
+        },
+        "swapRateRatio": {
+          "type": "string"
+        },
+        "swapUseExchangeRate": {
+          "type": "boolean"
         }
       }
     },

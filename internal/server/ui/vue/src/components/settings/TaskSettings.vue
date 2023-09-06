@@ -1,14 +1,28 @@
 <template>
-  <div class="d-inline-flex text-center">
-    <div class="mt-2"><b>{{ taskType }}</b> <i>slippage</i></div>
+  <div>
+    <div class="mt-2"><b>{{ taskType }}</b></div>
+    <div>
+      <div v-if="settings.slippage" class="d-inline-flex text-center">
+        <i>Проскальзывание</i>
 
-    <v-radio-group direction="horizontal" inline hide-details v-model="settings.slippage">
-      <v-radio value="2" label="2%"/>
-      <v-radio value="1" label="1%"/>
-      <v-radio value="0.5" label="0.5%"/>
-      <v-radio value="0.1" label="0.1%"/>
-      <v-radio value="0" label="0%"/>
-    </v-radio-group>
+        <v-radio-group direction="horizontal" inline hide-details v-model="settings.slippage">
+          <v-radio value="2" label="2%"/>
+          <v-radio value="1" label="1%"/>
+          <v-radio value="0.5" label="0.5%"/>
+          <v-radio value="0.1" label="0.1%"/>
+          <v-radio value="0" label="0%"/>
+        </v-radio-group>
+      </div>
+    </div>
+    <div>
+      <div v-if="settings.swapRateRatio" class="d-inline-flex text-center align-center">
+        <i class="mr-2">Допустимая разница с курсом бинанса</i>
+        <v-text-field suffix="%" style="width: 100px" type="number" density="compact" variant="outlined"
+                      v-model="settings.swapRateRatio"></v-text-field>
+      </div>
+    </div>
+
+
   </div>
 </template>
 

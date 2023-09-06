@@ -40,6 +40,9 @@ type (
 		AdminEmail string
 
 		Standalone bool
+
+		TestEVMWalletId      string
+		TestStarkNetWalletId string
 	}
 
 	App struct {
@@ -105,18 +108,20 @@ func Load() (*Config, error) {
 			RedirectOnSuccess: mayenv("REDIRECT_ON_SUCCESS", ""),
 			RedirectOnFailure: mayenv("REDIRECT_ON_FAILURE", ""),
 		},
-		InstanceId:         uuid.New().String(),
-		MigrationsDir:      mayenv("MIGRATIONS_DIR", "/internal/server/migrations"),
-		TelegramToken:      mayenv("TELEGRAM_TOKEN", ""),
-		SnapshotHost:       mustenv("SNAPSHOT_ORG_HOST"),
-		Lazanya:            mustenv("LAZANYA"),
-		PrometheusPort:     mayenv("PROMETHEUS_PORT", ""),
-		JaegerUrl:          mayenv("JAEGER_URL", ""),
-		JaegerServiceName:  mayenv("JAEGER_SERVICE_NAME", "cry-backend"),
-		PayServiceGRPCAddr: mustenv("PAY_SERVICE_GRPC_ADDR"),
-		HalperHost:         mustenv("HALPER_HOST"),
-		AdminEmail:         mustenv("ADMIN_EMAIL"),
-		Standalone:         mayenv("STANDALONE", "false") == "true",
+		InstanceId:           uuid.New().String(),
+		MigrationsDir:        mayenv("MIGRATIONS_DIR", "/internal/server/migrations"),
+		TelegramToken:        mayenv("TELEGRAM_TOKEN", ""),
+		SnapshotHost:         mustenv("SNAPSHOT_ORG_HOST"),
+		Lazanya:              mustenv("LAZANYA"),
+		PrometheusPort:       mayenv("PROMETHEUS_PORT", ""),
+		JaegerUrl:            mayenv("JAEGER_URL", ""),
+		JaegerServiceName:    mayenv("JAEGER_SERVICE_NAME", "cry-backend"),
+		PayServiceGRPCAddr:   mustenv("PAY_SERVICE_GRPC_ADDR"),
+		HalperHost:           mustenv("HALPER_HOST"),
+		AdminEmail:           mustenv("ADMIN_EMAIL"),
+		Standalone:           mayenv("STANDALONE", "false") == "true",
+		TestEVMWalletId:      mustenv("TEST_EVM_WALLET_ID"),
+		TestStarkNetWalletId: mustenv("TEST_STARKNET_WALLET_ID"),
 	}
 
 	CFG = c

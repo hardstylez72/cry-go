@@ -55,7 +55,12 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 		return nil, err
 	}
 
-	amountOutMin, _, _, err := c.MuteIoPairFee(ctx, req)
+	amountOut, _, _, err := c.MuteIoPairFee(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	amountOutMin, err := defi.Slippage(amountOut, req.Slippage)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +93,11 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 	result := &bozdo.DefaultRes{}
 	result.ECost = estimate
 
+	rate := CalcRate(req.FromToken, req.ToToken, req.Amount, amountOut)
+	if rate != nil && req.ExchangeRate != nil {
+		result.ECost.Details = append(result.ECost.Details, bozdo.NewSwapRateRatio(*req.ExchangeRate, *rate))
+	}
+
 	if req.EstimateOnly {
 		return result, nil
 	}
@@ -97,7 +107,7 @@ func (c *Client) muteIoSwapToEth(ctx context.Context, req *defi.DefaultSwapReq) 
 		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
-
+	result.TxDetails = result.ECost.Details
 	return result, nil
 }
 
@@ -119,13 +129,18 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 		return nil, err
 	}
 
-	amountOutMin, _, fee, err := c.MuteIoPairFee(ctx, req)
+	amountOut, _, fee, err := c.MuteIoPairFee(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	amountOutMin, err := defi.Slippage(amountOut, req.Slippage)
 	if err != nil {
 		return nil, err
 	}
 
 	path := []common.Address{c.Cfg.Weth, c.Cfg.TokenMap[req.ToToken]}
-	to := w.GetAddress()
+	to := w.Address()
 	deadline := new(big.Int).SetInt64(time.Now().Add(time.Second * 20).Unix())
 	stableMap := []bool{false, false}
 
@@ -158,6 +173,12 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 	result := &bozdo.DefaultRes{}
 	result.ECost = estimate
 
+	result.ECost = estimate
+	rate := CalcRate(req.FromToken, req.ToToken, req.Amount, amountOut)
+	if rate != nil && req.ExchangeRate != nil {
+		result.ECost.Details = append(result.ECost.Details, bozdo.NewSwapRateRatio(*req.ExchangeRate, *rate))
+	}
+
 	if req.EstimateOnly {
 		return result, nil
 	}
@@ -167,7 +188,7 @@ func (c *Client) muteIoSwapFromEth(ctx context.Context, req *defi.DefaultSwapReq
 		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 	result.Tx = c.NewTx(hash, defi.CodeContract, nil)
-
+	result.TxDetails = estimate.Details
 	return result, nil
 }
 
@@ -184,10 +205,5 @@ func (c *Client) MuteIoPairFee(ctx context.Context, req *defi.DefaultSwapReq) (A
 		return nil, false, nil, err
 	}
 
-	amSlip, err := defi.Slippage(amOut.AmountOut, req.Slippage)
-	if err != nil {
-		return nil, false, nil, err
-	}
-
-	return amSlip, amOut.Stable, amOut.Fee, nil
+	return amOut.AmountOut, amOut.Stable, amOut.Fee, nil
 }

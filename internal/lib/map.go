@@ -31,6 +31,12 @@ func (m *Map[A, B]) Keys() []A {
 	return m.m.Keys()
 }
 
+func (m *Map[A, B]) Values() []B {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	return m.m.Values()
+}
+
 func (m *Map[A, B]) Remove(a A) {
 	m.mu.Lock()
 	defer m.mu.Unlock()

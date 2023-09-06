@@ -28,7 +28,11 @@ export const useUserStore = defineStore('user', {
   actions: {
     async redirectToGeneralPage() {
       const path = window.location.pathname
-      if (path === "/" || path === '/modules') {
+      console.log('path: ' + path)
+      if (path === "/"
+        || path === '/modules'
+        || path === '/stats'
+        || path === '/stats/swap') {
         return
       }
 

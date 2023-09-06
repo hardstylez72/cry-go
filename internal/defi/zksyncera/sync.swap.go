@@ -120,5 +120,6 @@ func (c *syncSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq
 		Data:         data,
 		Value:        value,
 		ContractAddr: c.Cfg.SyncSwap.RouterSwap,
+		Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 	}, nil
 }

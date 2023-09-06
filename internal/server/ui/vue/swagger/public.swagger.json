@@ -1,0 +1,195 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "v1/public.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "publicService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/gw/v1/public/swap-stat": {
+      "post": {
+        "operationId": "publicService_SwapStat",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/SwapStatRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SwapStatReq"
+            }
+          }
+        ],
+        "tags": [
+          "publicService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Any": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "Status": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Any"
+          }
+        }
+      }
+    },
+    "SwapStatItem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/TaskType"
+        },
+        "rateRatio": {
+          "type": "number",
+          "format": "double"
+        },
+        "slippage": {
+          "type": "number",
+          "format": "double"
+        },
+        "sum": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "type",
+        "rateRatio",
+        "slippage",
+        "sum"
+      ]
+    },
+    "SwapStatReq": {
+      "type": "object"
+    },
+    "SwapStatRes": {
+      "type": "object",
+      "properties": {
+        "zkSyncETHUSDC": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/SwapStatItem"
+          }
+        },
+        "zkSyncUSDCETH": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/SwapStatItem"
+          }
+        },
+        "starknetETHUSDC": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/SwapStatItem"
+          }
+        },
+        "starknetUSDCETH": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/SwapStatItem"
+          }
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "zkSync",
+        "starknet",
+        "updated"
+      ]
+    },
+    "TaskType": {
+      "type": "string",
+      "enum": [
+        "StargateBridge",
+        "Mock",
+        "Delay",
+        "WithdrawExchange",
+        "OkexDeposit",
+        "TestNetBridgeSwap",
+        "SnapshotVote",
+        "OkexBinance",
+        "Swap1inch",
+        "SyncSwap",
+        "ZkSyncOfficialBridgeToEthereum",
+        "OrbiterBridge",
+        "ZkSyncOfficialBridgeFromEthereum",
+        "WETH",
+        "MuteioSwap",
+        "SyncSwapLP",
+        "MaverickSwap",
+        "SpaceFISwap",
+        "VelocoreSwap",
+        "IzumiSwap",
+        "VeSyncSwap",
+        "EzkaliburSwap",
+        "ZkSwap",
+        "TraderJoeSwap",
+        "MerklyMintAndBridgeNFT",
+        "DeployStarkNetAccount",
+        "Swap10k",
+        "PancakeSwap",
+        "SithSwap",
+        "JediSwap",
+        "MySwap",
+        "ProtossSwap",
+        "StarkNetBridge",
+        "Dmail",
+        "StarkNetIdMint"
+      ],
+      "default": "StargateBridge",
+      "title": "- OkexBinance: deprecated"
+    }
+  }
+}

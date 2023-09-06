@@ -135,7 +135,7 @@ func DeployStarkNetAccount(ctx context.Context, profile *halp.Profile, p *v1.Dep
 			return nil, nil, ErrAccountIsZero
 		}
 
-		gas, err := GasManager(estimation, s.Source, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network, v1.TaskType_DeployStarkNetAccount)
 		if err != nil {
 			return nil, nil, err
 		}

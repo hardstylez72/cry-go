@@ -3,9 +3,11 @@ package task
 import (
 	"context"
 	"math/big"
+	"strings"
 
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/lib"
 	"github.com/hardstylez72/cry/internal/log"
 	"github.com/hardstylez72/cry/internal/lzscan"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -194,7 +196,7 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 		return nil, nil, err
 	}
 
-	gas, err := GasManager(estimation, s.Source, p.FromNetwork)
+	gas, err := GasManager(estimation, s.Source, p.FromNetwork, t.Type())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -235,7 +237,7 @@ type Tx struct {
 	TxId string
 }
 
-func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network) (*bozdo.Gas, error) {
+func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network, tt v1.TaskType) (*bozdo.Gas, error) {
 
 	if e.GasLimit == nil {
 		e.GasLimit = &v1.AmUni{}
@@ -289,7 +291,49 @@ func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network) (*bozdo
 		return nil, ErrGasIsOverMax(max.Usd, estimated.Usd)
 	}
 
+	if err := validateSwapRateRatio(e, s, tt); err != nil {
+		return nil, err
+	}
+
 	return gas, nil
+}
+
+func validateSwapRateRatio(e *v1.EstimationTx, s *v1.NetworkSettings, tt v1.TaskType) error {
+	var limit float64 = 0
+	for _, d := range e.Details {
+		if d.Key == bozdo.TxDetailEaxchnageRateRatio {
+			value := strings.ReplaceAll(d.Value, " %", "")
+			f, err := lib.StringToFloat(value)
+			if err != nil {
+				return nil
+			}
+			limit = f
+		}
+	}
+
+	if limit == 0 {
+		return nil
+	}
+
+	v, exist := s.TaskSettings[tt.String()]
+	if !exist {
+		return nil
+	}
+
+	if v.GetSwapRateRatio() == "" {
+		return nil
+	}
+
+	max, err := lib.StringToFloat(v.GetSwapRateRatio())
+	if err != nil {
+		return nil
+	}
+
+	if limit < max {
+		return nil
+	}
+
+	return ErrSwapRateBiggerThenAllowed(limit, max)
 }
 
 func EstimateStargateBridgeSwapCost(ctx context.Context, p *v1.StargateBridgeTask, profile *halp.Profile) (*v1.EstimationTx, error) {

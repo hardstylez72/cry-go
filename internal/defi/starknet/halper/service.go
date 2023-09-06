@@ -108,6 +108,7 @@ type DefaultSwapRes struct {
 	SwapTx    *string `json:"swapTxId"`
 	Fee       *string `json:"maxFee"`
 	Error     *string `json:"error"`
+	Rate      float64 `json:"rate"`
 }
 
 type DefaultRes struct {

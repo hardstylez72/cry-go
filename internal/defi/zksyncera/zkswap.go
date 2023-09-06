@@ -64,8 +64,7 @@ func (c *zkSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) 
 		if err != nil {
 			return nil, err
 		}
-		amOut = amSlip
-		data, err := abispacefirouter.Pack("swapExactETHForTokens", amOut, path, w.WalletAddr, DefaultDeadLine())
+		data, err := abispacefirouter.Pack("swapExactETHForTokens", amSlip, path, w.WalletAddr, DefaultDeadLine())
 		if err != nil {
 			return nil, err
 		}
@@ -74,6 +73,7 @@ func (c *zkSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) 
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.ZkSwap.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
 
 	} else if req.ToToken == v1.Token_ETH {
@@ -82,8 +82,7 @@ func (c *zkSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) 
 		if err != nil {
 			return nil, err
 		}
-		amOut = amSlip
-		data, err := abispacefirouter.Pack("swapExactTokensForETH", req.Amount, amOut, path, w.WalletAddr, DefaultDeadLine())
+		data, err := abispacefirouter.Pack("swapExactTokensForETH", req.Amount, amSlip, path, w.WalletAddr, DefaultDeadLine())
 		if err != nil {
 			return nil, err
 		}
@@ -92,6 +91,7 @@ func (c *zkSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) 
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.ZkSwap.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
 	}
 

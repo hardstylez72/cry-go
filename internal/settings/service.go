@@ -188,12 +188,23 @@ func resolveNetworkSettings(in *v1.NetworkSettings, s ResolveNet, force bool) (*
 		out.GasMultiplier = 1
 	}
 
+	// настройки сваполок и бриджей
 	for taskType, slippage := range defi.SlippageMap {
-		_, exist := out.TaskSettings[taskType.String()]
+		v, exist := out.TaskSettings[taskType.String()]
 		if !exist {
 			tmp := slippage
 			out.TaskSettings[taskType.String()] = &v1.TaskSettings{
 				Slippage: &tmp,
+			}
+		} else {
+			if v.SwapRateRatio == nil {
+				tmp := "1"
+				out.TaskSettings[taskType.String()].SwapRateRatio = &tmp
+			}
+
+			if v.SwapUseExchangeRate == nil {
+				tmp := false
+				out.TaskSettings[taskType.String()].SwapUseExchangeRate = &tmp
 			}
 		}
 	}

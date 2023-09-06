@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "v1/shared.proto";
+import "v1/task.proto";
+
+package public;
+option go_package = "grpc/v1";
+
+service publicService {
+
+  rpc SwapStat(SwapStatReq) returns (SwapStatRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/public/swap-stat",
+      body: "*"
+    };
+  }
+}
+
+message SwapStatReq {
+
+}
+
+message SwapStatRes {
+  repeated SwapStatItem zkSyncETHUSDC = 1;
+  repeated SwapStatItem zkSyncUSDCETH = 2;
+  repeated SwapStatItem starknetETHUSDC = 3;
+  repeated SwapStatItem starknetUSDCETH = 4;
+  google.protobuf.Timestamp updated = 5;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["zkSync", "starknet", "updated"]
+    }
+  };
+}
+
+message SwapStatItem {
+  task.TaskType type = 1;
+  double rateRatio = 2;
+  double slippage = 3;
+  double sum = 4;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["type", "rateRatio", "slippage", "sum"]
+    }
+  };
+}

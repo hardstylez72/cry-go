@@ -148,7 +148,7 @@ func (t *MintTask) Execute(ctx context.Context, p *v1.SimpleTask, client defi.Mi
 	if estimateOnly {
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, s.Source, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network, t.Type())
 		if err != nil {
 			return nil, nil, err
 		}

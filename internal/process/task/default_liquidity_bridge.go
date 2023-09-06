@@ -201,7 +201,7 @@ func (h *DefaultLiquidityBridgeTaskHalper) Execute(ctx context.Context, from, to
 	if estimateOnly {
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, s.Source, p.FromNetwork)
+		gas, err := GasManager(estimation, s.Source, p.FromNetwork, h.TaskType)
 		if err != nil {
 			return nil, nil, err
 		}

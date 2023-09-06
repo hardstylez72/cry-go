@@ -2,10 +2,13 @@ package pub
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/hardstylez72/cry/internal/exchange/binance"
+	"github.com/hardstylez72/cry/internal/lib"
 	"github.com/hardstylez72/cry/internal/log"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
 
 type Listener struct {
@@ -65,25 +68,46 @@ func (l *Listener) GetData() (*Pairs, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
-	bnb, err := l.cli.GetCoinPrice(ctx, "BNBUSDT")
+	bnb, err := l.cli.GetPairRate(ctx, "BNBUSDT")
 	if err != nil {
 		return nil, err
 	}
 
-	eth, err := l.cli.GetCoinPrice(ctx, "ETHUSDT")
+	eth, err := l.cli.GetPairRate(ctx, "ETHUSDT")
 	if err != nil {
 		return nil, err
 	}
 
-	avax, err := l.cli.GetCoinPrice(ctx, "AVAXUSDT")
+	avax, err := l.cli.GetPairRate(ctx, "AVAXUSDT")
 	if err != nil {
 		return nil, err
 	}
 
-	matic, err := l.cli.GetCoinPrice(ctx, "MATICUSDT")
+	matic, err := l.cli.GetPairRate(ctx, "MATICUSDT")
 	if err != nil {
 		return nil, err
 	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		rate, err := l.cli.GetPairRate(ctx, "ETHUSDC")
+		if err == nil {
+			exchangeRateMap.Set(key(v1.Token_ETH, v1.Token_USDC), rate)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		rate, err := l.cli.GetPairRate(ctx, "ETHUSDT")
+		if err == nil {
+			exchangeRateMap.Set(key(v1.Token_ETH, v1.Token_USDT), rate)
+		}
+	}()
+
+	wg.Wait()
 
 	return &Pairs{
 		AVAX:  avax,
@@ -91,4 +115,30 @@ func (l *Listener) GetData() (*Pairs, error) {
 		ETH:   eth,
 		MATIC: matic,
 	}, nil
+}
+
+func key(t1, t2 v1.Token) string {
+	return t1.String() + t2.String()
+}
+
+var exchangeRateMap = lib.NewMap[string, float64]()
+
+func GetExchangeRate(t1, t2 v1.Token) *float64 {
+	rate, ok := exchangeRateMap.Get(t1.String() + t2.String())
+	if ok {
+		if rate < 1 {
+			rate = 1 / rate
+		}
+
+		return &rate
+	}
+
+	rate, ok = exchangeRateMap.Get(t2.String() + t1.String())
+	if ok {
+		if rate < 1 {
+			rate = 1 / rate
+		}
+		return &rate
+	}
+	return nil
 }

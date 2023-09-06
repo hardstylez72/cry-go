@@ -15,13 +15,15 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *HelperService) GetUser(ctx context.Context, req *v1.GetUserRequest) (*v1.GetUserResponse, error) {
+const lastSettingsUpdateTime = "2023-09-04 7:40:05"
+
+func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.GetUserResponse, error) {
 	userId, err := user.GetUserId(ctx)
 	if err != nil {
 		return nil, status.New(codes.Unauthenticated, "").Err()
 	}
 
-	settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-15")
+	settingsLastUpdateDate, err := time.Parse(time.DateTime, lastSettingsUpdateTime)
 	if err != nil {
 		return nil, err
 	}

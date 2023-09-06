@@ -7,6 +7,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
+	"github.com/hardstylez72/cry/internal/exchange/pub"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
 	"github.com/pkg/errors"
@@ -255,7 +256,7 @@ func (h *ZkSyncSwapHalper) Execute(ctx context.Context, profile *halp.Profile, p
 		am = bozdo.Percent(am, 90)
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, s.Source, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network, h.TaskType)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -283,6 +284,8 @@ func (h *ZkSyncSwapHalper) Execute(ctx context.Context, profile *halp.Profile, p
 		Gas:          Gas,
 		Debug:        false,
 		Slippage:     getSlippage(s.Source, h.TaskType),
+		SubType:      profile.SubType,
+		ExchangeRate: pub.GetExchangeRate(p.FromToken, p.ToToken),
 	}, h.TaskType)
 	if err != nil {
 		return nil, nil, err

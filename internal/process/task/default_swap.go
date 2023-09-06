@@ -171,7 +171,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 		am = bozdo.Percent(am, 90)
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, s.Source, p.Network)
+		gas, err := GasManager(estimation, s.Source, p.Network, h.TaskType)
 		if err != nil {
 			return nil, nil, err
 		}

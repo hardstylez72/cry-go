@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math/big"
-	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -78,7 +77,7 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 		Recipient:   recipient,
 		Amount:      req.Amount,
 		MinAcquired: acq.Acquire,
-		Deadline:    new(big.Int).SetInt64(time.Now().Add(time.Second * 20).Unix()),
+		Deadline:    DefaultDeadLine(),
 	}
 
 	constractabi, err := izumirouter.StorageMetaData.GetAbi()
@@ -96,6 +95,7 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 			Data:         p1,
 			Value:        value,
 			ContractAddr: c.Cfg.IZUMI.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, acq.Acquire),
 		}, nil
 	}
 
@@ -124,6 +124,7 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.IZUMI.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, acq.Acquire),
 		}, nil
 	}
 
@@ -136,6 +137,7 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 		Data:         data,
 		Value:        value,
 		ContractAddr: c.Cfg.IZUMI.Router,
+		Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, acq.Acquire),
 	}, nil
 }
 
@@ -152,6 +154,5 @@ func makeIzumiPath(from, to common.Address, fee *big.Int) []byte {
 	pathb = append(pathb, feeB...)
 	pathb = append(pathb, to.Bytes()...)
 
-	println(common.Bytes2Hex(pathb))
 	return pathb
 }

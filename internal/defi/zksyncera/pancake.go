@@ -46,9 +46,6 @@ func (c *pancakeMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 		toToken,
 	}
 
-	println("from: " + fromToken.String())
-	println("to: " + toToken.String())
-
 	value := big.NewInt(0)
 	if req.FromToken == v1.Token_ETH {
 		value = req.Amount
@@ -95,6 +92,7 @@ func (c *pancakeMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 			Value:        value,
 			ContractAddr: c.CA,
 			Details:      nil,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amountOut),
 		}, nil
 	}
 
@@ -123,6 +121,7 @@ func (c *pancakeMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 			Value:        value,
 			ContractAddr: c.CA,
 			Details:      nil,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amountOut),
 		}, nil
 	}
 

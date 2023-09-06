@@ -16,7 +16,7 @@ func TestService(t *testing.T) {
 	//})
 
 	c := NewWsClient()
-	c.GetCoinPrice(context.Background(), "STGUSDT")
+	c.GetPairRate(context.Background(), "STGUSDT")
 
 	//t.Run("networks", func(t *testing.T) {
 	//	ctx := context.Background()

@@ -127,7 +127,7 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		if err != nil {
 			return nil, err
 		}
-		gas, err := GasManager(estimate, s.Source, p.Network)
+		gas, err := GasManager(estimate, s.Source, p.Network, t.Type())
 		if err != nil {
 			return nil, err
 		}

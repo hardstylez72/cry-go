@@ -93,3 +93,15 @@ codegen({
   include: ['*'],
   fileName: 'orbiter.ts'
 });
+
+codegen({
+  methodNameMode: 'operationId',
+  source: require(path.resolve(__dirname, 'swagger/public.swagger.json')),
+  outputDir: path.resolve(__dirname, 'src/generated/'),
+  useCustomerRequestInstance: true,
+  serviceNameSuffix: '',
+  useStaticMethod: false,
+  include: ['*'],
+  fileName: 'public.ts'
+});
+

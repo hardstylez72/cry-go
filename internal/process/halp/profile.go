@@ -2,15 +2,12 @@ package halp
 
 import (
 	"context"
-	"math/big"
 
 	"github.com/hardstylez72/cry/internal/defi/starknet"
-	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/uniclient"
-	"github.com/pkg/errors"
 )
 
 type Halp struct {
@@ -96,19 +93,4 @@ func (p *Settings) BaseConfig() *uniclient.BaseClientConfig {
 		RPCEndpoint:     p.Source.RpcEndpoint,
 		UserAgentHeader: p.p.DB.UserAgent,
 	}
-}
-
-func (p *Settings) EraWallet() (*zksyncera.WalletTransactor, error) {
-
-	id, ok := big.NewInt(0).SetString(p.Source.Id, 10)
-	if !ok {
-		return nil, errors.New("invalid network id: " + p.Source.Id)
-	}
-
-	wallet, err := zksyncera.NewWalletTransactor(string(p.p.DB.MmskPk), id)
-	if err != nil {
-		return nil, err
-	}
-
-	return wallet, nil
 }

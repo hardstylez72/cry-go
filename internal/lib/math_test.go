@@ -11,11 +11,11 @@ func TestRound(t *testing.T) {
 
 	//println(FloatToString(RandFloatRange(0, 1)))
 	//println(FloatToString(RandFloatRange(0.1, 0.2)))
-	println(FloatToString(RandFloatRange(0.02, 0.026)))
-	println(FloatToString(RandFloatRange(0.02, 0.026)))
-	println(FloatToString(RandFloatRange(0.02, 0.026)))
-	println(FloatToString(RandFloatRange(0.02, 0.026)))
-	println(FloatToString(RandFloatRange(0.02, 0.026)))
+	println(FloatToString(RandFloatRange(50, 180)))
+	//println(FloatToString(RandFloatRange(0.02, 0.026)))
+	//println(FloatToString(RandFloatRange(0.02, 0.026)))
+	//println(FloatToString(RandFloatRange(0.02, 0.026)))
+	//println(FloatToString(RandFloatRange(0.02, 0.026)))
 
 }
 
@@ -124,9 +124,23 @@ func TestRound1(t *testing.T) {
 		{
 			name: "",
 			args: args{
+				150,
+			},
+			want: 150,
+		},
+		{
+			name: "",
+			args: args{
+				150.0223,
+			},
+			want: 150.022,
+		},
+		{
+			name: "",
+			args: args{
 				0.0023214,
 			},
-			want: 0.00232,
+			want: 0.002,
 		},
 		{
 			name: "",
@@ -140,7 +154,7 @@ func TestRound1(t *testing.T) {
 			args: args{
 				0.010204,
 			},
-			want: 0.0102,
+			want: 0.01,
 		},
 	}
 	for _, tt := range tests {

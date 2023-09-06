@@ -18,7 +18,6 @@ import (
 	"github.com/hardstylez72/cry/internal/pay"
 	core "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process"
-	"github.com/hardstylez72/cry/internal/server/access"
 	"github.com/hardstylez72/cry/internal/server/api/v1"
 	"github.com/hardstylez72/cry/internal/server/auth"
 	"github.com/hardstylez72/cry/internal/server/config"
@@ -61,6 +60,7 @@ type (
 		settingsService   *v1.SettingsService
 		swap1inchService  *v1.Swap1inchService
 		orbiterService    *v1.OrbiterService
+		publicService     *v1.PublicService
 
 		processRepository    repository.ProcessRepository
 		flowRepository       repository.FlowRepository
@@ -163,6 +163,9 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 	if err := core.RegisterOrbiterServiceHandler(ctx, mux, conn); err != nil {
 		return err
 	}
+	if err := core.RegisterPublicServiceHandler(ctx, mux, conn); err != nil {
+		return err
+	}
 
 	h := http.Handler(mux)
 
@@ -236,7 +239,7 @@ func ListenGRPC(ctx context.Context, port string, s *services) error {
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			grpc_auth.UnaryServerInterceptor(authMW),
-			grpc_auth.UnaryServerInterceptor(access.Access(s.userRepository)),
+			//grpc_auth.UnaryServerInterceptor(access.Access(s.userRepository)),
 			otelgrpc.UnaryServerInterceptor(),
 		)),
 	)
@@ -249,6 +252,7 @@ func ListenGRPC(ctx context.Context, port string, s *services) error {
 	core.RegisterSettingsServiceServer(server, s.settingsService)
 	core.RegisterSwap1InchServiceServer(server, s.swap1inchService)
 	core.RegisterOrbiterServiceServer(server, s.orbiterService)
+	core.RegisterPublicServiceServer(server, s.publicService)
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -360,6 +364,7 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 		userSettingsService:  settingsService,
 		orbiterService:       v1.NewOrbiterService(orbiterService),
 		statRepository:       statRepository,
+		publicService:        v1.NewPublicService(dispatcher),
 	}, nil
 }
 

@@ -152,7 +152,7 @@ func (t *ZksyncOfficialBridgeToEthereumTask) Withdrawal(ctx context.Context, a *
 	}
 
 	gasStation := GasStation(estimate.EstimatedGasCost, v1.Network_ZKSYNCERA)
-	gas, err := GasManager(gasStation, s.Source, v1.Network_ZKSYNCERA)
+	gas, err := GasManager(gasStation, s.Source, v1.Network_ZKSYNCERA, t.Type())
 	if err != nil {
 		return nil, nil, err
 	}

@@ -131,7 +131,7 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a
 		return nil, err
 	}
 
-	gas, err := GasManager(estimate, s.Source, v1.Network_Etherium)
+	gas, err := GasManager(estimate, s.Source, v1.Network_Etherium, t.Type())
 	if err != nil {
 		return nil, err
 	}

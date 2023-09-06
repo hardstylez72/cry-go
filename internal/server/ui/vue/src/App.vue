@@ -1,16 +1,15 @@
 <template>
   <v-app class="font">
     <v-navigation-drawer
-      v-if="userLoggedIn"
       location="left"
       v-model="drawer"
       :permanent="!isMobile"
     >
-      <v-list-item
-        prepend-avatar="/favicon-32x32.png"
-        :title="userEmail"
-        nav
-        @click="goGeneral"
+      <v-list-item v-if="userLoggedIn"
+                   prepend-avatar="/favicon-32x32.png"
+                   :title="userEmail"
+                   nav
+                   @click="goGeneral"
       >
         <div style="height: 20px; font-size: 14px" v-if="ass">Баланс: {{ ass }}</div>
         <template v-slot:append>
@@ -21,6 +20,12 @@
           ></v-btn>
         </template>
       </v-list-item>
+      <v-list-item v-else class="mx-2 my-2" prepend-avatar="/favicon-32x32.png"
+                   :title="userEmail"
+                   nav
+                   @click="goGeneral">
+        <Login/>
+      </v-list-item>
 
       <v-list-item>
         <v-switch @click="toggleTheme" :label="getTheme()">toggle theme</v-switch>
@@ -29,24 +34,31 @@
       <v-divider/>
 
       <v-list density="compact" height="vh 90" nav="true">
-        <v-list-item prepend-icon="mdi-account-multiple-outline" color="green" title="Профили" value="home"
+        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-account-multiple-outline" color="green" title="Профили"
+                     value="home"
                      @click="$router.push({name: 'Profiles'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-cash-outline" color="green" title="Биржи" value="Withdraw"
+        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-account-cash-outline" color="green" title="Биржи"
+                     value="Withdraw"
                      @click="$router.push({name: 'Withdraw'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-account-hard-hat-outline" color="green" title="Конструктор" value="Constructor"
+        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-account-hard-hat-outline" color="green" title="Конструктор"
+                     value="Constructor"
                      @click="$router.push({name: 'Constructor'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-blender-outline" color="green" title="Процессы" value="Processes"
+        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-blender-outline" color="green" title="Процессы"
+                     value="Processes"
                      @click="$router.push({name: 'Processes'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-cog" title="Настройки" color="green" value="Настройки"
+        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-cog" title="Настройки" color="green" value="Настройки"
                      @click="$router.push({name: 'Settings'})"></v-list-item>
-        <v-list-item prepend-icon="mdi-cash-multiple" title="Биллинг" color="green" value="Мани"
+        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-cash-multiple" title="Биллинг" color="green" value="Мани"
                      @click="$router.push({name: 'Billing'})"></v-list-item>
 
+        <v-list-item prepend-icon="mdi-chart-bar" title="Статистика" color="green"
+                     value="Статистика"
+                     @click="$router.push({name: 'Stats'})"></v-list-item>
 
         <div class="h-auto py-4 pl-3">
           <div class="flex-column  justify-start">
 
-            <a href="https://t.me/drop_hunter_alert_bot" target="_blank">
+            <a v-if="userLoggedIn" href="https://t.me/drop_hunter_alert_bot" target="_blank">
               <div style="height: 20px" class="d-inline-flex">
                 <v-img src="/icons/telegram.png"/>
                 <span class="ml-2">Бот</span>
@@ -59,7 +71,7 @@
                 <span class="ml-2">Сообщество</span>
               </div>
             </a>
-            <span class="d-inline-flex">
+            <span v-if="userLoggedIn" class="d-inline-flex">
               <v-icon icon="mdi-email-edit-outline" color="blue"/>
             <Support/>
             </span>
@@ -67,7 +79,7 @@
           </div>
 
 
-          <v-list-item class="d-flex pt-8" style="font-size: 14px">
+          <v-list-item class="d-flex pt-8" style="font-size: 14px" v-if="userLoggedIn">
             <div v-if="impact.top">
               <i>{{ `Статистика за 24 часа` }}
                 <br/>

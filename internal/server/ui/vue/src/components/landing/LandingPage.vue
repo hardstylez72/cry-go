@@ -2,9 +2,6 @@
 
   <v-container>
     <NavBar title="Главная">
-      <template v-slot:default>
-        <Login v-if="!userLoggedIn"/>
-      </template>
     </NavBar>
 
     <h2 class="text-center text-h4 font-weight-bold text-blue-darken-2 my-5">

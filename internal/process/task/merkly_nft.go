@@ -190,7 +190,7 @@ func MerklyMintNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMintA
 	if estimateOnly {
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, s.Source, p.FromNetwork)
+		gas, err := GasManager(estimation, s.Source, p.FromNetwork, v1.TaskType_MerklyMintAndBridgeNFT)
 		if err != nil {
 			return nil, nil, nil, nil, err
 		}
@@ -234,7 +234,7 @@ func MerklyBridgeNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMin
 	if estimateOnly {
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, s.Source, p.FromNetwork)
+		gas, err := GasManager(estimation, s.Source, p.FromNetwork, v1.TaskType_MerklyMintAndBridgeNFT)
 		if err != nil {
 			return nil, nil, err
 		}

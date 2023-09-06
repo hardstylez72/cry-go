@@ -87,7 +87,7 @@ func (t *OrbiterBridgeTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 			return nil, err
 		}
 
-		gas, err := GasManager(estimation, s.Source, p.FromNetwork)
+		gas, err := GasManager(estimation, s.Source, p.FromNetwork, t.Type())
 		if err != nil {
 			return nil, err
 		}
@@ -143,7 +143,7 @@ func EstimateOrbiterBridgeCost(ctx context.Context, orbiterService *orbiter.Serv
 	if err != nil {
 		return nil, err
 	}
-	
+
 	b, err := swapper.GetBalance(ctx, &defi.GetBalanceReq{WalletAddress: profile.Addr, Token: p.FromToken})
 	if err != nil {
 		return nil, err

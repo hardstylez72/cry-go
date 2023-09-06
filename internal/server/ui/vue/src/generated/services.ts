@@ -16,18 +16,8 @@ import {serviceOptions as so4, ProcessService} from './process'
 import {serviceOptions as so5, SettingsService} from './settings'
 import {serviceOptions as so6, Swap1InchService} from './swap1inch'
 import {serviceOptions as so7, OrbiterService} from './orbiter'
+import {serviceOptions as so8, PublicService} from './public'
 
-
-let ivs = "1234567812345678"
-
-let seceret = ''
-if (import.meta.env.DEV) {
-  seceret = 'jd92mdld93mdlemr'
-  ivs = 'jd42mdlf93mdlemr'
-} else {
-  seceret = ['ZEZqACAp3TGYNQHe'][0]
-  ivs = ['Fk2J79xYcZLhhZpM'][0]
-}
 
 export const instance = axios.create({
   baseURL: import.meta.env.DEV ? 'http://localhost:8083/' : '/',
@@ -62,31 +52,6 @@ export const instance = axios.create({
 
 const store = mapActions(useUserStore, ['redirectToGeneralPage'])
 
-
-const encrypt = (str: any, key: string) => {
-  let b = JSON.stringify(str)
-  //@ts-ignore
-  key = CryptoJS.enc.Utf8.parse(key);
-  let iv = CryptoJS.enc.Utf8.parse(ivs);
-  let encrypted = CryptoJS.AES.encrypt(b, key, {
-    iv: iv,
-    padding: CryptoJS.pad.Pkcs7
-  });
-  return encrypted.toString();
-}
-const decrypt = (str: any, key: string) => {
-  //@ts-ignore
-  key = CryptoJS.enc.Utf8.parse(key);
-  let iv = CryptoJS.enc.Utf8.parse(ivs);
-  let encrypted = CryptoJS.AES.decrypt(str.toString(), key, {
-    iv: iv,
-    padding: CryptoJS.pad.Pkcs7
-  });
-  const b = encrypted.toString(CryptoJS.enc.Utf8);
-
-  return JSON.parse(b)
-}
-
 instance.interceptors.response.use(res => {
   return res
 }, err => {
@@ -113,6 +78,7 @@ so4.axios = instance
 so5.axios = instance
 so6.axios = instance
 so7.axios = instance
+so8.axios = instance
 
 
 export const profileService = new ProfileService()
@@ -123,6 +89,7 @@ export const processService = new ProcessService()
 export const settingsService = new SettingsService()
 export const swap1inchService = new Swap1InchService()
 export const orbiterService = new OrbiterService()
+export const publicService = new PublicService()
 
 
 

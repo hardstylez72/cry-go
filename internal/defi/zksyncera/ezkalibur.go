@@ -73,6 +73,7 @@ func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapRe
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.Ezkalibur.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
 
 	} else if req.ToToken == v1.Token_ETH {
@@ -90,8 +91,21 @@ func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapRe
 			Data:         data,
 			Value:        value,
 			ContractAddr: c.Cfg.Ezkalibur.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
 	}
 
 	return nil, errors.New("unsupported input params")
+}
+
+func CalcRate(from, to v1.Token, amIn, amOut *big.Int) *float64 {
+	fam := defi.WeiToToken(amIn, from)
+	tam := defi.WeiToToken(amOut, to)
+
+	ratio, _ := big.NewFloat(0).Quo(tam, fam).Float64()
+
+	if ratio < 1 {
+		ratio = 1 / ratio
+	}
+	return &ratio
 }

@@ -10,25 +10,38 @@ import (
 func Round(v float64, prec int) float64 {
 
 	s := FloatToString(v)
+
+	mainFinish := 0
+
+	for i := range s {
+		if string(s[i]) == "." {
+			mainFinish = i
+			break
+		}
+	}
+
+	if mainFinish == 0 {
+		mainFinish = len(s)
+	}
+
+	base := s[:mainFinish]
+
 	count := 0
 	out := ""
-	for i := range s {
-		if string(s[i]) == "0" || string(s[i]) == "." {
+	for i := mainFinish; i < len(s); i++ {
+		if string(s[i]) == "." {
 			continue
 		}
 		count++
 
 		if count >= prec {
-			out = s[:i+1]
+			out = s[mainFinish : i+1]
 			break
 		}
+
 	}
 
-	if count == 0 {
-		return 0
-	}
-
-	f, _ := StringToFloat(out)
+	f, _ := StringToFloat(base + out)
 	return f
 }
 
@@ -98,7 +111,7 @@ func RoundFloat(v float64, prec int) float64 {
 }
 
 func FloatToString(v float64) string {
-	return strconv.FormatFloat(v, 'f', 6, 64)
+	return strconv.FormatFloat(v, 'g', 10, 64)
 }
 
 func StringToFloat(s string) (float64, error) {

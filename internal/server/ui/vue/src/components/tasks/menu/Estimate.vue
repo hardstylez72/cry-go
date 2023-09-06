@@ -30,7 +30,9 @@
           <div>
             <div><b>gas</b>: {{ getBalance(estimation.gas, true) }}</div>
             <div v-for="d in estimation.details">
-              <b>{{ d.key }}</b> {{ Number(d.value.split(" ")[0]).toPrecision(3) + " " + d.value.split(" ")[1] }}
+
+              <b>{{ d.key }}: </b>
+              <span>{{ Number(d.value.split(" ")[0]).toPrecision(3) + " " + d.value.split(" ")[1] || '' }}</span>
             </div>
             <div><b>gas limit</b>: {{ getBalance(estimation.gasLimit, false) }}</div>
             <div><b>gas price</b>: {{ getBalance(estimation.gasPrice, false) }}</div>

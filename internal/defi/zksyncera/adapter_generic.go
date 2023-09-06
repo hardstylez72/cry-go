@@ -57,10 +57,14 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 	}
 
 	result.ECost = estimate
+	if txData.Rate != nil && req.ExchangeRate != nil {
+		result.ECost.Details = append(result.ECost.Details, bozdo.NewSwapRateRatio(*req.ExchangeRate, *txData.Rate))
+	}
 
 	if req.EstimateOnly {
 		return result, nil
 	}
+	result.TxDetails = result.ECost.Details
 
 	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {

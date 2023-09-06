@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/hardstylez72/cry/internal/server/user"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -18,6 +19,11 @@ var (
 )
 
 func AuthGRPC(ctx context.Context) (context.Context, error) {
+
+	stream := grpc.ServerTransportStreamFromContext(ctx)
+	if strings.Contains(stream.Method(), "/public.publicService/") {
+		return ctx, nil
+	}
 
 	token, err := GetToken(ctx)
 	if err != nil {
