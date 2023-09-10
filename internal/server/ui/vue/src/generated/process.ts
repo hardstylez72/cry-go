@@ -1457,5 +1457,6 @@ export enum Token {
   'MAV' = 'MAV',
   'SPACE' = 'SPACE',
   'VC' = 'VC',
-  'IZI' = 'IZI'
+  'IZI' = 'IZI',
+  'USDCBridged' = 'USDCBridged'
 }

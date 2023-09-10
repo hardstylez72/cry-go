@@ -20,11 +20,12 @@ const (
 
 // https://arbiscan.io/tokens?p=1
 var TokenAddress = map[defi.Token]common.Address{
-	v1.Token_USDT:  common.HexToAddress("0x94b008aa00579c1307b0ef2c499ad98a8ce58e58"),
-	v1.Token_STG:   common.HexToAddress("0x296F55F8Fb28E498B858d0BcDA06D955B2Cb3f97"),
-	v1.Token_USDC:  common.HexToAddress("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"),
-	v1.Token_veSTG: common.HexToAddress("0xB0D502E938ed5f4df2E681fE6E419ff29631d62b"),
-	v1.Token_ETH:   common.HexToAddress("0x0000000000000000000000000000000000000000"),
+	v1.Token_USDT:        common.HexToAddress("0x94b008aa00579c1307b0ef2c499ad98a8ce58e58"),
+	v1.Token_STG:         common.HexToAddress("0x296F55F8Fb28E498B858d0BcDA06D955B2Cb3f97"),
+	v1.Token_USDCBridged: common.HexToAddress("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"),
+	v1.Token_USDC:        common.HexToAddress("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"),
+	v1.Token_veSTG:       common.HexToAddress("0xB0D502E938ed5f4df2E681fE6E419ff29631d62b"),
+	v1.Token_ETH:         common.HexToAddress("0x0000000000000000000000000000000000000000"),
 }
 
 var Dict = defi.Dict{
@@ -60,7 +61,7 @@ func NewClient(c *ClientConfig) (*Client, error) {
 	ethcli, err := defi.NewEVMClient(&defi.ClientConfig{
 		Network:   v1.Network_OPTIMISM,
 		MainToken: v1.Token_ETH,
-		MainNet:   c.RPCEndpoint,
+		MainNet:   defi.ResolveANKR(c.RPCEndpoint),
 		TokenMap:  TokenAddress,
 		Dict:      &Dict,
 		Httpcli:   config.HttpCli,

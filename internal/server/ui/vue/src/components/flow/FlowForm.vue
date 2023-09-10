@@ -1,7 +1,8 @@
 <template>
   <v-row class="mx-5">
-    <v-col cols="5" v-if="!isMobile">
-      <v-card style="position: fixed; font-size: 18px; width: 30%" class="px-1 py-1">
+    <v-col cols="5" v-if="!isMobile"
+           style="float: left; font-size: 18px; width: 30%; overflow: auto; box-sizing: border-box;">
+      <v-card class="px-1 py-1">
         Сценарий
         <draggable
           v-model="tasks"
@@ -14,7 +15,7 @@
           class="list-group"
         >
           <template #item="{element}">
-            <div class="handle my-2 elevation-1 py-1 px-1" style="cursor: pointer">
+            <div class="handle my-2 elevation-1 py-1 px-1" style="cursor: pointer; height: 50px;">
               <a style="text-decoration: none; color: black" :href="`#${element.weight}`">
                 <div class="d-inline-flex">
                   {{ element.weight }})
@@ -54,23 +55,17 @@
       </v-card>
     </v-col>
 
-    <v-col>
-      <v-row>
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field
-            ref="label-input"
-            v-model="label"
-            label="label"
-            density="comfortable"
-            variant="outlined"
-            :rules="labelRules()"
-            @input="labelChanged"
-            :disabled="disable"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-
-
+    <v-col style="float: right; font-size: 18px; width: 30%; overflow-y: scroll">
+      <v-text-field
+        ref="label-input"
+        v-model="label"
+        label="label"
+        density="comfortable"
+        variant="outlined"
+        :rules="labelRules()"
+        @input="labelChanged"
+        :disabled="disable"
+      ></v-text-field>
       <draggable
         v-model="tasks"
         @start="drag=true"
@@ -420,10 +415,6 @@ export default defineComponent({
 
 
 <style>
-.ghost {
-  opacity: 0.7;
-  background: #c8ebfb;
-}
 
 </style>
 

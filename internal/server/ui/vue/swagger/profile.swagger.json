@@ -1142,7 +1142,8 @@
         "MAV",
         "SPACE",
         "VC",
-        "IZI"
+        "IZI",
+        "USDCBridged"
       ],
       "default": "USDT"
     },

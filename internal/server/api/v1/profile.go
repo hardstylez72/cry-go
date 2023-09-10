@@ -256,6 +256,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 	tokens := []v1.Token{
 		v1.Token_USDT,
 		v1.Token_USDC,
+		v1.Token_USDCBridged,
 		v1.Token_ETH,
 		v1.Token_STG,
 		v1.Token_WETH,
@@ -293,6 +294,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 
 	cli, err := uniclient.NewBaseClient(req.Network, &uniclient.BaseClientConfig{
 		RPCEndpoint: stgs.RpcEndpoint,
+		ProxyString: p.GetProxy(),
 	})
 	if err != nil {
 		return nil, err

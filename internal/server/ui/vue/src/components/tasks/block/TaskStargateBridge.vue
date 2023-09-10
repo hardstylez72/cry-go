@@ -147,10 +147,10 @@ export default defineComponent({
         // from ARBITRUM
         tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.ETH, Token.ETH),
         tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.STG, Token.STG),
-        tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.USDCBridged, Token.USDCBridged),
 
         tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.STG, Token.STG),
-        tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDCBridged, Token.USDC),
         tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDT, Token.USDT),
 
         tokenBridgePair(Network.ARBITRUM, Network.BinanaceBNB, Token.STG, Token.STG),
@@ -158,7 +158,7 @@ export default defineComponent({
 
         tokenBridgePair(Network.ARBITRUM, Network.AVALANCHE, Token.STG, Token.STG),
         tokenBridgePair(Network.ARBITRUM, Network.AVALANCHE, Token.USDT, Token.USDT),
-        tokenBridgePair(Network.ARBITRUM, Network.AVALANCHE, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.ARBITRUM, Network.AVALANCHE, Token.USDCBridged, Token.USDC),
 
         // from BinanaceBNB
         tokenBridgePair(Network.BinanaceBNB, Network.AVALANCHE, Token.STG, Token.STG),
@@ -180,13 +180,13 @@ export default defineComponent({
         tokenBridgePair(Network.OPTIMISM, Network.BinanaceBNB, Token.STG, Token.STG),
 
         tokenBridgePair(Network.OPTIMISM, Network.AVALANCHE, Token.STG, Token.STG),
-        tokenBridgePair(Network.OPTIMISM, Network.AVALANCHE, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.OPTIMISM, Network.AVALANCHE, Token.USDCBridged, Token.USDC),
 
         tokenBridgePair(Network.OPTIMISM, Network.POLIGON, Token.STG, Token.STG),
-        tokenBridgePair(Network.OPTIMISM, Network.POLIGON, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.OPTIMISM, Network.POLIGON, Token.USDCBridged, Token.USDC),
 
         tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.STG, Token.STG),
-        tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.USDCBridged, Token.USDCBridged),
         tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.ETH, Token.ETH),
 
         // from AVALANCHE

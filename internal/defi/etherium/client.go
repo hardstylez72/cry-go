@@ -57,7 +57,7 @@ func NewClient(c *ClientConfig) (*Client, error) {
 	ethcli, err := defi.NewEVMClient(&defi.ClientConfig{
 		Network:   v1.Network_Etherium,
 		MainToken: v1.Token_ETH,
-		MainNet:   c.RPCEndpoint,
+		MainNet:   defi.ResolveANKR(c.RPCEndpoint),
 		TokenMap:  TokenAddress,
 		Dict:      &Dict,
 		Httpcli:   config.HttpCli,

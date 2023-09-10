@@ -123,3 +123,8 @@ func (c *syncSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq
 		Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 	}, nil
 }
+
+//USDC -> USDT
+//0x0000000000000000000000003355df6d4c9c3035724fd0e3914de96a5a83aaf4
+//0000000000000000000000004a6e7c137a6691d55693ca3bc7e5c698d9d43815
+//0000000000000000000000000000000000000000000000000000000000000002

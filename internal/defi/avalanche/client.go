@@ -58,7 +58,7 @@ func NewClient(c *ClientConfig) (*Client, error) {
 	ethcli, err := defi.NewEVMClient(&defi.ClientConfig{
 		Network:   v1.Network_AVALANCHE,
 		MainToken: v1.Token_AVAX,
-		MainNet:   c.RPCEndpoint,
+		MainNet:   defi.ResolveANKR(c.RPCEndpoint),
 		TokenMap:  TokenAddress,
 		Dict:      &Dict,
 		Httpcli:   config.HttpCli,

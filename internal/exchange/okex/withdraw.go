@@ -24,16 +24,21 @@ func (s *Service) Currency(ctx context.Context, ccy string) (responses.GetCurren
 }
 func (s *Service) Withdraw(ctx context.Context, req *exchange.WithdrawRequest) (*exchange.WithdrawResponse, error) {
 
-	ccy, err := s.Currency(ctx, req.Token)
-	if err != nil {
-		return nil, errors.Wrap(err, "s.Currency")
-	}
+	maxTry := 5
+	try := 0
+	fee := "0"
+	for try < maxTry {
+		try++
+		ccy, err := s.Currency(ctx, req.Token)
+		if err != nil {
+			continue
+		}
 
-	var fee string
-	for _, c := range ccy.Currencies {
-		if c.Ccy == req.Token && req.Network == c.Chain {
-			fee = c.MinFee
-			break
+		for _, c := range ccy.Currencies {
+			if c.Ccy == req.Token && req.Network == c.Chain {
+				fee = c.MinFee
+				break
+			}
 		}
 	}
 

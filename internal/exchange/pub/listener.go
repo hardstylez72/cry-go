@@ -89,7 +89,7 @@ func (l *Listener) GetData() (*Pairs, error) {
 	}
 
 	wg := sync.WaitGroup{}
-	wg.Add(2)
+	wg.Add(3)
 
 	go func() {
 		defer wg.Done()
@@ -104,6 +104,14 @@ func (l *Listener) GetData() (*Pairs, error) {
 		rate, err := l.cli.GetPairRate(ctx, "ETHUSDT")
 		if err == nil {
 			exchangeRateMap.Set(key(v1.Token_ETH, v1.Token_USDT), rate)
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		rate, err := l.cli.GetPairRate(ctx, "USDCUSDT")
+		if err == nil {
+			exchangeRateMap.Set(key(v1.Token_USDC, v1.Token_USDT), rate)
 		}
 	}()
 

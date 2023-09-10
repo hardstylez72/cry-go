@@ -71,6 +71,9 @@ export default class SyncSwap extends DefaultSwapTask {
 
     tokenSwapPair(Token.ETH, Token.MUTE),
     tokenSwapPair(Token.MUTE, Token.ETH),
+
+    tokenSwapPair(Token.USDT, Token.USDC),
+    tokenSwapPair(Token.USDC, Token.USDT),
   ]
 
   created() {

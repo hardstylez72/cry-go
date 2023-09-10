@@ -38,6 +38,7 @@ enum Token {
   SPACE = 13;
   VC = 14;
   IZI = 15;
+  USDCBridged = 16;
 }
 
 enum ProcessStatus {

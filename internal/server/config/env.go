@@ -43,6 +43,8 @@ type (
 
 		TestEVMWalletId      string
 		TestStarkNetWalletId string
+
+		AnkrToken string
 	}
 
 	App struct {
@@ -122,6 +124,7 @@ func Load() (*Config, error) {
 		Standalone:           mayenv("STANDALONE", "false") == "true",
 		TestEVMWalletId:      mustenv("TEST_EVM_WALLET_ID"),
 		TestStarkNetWalletId: mustenv("TEST_STARKNET_WALLET_ID"),
+		AnkrToken:            mustenv("ANKR_TOKEN"),
 	}
 
 	CFG = c

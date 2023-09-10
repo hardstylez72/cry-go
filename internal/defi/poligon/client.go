@@ -59,7 +59,7 @@ func NewClient(c *ClientConfig) (*Client, error) {
 	ethcli, err := defi.NewEVMClient(&defi.ClientConfig{
 		Network:   v1.Network_POLIGON,
 		MainToken: v1.Token_MATIC,
-		MainNet:   c.RPCEndpoint,
+		MainNet:   defi.ResolveANKR(c.RPCEndpoint),
 		TokenMap:  TokenAddress,
 		Dict:      &Dict,
 		Httpcli:   config.HttpCli,
