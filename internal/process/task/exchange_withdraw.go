@@ -121,7 +121,7 @@ func (t *WithdrawExchange) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 		p.WithdrawAddr = &profile.Addr
 	}
 
-	if p.SendAllCoins != nil && *p.SendAllCoins {
+	if *p.SendAllCoins {
 		b, err := exchangeWithdrawer.GetBalance(ctx, p.Token)
 		if err != nil {
 			return nil, errors.Wrap(err, "exchangeWithdrawer.GetBalance")

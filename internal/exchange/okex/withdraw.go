@@ -26,8 +26,8 @@ func (s *Service) Withdraw(ctx context.Context, req *exchange.WithdrawRequest) (
 
 	maxTry := 5
 	try := 0
-	fee := "0"
-	for try < maxTry {
+	fee := "-1"
+	for try < maxTry && fee == "-1" {
 		try++
 		ccy, err := s.Currency(ctx, req.Token)
 		if err != nil {

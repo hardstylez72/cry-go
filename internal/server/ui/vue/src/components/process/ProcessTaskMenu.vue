@@ -2,7 +2,7 @@
   <v-menu
     v-model="menu"
     persistent
-    width="365px"
+    width="385px"
     :close-on-back="false"
     :close-on-content-click="false"
   >
@@ -81,7 +81,7 @@
 
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
-          <Support :process-id="processId" :task-id="task.id"/>
+          <Support :process-id="processId" :task-id="task.id" btn-text="Проблема" :skip-title="true"/>
           <v-btn v-if="errorHappen(task)" @click="retry(task, ppId)" :loading="retryLoading">Retry</v-btn>
           <v-btn v-if="skipable()" @click="skip(task, ppId)" :loading="skippingTask">Skip</v-btn>
           <EstimateTask v-if="estimatedTaskMap.get(task.task.taskType)" :task-id="task.id" :profile-id="profileId"
@@ -103,7 +103,7 @@ import {Delay, formatTime, GetStatusColor, GetStatusText} from "@/components/hel
 import dayjs from "dayjs";
 import {estimatedTaskMap, menuTaskComponentMap, TaskArg, taskProps, TaskSpec} from '@/components/tasks/tasks'
 import EstimateTask from "@/components/tasks/menu/Estimate.vue";
-import Support from "@/components/Support.vue";
+import Support from "@/components/issue/Support.vue";
 
 export default defineComponent({
   name: "ProcessTaskMenu",

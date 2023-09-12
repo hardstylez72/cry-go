@@ -134,7 +134,7 @@ type Client struct {
 }
 
 func (c *Client) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Set("User-Agent", c.UserAgentHeader)
+	//req.Header.Set("User-Agent", c.UserAgentHeader)
 	return c.source.RoundTrip(req)
 }
 

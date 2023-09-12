@@ -18,8 +18,7 @@ import (
 )
 
 const (
-	MainNetURL = "https://rpc.ankr.com/zksync_era" // mainnet
-	TestNetURL = "https://testnet.era.zksync.dev"
+	MainNetURL = "https://mainnet.era.zksync.io" // mainnet
 )
 
 var ZEROADDR = common.HexToAddress("0x0000000000000000000000000000000000000000")
@@ -108,65 +107,6 @@ func TxTestNetViewer(txId string) string {
 
 var DefaultDeadLine = func() *big.Int {
 	return new(big.Int).SetInt64(time.Now().Add(time.Second * 20).Unix())
-}
-
-func NewTestNetClient(c *ClientConfig) (*Client, error) {
-
-	syncSwap := SyncSwap{
-		RouterSwap:         common.HexToAddress("0xB3b7fCbb8Db37bC6f572634299A58f51622A847e"), // staging
-		ClassicPoolFactory: common.HexToAddress("0xf2FD2bc2fBC12842aAb6FbB8b1159a6a83E72006"), // staging
-	}
-
-	var TokenAddress = map[v1.Token]common.Address{
-		v1.Token_ETH:  common.HexToAddress("0x20b28b1e4665fff290650586ad76e977eab90c5d"), // staging
-		v1.Token_USDC: common.HexToAddress("0x0faF6df7054946141266420b43783387A78d82A9"), //staging
-	}
-	muteio := Muteio{
-		RouterSwap: common.HexToAddress(""),
-	}
-
-	maverick := Maverick{
-		Router: common.HexToAddress(""),
-	}
-
-	spaceFI := SpaceFI{
-		Router: common.HexToAddress(""),
-	}
-
-	velocore := Velocore{
-		Router: common.HexToAddress(""),
-	}
-
-	izumi := IZUMI{
-		Router: common.HexToAddress(""),
-	}
-
-	vesync := VeSync{
-		Router: common.HexToAddress(""),
-	}
-	ezkalibur := Ezkalibur{
-		Router: common.HexToAddress(""),
-	}
-
-	ZkSwap := ZkSwap{
-		Router: common.HexToAddress(""),
-	}
-	return newClient(
-		c,
-		syncSwap,
-		TokenAddress,
-		TxTestNetViewer,
-		v1.Network_ZKSYNCERATESTNET,
-		scan.NewTestNetService(),
-		muteio,
-		maverick,
-		spaceFI,
-		velocore,
-		izumi,
-		vesync,
-		ezkalibur,
-		ZkSwap,
-	)
 }
 
 func NewMainNetClient(c *ClientConfig) (*Client, error) {

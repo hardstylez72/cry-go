@@ -8,7 +8,7 @@ import (
 )
 
 func Round(v float64, prec int) float64 {
-
+	
 	s := FloatToString(v)
 
 	mainFinish := 0
@@ -43,6 +43,23 @@ func Round(v float64, prec int) float64 {
 
 	f, _ := StringToFloat(base + out)
 	return f
+}
+
+func Precision(v float64) int {
+
+	s := FloatToString(v)
+	mainFinish := 0
+	count := 0
+	for i := range s {
+		if mainFinish != 0 {
+			count++
+		}
+		if string(s[i]) == "." && mainFinish == 0 {
+			mainFinish = i
+		}
+	}
+
+	return count
 }
 
 func roundFloat(val float64, precision uint) float64 {

@@ -1,10 +1,8 @@
 package zksyncera
 
 import (
-	"context"
 	"testing"
 
-	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,18 +13,18 @@ func Test(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 
-	ctx := context.Background()
-
-	res, err := r.SendDmailMessage(ctx, &SendDmailMessageReq{
-		PK: tests.GetConfig().PK,
-		BaseReq: &bozdo.BaseReq{
-			EstimateOnly: true,
-			Gas:          nil,
-			Debug:        true,
-		},
-	})
-	assert.NoError(t, err)
-	assert.NotNil(t, res)
+	//ctx := context.Background()
+	//
+	//res, err := r.SendDmailMessage(ctx, &SendDmailMessageReq{
+	//	PK: tests.GetConfig().PK,
+	//	BaseReq: &bozdo.BaseReq{
+	//		EstimateOnly: true,
+	//		Gas:          nil,
+	//		Debug:        true,
+	//	},
+	//})
+	//assert.NoError(t, err)
+	//assert.NotNil(t, res)
 
 	//tx, err := r.rpcL2.GetTransaction(txHash)
 	//

@@ -105,3 +105,13 @@ codegen({
   fileName: 'public.ts'
 });
 
+codegen({
+  methodNameMode: 'operationId',
+  source: require(path.resolve(__dirname, 'swagger/issue.swagger.json')),
+  outputDir: path.resolve(__dirname, 'src/generated/'),
+  useCustomerRequestInstance: true,
+  serviceNameSuffix: '',
+  useStaticMethod: false,
+  include: ['*'],
+  fileName: 'issue.ts'
+});

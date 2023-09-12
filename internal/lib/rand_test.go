@@ -19,8 +19,8 @@ func Test_randFloatRange(t *testing.T) {
 		{
 			name: "",
 			args: args{
-				min: 0.01,
-				max: 0.02,
+				min: 0.00001,
+				max: 0.00002,
 			},
 			want: 0,
 		},

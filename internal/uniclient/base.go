@@ -45,8 +45,6 @@ func NewBaseClient(network v1.Network, c *BaseClientConfig) (defi.Networker, err
 		cli, err = avalanche.NewClient(&avalanche.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_ZKSYNCERA:
 		cli, err = zksyncera.NewMainNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
-	case v1.Network_ZKSYNCERATESTNET:
-		cli, err = zksyncera.NewTestNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_ZKSYNCLITE:
 		cli, err = zksynclite.NewClient(&zksynclite.Config{HttpCli: proxy.Cli, RPCETHURL: c.RPCEndpoint})
 	case v1.Network_StarkNet:

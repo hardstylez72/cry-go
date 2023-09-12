@@ -61,6 +61,7 @@ type (
 		swap1inchService  *v1.Swap1inchService
 		orbiterService    *v1.OrbiterService
 		publicService     *v1.PublicService
+		issueService      *v1.IssueService
 
 		processRepository    repository.ProcessRepository
 		flowRepository       repository.FlowRepository
@@ -69,7 +70,9 @@ type (
 		withdrawerRepository repository.WithdrawerRepository
 		userRepository       repository.UserRepository
 		statRepository       repository.StatRepository
-		userSettingsService  *settings.Service
+		issueRepository      repository.IssueRepository
+
+		userSettingsService *settings.Service
 
 		dispatcher *process.Dispatcher
 
@@ -166,6 +169,9 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 	if err := core.RegisterPublicServiceHandler(ctx, mux, conn); err != nil {
 		return err
 	}
+	if err := core.RegisterIssueServiceHandler(ctx, mux, conn); err != nil {
+		return err
+	}
 
 	h := http.Handler(mux)
 
@@ -253,6 +259,7 @@ func ListenGRPC(ctx context.Context, port string, s *services) error {
 	core.RegisterSwap1InchServiceServer(server, s.swap1inchService)
 	core.RegisterOrbiterServiceServer(server, s.orbiterService)
 	core.RegisterPublicServiceServer(server, s.publicService)
+	core.RegisterIssueServiceServer(server, s.issueService)
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -307,6 +314,7 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 	profileRepository := repository.NewProfileRepositoryCrypto(repository.ProfileRepository(rep), userRepository, cfg.Lazanya)
 	settingsRepository := repository.SettingsRepository(rep)
 	settingsService := settings.NewService(settingsRepository)
+	issueRepository := repository.NewIssueRepository(mconn)
 	withdrawerRepository := repository.NewWithdrawerRepositoryCrypto(repository.WithdrawerRepository(rep), userRepository, cfg.Lazanya)
 
 	tgBot, err := tg.NewBot(ctx, &tg.Config{
@@ -345,6 +353,8 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 	)
 	go dispatcher.RunDispatcher(ctx)
 
+	issueService := v1.NewIssueService(issueRepository, processRepository)
+
 	return &services{
 		profileService:       v1.NewProfileService(profileRepository, settingsService, starknetNewClient),
 		helperService:        v1.NewHelperService(settingsService, profileRepository, userRepository, payService, statRepository, processRepository, tgBot, starknetNewClient),
@@ -353,18 +363,20 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 		processService:       v1.NewProcessService(processRepository, dispatcher, flowRepository, settingsService),
 		settingsService:      v1.NewSettingsService(settingsService),
 		swap1inchService:     v1.NewSwap1inchService(),
+		orbiterService:       v1.NewOrbiterService(orbiterService),
+		publicService:        v1.NewPublicService(dispatcher),
+		issueService:         issueService,
 		processRepository:    processRepository,
 		flowRepository:       flowRepository,
 		profileRepository:    profileRepository,
 		settingsRepository:   settingsRepository,
 		withdrawerRepository: withdrawerRepository,
 		userRepository:       userRepository,
+		statRepository:       statRepository,
+		issueRepository:      issueRepository,
+		userSettingsService:  settingsService,
 		dispatcher:           dispatcher,
 		payService:           payService,
-		userSettingsService:  settingsService,
-		orbiterService:       v1.NewOrbiterService(orbiterService),
-		statRepository:       statRepository,
-		publicService:        v1.NewPublicService(dispatcher),
 	}, nil
 }
 

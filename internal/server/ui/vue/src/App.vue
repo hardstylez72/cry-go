@@ -55,6 +55,10 @@
                      value="Статистика"
                      @click="$router.push({name: 'Stats'})"></v-list-item>
 
+        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-lifebuoy" title="Поддержка" color="green"
+                     value="поддержка"
+                     @click="$router.push({name: 'Issues'})"></v-list-item>
+
         <div class="h-auto py-4 pl-3">
           <div class="flex-column  justify-start">
 
@@ -71,10 +75,6 @@
                 <span class="ml-2">Сообщество</span>
               </div>
             </a>
-            <span v-if="userLoggedIn" class="d-inline-flex">
-              <v-icon icon="mdi-email-edit-outline" color="blue"/>
-            <Support/>
-            </span>
 
           </div>
 
@@ -113,7 +113,7 @@ import {mapActions, mapStores} from "pinia";
 import {useUserStore, useSysStore} from "@/plugins/pinia";
 import Snackbar from "@/components/Snackbar.vue";
 import NavBar from "@/components/NavBar.vue";
-import Support from "@/components/Support.vue";
+import Support from "@/components/issue/Support.vue";
 import {ThemeInstance} from 'vuetify'
 import {myCustomLightTheme} from "@/plugins/vuetify";
 

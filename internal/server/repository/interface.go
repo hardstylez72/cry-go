@@ -125,4 +125,5 @@ type Repository interface {
 	UserRepository
 	ProcessRepository
 	StatRepository
+	IssueRepository
 }

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
+	"time"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
-	tt "github.com/ethereum/go-ethereum/core/types"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/orbiter"
@@ -97,16 +98,38 @@ func (c *Client) GetNetworkId() *big.Int {
 }
 
 func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
-	res, err := c.ClientL2.WaitMined(ctx, common.HexToHash(tx))
-	if err != nil {
-		return err
-	}
 
-	if res.Status == tt.ReceiptStatusFailed {
-		return errors.Wrap(defi.ErrTxStatusFailed, "invalid status")
-	}
+	txHash := common.HexToHash(tx)
+	count := 0
+	max := 60
 
-	return nil
+	queryTicker := time.NewTicker(time.Second)
+	defer queryTicker.Stop()
+	for {
+		count++
+		receipt, err := c.ClientL2.TransactionReceipt(ctx, txHash)
+		if err == nil && receipt.BlockNumber != nil {
+			return nil
+		}
+
+		if errors.Is(err, ethereum.NotFound) {
+			if count > max {
+				return defi.ErrTxNotFound
+			}
+			continue
+		}
+
+		if err != nil {
+			return err
+		}
+
+		// Wait for the next round.
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-queryTicker.C:
+		}
+	}
 }
 
 type L1L2BridgeReq struct {

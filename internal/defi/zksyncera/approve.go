@@ -40,7 +40,7 @@ func (c *Client) TokenLimitChecker(ctx context.Context, req *TokenLimitCheckerRe
 	if err != nil {
 		return nil, err
 	}
-	allowed, err := c.TokenAllowed(ctx, &AllowedReq{
+	allowed, err := c.Allowance(ctx, &AllowedReq{
 		Token:       req.Token,
 		WalletAddr:  tx.WalletAddr,
 		SpenderAddr: req.SpenderAddr,
@@ -90,7 +90,7 @@ type AllowedRes struct {
 	Allowance *big.Int
 }
 
-func (c *Client) TokenAllowed(ctx context.Context, req *AllowedReq) (*AllowedRes, error) {
+func (c *Client) Allowance(ctx context.Context, req *AllowedReq) (*AllowedRes, error) {
 	addr, ok := c.Cfg.TokenMap[req.Token]
 	if !ok {
 		return nil, defi.ErrTokenNotSupportedFn(req.Token)

@@ -133,14 +133,14 @@ func TestRound1(t *testing.T) {
 			args: args{
 				150.0223,
 			},
-			want: 150.022,
+			want: 150.0223,
 		},
 		{
 			name: "",
 			args: args{
 				0.0023214,
 			},
-			want: 0.002,
+			want: 0.0023214,
 		},
 		{
 			name: "",
@@ -154,12 +154,50 @@ func TestRound1(t *testing.T) {
 			args: args{
 				0.010204,
 			},
-			want: 0.01,
+			want: 0.010204,
+		},
+		{
+			name: "",
+			args: args{
+				0.00001,
+			},
+			want: 0.00001,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, Round(tt.args.v, 3), "Round(%v)", tt.args.v)
+			assert.Equalf(t, tt.want, Round(tt.args.v), "Round(%v)", tt.args.v)
+		})
+	}
+}
+
+func TestPrecision(t *testing.T) {
+	type args struct {
+		v float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "",
+			args: args{
+				v: 0.001,
+			},
+			want: 3,
+		},
+		{
+			name: "",
+			args: args{
+				v: 100,
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, Precision(tt.args.v), "Precision(%v)", tt.args.v)
 		})
 	}
 }

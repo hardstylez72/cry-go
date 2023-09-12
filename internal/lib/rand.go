@@ -6,8 +6,16 @@ import (
 )
 
 func RandFloatRange(min, max float64) float64 {
+
+	minPrec := Precision(min)
+	maxPrec := Precision(max)
+
+	prec := minPrec
+	if prec < maxPrec {
+		prec = maxPrec
+	}
+
 	randomFloatInRange := randFloatRange(min, max)
-	prec := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(2) + 2
 	return Round(randomFloatInRange, prec)
 }
 

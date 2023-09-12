@@ -71,7 +71,7 @@ func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, n
 					if err := updater.UpdateTask(ctx, task); err != nil {
 						return err
 					}
-					return errors.New("failed to make transaction")
+					return errors.New("transaction not found")
 				}
 				tx.RetryCount++
 				if err := updater.UpdateTask(ctx, task); err != nil {
