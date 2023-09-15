@@ -45,7 +45,7 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 		transactor.WalletAddr,
 		txData.ContractAddr,
 		big.NewInt(0),
-		big.NewInt(0),
+		txData.Gas,
 		txData.Value,
 		txData.Data,
 		nil, nil,
@@ -57,7 +57,9 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 	}
 
 	result.ECost = estimate
+	result.ECost.Details = append(result.ECost.Details, txData.Details...)
 	if txData.Rate != nil && req.ExchangeRate != nil {
+
 		result.ECost.Details = append(result.ECost.Details, bozdo.NewSwapRateRatio(*req.ExchangeRate, *txData.Rate))
 	}
 

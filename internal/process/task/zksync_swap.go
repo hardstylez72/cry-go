@@ -17,6 +17,16 @@ type SyncSwapTask struct {
 	*ZkSyncSwap
 }
 
+func NewOdosSwapTask() *ZkSyncSwap {
+	return NewZkSyncSwapTask(v1.TaskType_OdosSwap, func(a *Input) (*v1.DefaultSwap, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_OdosSwapTask)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_OdosSwapTask) call an ambulance!")
+		}
+		return l.OdosSwapTask, nil
+	})
+}
+
 func NewSyncSwapTask() *ZkSyncSwap {
 	return NewZkSyncSwapTask(v1.TaskType_SyncSwap, func(a *Input) (*v1.DefaultSwap, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_SyncSwapTask)

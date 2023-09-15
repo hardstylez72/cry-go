@@ -16,15 +16,14 @@
         </div>
         <ul>
 
-
           Допустимые варианты ввода:
-          <li> eee5112gd2433f855896002e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa, "123.456.67.89:5436:login:password",
+          <li> 4374d77b231f6ed16f2fc23a6e28706615f852bdaf223685475f7337487ae51d, "123.456.67.89:5436:login:password",
             "profile_1" - все поля заданы
           </li>
-          <li>eee5112gd2433f855896002e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa, "",
+          <li>4374d77b231f6ed16f2fc23a6e28706615f852bdaf223685475f7337487ae51d, "",
             "profile_1" - прокси не задан
           </li>
-          <li>eee5112gd2433f855896002e9cb9c8c1eeb3d8f8dac388d4901dbbf3dec683aa, "", "" - задан только приватный ключ
+          <li>4374d77b231f6ed16f2fc23a6e28706615f852bdaf223685475f7337487ae51d, "", "" - задан только приватный ключ
           </li>
         </ul>
       </div>

@@ -31,6 +31,8 @@ func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1
 		return c.ZkSwap(ctx, req)
 	case v1.TaskType_EzkaliburSwap:
 		return c.EzkaliburSwap(ctx, req)
+	case v1.TaskType_OdosSwap:
+		return c.OdosSwap(ctx, req)
 	default:
 		return nil, errors.New("unsupported task type: " + taskType.String())
 	}

@@ -56,6 +56,10 @@ func (c *Client) Wallet(pk string) (*accounts.Wallet, *WalletTransactor, error) 
 func CreateFunctionCallTransaction(from, to common.Address, gasPrice, gasLimit, value *big.Int, data hexutil.Bytes,
 	customSignature hexutil.Bytes, paymasterParams *types.PaymasterParams) *types.CallMsg {
 
+	if gasLimit == nil {
+		gasLimit = big.NewInt(0)
+	}
+
 	return &types.CallMsg{
 		CallMsg: ethereum.CallMsg{
 			From:       from,

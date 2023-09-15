@@ -46,6 +46,7 @@ enum TaskType {
   StarkNetBridge = 32;
   Dmail = 33;
   StarkNetIdMint = 34;
+  OdosSwap = 35;
 }
 
 

@@ -144,6 +144,9 @@ func (c *izumiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (
 // site 5aea5775959fbc2557cc8789bc1bf90a239d9a91 0007d0 3355df6d4c9c3035724fd0e3914de96a5a83aaf4
 // me	5aea5775959fbc2557cc8789bc1bf90a239d9a91 0007d0 3355df6d4c9c3035724fd0e3914de96a5a83aaf4
 // 5aea5775959fbc2557cc8789bc1bf90a239d9a91 0007d0 16a9494e257703797d747540f01683952547ee5b
+
+// 0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4 00019 0496d88d1efc3e145b7c12d53b78ce5e7eda7a42c
+// 0x496d88d1efc3e145b7c12d53b78ce5e7eda7a42c
 func makeIzumiPath(from, to common.Address, fee *big.Int) []byte {
 
 	feeHex := fmt.Sprintf("%06X", fee.Int64())

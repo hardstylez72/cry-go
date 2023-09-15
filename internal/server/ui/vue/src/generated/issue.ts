@@ -349,6 +349,9 @@ export interface Issue {
 
   /**  */
   status: IssueStatus;
+
+  /**  */
+  my: boolean;
 }
 
 export interface IssueComment {
@@ -407,5 +410,7 @@ export interface IssuesRes {
 export enum IssueStatus {
   'Created' = 'Created',
   'Processing' = 'Processing',
-  'Finished' = 'Finished'
+  'Done' = 'Done',
+  'Deleted' = 'Deleted',
+  'Rejected' = 'Rejected'
 }

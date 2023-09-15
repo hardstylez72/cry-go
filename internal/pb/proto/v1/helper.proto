@@ -234,11 +234,12 @@ message GetUserResponse {
   string task_price = 4;
   repeated task.TaskType payable_tasks = 5;
   repeated task.TaskType nonpayable_tasks = 6;
+  repeated string groups = 7;
 
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id", "email", "funds", "task_price", "payable_tasks", "nonpayable_tasks"]
+      required: ["id", "email", "funds", "task_price", "payable_tasks", "nonpayable_tasks", "groups"]
     }
   };
 }

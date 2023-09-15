@@ -1,4 +1,5 @@
 <template>
+
   <v-expansion-panel @group:selected="loadSettings">
     <v-expansion-panel-title>
       <div class="d-flex align-center ">
@@ -10,69 +11,72 @@
     <v-expansion-panel-text>
       <Loader v-if="loading"/>
       <v-card v-else>
-        <div class="d-flex justify-end">
-          <v-btn v-if="settingsChanged" variant="flat" @click=Update :loading="updating" class="ma-3">Обновить</v-btn>
-          <v-btn @click=Reset variant="flat" :loading="reseting" class="ma-3">Сброс</v-btn>
-        </div>
-
-        <v-card-text>
-          <v-row>
-            <v-col>
-              <v-text-field
-                ref="network-input"
-                v-model="settings.rpcEndpoint"
-                label="rpc endpoint"
-                density="compact"
-                variant="outlined"
-                :disabled="true"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-text-field
-                v-model="settings.id"
-                label="network id"
-                density="compact"
-                variant="outlined"
-                :loading="loading"
-                :disabled="true"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <NetworkGasMultiplier v-model="settings.gasMultiplier"/>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <NetworkMaxGas v-model="settings.maxGas" :network="network.value"/>
-            </v-col>
-          </v-row>
-        </v-card-text>
-
-        <v-list>
-          <div v-for="(task) in taskMap">
-            <v-list-item
-              v-if="slippageAvailable(task[0])"
-              density="compact"
-              variant="plain"
-              class="my-1 my-4"
-              rounded
-              height="auto"
-              elevation="1"
-            >
-              <TaskSettingsC :network="network.value" :task-type="task[0]"
-                             :settings-prop="task[1]"
-                             @updated="taskUpdated"/>
-            </v-list-item>
+        <v-form ref="form">
+          <div class="d-flex justify-end">
+            <v-btn v-if="settingsChanged" variant="flat" @click=Update :loading="updating" class="ma-3">Обновить</v-btn>
+            <v-btn @click=Reset variant="flat" :loading="reseting" class="ma-3">Сброс</v-btn>
           </div>
-        </v-list>
 
+          <v-card-text>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  ref="network-input"
+                  v-model="settings.rpcEndpoint"
+                  label="rpc endpoint"
+                  density="compact"
+                  variant="outlined"
+                  :disabled="true"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="settings.id"
+                  label="network id"
+                  density="compact"
+                  variant="outlined"
+                  :loading="loading"
+                  :disabled="true"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <NetworkGasMultiplier v-model="settings.gasMultiplier"/>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <NetworkMaxGas v-model="settings.maxGas" :network="network.value"/>
+              </v-col>
+            </v-row>
+          </v-card-text>
+
+          <v-list>
+            <div v-for="(task) in taskMap">
+              <v-list-item
+                v-if="slippageAvailable(task[0])"
+                density="compact"
+                variant="plain"
+                class="my-1 my-4"
+                rounded
+                height="auto"
+                elevation="1"
+              >
+                <TaskSettingsC :network="network.value" :task-type="task[0]"
+                               :settings-prop="task[1]"
+                               @updated="taskUpdated"/>
+              </v-list-item>
+            </div>
+          </v-list>
+        </v-form>
       </v-card>
+
     </v-expansion-panel-text>
   </v-expansion-panel>
+
 </template>
 
 <script lang="ts">
@@ -172,8 +176,19 @@ export default defineComponent({
         this.reseting = false
       }
     },
+    async validateForm(): Promise<boolean> {
+      // @ts-ignore попизди мне еще что руки из жопы у меня ага
+      // спасибо китайцам скажи лучше
+      const {valid} = await this["$refs"]['form'].validate()
+
+      return valid
+    },
     async Update() {
       try {
+        if (!await this.validateForm()) {
+          return
+        }
+
         this.updating = true
         this.settings.taskSettings = castTaskSettingsMapObj(this.taskMap)
         const res = await settingsService.settingsServiceUpdateSettings({

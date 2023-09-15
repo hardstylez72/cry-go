@@ -68,6 +68,8 @@ import Dmail from "@/components/tasks/block/Dmail.vue";
 import MenuDmail from "@/components/tasks/menu/MenuDmail.vue";
 import StarkNetId from "@/components/tasks/block/StarkNetId.vue";
 import MenuStarkNetId from "@/components/tasks/menu/MenuStarkNetId.vue";
+import MenuOdosSwap from "@/components/tasks/menu/MenuOdosSwap.vue";
+import OdosSwap from "@/components/tasks/block/OdosSwap.vue";
 
 
 export interface TaskArg {
@@ -812,7 +814,27 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     networks: new Set<Network>([Network.StarkNet]),
     airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
     profileType: new Set([ProfileType.StarkNet])
-  }
+  },
+  OdosSwap: {
+    deprecated: false,
+    canBeEstimated: true,
+    descFn(task) {
+      const p = task.odosSwapTask
+      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+    },
+    component: OdosSwap,
+    menu: MenuOdosSwap,
+    service: {
+      name: 'Odos',
+      link: 'https://app.odos.xyz',
+      img: '/icons/odos.ico',
+      op: 'swap',
+    },
+    job: TaskJob.Swap,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
+  },
 }
 
 export const getFlow = (flow: flow_Flow): string[] => {

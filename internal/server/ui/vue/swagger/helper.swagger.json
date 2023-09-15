@@ -603,6 +603,12 @@
           "items": {
             "$ref": "#/definitions/TaskType"
           }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
@@ -611,7 +617,8 @@
         "funds",
         "taskPrice",
         "payableTasks",
-        "nonpayableTasks"
+        "nonpayableTasks",
+        "groups"
       ]
     },
     "Network": {
@@ -788,7 +795,8 @@
         "ProtossSwap",
         "StarkNetBridge",
         "Dmail",
-        "StarkNetIdMint"
+        "StarkNetIdMint",
+        "OdosSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

@@ -186,7 +186,8 @@
         "ProtossSwap",
         "StarkNetBridge",
         "Dmail",
-        "StarkNetIdMint"
+        "StarkNetIdMint",
+        "OdosSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

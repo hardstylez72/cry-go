@@ -478,6 +478,9 @@ export interface GetUserResponse {
 
   /**  */
   nonpayableTasks: TaskType[];
+
+  /**  */
+  groups: string[];
 }
 
 export interface Order {
@@ -647,5 +650,6 @@ export enum TaskType {
   'ProtossSwap' = 'ProtossSwap',
   'StarkNetBridge' = 'StarkNetBridge',
   'Dmail' = 'Dmail',
-  'StarkNetIdMint' = 'StarkNetIdMint'
+  'StarkNetIdMint' = 'StarkNetIdMint',
+  'OdosSwap' = 'OdosSwap'
 }

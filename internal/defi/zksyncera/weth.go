@@ -155,8 +155,17 @@ func (c *Client) Make712Tx(ctx context.Context, tx *types.CallMsg, gasOpt *bozdo
 
 		gasPrice = bozdo.BigIntSum(header.BaseFee, tip)
 		tx.GasFeeCap = gasPrice
-		gasLimit, err := c.ClientL2.EstimateGasL2(ctx, *tx)
-		gas = big.NewInt(0).SetUint64(gasLimit)
+
+		if tx.Gas == 0 {
+			gasLimit, err := c.ClientL2.EstimateGasL2(ctx, *tx)
+			if err != nil {
+				return nil, nil, errors.Wrap(err, "ClientL2.EstimateGasL2")
+			}
+			gas = big.NewInt(0).SetUint64(gasLimit)
+		} else {
+			gas = big.NewInt(0).SetUint64(tx.Gas)
+		}
+
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to EstimateGas: %w", err)
 		}

@@ -3,6 +3,7 @@ package defi
 import (
 	"math/big"
 
+	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
@@ -21,36 +22,30 @@ const (
 	SlippagePercentZero SlippagePercent = "0"
 )
 
-func Slippage(v *big.Int, slippagePercent SlippagePercent) (*big.Int, error) {
-	switch slippagePercent {
-	case SlippagePercentZero:
-		return v, nil
-	case SlippagePercent05:
-		prec := big.NewInt(0).Div(v, big.NewInt(1000))
-		return big.NewInt(0).Mul(prec, big.NewInt(995)), nil
-	case SlippagePercent01:
-		prec := big.NewInt(0).Div(v, big.NewInt(1000))
-		return big.NewInt(0).Mul(prec, big.NewInt(999)), nil
-	case SlippagePercent001:
-		prec := big.NewInt(0).Div(v, big.NewInt(10000))
-		return big.NewInt(0).Mul(prec, big.NewInt(9999)), nil
-	case SlippagePercent02:
-		prec := big.NewInt(0).Div(v, big.NewInt(10000))
-		return big.NewInt(0).Mul(prec, big.NewInt(9998)), nil
-	case SlippagePercent03:
-		prec := big.NewInt(0).Div(v, big.NewInt(10000))
-		return big.NewInt(0).Mul(prec, big.NewInt(9997)), nil
-	case SlippagePercent1:
-		prec := big.NewInt(0).Div(v, big.NewInt(100))
-		return big.NewInt(0).Mul(prec, big.NewInt(99)), nil
-	case SlippagePercent2:
-		prec := big.NewInt(0).Div(v, big.NewInt(100))
-		return big.NewInt(0).Mul(prec, big.NewInt(98)), nil
-	case SlippagePercent5:
-		prec := big.NewInt(0).Div(v, big.NewInt(100))
-		return big.NewInt(0).Mul(prec, big.NewInt(95)), nil
+func slippageSpecial(v *big.Int, s string) (*big.Int, error) {
+	f, err := lib.StringToFloat(s)
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid slippage value: "+s)
 	}
-	return nil, errors.New("invalid slippage: " + string(slippagePercent))
+
+	if f > 100 || f < 0.001 {
+		return nil, errors.New("slippage must be between [0.001:100]")
+	}
+
+	v10 := big.NewInt(0).Mul(v, big.NewInt(10000))
+	f10 := big.NewFloat(0).Mul(big.NewFloat(f), big.NewFloat(10000))
+	i10, _ := f10.Int(nil)
+
+	slippageValue := big.NewInt(0).Mul(v10, i10)
+
+	slippageValue = big.NewInt(0).Div(slippageValue, big.NewInt(10e9))
+
+	return big.NewInt(0).Sub(v, slippageValue), nil
+
+}
+
+func Slippage(v *big.Int, slippagePercent SlippagePercent) (*big.Int, error) {
+	return slippageSpecial(v, slippagePercent)
 }
 
 var SlippageMap = map[v1.TaskType]SlippagePercent{
@@ -70,4 +65,5 @@ var SlippageMap = map[v1.TaskType]SlippagePercent{
 	v1.TaskType_JediSwap:       SlippagePercent05,
 	v1.TaskType_MySwap:         SlippagePercent2,
 	v1.TaskType_ProtossSwap:    SlippagePercent2,
+	v1.TaskType_OdosSwap:       SlippagePercent05,
 }

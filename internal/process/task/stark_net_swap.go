@@ -269,22 +269,21 @@ func (h *StarketSwapHalper) Execute(ctx context.Context, profile *halp.Profile, 
 			return nil, nil, errors.Wrap(err, "client.GetBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
-			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balance.WEI)
+			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balanceNative.WEI)
 		}
 	}
 	res, err := client.Swap(ctx, &defi.DefaultSwapReq{
-		Network:         v1.Network_StarkNet,
-		Amount:          am,
-		FromToken:       p.FromToken,
-		ToToken:         p.ToToken,
-		WalletPK:        profile.WalletPK,
-		EstimateOnly:    estimateOnly,
-		Gas:             Gas,
-		Slippage:        getSlippage(s.Source, h.TaskType),
-		Debug:           false,
-		SubType:         profile.SubType,
-		ExchangeRate:    pub.GetExchangeRate(p.FromToken, p.ToToken),
-		UseExchangeRate: false,
+		Network:      v1.Network_StarkNet,
+		Amount:       am,
+		FromToken:    p.FromToken,
+		ToToken:      p.ToToken,
+		WalletPK:     profile.WalletPK,
+		EstimateOnly: estimateOnly,
+		Gas:          Gas,
+		Slippage:     getSlippage(s.Source, h.TaskType),
+		Debug:        false,
+		SubType:      profile.SubType,
+		ExchangeRate: pub.GetExchangeRate(p.FromToken, p.ToToken),
 	}, h.TaskType)
 	if err != nil {
 		return nil, nil, err

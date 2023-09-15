@@ -47,6 +47,11 @@ func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.
 		return nil, err
 	}
 
+	groups, err := user.Groups(ctx, s.userRepository)
+	if err != nil {
+		return nil, err
+	}
+	
 	return &v1.GetUserResponse{
 		Id:              u.Id,
 		Email:           u.Email,
@@ -54,5 +59,6 @@ func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.
 		TaskPrice:       lib.FloatToString(res.GetAccount().GetTaskPrice()),
 		PayableTasks:    task.PayableTasks,
 		NonpayableTasks: task.NonPayableTasks,
+		Groups:          groups.Keys(),
 	}, nil
 }

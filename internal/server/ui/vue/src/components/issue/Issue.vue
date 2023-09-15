@@ -9,12 +9,20 @@
       <v-card elevation="2" class="mx-1 my-1">
         <v-card-title class="d-flex justify-space-between text-break text-pre-wrap">
           <div>
+            <span class="mx-1">  <StatusChip :status="item.status"/></span>
             <b>{{ item.title }}</b>
-            <span class="mx-1"> [{{ item.status }}]</span>
           </div>
           <span class="mx-1"> {{ formatTime(item.createdAt) }}</span>
         </v-card-title>
         <v-card-text>{{ item.description }}</v-card-text>
+        <v-card-actions class="d-flex justify-end align-center">
+          <div style="width: 200px; height: 50px">
+            <v-select v-if="support" :items="statuses" :loading="updating" v-model="status" variant="outlined"
+                      density="compact" label="изменить статус"/>
+          </div>
+
+          <v-btn @click="remove" :loading="removing" v-if="item.my">Удалить</v-btn>
+        </v-card-actions>
       </v-card>
 
       <v-list class="mx-3 my-3">
@@ -43,20 +51,33 @@
 
 import {defineComponent} from 'vue';
 import NavBar from "@/components/NavBar.vue";
-import Login from "@/components/Login.vue";
 import {mapStores} from "pinia";
 import {useUserStore} from "@/plugins/pinia";
 import General from "@/components/landing/modules/General.vue";
-import {Issue, IssueComment} from "@/generated/issue";
+import {Issue, IssueComment, IssueStatus} from "@/generated/issue";
 import {issueService} from "@/generated/services";
 import Support from "@/components/issue/Support.vue";
 import {formatTime} from "../helper";
 import Loader from "@/components/Loader.vue";
 import {required} from "@/components/tasks/menu/helper";
+import StatusChip from "@/components/issue/StatusChip.vue";
 
 export default defineComponent({
   name: "Issues",
   watch: {
+    status: {
+      async handler() {
+        try {
+          this.updating = true
+          await issueService.issueServiceIssueUpdateStatus({body: {status: this.status, issueId: this.issueId}})
+          await this.loadIssues()
+        } catch (e) {
+
+        } finally {
+          this.updating = false
+        }
+      }
+    },
     issueType: {
       handler() {
         this.reset()
@@ -66,15 +87,35 @@ export default defineComponent({
   },
   data() {
     return {
+      status: null as IssueStatus,
+      statuses: [
+        IssueStatus.Created,
+        IssueStatus.Done,
+        IssueStatus.Processing,
+        IssueStatus.Rejected,
+      ],
       listLoading: false,
       item: {} as Issue,
       comments: [] as IssueComment[],
       commentText: '',
       commentLoading: false,
+      removing: false,
+      updating: false,
     }
   },
-  components: {Loader, Support, General, NavBar},
+  components: {Loader, Support, General, NavBar, StatusChip},
   methods: {
+    async remove() {
+      try {
+        this.removing = true
+        await issueService.issueServiceDeleteIssue({body: {issueId: this.issueId}})
+        this.$router.push({name: 'Issues'})
+      } catch (e) {
+
+      } finally {
+        this.removing = false
+      }
+    },
     required,
     async validate(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
@@ -125,7 +166,15 @@ export default defineComponent({
       this.offset = 0;
     }
   },
+
   computed: {
+    IssueStatus() {
+      return IssueStatus
+    },
+    support(): boolean {
+      return this.userStore.support
+    },
+    ...mapStores(useUserStore),
     issueId: {
       get(): string {
         const pId = this.$route.params.id.toString()

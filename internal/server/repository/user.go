@@ -42,6 +42,14 @@ func (r *pgRepository) GetOrCreateUser(ctx context.Context, user *User) (*User, 
 	return &u, false, nil
 }
 
+func (r *pgRepository) GetUserEmail(ctx context.Context, id string) (*string, error) {
+	u, err := r.GetUserById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &u.Email, nil
+}
+
 func (r *pgRepository) GetUserById(ctx context.Context, id string) (*User, error) {
 	q := `select id, email, access from users where id = $1`
 

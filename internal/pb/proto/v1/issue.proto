@@ -11,7 +11,9 @@ option go_package = "grpc/v1";
 enum IssueStatus {
   Created = 0;
   Processing = 1;
-  Finished = 2;
+  Done = 2;
+  Deleted = 3;
+  Rejected = 4;
 
 }
 
@@ -23,9 +25,10 @@ message Issue {
    string title = 5;
    string description = 6;
   IssueStatus status = 7;
+  bool my = 8;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id", "created_at", "created_by", "title", "description", "status"]
+      required: ["id", "created_at", "created_by", "title", "description", "status", "my"]
     }
   };
 }

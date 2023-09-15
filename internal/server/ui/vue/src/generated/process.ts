@@ -1180,6 +1180,9 @@ export interface Task {
 
   /**  */
   starkNetIdMintTask?: SimpleTask;
+
+  /**  */
+  odosSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1438,7 +1441,8 @@ export enum TaskType {
   'ProtossSwap' = 'ProtossSwap',
   'StarkNetBridge' = 'StarkNetBridge',
   'Dmail' = 'Dmail',
-  'StarkNetIdMint' = 'StarkNetIdMint'
+  'StarkNetIdMint' = 'StarkNetIdMint',
+  'OdosSwap' = 'OdosSwap'
 }
 
 export enum Token {

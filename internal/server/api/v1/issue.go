@@ -18,16 +18,22 @@ type IssueService struct {
 	v1.UnimplementedIssueServiceServer
 	r                 repository.IssueRepository
 	processRepository repository.ProcessRepository
+	userRepository    repository.UserRepository
 }
 
-func NewIssueService(r repository.IssueRepository, processRepository repository.ProcessRepository) *IssueService {
+func NewIssueService(r repository.IssueRepository, processRepository repository.ProcessRepository, userRepository repository.UserRepository) *IssueService {
 	return &IssueService{
 		r:                 r,
 		processRepository: processRepository,
+		userRepository:    userRepository,
 	}
 }
 
 func (s *IssueService) Issues(ctx context.Context, req *v1.IssuesReq) (*v1.IssuesRes, error) {
+	userId, err := user.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	tmp, err := s.r.Issues(ctx, &repository.Offset{
 		Limit:  req.Limit,
@@ -47,6 +53,7 @@ func (s *IssueService) Issues(ctx context.Context, req *v1.IssuesReq) (*v1.Issue
 			CreatedBy:   t.CreatorId,
 			Title:       t.Title,
 			Description: t.Description,
+			My:          t.CreatorId == userId,
 		}
 
 		if t.FinishedAt.Valid {
@@ -81,6 +88,7 @@ func (s *IssueService) IssuesUser(ctx context.Context, req *v1.IssuesReq) (*v1.I
 			CreatedBy:   t.CreatorId,
 			Title:       t.Title,
 			Description: t.Description,
+			My:          t.CreatorId == userId,
 		}
 
 		if t.FinishedAt.Valid {
@@ -147,6 +155,11 @@ func (s *IssueService) DeleteIssue(ctx context.Context, req *v1.DeleteIssueReq) 
 }
 
 func (s *IssueService) Issue(ctx context.Context, req *v1.IssueReq) (*v1.IssueRes, error) {
+	userId, err := user.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	t, err := s.r.Issue(ctx, req.Id)
 	if err != nil {
 		return nil, err
@@ -160,6 +173,7 @@ func (s *IssueService) Issue(ctx context.Context, req *v1.IssueReq) (*v1.IssueRe
 		CreatedBy:   t.CreatorId,
 		Title:       t.Title,
 		Description: t.Description,
+		My:          t.CreatorId == userId,
 	}
 
 	if t.FinishedAt.Valid {
@@ -188,7 +202,24 @@ func (s *IssueService) Issue(ctx context.Context, req *v1.IssueReq) (*v1.IssueRe
 	}, nil
 }
 func (s *IssueService) IssueUpdateStatus(ctx context.Context, req *v1.IssueUpdateStatusReq) (*v1.IssueUpdateStatusRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IssueUpdateStatus not implemented")
+	userId, err := user.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	groups, err := user.Groups(ctx, s.userRepository)
+	if err != nil {
+		return nil, err
+	}
+	
+	if !groups.Get(user.GroupSupport) {
+		return nil, status.New(codes.PermissionDenied, "user is not in support group").Err()
+	}
+
+	if err := s.r.UpdateStatus(ctx, req.IssueId, req.Status.String(), userId); err != nil {
+		return nil, err
+	}
+	return &v1.IssueUpdateStatusRes{}, nil
 }
 func (s *IssueService) AddComment(ctx context.Context, req *v1.AddCommentReq) (*v1.AddCommentRes, error) {
 	userId, err := user.GetUserId(ctx)

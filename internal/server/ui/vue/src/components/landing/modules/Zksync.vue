@@ -175,6 +175,14 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Swap (ETH <-> USDC)',
           quest: ''
+        },
+        {
+          name: taskProps.OdosSwap.service.name,
+          link: taskProps.OdosSwap.service.link,
+          img: taskProps.OdosSwap.service.img,
+          status: Status.integrated,
+          action: 'Swap (ETH <-> USDC, USDC <-> USDT)',
+          quest: ''
         }
       ],
       links: [

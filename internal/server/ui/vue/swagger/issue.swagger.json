@@ -378,6 +378,9 @@
         },
         "status": {
           "$ref": "#/definitions/IssueStatus"
+        },
+        "my": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -386,7 +389,8 @@
         "createdBy",
         "title",
         "description",
-        "status"
+        "status",
+        "my"
       ]
     },
     "IssueComment": {
@@ -452,7 +456,9 @@
       "enum": [
         "Created",
         "Processing",
-        "Finished"
+        "Done",
+        "Deleted",
+        "Rejected"
       ],
       "default": "Created"
     },

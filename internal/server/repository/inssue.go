@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/google/uuid"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository/pg"
 	"github.com/jmoiron/sqlx"
 )
@@ -39,7 +41,7 @@ type IssueRepository interface {
 	Issues(ctx context.Context, o *Offset) ([]Issue, error)
 	CreateIssue(ctx context.Context, i *Issue) error
 	DeleteIssue(ctx context.Context, userId, issueId string) error
-	UpdateStatus(ctx context.Context, issueId, status string) error
+	UpdateStatus(ctx context.Context, issueId, status, userId string) error
 	Issue(ctx context.Context, issueId string) (*Issue, error)
 
 	IssueComments(ctx context.Context, issueId string) ([]IssueComment, error)
@@ -84,15 +86,39 @@ func NewIssueRepository(conn *sqlx.DB) *issueRepository {
 	}
 }
 
-func (db *issueRepository) UpdateStatus(ctx context.Context, issueId, status string) error {
-	if _, err := db.conn.ExecContext(ctx, "update issues set status = $1 where id = $2 ", status, issueId); err != nil {
+func (db *issueRepository) UpdateStatus(ctx context.Context, issueId, status, userId string) error {
+
+	tx, err := db.conn.BeginTxx(ctx, nil)
+	if err != nil {
 		return err
 	}
-	return nil
+
+	issue, err := db.Issue(ctx, issueId)
+	if err != nil {
+		return err
+	}
+	i := &IssueComment{
+		Id:          uuid.New().String(),
+		IssueId:     issueId,
+		Description: "Статус изменен: [" + issue.Status + "] -> [" + status + "]",
+		UserId:      userId,
+		CreatedAt:   time.Now(),
+	}
+
+	q := Join("insert into issue_comments (", db.comment.Cols(), `) values (`, db.comment.ColsColon(), ")")
+
+	if _, err := tx.NamedExecContext(ctx, q, i); err != nil {
+		return pg.PgError(err)
+	}
+
+	if _, err := tx.ExecContext(ctx, "update issues set status = $1 where id = $2 ", status, issueId); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 func (db *issueRepository) IssuesByUser(ctx context.Context, userId string, o *Offset) ([]Issue, error) {
-	q := Join(`select `, db.issue.Cols(), ` from issues where creator_id = $1 order by created_at desc`)
+	q := Join(`select `, db.issue.Cols(), ` from issues where creator_id = $1  and deleted_at is null order by created_at desc `)
 	var out []Issue
 	if err := db.conn.SelectContext(ctx, &out, q, userId); err != nil {
 		return nil, err
@@ -101,7 +127,7 @@ func (db *issueRepository) IssuesByUser(ctx context.Context, userId string, o *O
 }
 
 func (db *issueRepository) Issues(ctx context.Context, o *Offset) ([]Issue, error) {
-	q := Join(`select `, db.issue.Cols(), ` from issues order by created_at desc`)
+	q := Join(`select `, db.issue.Cols(), ` from issues where deleted_at is null order by created_at desc  `)
 	var out []Issue
 	if err := db.conn.SelectContext(ctx, &out, q); err != nil {
 		return nil, err
@@ -128,7 +154,8 @@ func (db *issueRepository) CreateIssue(ctx context.Context, i *Issue) error {
 }
 
 func (db *issueRepository) DeleteIssue(ctx context.Context, userId, issueId string) error {
-	if _, err := db.conn.ExecContext(ctx, "delete from issues where id = $1 and creator_id = $2", issueId, userId); err != nil {
+	if _, err := db.conn.ExecContext(ctx, "update issues set deleted_at = now(), status = $3 where id = $1 and creator_id = $2",
+		issueId, userId, v1.IssueStatus_Deleted.String()); err != nil {
 		return err
 	}
 	return nil

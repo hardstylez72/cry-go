@@ -56,18 +56,17 @@ type OrbiterSwapper interface {
 }
 
 type DefaultSwapReq struct {
-	Network         v1.Network
-	Amount          *big.Int
-	FromToken       v1.Token
-	ToToken         v1.Token
-	WalletPK        string
-	EstimateOnly    bool
-	Gas             *bozdo.Gas
-	Slippage        SlippagePercent
-	Debug           bool
-	SubType         v1.ProfileSubType
-	ExchangeRate    *float64
-	UseExchangeRate bool
+	Network      v1.Network
+	Amount       *big.Int
+	FromToken    v1.Token
+	ToToken      v1.Token
+	WalletPK     string
+	EstimateOnly bool
+	Gas          *bozdo.Gas
+	Slippage     SlippagePercent
+	Debug        bool
+	SubType      v1.ProfileSubType
+	ExchangeRate *float64
 }
 
 type DefaultBridgeReq struct {

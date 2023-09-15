@@ -1740,6 +1740,9 @@
         },
         "starkNetIdMintTask": {
           "$ref": "#/definitions/SimpleTask"
+        },
+        "odosSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -1849,7 +1852,8 @@
         "ProtossSwap",
         "StarkNetBridge",
         "Dmail",
-        "StarkNetIdMint"
+        "StarkNetIdMint",
+        "OdosSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

@@ -432,7 +432,10 @@ func (s *ProfileService) GenerateProfiles(ctx context.Context, req *v1.GenerateP
 				return nil, err
 			}
 
-			if _, err := pb.Write([]byte(" pk: " + privateKey + " pub: " + walletAddr.String() + "\n")); err != nil {
+			if _, err := pb.Write([]byte(
+				" pk: " + privateKey +
+					" pub: " + walletAddr.String() +
+					"\n")); err != nil {
 				return nil, err
 			}
 		}

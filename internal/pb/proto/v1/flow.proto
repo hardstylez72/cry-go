@@ -130,6 +130,7 @@ message Task {
     task.LiquidityBridgeTask starkNetBridgeTask = 36;
     task.SimpleTask dmailTask = 37;
     task.SimpleTask starkNetIdMintTask = 38;
+    task.DefaultSwap odosSwapTask = 39;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

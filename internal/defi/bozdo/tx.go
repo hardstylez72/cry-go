@@ -63,6 +63,7 @@ type TxData struct {
 	ContractAddr common.Address
 	Details      []TxDetail
 	Rate         *float64
+	Gas          *big.Int
 }
 
 type BaseReq struct {
@@ -101,6 +102,23 @@ type Gas struct {
 	GasLimit            big.Int
 	GasPrice            big.Int
 	TotalGas            big.Int
+}
+
+func NewOdos(in, out string, network v1.Network, tokenIn, tokenOut v1.Token, priceImpact float64) []TxDetail {
+	return []TxDetail{
+		{
+			Key:   "odosIn",
+			Value: in + " " + tokenIn.String(),
+		},
+		{
+			Key:   "odosOut",
+			Value: out + " " + tokenOut.String(),
+		},
+		{
+			Key:   "odosPriceImpact",
+			Value: lib.FloatToString(priceImpact) + " %",
+		},
+	}
 }
 
 func NewTxFee(s *big.Int, network v1.Network, token v1.Token) TxDetail {

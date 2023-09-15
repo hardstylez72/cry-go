@@ -23,7 +23,8 @@ export const useUserStore = defineStore('user', {
       my: "0",
       top: "0",
       total: "0"
-    }
+    },
+    support: false
   }),
   actions: {
     async redirectToGeneralPage() {
@@ -52,6 +53,9 @@ export const useUserStore = defineStore('user', {
           state.taskPrice = Number(res.taskPrice).toFixed(2) + " USD"
           state.payableTasks = res.payableTasks
           state.nonpayableTasks = res.nonpayableTasks
+          if (res.groups.find(g => g === 'support')) {
+            state.support = true
+          }
         })
       } catch (e) {
         this.$patch((state) => {
@@ -59,6 +63,7 @@ export const useUserStore = defineStore('user', {
           state.email = ''
           state.ass = '0 USD'
           state.taskPrice = '0 USD'
+          state.support = false
         })
 
 

@@ -222,6 +222,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_StarkNetIdMint:
 		p := t.Task.Task.(*v1.Task_StarkNetIdMintTask).StarkNetIdMintTask
 		e, err = task.EstimateMintCost(ctx, p, profile)
+	case v1.TaskType_OdosSwap:
+		p := t.Task.Task.(*v1.Task_OdosSwapTask).OdosSwapTask
+		e, err = task.NewOdosSwapTask().EstimateCost(ctx, profile, p, nil)
 
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
@@ -485,6 +488,7 @@ func (d *Dispatcher) estimateZkSyncSwapRatio(ctx context.Context, t1, t2 v1.Toke
 		task.NewVeSyncSwapTask(),
 		task.NewIzumiSwapTask(),
 		task.NewSpaceFiSwapTask(),
+		task.NewOdosSwapTask(),
 	}
 
 	for _, tasker := range tasks {

@@ -19,6 +19,7 @@ import (
 
 const (
 	MainNetURL = "https://mainnet.era.zksync.io" // mainnet
+	ChainId    = 324
 )
 
 var ZEROADDR = common.HexToAddress("0x0000000000000000000000000000000000000000")
@@ -99,10 +100,6 @@ type ClientConfig struct {
 
 func TxViewer(txId string) string {
 	return "https://explorer.zksync.io/tx/" + txId //mainnet
-}
-
-func TxTestNetViewer(txId string) string {
-	return "https://goerli.explorer.zksync.io/tx/" + txId
 }
 
 var DefaultDeadLine = func() *big.Int {
@@ -216,15 +213,7 @@ func newClient(
 		return nil, errors.Wrap(err, "Failed to connect to ETH: "+c.RPCEndpoint)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
 	clientL2 := clients.NewClient(rpcL2Client)
-	chainId, err := clientL2.ChainID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	clientL1 := ethclient.NewClient(rpcL1Client)
 
 	return &Client{
@@ -232,7 +221,7 @@ func newClient(
 		rpcL1:     rpcL1Client,
 		ClientL2:  clientL2,
 		ClientL1:  clientL1,
-		NetworkId: chainId,
+		NetworkId: big.NewInt(ChainId),
 		Cfg: &Config{
 			Weth:      tm[v1.Token_WETH],
 			Network:   n,
@@ -242,7 +231,7 @@ func newClient(
 			SyncSwap:  syncSwap,
 			Httpcli:   config.HttpCli,
 			TxViewFn:  viewer,
-			networkId: chainId,
+			networkId: big.NewInt(ChainId),
 			Muteio:    Muteio,
 			Maverick:  maverick,
 			SpaceFI:   spaceFI,

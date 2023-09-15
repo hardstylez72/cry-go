@@ -112,6 +112,7 @@ type SettingsRepository interface {
 type UserRepository interface {
 	GetOrCreateUser(ctx context.Context, user *User) (*User, bool, error)
 	GetUserById(ctx context.Context, id string) (*User, error)
+	GetUserEmail(ctx context.Context, id string) (*string, error)
 	SubscribeAlerts(ctx context.Context, email, chatId string) error
 	GetUserTelegramChatId(ctx context.Context, userId string) (*string, error)
 	// todo: unsubscribe alerts

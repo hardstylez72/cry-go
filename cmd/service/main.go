@@ -353,7 +353,7 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 	)
 	go dispatcher.RunDispatcher(ctx)
 
-	issueService := v1.NewIssueService(issueRepository, processRepository)
+	issueService := v1.NewIssueService(issueRepository, processRepository, userRepository)
 
 	return &services{
 		profileService:       v1.NewProfileService(profileRepository, settingsService, starknetNewClient),

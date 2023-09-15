@@ -12,8 +12,6 @@
       <v-radio class="mx-4" value="все">Все</v-radio>
     </v-radio-group>
     <div class="d-flex justify-center">
-
-
       <div class="text-h6"><b>Список заявок</b></div>
     </div>
 
@@ -25,9 +23,9 @@
         Заявки не найдены
       </v-list-item>
       <v-list-item v-else v-for="item in items" elevation="1" :to='`/issue/${item.id}`'>
+        <span class="mx-1"> <StatusChip :status="item.status"/></span>
         <b class="mx-1">{{ item.title }}</b>
         <i class="mx-1">{{ item.description }}</i>
-        <span class="mx-1"> [{{ item.status }}]</span>
         <span class="mx-1"> {{ formatTime(item.createdAt) }}</span>
       </v-list-item>
     </v-list>
@@ -40,15 +38,13 @@
 
 import {defineComponent} from 'vue';
 import NavBar from "@/components/NavBar.vue";
-import Login from "@/components/Login.vue";
-import {mapStores} from "pinia";
-import {useUserStore} from "@/plugins/pinia";
 import General from "@/components/landing/modules/General.vue";
 import {Issue} from "@/generated/issue";
 import {issueService} from "@/generated/services";
 import Support from "@/components/issue/Support.vue";
 import {formatTime} from "../helper";
 import Loader from "@/components/Loader.vue";
+import StatusChip from '@/components/issue/StatusChip.vue'
 
 export default defineComponent({
   name: "Issues",
@@ -60,7 +56,7 @@ export default defineComponent({
       }
     }
   },
-  components: {Loader, Support, General, NavBar},
+  components: {StatusChip, Loader, Support, General, NavBar},
   methods: {
     formatTime,
     issueCreated() {
