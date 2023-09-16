@@ -76,7 +76,7 @@ func (c *EtheriumClient) Transfer(ctx context.Context, r *TransferReq) (*Transfe
 	}
 
 	toto := common.HexToAddress(r.ToAddr)
-	
+
 	tx, err := trx.Transfer(opt, toto, r.Amount)
 	if err != nil {
 		return nil, errors.Wrap(err, "Transfer")
@@ -124,10 +124,6 @@ type TransferMainTokenReq struct {
 }
 
 func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainTokenReq) (*TransferRes, error) {
-	gasPrice, err := c.Cli.SuggestGasPrice(ctx)
-	if err != nil {
-		return nil, err
-	}
 
 	nonce, err := c.Cli.NonceAt(ctx, r.Wallet.WalletAddr, nil)
 	if err != nil {
@@ -146,12 +142,18 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 
 	tot := common.HexToAddress(r.ToAddr)
 
+	header, err := c.Cli.HeaderByNumber(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	gasFeeCap := bozdo.BigIntSum(header.BaseFee, header.BaseFee)
 	gas, err := c.Cli.EstimateGas(ctx, ethereum.CallMsg{
 		From:       r.Wallet.WalletAddr,
 		To:         &tot,
 		Gas:        0,
-		GasPrice:   gasPrice,
-		GasFeeCap:  nil,
+		GasPrice:   nil,
+		GasFeeCap:  gasFeeCap,
 		GasTipCap:  nil,
 		Value:      big.NewInt(1),
 		Data:       data,
@@ -163,8 +165,8 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 
 	estimate := &bozdo.EstimatedGasCost{
 		GasLimit:    big.NewInt(0).SetUint64(gas),
-		GasPrice:    gasPrice,
-		TotalGasWei: MinerGasLegacy(gasPrice, gas),
+		GasPrice:    gasFeeCap,
+		TotalGasWei: MinerGasLegacy(gasFeeCap, gas),
 	}
 
 	if r.EstimateOnly {
@@ -175,34 +177,34 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 	}
 
 	if r.Gas.RuleSet() {
-		gasPrice = &r.Gas.GasPrice
+		gasFeeCap = &r.Gas.GasPrice
 		gas = r.Gas.GasLimit.Uint64()
 	}
 
 	am := r.Amount
 	if am.Cmp(b.WEI) == 0 {
-		am = new(big.Int).Sub(b.WEI, MinerGasLegacy(gasPrice, gas))
+		am = new(big.Int).Sub(b.WEI, MinerGasLegacy(gasFeeCap, gas))
 	}
 
 	to := common.HexToAddress(r.ToAddr)
 
-	tx := types.NewTx(&types.LegacyTx{
-		Nonce:    nonce,
-		GasPrice: gasPrice,
-		Gas:      gas,
-		To:       &to,
-		Value:    am,
-		Data:     data,
+	tx := types.NewTx(&types.DynamicFeeTx{
+		Nonce:     nonce,
+		GasFeeCap: gasFeeCap,
+		Gas:       gas,
+		To:        &to,
+		Value:     am,
+		Data:      data,
 	})
 
-	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(c.Cfg.networkId), r.Wallet.PrivateKey)
+	signedTx, err := types.SignTx(tx, types.NewLondonSigner(c.Cfg.networkId), r.Wallet.PrivateKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "types.SignTx")
 	}
 
 	err = c.Cli.SendTransaction(ctx, signedTx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Cli.SendTransaction")
 	}
 	return &TransferRes{
 		Tx:    c.NewTx(signedTx.Hash(), CodeTransfer, nil),

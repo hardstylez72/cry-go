@@ -1,6 +1,7 @@
 package zksyncera
 
 import (
+	"context"
 	"testing"
 
 	"github.com/hardstylez72/cry/internal/tests"
@@ -12,6 +13,8 @@ func Test(t *testing.T) {
 	r, err := NewMainNetClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
+
+	r.WaitTxComplete(context.Background(), "0xf0ce2ba93e5d068cd47a64b79fbc04df42876d9c29a2b7b5cb909d4f7efb148e")
 
 	//ctx := context.Background()
 	//

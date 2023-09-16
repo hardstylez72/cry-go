@@ -322,8 +322,7 @@ func EstimateOkexDepositCost(ctx context.Context, profile *halp.Profile, p *v1.O
 		Pk:           profile.WalletPK,
 		ToAddr:       *addr,
 		Token:        p.Token,
-		Amount:       bozdo.Percent(am, 90),
-		Gas:          nil,
+		Amount:       bozdo.Percent(am, 80),
 		EstimateOnly: true,
 		PSubType:     profile.SubType,
 	})

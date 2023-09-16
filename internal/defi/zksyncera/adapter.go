@@ -108,10 +108,6 @@ func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
 	for {
 		count++
 		receipt, err := c.ClientL2.TransactionReceipt(ctx, txHash)
-		if err == nil && receipt.BlockNumber != nil {
-			return nil
-		}
-
 		if errors.Is(err, ethereum.NotFound) {
 			if count > max {
 				return defi.ErrTxNotFound
@@ -121,6 +117,14 @@ func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
 
 		if err != nil {
 			return err
+		}
+
+		if receipt.Status == 0 && receipt.BlockNumber != nil {
+			return defi.ErrTxStatusFailed
+		}
+
+		if receipt.Status == 1 && receipt.BlockNumber != nil {
+			return nil
 		}
 
 		// Wait for the next round.
@@ -274,15 +278,6 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 	raw, estimate, err := c.Make712Tx(ctx, tx, r.Gas, wtx.Signer)
 	if err != nil {
 		return nil, errors.Wrap(err, "Make712Tx")
-	}
-
-	res.ECost = estimate
-
-	if r.EstimateOnly {
-		return res, nil
-	}
-	if r.EstimateOnly {
-		return res, nil
 	}
 
 	res.ECost = estimate
