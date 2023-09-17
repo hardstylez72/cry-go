@@ -63,6 +63,9 @@ export default class OdosSwap extends DefaultSwapTask {
     tokenSwapPair(Token.ETH, Token.USDC),
     tokenSwapPair(Token.USDC, Token.ETH),
 
+    tokenSwapPair(Token.BUSD, Token.USDC),
+    tokenSwapPair(Token.USDC, Token.BUSD),
+
     tokenSwapPair(Token.USDC, Token.USDT),
     tokenSwapPair(Token.USDT, Token.USDC),
   ]

@@ -151,7 +151,7 @@ func (r *pgRepository) ListWithdrawers(ctx context.Context, userId string) ([]Wi
 }
 
 func (r *pgRepository) GetList(ctx context.Context, id string) (*Withdrawer, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (r *pgRepository) GetList(ctx context.Context, id string) (*Withdrawer, err
 }
 
 func (r *pgRepository) GetWithdrawers(ctx context.Context, id string) (*Withdrawer, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

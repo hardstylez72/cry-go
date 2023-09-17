@@ -6,9 +6,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/server/user"
+	"github.com/hardstylez72/cry/internal/tg"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -19,18 +22,20 @@ type IssueService struct {
 	r                 repository.IssueRepository
 	processRepository repository.ProcessRepository
 	userRepository    repository.UserRepository
+	tgbot             *tg.Bot
 }
 
-func NewIssueService(r repository.IssueRepository, processRepository repository.ProcessRepository, userRepository repository.UserRepository) *IssueService {
+func NewIssueService(r repository.IssueRepository, processRepository repository.ProcessRepository, userRepository repository.UserRepository, tgbot *tg.Bot) *IssueService {
 	return &IssueService{
 		r:                 r,
 		processRepository: processRepository,
 		userRepository:    userRepository,
+		tgbot:             tgbot,
 	}
 }
 
 func (s *IssueService) Issues(ctx context.Context, req *v1.IssuesReq) (*v1.IssuesRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +71,7 @@ func (s *IssueService) Issues(ctx context.Context, req *v1.IssuesReq) (*v1.Issue
 
 }
 func (s *IssueService) IssuesUser(ctx context.Context, req *v1.IssuesReq) (*v1.IssuesRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +107,7 @@ func (s *IssueService) IssuesUser(ctx context.Context, req *v1.IssuesReq) (*v1.I
 }
 func (s *IssueService) CreateIssue(ctx context.Context, req *v1.CreateIssueReq) (*v1.CreateIssueRes, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -138,11 +143,19 @@ func (s *IssueService) CreateIssue(ctx context.Context, req *v1.CreateIssueReq) 
 	if err := s.r.CreateIssue(ctx, i); err != nil {
 		return nil, err
 	}
+
+	chstId, err := s.userRepository.GetUserTelegramChatId(ctx, i.CreatorId)
+	if err == nil {
+		if err := s.tgbot.IssueNotification(*chstId, i.Id, i.Title); err != nil {
+			log.Log.Error(zap.Error(err), "s.tgbot.ProcessNotification")
+		}
+	}
+
 	return &v1.CreateIssueRes{}, nil
 }
 func (s *IssueService) DeleteIssue(ctx context.Context, req *v1.DeleteIssueReq) (*v1.DeleteIssueRes, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +168,7 @@ func (s *IssueService) DeleteIssue(ctx context.Context, req *v1.DeleteIssueReq) 
 }
 
 func (s *IssueService) Issue(ctx context.Context, req *v1.IssueReq) (*v1.IssueRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -202,16 +215,16 @@ func (s *IssueService) Issue(ctx context.Context, req *v1.IssueReq) (*v1.IssueRe
 	}, nil
 }
 func (s *IssueService) IssueUpdateStatus(ctx context.Context, req *v1.IssueUpdateStatusReq) (*v1.IssueUpdateStatusRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	groups, err := user.Groups(ctx, s.userRepository)
+	groups, err := user.GetUserGroups(ctx)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if !groups.Get(user.GroupSupport) {
 		return nil, status.New(codes.PermissionDenied, "user is not in support group").Err()
 	}
@@ -219,10 +232,21 @@ func (s *IssueService) IssueUpdateStatus(ctx context.Context, req *v1.IssueUpdat
 	if err := s.r.UpdateStatus(ctx, req.IssueId, req.Status.String(), userId); err != nil {
 		return nil, err
 	}
+
+	i, err := s.r.Issue(ctx, req.IssueId)
+	if err == nil {
+		chstId, err := s.userRepository.GetUserTelegramChatId(ctx, i.CreatorId)
+		if err == nil {
+			if err := s.tgbot.IssueNotification(*chstId, req.IssueId, "статус изменен на: "+req.Status.String()); err != nil {
+				log.Log.Error(zap.Error(err), "s.tgbot.ProcessNotification")
+			}
+		}
+	}
+
 	return &v1.IssueUpdateStatusRes{}, nil
 }
 func (s *IssueService) AddComment(ctx context.Context, req *v1.AddCommentReq) (*v1.AddCommentRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -239,10 +263,20 @@ func (s *IssueService) AddComment(ctx context.Context, req *v1.AddCommentReq) (*
 		return nil, err
 	}
 
+	i, err := s.r.Issue(ctx, req.IssueId)
+	if err == nil {
+		chstId, err := s.userRepository.GetUserTelegramChatId(ctx, i.CreatorId)
+		if err == nil {
+			if err := s.tgbot.IssueNotification(*chstId, req.IssueId, req.Text); err != nil {
+				log.Log.Error(zap.Error(err), "s.tgbot.ProcessNotification")
+			}
+		}
+	}
+
 	return &v1.AddCommentRes{}, nil
 }
 func (s *IssueService) DeleteComment(ctx context.Context, req *v1.DeleteCommentReq) (*v1.DeleteCommentRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

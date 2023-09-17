@@ -256,8 +256,8 @@ func (d *Dispatcher) SendAlert(ctx context.Context, userId string, pId string, e
 		}
 		return
 	}
-	if err := d.runner.tgBot.SendAlert(*chatId, pId, execErr.Error()); err != nil {
-		l.Warn("SendAlert", zap.Error(err))
+	if err := d.runner.tgBot.ProcessNotification(*chatId, pId, execErr.Error()); err != nil {
+		l.Warn("ProcessNotification", zap.Error(err))
 	}
 }
 func (d *Dispatcher) NotifyUserProcessStarted(ctx context.Context, userId string, pId string) {

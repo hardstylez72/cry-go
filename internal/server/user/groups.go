@@ -1,37 +1,34 @@
 package user
 
 import (
-	"context"
+	"database/sql"
 
 	"github.com/hardstylez72/cry/internal/lib"
 )
 
 const GroupSupport = "support"
+const GroupWorker = "worker"
 
 var support = map[string]string{
 	"korotkovcv77@gmail.com": GroupSupport,
 }
 
-type Getter interface {
-	GetUserEmail(ctx context.Context, id string) (*string, error)
+type User struct {
+	Id           string
+	Email        string
+	ControlledBy sql.NullString
 }
 
-func Groups(ctx context.Context, r Getter) (*lib.Set[string], error) {
-
-	userId, err := GetUserId(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	email, err := r.GetUserEmail(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
+func Groups(u *User) (*lib.Set[string], error) {
 
 	out := lib.NewSet[string]()
-	_, ok := support[*email]
+	_, ok := support[u.Email]
 	if ok {
 		out.Set(GroupSupport)
+	}
+
+	if u.ControlledBy.Valid {
+		out.Set(GroupWorker)
 	}
 
 	return out, nil

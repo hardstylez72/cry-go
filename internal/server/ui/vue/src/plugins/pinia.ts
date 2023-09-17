@@ -24,7 +24,8 @@ export const useUserStore = defineStore('user', {
       top: "0",
       total: "0"
     },
-    support: false
+    support: false,
+    controlledBy: false,
   }),
   actions: {
     async redirectToGeneralPage() {
@@ -56,6 +57,10 @@ export const useUserStore = defineStore('user', {
           if (res.groups.find(g => g === 'support')) {
             state.support = true
           }
+          if (res.groups.find(g => g === 'worker')) {
+            state.controlledBy = true
+          }
+
         })
       } catch (e) {
         this.$patch((state) => {
@@ -64,6 +69,7 @@ export const useUserStore = defineStore('user', {
           state.ass = '0 USD'
           state.taskPrice = '0 USD'
           state.support = false
+          state.controlledBy = false
         })
 
 

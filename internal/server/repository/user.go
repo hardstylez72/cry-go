@@ -8,14 +8,15 @@ import (
 )
 
 type User struct {
-	Id     string `db:"id"`
-	Email  string `db:"email"`
-	Access bool   `db:"access"`
+	Id           string         `db:"id"`
+	Email        string         `db:"email"`
+	Access       bool           `db:"access"`
+	ControlledBy sql.NullString `db:"controlled_by"`
 }
 
 func (r *pgRepository) GetOrCreateUser(ctx context.Context, user *User) (*User, bool, error) {
 
-	q := `select id, email, access from users where email = $1`
+	q := `select id, email, access, controlled_by from users where email = $1`
 
 	var u User
 	if err := r.conn.GetContext(ctx, &u, q, user.Email); err != nil {
@@ -33,7 +34,7 @@ func (r *pgRepository) GetOrCreateUser(ctx context.Context, user *User) (*User, 
 		return nil, false, pg.PgError(err)
 	}
 
-	q = `select id, email, access from users where email = $1`
+	q = `select id, email, access, controlled_by from users where email = $1`
 
 	if err := r.conn.GetContext(ctx, &u, q, user.Email); err != nil {
 		return nil, false, pg.PgError(err)
@@ -51,7 +52,7 @@ func (r *pgRepository) GetUserEmail(ctx context.Context, id string) (*string, er
 }
 
 func (r *pgRepository) GetUserById(ctx context.Context, id string) (*User, error) {
-	q := `select id, email, access from users where id = $1`
+	q := `select id, email, access, controlled_by from users where id = $1`
 
 	var u User
 	if err := r.conn.GetContext(ctx, &u, q, id); err != nil {

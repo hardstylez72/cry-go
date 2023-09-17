@@ -44,6 +44,10 @@ func NewProfileService(repository repository.ProfileRepository, settingsService 
 
 func (s *ProfileService) UpdateProfile(ctx context.Context, req *v1.UpdateProfileRequest) (*v1.UpdateProfileResponse, error) {
 
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+
 	p := &repository.Profile{
 		Id:        req.ProfileId,
 		Label:     req.Label,
@@ -68,7 +72,7 @@ func (s *ProfileService) UpdateProfile(ctx context.Context, req *v1.UpdateProfil
 	return &v1.UpdateProfileResponse{}, nil
 }
 func (s *ProfileService) ValidateLabel(ctx context.Context, req *v1.ValidateLabelRequest) (*v1.ValidateLabelResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +105,11 @@ func (s *ProfileService) GetProfile(ctx context.Context, req *v1.GetProfileReque
 }
 func (s *ProfileService) CreateProfile(ctx context.Context, req *v1.CreateProfileRequest) (*v1.CreateProfileResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +185,7 @@ func (s *ProfileService) CreateProfile(ctx context.Context, req *v1.CreateProfil
 	}, nil
 }
 func (s *ProfileService) ListProfile(ctx context.Context, req *v1.ListProfileRequest) (*v1.ListProfileResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -203,12 +211,16 @@ func (s *ProfileService) ListProfile(ctx context.Context, req *v1.ListProfileReq
 	}, nil
 }
 func (s *ProfileService) DeleteProfile(ctx context.Context, req *v1.DeleteProfileRequest) (*v1.DeleteProfileResponse, error) {
+
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
 	_, _ = s.repository.DeleteProfile(ctx, req)
 	return &v1.DeleteProfileResponse{}, nil
 }
 func (s *ProfileService) SearchProfilesNotConnectedToOkexDeposit(ctx context.Context, req *v1.SearchProfilesNotConnectedToOkexDepositRequest) (*v1.SearchProfilesNotConnectedToOkexDepositResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +242,7 @@ func (s *ProfileService) SearchProfilesNotConnectedToOkexDeposit(ctx context.Con
 	return &v1.SearchProfilesNotConnectedToOkexDepositResponse{Profiles: out}, nil
 }
 func (s *ProfileService) SearchProfile(ctx context.Context, req *v1.SearchProfileRequest) (*v1.SearchProfileResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -267,6 +279,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 		v1.Token_SPACE,
 		v1.Token_VC,
 		v1.Token_IZI,
+		v1.Token_BUSD,
 	}
 
 	var err error
@@ -282,7 +295,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 		return nil, err
 	}
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -363,7 +376,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 }
 
 //	func (s *ProfileService) ExportProfiles(ctx context.Context, req *v1.ExportProfilesReq) (*v1.ExportProfilesRes, error) {
-//		userId, err := user.GetUserId(ctx)
+//		userId, err := user.ResolveUserId(ctx)
 //		if err != nil {
 //			return nil, err
 //		}
@@ -395,6 +408,10 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 //		}, nil
 //	}
 func (s *ProfileService) GenerateProfiles(ctx context.Context, req *v1.GenerateProfilesReq) (*v1.GenerateProfilesRes, error) {
+
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
 
 	pb := bytes.NewBuffer([]byte{})
 	pb.Grow(100000)
@@ -486,7 +503,7 @@ func (s *ProfileService) StarkNetAccountDeployed(ctx context.Context, req *v1.St
 }
 
 func (s *ProfileService) GetProfileRelations(ctx context.Context, req *v1.GetProfileRelationsReq) (*v1.GetProfileRelationsRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -530,7 +547,11 @@ func (s *ProfileService) GetProfileRelations(ctx context.Context, req *v1.GetPro
 
 }
 func (s *ProfileService) DeleteProfileRelation(ctx context.Context, req *v1.DeleteProfileRelationReq) (*v1.DeleteProfileRelationRes, error) {
-	userId, err := user.GetUserId(ctx)
+
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -550,7 +571,11 @@ func (s *ProfileService) DeleteProfileRelation(ctx context.Context, req *v1.Dele
 	return &v1.DeleteProfileRelationRes{}, nil
 }
 func (s *ProfileService) AddProfileRelation(ctx context.Context, req *v1.AddProfileRelationReq) (*v1.AddProfileRelationRes, error) {
-	userId, err := user.GetUserId(ctx)
+
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -571,7 +596,7 @@ func (s *ProfileService) AddProfileRelation(ctx context.Context, req *v1.AddProf
 }
 func (s *ProfileService) SearchProfileRelation(ctx context.Context, req *v1.SearchProfileRelationReq) (*v1.SearchProfileRelationRes, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -1143,7 +1143,8 @@
         "SPACE",
         "VC",
         "IZI",
-        "USDCBridged"
+        "USDCBridged",
+        "BUSD"
       ],
       "default": "USDT"
     },

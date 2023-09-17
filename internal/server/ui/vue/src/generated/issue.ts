@@ -412,5 +412,6 @@ export enum IssueStatus {
   'Processing' = 'Processing',
   'Done' = 'Done',
   'Deleted' = 'Deleted',
-  'Rejected' = 'Rejected'
+  'Rejected' = 'Rejected',
+  'Stop' = 'Stop'
 }

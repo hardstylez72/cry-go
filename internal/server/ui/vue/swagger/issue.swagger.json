@@ -458,7 +458,8 @@
         "Processing",
         "Done",
         "Deleted",
-        "Rejected"
+        "Rejected",
+        "Stop"
       ],
       "default": "Created"
     },

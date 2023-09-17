@@ -295,5 +295,6 @@ export enum Token {
   'SPACE' = 'SPACE',
   'VC' = 'VC',
   'IZI' = 'IZI',
-  'USDCBridged' = 'USDCBridged'
+  'USDCBridged' = 'USDCBridged',
+  'BUSD' = 'BUSD'
 }

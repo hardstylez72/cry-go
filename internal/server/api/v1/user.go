@@ -18,7 +18,7 @@ import (
 const lastSettingsUpdateTime = "2023-09-04 7:40:05"
 
 func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.GetUserResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, status.New(codes.Unauthenticated, "").Err()
 	}
@@ -47,11 +47,15 @@ func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.
 		return nil, err
 	}
 
-	groups, err := user.Groups(ctx, s.userRepository)
+	groups, err := user.Groups(&user.User{
+		Id:           u.Id,
+		Email:        u.Email,
+		ControlledBy: u.ControlledBy,
+	})
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &v1.GetUserResponse{
 		Id:              u.Id,
 		Email:           u.Email,

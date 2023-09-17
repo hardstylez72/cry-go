@@ -40,7 +40,7 @@ func NewWithdrawerService(repository repository.WithdrawerRepository, userReposi
 }
 
 func (s *WithdrawerService) GetExchangeDepositOptions(ctx context.Context, req *v1.GetExchangeDepositOptionsRequest) (*v1.GetExchangeDepositOptionsResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,11 @@ func (s *WithdrawerService) GetExchangeDepositOptions(ctx context.Context, req *
 }
 func (s *WithdrawerService) OkexDepositAddrAttach(ctx context.Context, req *v1.OkexDepositAddrAttachRequest) (*v1.OkexDepositAddrAttachResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +93,11 @@ func (s *WithdrawerService) OkexDepositAddrAttach(ctx context.Context, req *v1.O
 }
 func (s *WithdrawerService) OkexDepositAddrDetach(ctx context.Context, req *v1.OkexDepositAddrDetachRequest) (*v1.OkexDepositAddrDetachResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +116,7 @@ func (s *WithdrawerService) OkexDepositAddrDetach(ctx context.Context, req *v1.O
 }
 func (s *WithdrawerService) ListDepositAddresses(ctx context.Context, req *v1.ListDepositAddressesRequest) (*v1.ListDepositAddressesResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -252,7 +260,7 @@ func (s *WithdrawerService) GetDepositAddrs(ctx context.Context, wd *repository.
 
 func (s *WithdrawerService) ListSubWithdrawer(ctx context.Context, req *v1.ListSubWithdrawerRequest) (*v1.ListSubWithdrawerResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +279,11 @@ func (s *WithdrawerService) ListSubWithdrawer(ctx context.Context, req *v1.ListS
 }
 func (s *WithdrawerService) CreateSubWithdrawer(ctx context.Context, req *v1.CreateOkexWithdrawerRequest) (*v1.CreateOkexWithdrawerResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -317,7 +329,11 @@ func (s *WithdrawerService) CreateSubWithdrawer(ctx context.Context, req *v1.Cre
 }
 func (s *WithdrawerService) CreateWithdrawer(ctx context.Context, req *v1.CreateWithdrawerRequest) (*v1.CreateWithdrawerResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -355,7 +371,7 @@ func (s *WithdrawerService) CreateWithdrawer(ctx context.Context, req *v1.Create
 }
 func (s *WithdrawerService) ListWithdrawer(ctx context.Context, req *v1.ListWithdrawerRequest) (*v1.ListWithdrawerResponse, error) {
 
-	userid, err := user.GetUserId(ctx)
+	userid, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -373,13 +389,17 @@ func (s *WithdrawerService) ListWithdrawer(ctx context.Context, req *v1.ListWith
 	return &v1.ListWithdrawerResponse{Withdrawers: out}, nil
 }
 func (s *WithdrawerService) DeleteWithdrawer(ctx context.Context, req *v1.DeleteWithdrawerRequest) (*v1.DeleteWithdrawerResponse, error) {
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+
 	if _, err := s.repository.DeleteWithdrawer(ctx, req); err != nil {
 		return nil, err
 	}
 	return &v1.DeleteWithdrawerResponse{}, nil
 }
 func (s *WithdrawerService) GetExchangeWithdrawOptions(ctx context.Context, req *v1.GetExchangeWithdrawOptionsRequest) (*v1.GetExchangeWithdrawOptionsResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -398,7 +418,11 @@ func (s *WithdrawerService) GetExchangeWithdrawOptions(ctx context.Context, req 
 }
 func (s *WithdrawerService) UpdateWithdrawer(ctx context.Context, req *v1.UpdateWithdrawerRequest) (*v1.UpdateWithdrawerResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+		return nil, err
+	}
+
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -444,7 +468,7 @@ func (s *WithdrawerService) UpdateWithdrawer(ctx context.Context, req *v1.Update
 	return res, nil
 }
 func (s *WithdrawerService) GetWithdrawer(ctx context.Context, req *v1.GetWithdrawerRequest) (*v1.GetWithdrawerResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -478,7 +502,7 @@ func (s *WithdrawerService) GetWithdrawer(ctx context.Context, req *v1.GetWithdr
 	}, nil
 }
 func (s *WithdrawerService) Withdraw(ctx context.Context, req *v1.WithdrawReq) (*v1.WithdrawRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -542,7 +566,7 @@ func (s *WithdrawerService) WithdrawStatus(ctx context.Context, req *v1.Withdraw
 }
 
 //func (s *WithdrawerService) ExportExchangeAccounts(ctx context.Context, req *v1.ExportExchangeAccountsReq) (*v1.ExportExchangeAccountsRes, error) {
-//	userId, err := user.GetUserId(ctx)
+//	userId, err := user.ResolveUserId(ctx)
 //	if err != nil {
 //		return nil, err
 //	}

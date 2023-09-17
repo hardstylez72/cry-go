@@ -22,7 +22,7 @@ func NewFlowService(repository repository.FlowRepository) *FlowService {
 
 func (s *FlowService) UpdateFlow(ctx context.Context, req *v1.UpdateFlowRequest) (*v1.UpdateFlowResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

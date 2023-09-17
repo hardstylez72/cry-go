@@ -60,7 +60,7 @@ func (s *ProcessService) SkipProcessTask(ctx context.Context, req *v1.SkipProces
 }
 func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProcessRequest) (*v1.CreateProcessResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 	}, nil
 }
 func (s *ProcessService) GetProcess(ctx context.Context, req *v1.GetProcessRequest) (*v1.GetProcessResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (s *ProcessService) GetProcess(ctx context.Context, req *v1.GetProcessReque
 }
 func (s *ProcessService) ListProcess(ctx context.Context, req *v1.ListProcessRequest) (*v1.ListProcessResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func (s *ProcessService) EstimateCost(ctx context.Context, req *v1.EstimateCostR
 
 func (s *ProcessService) GetTaskTransactions(ctx context.Context, req *v1.GetTaskTransactionsReq) (*v1.GetTaskTransactionsRes, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +268,7 @@ func (s *ProcessService) GetTaskTransactions(ctx context.Context, req *v1.GetTas
 	}, nil
 }
 func (s *ProcessService) GetProfileTransactions(ctx context.Context, req *v1.GetProfileTransactionsReq) (*v1.GetProfileTransactionsRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

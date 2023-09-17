@@ -92,7 +92,7 @@ func (r *pgRepository) UpdateFlow(ctx context.Context, parentFlowId string, req 
 
 func (r *pgRepository) CreateFlow(ctx context.Context, req *v1.CreateFlowRequest) (*v1.CreateFlowResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func getFlow(ctx context.Context, conn *sqlx.DB, id string) (*Flow, error) {
 
 func (r *pgRepository) ListFlows(ctx context.Context, req *v1.ListFlowRequest) (*v1.ListFlowResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

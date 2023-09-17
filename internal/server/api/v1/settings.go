@@ -19,7 +19,7 @@ func NewSettingsService(settingsService *settings2.Service) *SettingsService {
 
 func (s *SettingsService) ResetSettings(ctx context.Context, req *v1.ResetRequest) (*v1.ResetResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (s *SettingsService) ResetSettings(ctx context.Context, req *v1.ResetReques
 
 func (s *SettingsService) GetSettings(ctx context.Context, req *v1.GetSettingsRequest) (*v1.GetSettingsResponse, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (s *SettingsService) GetSettings(ctx context.Context, req *v1.GetSettingsRe
 
 }
 func (s *SettingsService) UpdateSettings(ctx context.Context, req *v1.UpdateSettingsRequest) (*v1.UpdateSettingsResponse, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

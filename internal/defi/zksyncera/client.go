@@ -126,6 +126,7 @@ func NewMainNetClient(c *ClientConfig) (*Client, error) {
 		v1.Token_SPACE: common.HexToAddress("0x47260090cE5e83454d5f05A0AbbB2C953835f777"),
 		v1.Token_VC:    common.HexToAddress("0x85D84c774CF8e9fF85342684b0E795Df72A24908"),
 		v1.Token_IZI:   common.HexToAddress("0x16a9494e257703797d747540f01683952547ee5b"),
+		v1.Token_BUSD:  common.HexToAddress("0x2039bb4116b4efc145ec4f0e2ea75012d6c0f181"),
 	}
 
 	muteio := Muteio{

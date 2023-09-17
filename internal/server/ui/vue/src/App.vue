@@ -37,7 +37,7 @@
         <v-list-item v-if="userLoggedIn" prepend-icon="mdi-account-multiple-outline" color="green" title="Профили"
                      value="home"
                      @click="$router.push({name: 'Profiles'})"></v-list-item>
-        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-account-cash-outline" color="green" title="Биржи"
+        <v-list-item v-if="userLoggedIn && !worker" prepend-icon="mdi-account-cash-outline" color="green" title="Биржи"
                      value="Withdraw"
                      @click="$router.push({name: 'Withdraw'})"></v-list-item>
         <v-list-item v-if="userLoggedIn" prepend-icon="mdi-account-hard-hat-outline" color="green" title="Конструктор"
@@ -146,6 +146,9 @@ export default defineComponent({
     },
     userLoggedIn(): boolean {
       return this.userStore.login
+    },
+    worker(): boolean {
+      return this.userStore.controlledBy
     },
     userEmail(): string {
       return this.userStore.email

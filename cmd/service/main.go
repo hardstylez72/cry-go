@@ -18,6 +18,7 @@ import (
 	"github.com/hardstylez72/cry/internal/pay"
 	core "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process"
+	"github.com/hardstylez72/cry/internal/server/access"
 	"github.com/hardstylez72/cry/internal/server/api/v1"
 	"github.com/hardstylez72/cry/internal/server/auth"
 	"github.com/hardstylez72/cry/internal/server/config"
@@ -245,7 +246,7 @@ func ListenGRPC(ctx context.Context, port string, s *services) error {
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			grpc_auth.UnaryServerInterceptor(authMW),
-			//grpc_auth.UnaryServerInterceptor(access.Access(s.userRepository)),
+			grpc_auth.UnaryServerInterceptor(access.Access(s.userRepository)),
 			otelgrpc.UnaryServerInterceptor(),
 		)),
 	)
@@ -353,7 +354,7 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 	)
 	go dispatcher.RunDispatcher(ctx)
 
-	issueService := v1.NewIssueService(issueRepository, processRepository, userRepository)
+	issueService := v1.NewIssueService(issueRepository, processRepository, userRepository, tgBot)
 
 	return &services{
 		profileService:       v1.NewProfileService(profileRepository, settingsService, starknetNewClient),

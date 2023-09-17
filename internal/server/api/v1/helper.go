@@ -148,7 +148,7 @@ func (s *HelperService) CastWEI(ctx context.Context, req *v1.CastWEIRequest) (*v
 	}, nil
 }
 func (s *HelperService) GetBillingHistory(ctx context.Context, req *v1.GetBillingHistoryReq) (*v1.GetBillingHistoryRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (s *HelperService) GetBillingHistory(ctx context.Context, req *v1.GetBillin
 }
 func (s *HelperService) CreateOrder(ctx context.Context, req *v1.CreateOrderReq) (*v1.CreateOrderRes, error) {
 
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (s *HelperService) GetOrderStatus(ctx context.Context, req *v1.GetOrderStat
 	}, nil
 }
 func (s *HelperService) GetOrderHistory(ctx context.Context, req *v1.GetOrderHistoryReq) (*v1.GetOrderHistoryRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (s *HelperService) GetOrderHistory(ctx context.Context, req *v1.GetOrderHis
 	}, nil
 }
 func (s *HelperService) TransactionsDailyImpact(ctx context.Context, req *v1.TransactionsDailyImpactReq) (*v1.TransactionsDailyImpactRes, error) {
-	userId, err := user.GetUserId(ctx)
+	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
 	}

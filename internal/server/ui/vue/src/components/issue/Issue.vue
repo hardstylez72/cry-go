@@ -93,6 +93,7 @@ export default defineComponent({
         IssueStatus.Done,
         IssueStatus.Processing,
         IssueStatus.Rejected,
+        IssueStatus.Stop,
       ],
       listLoading: false,
       item: {} as Issue,

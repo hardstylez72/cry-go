@@ -154,7 +154,31 @@ func (b *Bot) ProcessFinished(chatId, processId string) error {
 	return nil
 }
 
-func (b *Bot) SendAlert(chatId, processId, text string) error {
+func (b *Bot) IssueNotification(chatId, issueId, text string) error {
+	if b.disabled {
+		return nil
+	}
+	chatInt, err := strconv.Atoi(chatId)
+	if err != nil {
+		return err
+	}
+
+	domain := "https://cry.monster"
+	if config.CFG.Env == config.Prod {
+		domain = "https://drop-hunter.pro"
+	}
+	out := "[issue](" + domain + "/issue/" + issueId + ") "
+	text = tgbotapi.EscapeText(tgbotapi.ModeMarkdownV2, text)
+	out = out + text
+	m := tgbotapi.NewMessage(int64(chatInt), out)
+	m.ParseMode = tgbotapi.ModeMarkdownV2
+
+	if _, err := b.driver.Send(m); err != nil {
+		return errors.Wrap(err, "b.driver.Send")
+	}
+	return nil
+}
+func (b *Bot) ProcessNotification(chatId, processId, text string) error {
 	if b.disabled {
 		return nil
 	}
