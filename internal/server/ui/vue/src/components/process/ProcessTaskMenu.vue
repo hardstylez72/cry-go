@@ -101,9 +101,10 @@ import ViewFlow from "@/components/flow/ViewFlow.vue";
 import StatusCard from "@/components/StatusCard.vue";
 import {Delay, formatTime, GetStatusColor, GetStatusText} from "@/components/helper";
 import dayjs from "dayjs";
-import {estimatedTaskMap, menuTaskComponentMap, TaskArg, taskProps, TaskSpec} from '@/components/tasks/tasks'
+import {estimatedTaskMap, menuTaskComponentMap, taskProps} from '@/components/tasks/tasks'
 import EstimateTask from "@/components/tasks/menu/Estimate.vue";
 import Support from "@/components/issue/Support.vue";
+import {TaskSpec} from "@/components/tasks/utils";
 
 export default defineComponent({
   name: "ProcessTaskMenu",

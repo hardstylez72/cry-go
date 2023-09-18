@@ -225,6 +225,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_OdosSwap:
 		p := t.Task.Task.(*v1.Task_OdosSwapTask).OdosSwapTask
 		e, err = task.NewOdosSwapTask().EstimateCost(ctx, profile, p, nil)
+	case v1.TaskType_AcrossBridge:
+		p := t.Task.Task.(*v1.Task_AcrossBridgeTask).AcrossBridgeTask
+		e, err = task.NewAcrossBridgeTask().EstimateCost(ctx, profile, p, nil)
 
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")

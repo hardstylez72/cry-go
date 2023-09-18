@@ -269,6 +269,43 @@
         "flow"
       ]
     },
+    "DefaultBridge": {
+      "type": "object",
+      "properties": {
+        "fromNetwork": {
+          "$ref": "#/definitions/Network"
+        },
+        "toNetwork": {
+          "$ref": "#/definitions/Network"
+        },
+        "fromToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "toToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "amount": {
+          "$ref": "#/definitions/Amount"
+        },
+        "approveTx": {
+          "$ref": "#/definitions/TaskTx"
+        },
+        "tx": {
+          "$ref": "#/definitions/TaskTx"
+        },
+        "received": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "fromNetwork",
+        "toNetwork",
+        "fromToken",
+        "toToken",
+        "amount",
+        "received"
+      ]
+    },
     "DefaultLP": {
       "type": "object",
       "properties": {
@@ -955,6 +992,9 @@
         },
         "odosSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "acrossBridgeTask": {
+          "$ref": "#/definitions/DefaultBridge"
         }
       },
       "required": [
@@ -1065,7 +1105,8 @@
         "StarkNetBridge",
         "Dmail",
         "StarkNetIdMint",
-        "OdosSwap"
+        "OdosSwap",
+        "AcrossBridge"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

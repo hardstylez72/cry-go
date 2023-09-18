@@ -47,8 +47,27 @@ enum TaskType {
   Dmail = 33;
   StarkNetIdMint = 34;
   OdosSwap = 35;
+  AcrossBridge = 36;
 }
 
+
+
+message DefaultBridge {
+  shared.Network fromNetwork = 1;
+  shared.Network toNetwork = 2;
+  shared.Token fromToken = 3;
+  shared.Token toToken = 4;
+  optional shared.Amount amount = 5;
+  optional TaskTx approveTx = 6;
+  optional TaskTx tx = 7;
+  bool received = 8;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["fromNetwork", "toNetwork", "fromToken", "toToken", "amount", "received"]
+    }
+  };
+}
 
 message TxDetail {
   string key = 1;

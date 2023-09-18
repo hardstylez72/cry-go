@@ -183,6 +183,14 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Swap (ETH <-> USDC, USDC <-> USDT)',
           quest: ''
+        },
+        {
+          name: taskProps.AcrossBridge.service.name,
+          link: taskProps.AcrossBridge.service.link,
+          img: taskProps.AcrossBridge.service.img,
+          status: Status.integrated,
+          action: 'Bridge USDC -> Arbitrum',
+          quest: ''
         }
       ],
       links: [

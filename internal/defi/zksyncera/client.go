@@ -35,6 +35,7 @@ type Muteio struct {
 }
 
 type Client struct {
+	httpCli   *http.Client
 	rpcL2     *rpc.Client
 	rpcL1     *rpc.Client
 	ClientL2  clients.Client
@@ -218,6 +219,7 @@ func newClient(
 	clientL1 := ethclient.NewClient(rpcL1Client)
 
 	return &Client{
+		httpCli:   config.HttpCli,
 		rpcL2:     rpcL2Client,
 		rpcL1:     rpcL1Client,
 		ClientL2:  clientL2,

@@ -50,6 +50,12 @@ type Swapper interface {
 	Swap(ctx context.Context, req *DefaultSwapReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)
 }
 
+type Bridger interface {
+	Networker
+	Bridge(ctx context.Context, req *DefaultBridgeReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)
+	WaitForConfirm(ctx context.Context, txId string) error
+}
+
 type OrbiterSwapper interface {
 	Transfer
 	OrbiterBridge(ctx context.Context, req *OrbiterBridgeReq) (*OrbiterBridgeRes, error)
@@ -72,7 +78,7 @@ type DefaultSwapReq struct {
 type DefaultBridgeReq struct {
 	FromNetwork  v1.Network
 	ToNetwork    v1.Network
-	WalletPK     string
+	PK           string
 	Amount       *big.Int
 	FromToken    Token
 	ToToken      Token
@@ -80,6 +86,7 @@ type DefaultBridgeReq struct {
 	Slippage     SlippagePercent
 	EstimateOnly bool
 	Debug        bool
+	SubType      v1.ProfileSubType
 }
 
 type TxCode = string

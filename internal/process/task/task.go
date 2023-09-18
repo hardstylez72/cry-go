@@ -95,6 +95,7 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_Dmail,
 	v1.TaskType_StarkNetIdMint,
 	v1.TaskType_OdosSwap,
+	v1.TaskType_AcrossBridge,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -139,6 +140,7 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_Dmail:                            &Wrap{Tasker: &DmailTask{}},
 	v1.TaskType_StarkNetIdMint:                   &Wrap{Tasker: &MintTask{}},
 	v1.TaskType_OdosSwap:                         &Wrap{Tasker: NewOdosSwapTask()},
+	v1.TaskType_AcrossBridge:                     &Wrap{Tasker: NewAcrossBridgeTask()},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -354,7 +356,12 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_OdosSwapTask)")
 		}
 		return Marshal(t.OdosSwapTask)
-
+	case v1.TaskType_AcrossBridge:
+		t, ok := m.Task.(*v1.Task_AcrossBridgeTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_AcrossBridgeTask)")
+		}
+		return Marshal(t.AcrossBridgeTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}

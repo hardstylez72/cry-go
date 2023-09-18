@@ -70,6 +70,8 @@ import StarkNetId from "@/components/tasks/block/StarkNetId.vue";
 import MenuStarkNetId from "@/components/tasks/menu/MenuStarkNetId.vue";
 import MenuOdosSwap from "@/components/tasks/menu/MenuOdosSwap.vue";
 import OdosSwap from "@/components/tasks/block/OdosSwap.vue";
+import {AcrossBridgeSpec} from "@/components/tasks/BridgeAcross";
+import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 
 
 export interface TaskArg {
@@ -80,56 +82,6 @@ export interface TaskArg {
   taskType: TaskType
 }
 
-export interface TaskSpec {
-  menu: any
-  component: any
-
-  canBeEstimated: boolean
-  deprecated: boolean
-
-  descFn: DescFn
-
-  service: Service
-
-  networks: Set<Network>
-
-  airdrops: Set<Airdrop>
-  job: TaskJob
-
-  profileType: Set<ProfileType>
-}
-
-export enum TaskJob {
-  Swap = 'Swap',
-  Bridge = 'Bridge',
-  Exchange = 'Exchange',
-  Other = 'Other',
-
-  NFT = "NFT",
-
-  LP = 'LP'
-}
-
-interface Service {
-  link: string
-  img: string
-
-  name: string
-
-  op: string
-}
-
-interface DescFn {
-  (task: Task): string;
-}
-
-
-export enum Airdrop {
-  LayerZero = "LayerZero",
-  ZkSync = "ZkSync",
-  StarkNet = "StarkNet",
-  Orbiter = "Orbiter",
-}
 
 const Universal = [Airdrop.ZkSync, Airdrop.StarkNet, Airdrop.Orbiter, Airdrop.LayerZero]
 
@@ -835,6 +787,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
     profileType: new Set([ProfileType.EVM])
   },
+  AcrossBridge: AcrossBridgeSpec,
 }
 
 export const getFlow = (flow: flow_Flow): string[] => {

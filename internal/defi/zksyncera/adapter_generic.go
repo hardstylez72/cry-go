@@ -79,7 +79,7 @@ func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.D
 func (c *Client) GenericBridge(ctx context.Context, maker TxBridgeMaker, req *defi.DefaultBridgeReq) (*bozdo.DefaultRes, error) {
 	result := &bozdo.DefaultRes{}
 
-	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
+	transactor, err := NewWalletTransactor(req.PK, c.NetworkId)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (c *Client) GenericBridge(ctx context.Context, maker TxBridgeMaker, req *de
 
 	tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
 		Token:       req.FromToken,
-		WalletPK:    req.WalletPK,
+		WalletPK:    req.PK,
 		Amount:      req.Amount,
 		SpenderAddr: txData.ContractAddr,
 	})

@@ -41,10 +41,11 @@
 
 import {defineComponent, PropType, ref} from 'vue';
 import {Network, Task, TaskType} from "@/generated/flow";
-import {taskComponentMap, TaskArg, taskTypes, taskProps, TaskJob, TaskSpec, Airdrop} from '@/components/tasks/tasks'
+import {taskComponentMap, TaskArg, taskTypes, taskProps} from '@/components/tasks/tasks'
 import draggable from 'vuedraggable'
 import TaskChip from "@/components/tasks/TaskChip.vue";
 import {networkProps} from "@/components/helper";
+import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 
 
 export default defineComponent({

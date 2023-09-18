@@ -11,8 +11,8 @@ import {formatTime, humanDuration} from "@/components/helper";
 import {ProcessStatus} from "@/generated/process";
 import {getStatusColor} from "@/components/tasks/menu/helper";
 import {link} from "@/components/tasks/links";
-import {TaskSpec} from "@/components/tasks/tasks";
 import MenuTaskSettings from "@/components/tasks/menu/Settings.vue";
+import {TaskSpec} from "@/components/tasks/utils";
 
 
 interface Proposal {

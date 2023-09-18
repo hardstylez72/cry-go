@@ -26,7 +26,7 @@ func TestStargate(t *testing.T) {
 		req := &defi.DefaultBridgeReq{
 			FromNetwork:  v1.Network_ZKSYNCERA,
 			ToNetwork:    v1.Network_BinanaceBNB,
-			WalletPK:     tests.GetConfig().PK,
+			PK:           tests.GetConfig().PK,
 			Amount:       am,
 			FromToken:    v1.Token_MAV,
 			ToToken:      v1.Token_MAV,

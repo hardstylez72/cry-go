@@ -82,7 +82,7 @@ func CastFloatToEtherWEI(wei float64) *big.Int {
 
 func WeiToToken(wei *big.Int, token Token) *big.Float {
 	switch token {
-	case v1.Token_USDT, v1.Token_USDC:
+	case v1.Token_USDT, v1.Token_USDC, v1.Token_USDCBridged:
 		return new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(params.Ether*1e-12))
 	default:
 		return new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(params.Ether))

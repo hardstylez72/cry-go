@@ -338,6 +338,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 			if err != nil {
 				return
 			}
+			
 			b, err := balancer.GetBalance(ctx, &defi.GetBalanceReq{
 				WalletAddress: pubKey,
 				Token:         tokens[i],

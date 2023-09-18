@@ -1,13 +1,12 @@
 package arbitrum
 
 import (
-	"context"
 	"math/big"
 	"net/http"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
@@ -20,7 +19,7 @@ const (
 var TokenAddress = map[defi.Token]common.Address{
 	v1.Token_USDT: common.HexToAddress("0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"),
 	v1.Token_STG:  common.HexToAddress("0x6694340fc020c5e6b96567843da2df01b2ce1eb6"),
-	
+
 	v1.Token_USDC:        common.HexToAddress("0xaf88d065e77c8cc2239327c5edb3a432268e5831"),
 	v1.Token_USDCBridged: common.HexToAddress("0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"),
 
@@ -72,16 +71,8 @@ func NewClient(c *ClientConfig) (*Client, error) {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum main: "+c.RPCEndpoint)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	networkId, err := ethcli.GetNetworkId(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Client{
 		defi:      ethcli,
-		NetworkId: networkId,
+		NetworkId: bozdo.ChainMap[v1.Network_ARBITRUM],
 	}, nil
 }

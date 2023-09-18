@@ -212,7 +212,7 @@ func (t *StargateTask) Swap(ctx context.Context, p *v1.StargateBridgeTask, swapp
 	swap, err := swapper.StargateBridgeSwap(ctx, &defi.DefaultBridgeReq{
 		FromNetwork: p.FromNetwork,
 		ToNetwork:   p.ToNetwork,
-		WalletPK:    profile.WalletPK,
+		PK:          profile.WalletPK,
 		Amount:      am,
 		FromToken:   p.FromToken,
 		ToToken:     p.ToToken,
@@ -364,7 +364,7 @@ func EstimateStargateBridgeSwapCost(ctx context.Context, p *v1.StargateBridgeTas
 	swap, err := swapper.StargateBridgeSwap(ctx, &defi.DefaultBridgeReq{
 		FromNetwork:  p.FromNetwork,
 		ToNetwork:    p.ToNetwork,
-		WalletPK:     profile.WalletPK,
+		PK:           profile.WalletPK,
 		Amount:       bozdo.Percent(am, 90),
 		FromToken:    p.FromToken,
 		ToToken:      p.ToToken,

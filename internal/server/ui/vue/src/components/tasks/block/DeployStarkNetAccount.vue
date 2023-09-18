@@ -14,7 +14,7 @@
 <script lang="ts">
 import {DeployStarkNetAccountTask, Network, Task, TaskType} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
-import {TaskSpec} from "@/components/tasks/tasks";
+import {TaskSpec} from "@/components/tasks/utils";
 
 export default defineComponent({
   name: "TaskDeployStarkNetAccount",

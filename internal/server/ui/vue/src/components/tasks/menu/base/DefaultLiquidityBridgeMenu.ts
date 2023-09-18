@@ -26,10 +26,10 @@ import {getAmountSend} from "../helper";
       <GasOptions :item="item.tx" :network="item.fromNetwork"/>
     </div>
     </div>`,
-  name: 'DefaultBridgeMenu',
+  name: 'DefaultLiquidityBridgeMenu',
   components: {MenuTaskSettings, GasOptions},
 })
-export default class DefaultBridgeMenu extends Vue {
+export default class DefaultLiquidityBridgeMenu extends Vue {
   @Prop() task!: Task
   @Prop() status!: ProcessStatus
 
@@ -69,14 +69,9 @@ export default class DefaultBridgeMenu extends Vue {
       return 'not started'
     }
 
-    if (this.item.tx.received) {
-      return 'completed'
-    }
-
     if (this.item.tx.txCompleted) {
       return 'completed'
     }
-
 
     return 'waiting'
   }

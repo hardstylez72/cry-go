@@ -275,6 +275,32 @@ export interface CreateFlowResponse {
   flow: flow_Flow;
 }
 
+export interface DefaultBridge {
+  /**  */
+  fromNetwork: Network;
+
+  /**  */
+  toNetwork: Network;
+
+  /**  */
+  fromToken: Token;
+
+  /**  */
+  toToken: Token;
+
+  /**  */
+  amount: Amount;
+
+  /**  */
+  approveTx?: TaskTx;
+
+  /**  */
+  tx?: TaskTx;
+
+  /**  */
+  received: boolean;
+}
+
 export interface DefaultLP {
   /**  */
   amount: Amount;
@@ -711,6 +737,9 @@ export interface Task {
 
   /**  */
   odosSwapTask?: DefaultSwap;
+
+  /**  */
+  acrossBridgeTask?: DefaultBridge;
 }
 
 export interface TaskTx {
@@ -942,7 +971,8 @@ export enum TaskType {
   'StarkNetBridge' = 'StarkNetBridge',
   'Dmail' = 'Dmail',
   'StarkNetIdMint' = 'StarkNetIdMint',
-  'OdosSwap' = 'OdosSwap'
+  'OdosSwap' = 'OdosSwap',
+  'AcrossBridge' = 'AcrossBridge'
 }
 
 export enum Token {

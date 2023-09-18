@@ -8,7 +8,7 @@ import (
 )
 
 func Round(v float64, prec int) float64 {
-	
+
 	s := FloatToString(v)
 
 	mainFinish := 0
@@ -133,4 +133,12 @@ func FloatToString(v float64) string {
 
 func StringToFloat(s string) (float64, error) {
 	return strconv.ParseFloat(s, 10)
+}
+
+func IntToString(v int64) string {
+	return strconv.FormatInt(v, 10)
+}
+
+func StringToInt(s string) (int64, error) {
+	return strconv.ParseInt(s, 10, 64)
 }

@@ -29,7 +29,7 @@ func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.Default
 
 	contractAddr := common.HexToAddress("0xDAc7479e5F7c01CC59bbF7c1C4EDF5604ADA1FF2")
 
-	wt, err := NewWalletTransactor(req.WalletPK, c.Cfg.networkId)
+	wt, err := NewWalletTransactor(req.PK, c.Cfg.networkId)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (m stargateBridgeMaker) MakeBridgeTx(ctx context.Context, req *defi.Default
 
 	fee, err := m.GetStargateBridgeFee(ctx, &GetStargateBridgeFeeReq{
 		ToChain:  req.ToNetwork,
-		WalletPK: req.WalletPK,
+		WalletPK: req.PK,
 	})
 	if err != nil {
 		return nil, err

@@ -5,7 +5,7 @@
     </div>
     <div>From: <b>{{ item.fromNetwork }}</b></div>
     <div>To: <b>{{ item.toNetwork }}</b></div>
-    <div>Token: <b>{{ item.token }} </b></div>
+    <div>Token: <b>{{ item.fromToken }} -> {{ item.toToken }} </b></div>
     <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>
     <div>Status:
       <span :style="statusColor">{{ getTxStatus }}</span>
@@ -16,15 +16,14 @@
 
 <script lang="ts">
 
-import DefaultSwapMenu from "@/components/tasks/menu/base/DefaultSwapMenu.js";
-import {Component, toNative} from "vue-facing-decorator";
-import DefaultLiquidityBridgeMenu from "@/components/tasks/menu/base/DefaultLiquidityBridgeMenu";
+import {Component} from "vue-facing-decorator";
+import DefaultBridgeMenu from "@/components/tasks/menu/base/DefaultBridgeMenu";
 
-@Component({name: 'MenuStarkNetBridge'})
-export default class MenuStarkNetBridge extends DefaultLiquidityBridgeMenu {
+@Component({name: 'BridgeAcrossMenu'})
+export default class BridgeAcrossMenu extends DefaultBridgeMenu {
   created() {
-    if (this.task?.starkNetBridgeTask) {
-      this.item = this.task.starkNetBridgeTask
+    if (this.task?.acrossBridgeTask) {
+      this.item = this.task.acrossBridgeTask
     }
   }
 }

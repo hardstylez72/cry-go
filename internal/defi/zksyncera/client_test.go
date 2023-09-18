@@ -2,6 +2,7 @@ package zksyncera
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/hardstylez72/cry/internal/tests"
@@ -14,7 +15,28 @@ func Test(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 
-	r.WaitTxComplete(context.Background(), "0xf0ce2ba93e5d068cd47a64b79fbc04df42876d9c29a2b7b5cb909d4f7efb148e")
+	d := AcrossBridge{
+		cli:     r,
+		HttpCli: &http.Client{},
+		Debug:   true,
+	}
+
+	d.WaitTxComplete(context.Background(), "0x34cd2eddfc129d7040fa87f292e82cd0433f37b71b4204ccc3e2342925059ec0")
+
+	//d.MakeBridgeTx(context.Background(), &defi.DefaultBridgeReq{
+	//	FromNetwork:  v1.Network_ZKSYNCERA,
+	//	ToNetwork:    v1.Network_ARBITRUM,
+	//	PK:           tests.GetConfig().PK,
+	//	Amount:       big.NewInt(100_000_0),
+	//	FromToken:    v1.Token_USDC,
+	//	ToToken:      v1.Token_USDC,
+	//	Gas:          nil,
+	//	Slippage:     "0.01",
+	//	EstimateOnly: true,
+	//	Debug:        false,
+	//})
+
+	//r.WaitTxComplete(context.Background(), "0xf0ce2ba93e5d068cd47a64b79fbc04df42876d9c29a2b7b5cb909d4f7efb148e")
 
 	//ctx := context.Background()
 	//

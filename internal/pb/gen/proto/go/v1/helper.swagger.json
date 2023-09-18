@@ -796,7 +796,8 @@
         "StarkNetBridge",
         "Dmail",
         "StarkNetIdMint",
-        "OdosSwap"
+        "OdosSwap",
+        "AcrossBridge"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
