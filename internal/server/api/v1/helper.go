@@ -297,3 +297,23 @@ func (s *HelperService) SupportMessage(ctx context.Context, req *v1.SupportMessa
 	}
 	return &v1.SupportMessageRes{}, nil
 }
+
+func (s *HelperService) UsePromo(ctx context.Context, req *v1.UsePromoReq) (*v1.UsePromoRes, error) {
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := s.payService.AddPromo(ctx, &paycli.AddPromoReq{
+		UserId: userId,
+		Promo:  req.Promo,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.UsePromoRes{
+		Valid: res.Valid,
+		Bonus: res.Bonus,
+	}, nil
+}

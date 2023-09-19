@@ -1,8 +1,5 @@
 <template>
-  <div class="d-inline-flex">
-    <a :href="taskProps.StargateBridge.service.link" target="_blank">{{ taskProps.StargateBridge.service.name }}</a>
-    <MenuTaskSettings :network="item.fromNetwork"/>
-  </div>
+  <MenuTaskSettings :network="item.fromNetwork"/>
   <div>Network: <b>{{ `${item.fromNetwork} to ${item.toNetwork}` }}</b></div>
   <div>Token: <b>{{ `${item.fromToken} to ${item.toToken}` }}</b></div>
   <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>

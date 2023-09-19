@@ -19,7 +19,7 @@
 
     </v-list-item>
   </v-list>
-  <v-btn v-if="showNext" @click="next" width="100%">More</v-btn>
+  <v-btn v-if="showNext" @click="next" width="100%">Еще</v-btn>
 </template>
 
 <script lang="ts">

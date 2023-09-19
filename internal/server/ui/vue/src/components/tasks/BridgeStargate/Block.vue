@@ -198,10 +198,10 @@ export default defineComponent({
         tokenBridgePair(Network.AVALANCHE, Network.POLIGON, Token.STG, Token.STG),
 
         tokenBridgePair(Network.AVALANCHE, Network.ARBITRUM, Token.USDT, Token.USDT),
-        tokenBridgePair(Network.AVALANCHE, Network.ARBITRUM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.AVALANCHE, Network.ARBITRUM, Token.USDC, Token.USDCBridged),
         tokenBridgePair(Network.AVALANCHE, Network.ARBITRUM, Token.STG, Token.STG),
 
-        tokenBridgePair(Network.AVALANCHE, Network.OPTIMISM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.AVALANCHE, Network.OPTIMISM, Token.USDC, Token.USDCBridged),
         tokenBridgePair(Network.AVALANCHE, Network.OPTIMISM, Token.STG, Token.STG),
 
         // from POLIGON
@@ -214,11 +214,11 @@ export default defineComponent({
         tokenBridgePair(Network.POLIGON, Network.AVALANCHE, Token.USDT, Token.USDT),
 
         tokenBridgePair(Network.POLIGON, Network.ARBITRUM, Token.STG, Token.STG),
-        tokenBridgePair(Network.POLIGON, Network.ARBITRUM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.POLIGON, Network.ARBITRUM, Token.USDC, Token.USDCBridged),
         tokenBridgePair(Network.POLIGON, Network.ARBITRUM, Token.USDT, Token.USDT),
 
         tokenBridgePair(Network.POLIGON, Network.OPTIMISM, Token.STG, Token.STG),
-        tokenBridgePair(Network.POLIGON, Network.OPTIMISM, Token.USDC, Token.USDC),
+        tokenBridgePair(Network.POLIGON, Network.OPTIMISM, Token.USDC, Token.USDCBridged),
 
         // from ZKSYNCERA
         tokenBridgePair(Network.ZKSYNCERA, Network.BinanaceBNB, Token.MAV, Token.MAV),

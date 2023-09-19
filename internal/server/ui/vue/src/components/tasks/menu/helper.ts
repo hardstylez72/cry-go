@@ -41,4 +41,4 @@ export const onlyInteger = (v: any) => {
   return 'number must be integer'
 }
 
-export const required = (v: any) => !!v || 'required'
+export const required = (v: any) => !!v || 'обязательно для заполнения'

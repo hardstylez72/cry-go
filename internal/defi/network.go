@@ -10,7 +10,7 @@ func (c *EtheriumClient) GetNetworkId(ctx context.Context) (*big.Int, error) {
 	if err != nil {
 		return nil, err
 	}
-	c.Cfg.networkId = id
+	c.Cfg.NetworkId = id
 	return id, nil
 }
 func (c *EtheriumClient) SuggestGasPrice(ctx context.Context) (*big.Int, error) {

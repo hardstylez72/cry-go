@@ -283,7 +283,9 @@ func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network, tt v1.T
 		TotalGas:            *totalGas,
 	}
 
-	gas = GasMultiplier(&s.GasMultiplier, gas)
+	if tt != v1.TaskType_Dmail {
+		gas = GasMultiplier(&s.GasMultiplier, gas)
+	}
 
 	if maxGas.Cmp(&gas.TotalGas) <= -1 {
 		max := defi.AmountUni(maxGas, n)

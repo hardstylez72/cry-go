@@ -64,5 +64,6 @@ func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.
 		PayableTasks:    task.PayableTasks,
 		NonpayableTasks: task.NonPayableTasks,
 		Groups:          groups.Keys(),
+		Promo:           res.Account.Promo,
 	}, nil
 }

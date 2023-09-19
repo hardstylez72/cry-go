@@ -39,6 +39,11 @@ func (a *AcrossBridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq, t
 
 func (a *AcrossBridge) MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.TxData, error) {
 
+	value := big.NewInt(0)
+	if req.FromToken == v1.Token_ETH {
+		value = req.Amount
+	}
+
 	ca := common.HexToAddress("0xE0B015E54d54fc84a6cB9B666099c46adE9335FF")
 
 	wt, err := NewWalletTransactor(req.PK, a.NetworkId)
@@ -102,7 +107,7 @@ func (a *AcrossBridge) MakeBridgeTx(ctx context.Context, req *defi.DefaultBridge
 
 	return &bozdo.TxData{
 		Data:         data,
-		Value:        nil,
+		Value:        value,
 		ContractAddr: ca,
 		Details:      nil,
 		Rate:         nil,

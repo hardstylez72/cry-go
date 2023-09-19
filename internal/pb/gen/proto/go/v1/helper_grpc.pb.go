@@ -33,6 +33,7 @@ type HelperServiceClient interface {
 	GetOrderHistory(ctx context.Context, in *GetOrderHistoryReq, opts ...grpc.CallOption) (*GetOrderHistoryRes, error)
 	TransactionsDailyImpact(ctx context.Context, in *TransactionsDailyImpactReq, opts ...grpc.CallOption) (*TransactionsDailyImpactRes, error)
 	SupportMessage(ctx context.Context, in *SupportMessageReq, opts ...grpc.CallOption) (*SupportMessageRes, error)
+	UsePromo(ctx context.Context, in *UsePromoReq, opts ...grpc.CallOption) (*UsePromoRes, error)
 }
 
 type helperServiceClient struct {
@@ -142,6 +143,15 @@ func (c *helperServiceClient) SupportMessage(ctx context.Context, in *SupportMes
 	return out, nil
 }
 
+func (c *helperServiceClient) UsePromo(ctx context.Context, in *UsePromoReq, opts ...grpc.CallOption) (*UsePromoRes, error) {
+	out := new(UsePromoRes)
+	err := c.cc.Invoke(ctx, "/helper.HelperService/UsePromo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HelperServiceServer is the server API for HelperService service.
 // All implementations must embed UnimplementedHelperServiceServer
 // for forward compatibility
@@ -157,6 +167,7 @@ type HelperServiceServer interface {
 	GetOrderHistory(context.Context, *GetOrderHistoryReq) (*GetOrderHistoryRes, error)
 	TransactionsDailyImpact(context.Context, *TransactionsDailyImpactReq) (*TransactionsDailyImpactRes, error)
 	SupportMessage(context.Context, *SupportMessageReq) (*SupportMessageRes, error)
+	UsePromo(context.Context, *UsePromoReq) (*UsePromoRes, error)
 	mustEmbedUnimplementedHelperServiceServer()
 }
 
@@ -196,6 +207,9 @@ func (UnimplementedHelperServiceServer) TransactionsDailyImpact(context.Context,
 }
 func (UnimplementedHelperServiceServer) SupportMessage(context.Context, *SupportMessageReq) (*SupportMessageRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SupportMessage not implemented")
+}
+func (UnimplementedHelperServiceServer) UsePromo(context.Context, *UsePromoReq) (*UsePromoRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UsePromo not implemented")
 }
 func (UnimplementedHelperServiceServer) mustEmbedUnimplementedHelperServiceServer() {}
 
@@ -408,6 +422,24 @@ func _HelperService_SupportMessage_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HelperService_UsePromo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UsePromoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelperServiceServer).UsePromo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/helper.HelperService/UsePromo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelperServiceServer).UsePromo(ctx, req.(*UsePromoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HelperService_ServiceDesc is the grpc.ServiceDesc for HelperService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -458,6 +490,10 @@ var HelperService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SupportMessage",
 			Handler:    _HelperService_SupportMessage_Handler,
+		},
+		{
+			MethodName: "UsePromo",
+			Handler:    _HelperService_UsePromo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

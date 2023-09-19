@@ -76,6 +76,16 @@ export default defineComponent({
 
   data() {
     return {
+      opt: new Map<Network, Token[]>([
+        [Network.ARBITRUM, [Token.USDT, Token.USDC, Token.USDCBridged, Token.ETH]],
+        [Network.StarkNet, [Token.ETH]],
+        [Network.ZKSYNCERA, [Token.ETH, Token.USDC]],
+        [Network.Etherium, [Token.ETH, Token.USDC, Token.USDT]],
+        [Network.AVALANCHE, [Token.USDC, Token.USDT]],
+        [Network.POLIGON, [Token.USDC, Token.USDT]],
+        [Network.BinanaceBNB, [Token.USDC, Token.USDT]],
+        [Network.OPTIMISM, [Token.ETH, Token.USDC, Token.USDT]],
+      ]),
       item: {
         network: Network.AVALANCHE,
         token: Token.USDT
@@ -84,30 +94,11 @@ export default defineComponent({
   },
   computed: {
     tokens(): Token[] {
-      if (this.item.network === Network.ARBITRUM) {
-        return [
-          Token.USDT,
-          Token.USDC,
-          Token.ETH,
-        ]
+      const tokens = this.opt.get(this.item.network)
+      if (!tokens) {
+        return []
       }
-
-      if (this.item.network === Network.StarkNet) {
-        return [
-          Token.ETH,
-        ]
-      }
-
-      if (this.item.network === Network.ZKSYNCERA) {
-        return [
-          Token.USDC,
-          Token.ETH,
-        ]
-      }
-      return [
-        Token.USDT,
-        Token.USDC,
-      ]
+      return tokens
     },
     networks(): Network[] {
       if (this.item.token === Token.ETH) {

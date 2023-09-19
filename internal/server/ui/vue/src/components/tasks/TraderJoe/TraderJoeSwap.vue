@@ -61,13 +61,21 @@ export default class TraderJoeSwap extends DefaultSwapTask {
   }
   pairs: SwapPair[] = [
     tokenSwapPair(Token.STG, Token.ETH),
+
     tokenSwapPair(Token.ETH, Token.USDT),
     tokenSwapPair(Token.USDT, Token.ETH),
+
     tokenSwapPair(Token.ETH, Token.USDC),
     tokenSwapPair(Token.USDC, Token.ETH),
 
     tokenSwapPair(Token.USDT, Token.USDC),
     tokenSwapPair(Token.USDC, Token.USDT),
+
+    tokenSwapPair(Token.USDC, Token.USDCBridged),
+    tokenSwapPair(Token.USDCBridged, Token.USDC),
+
+    tokenSwapPair(Token.ETH, Token.USDCBridged),
+    tokenSwapPair(Token.USDCBridged, Token.ETH),
   ]
 
   created() {

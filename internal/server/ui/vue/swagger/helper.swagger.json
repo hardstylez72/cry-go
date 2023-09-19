@@ -304,6 +304,38 @@
         ]
       }
     },
+    "/api/gw/v1/promo/use": {
+      "post": {
+        "operationId": "HelperService_UsePromo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/UsePromoRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UsePromoReq"
+            }
+          }
+        ],
+        "tags": [
+          "HelperService"
+        ]
+      }
+    },
     "/api/gw/v1/support": {
       "post": {
         "operationId": "HelperService_SupportMessage",
@@ -568,6 +600,12 @@
       "properties": {
         "status": {
           "type": "string"
+        },
+        "bonus": {
+          "type": "string"
+        },
+        "promo": {
+          "type": "string"
         }
       },
       "required": [
@@ -609,6 +647,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "promo": {
+          "type": "string"
         }
       },
       "required": [
@@ -825,6 +866,33 @@
         "myImpact",
         "totalImpact",
         "topImpact"
+      ]
+    },
+    "UsePromoReq": {
+      "type": "object",
+      "properties": {
+        "promo": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "promo"
+      ]
+    },
+    "UsePromoRes": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        },
+        "bonus": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "valid",
+        "bonus"
       ]
     },
     "ValidatePKRequest": {

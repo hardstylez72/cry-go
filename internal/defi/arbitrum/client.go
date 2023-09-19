@@ -66,6 +66,7 @@ func NewClient(c *ClientConfig) (*Client, error) {
 		Dict:      &Dict,
 		Httpcli:   config.HttpCli,
 		TxViewFn:  TxViewer,
+		NetworkId: bozdo.ChainMap[v1.Network_ARBITRUM],
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum main: "+c.RPCEndpoint)

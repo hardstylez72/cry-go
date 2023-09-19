@@ -3,11 +3,11 @@
     <NavBar title="Биллинг"/>
     <div class="mb-5">
       <div class="my-1 text-h6"> Пользователь: {{ store.email }}</div>
-      <div class="d-flex flex-row my-1 text-h5 ">
+      <div class="d-inline-flex my-1 text-h5 ">
         <div class="mr-1">Баланс: <b>{{ store.ass }}</b>
-          <TopUp/>
+          <TopUp class="mx-2"/>
+          <Promo v-if="!store.promo" class="mx-2"/>
         </div>
-
       </div>
       <div class="my-1 text-h5">Task execution price: <b>{{ store.taskPrice }}</b></div>
 
@@ -48,10 +48,11 @@ import TaskHistory from "@/components/billing/TaskHistory.vue";
 import TopUp from "@/components/billing/TopUp.vue";
 import PaymentHistory from "@/components/billing/PaymentHistory.vue";
 import NavBar from "@/components/NavBar.vue";
+import Promo from "@/components/billing/Promo.vue";
 
 export default defineComponent({
   name: "Billing",
-  components: {NavBar, PaymentHistory, TopUp, TaskHistory},
+  components: {Promo, NavBar, PaymentHistory, TopUp, TaskHistory},
   created() {
   },
   data() {

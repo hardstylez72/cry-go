@@ -24,6 +24,7 @@ export const useUserStore = defineStore('user', {
       top: "0",
       total: "0"
     },
+    promo: '',
     support: false,
     controlledBy: false,
   }),
@@ -54,6 +55,7 @@ export const useUserStore = defineStore('user', {
           state.taskPrice = Number(res.taskPrice).toFixed(2) + " USD"
           state.payableTasks = res.payableTasks
           state.nonpayableTasks = res.nonpayableTasks
+          state.promo = res.promo
           if (res.groups.find(g => g === 'support')) {
             state.support = true
           }
@@ -70,8 +72,8 @@ export const useUserStore = defineStore('user', {
           state.taskPrice = '0 USD'
           state.support = false
           state.controlledBy = false
+          state.promo = ''
         })
-
 
         await this.redirectToGeneralPage()
       }

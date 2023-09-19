@@ -47,7 +47,7 @@ type ClientConfig struct {
 	Dict      *Dict
 	Httpcli   *http.Client
 	TxViewFn  func(s string) string
-	networkId *big.Int
+	NetworkId *big.Int
 }
 
 func NewEVMClient(c *ClientConfig) (*EtheriumClient, error) {

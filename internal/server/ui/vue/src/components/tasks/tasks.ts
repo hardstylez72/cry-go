@@ -2,19 +2,19 @@ import {Network, Task, TaskType} from "@/generated/flow";
 import {flow_Flow} from "@/generated/process";
 
 
-import TaskStargateBridge from "@/components/tasks/block/TaskStargateBridge.vue";
+import TaskStargateBridge from "@/components/tasks/BridgeStargate/Block.vue";
 import TaskDelay from "@/components/tasks/block/Delay.vue";
-import TaskExchangeWithdraw from "@/components/tasks/block/ExchangeWithdraw.vue";
-import TaskOkexDeposit from "@/components/tasks/block/OkexDeposit.vue";
+import TaskExchangeWithdraw from "@/components/tasks/Exchange/Withdraw.vue";
+import TaskOkexDeposit from "@/components/tasks/Exchange/Deposit.vue";
 import TaskTestNetBridgeSwap from "@/components/tasks/block/TaskTestNetBridgeSwap.vue";
 import TaskSnapshotVote from "@/components/tasks/block/TaskSnapshotVote.vue";
 import TaskSyncSwap from "@/components/tasks/block/SyncSwap.vue";
 import MenuTaskSyncSwap from "@/components/tasks/menu/MenuSyncSwap.vue";
 import MenuDelayTask from "@/components/tasks/menu/DelayMenu.vue";
-import MenuExchangeWithdraw from "@/components/tasks/menu/ExchangeWithdraw.vue";
-import MenuOkexDeposit from "@/components/tasks/menu/OkexDeposit.vue";
+import MenuExchangeWithdraw from "@/components/tasks/Exchange/WithdrawMenu.vue";
+import MenuOkexDeposit from "@/components/tasks/Exchange/DepositMenu.vue";
 import MenuSnapshotTask from "@/components/tasks/menu/Snapshot.vue";
-import MenuTaskStargateBridge from "@/components/tasks/menu/MenuTaskStargateBridge.vue";
+import MenuTaskStargateBridge from "@/components/tasks/BridgeStargate/Menu.vue";
 import MenuTaskTestNetBridge from "@/components/tasks/menu/MenuTaskTestNetBridge.vue";
 import TaskZkSyncOfficialBridgeToEth from "@/components/tasks/block/TaskZkSyncOfficialBridgeToEth.vue";
 import TaskOrbiterBridge from "@/components/tasks/block/TaskOrbiterBridge.vue";
@@ -43,8 +43,8 @@ import TaskEzkaliburSwap from "@/components/tasks/block/EzkaliburSwap.vue";
 import MenuTaskEzkaliburSwap from "@/components/tasks/menu/MenuEzkaliburSwap.vue";
 import TaskZkSwap from "@/components/tasks/block/ZkSwap.vue";
 import MenuTaskZkSwap from "@/components/tasks/menu/MenuZkSwap.vue";
-import TaskTraderJoeSwap from "@/components/tasks/block/TraderJoeSwap.vue";
-import MenuTaskTraderJoeSwap from "@/components/tasks/menu/MenuTraderJoeSwap.vue";
+import TaskTraderJoeSwap from "@/components/tasks/TraderJoe/TraderJoeSwap.vue";
+import MenuTaskTraderJoeSwap from "@/components/tasks/TraderJoe/MenuTraderJoeSwap.vue";
 import MenuTaskMerklyNFT from "@/components/tasks/menu/MenuTaskMerklyNFT.vue";
 import TaskMerklyNFT from "@/components/tasks/block/TaskMerklyNFT.vue";
 import TaskDeployStarkNetAccount from "@/components/tasks/block/DeployStarkNetAccount.vue";
@@ -71,7 +71,10 @@ import MenuStarkNetId from "@/components/tasks/menu/MenuStarkNetId.vue";
 import MenuOdosSwap from "@/components/tasks/menu/MenuOdosSwap.vue";
 import OdosSwap from "@/components/tasks/block/OdosSwap.vue";
 import {AcrossBridgeSpec} from "@/components/tasks/BridgeAcross";
-import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
+import {Airdrop, allNetworks, TaskJob, TaskSpec, Universal} from "@/components/tasks/utils";
+import {StargateBridgeSpec} from "@/components/tasks/BridgeStargate";
+import {TraderJoeSpec} from "@/components/tasks/TraderJoe";
+import {ExchangeDeposit, ExchangeWithdrawSpec} from "@/components/tasks/Exchange";
 
 
 export interface TaskArg {
@@ -82,19 +85,6 @@ export interface TaskArg {
   taskType: TaskType
 }
 
-
-const Universal = [Airdrop.ZkSync, Airdrop.StarkNet, Airdrop.Orbiter, Airdrop.LayerZero]
-
-export const allNetworks: Network[] = [
-  Network.ZKSYNCERA,
-  Network.ARBITRUM,
-  Network.StarkNet,
-  Network.AVALANCHE,
-  Network.BinanaceBNB,
-  Network.POLIGON,
-  Network.OPTIMISM,
-  Network.Etherium
-]
 
 const deprecated: TaskSpec = {
   deprecated: true,
@@ -139,72 +129,9 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     airdrops: new Set<Airdrop>(Universal),
     profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
   },
-  StargateBridge: {
-    deprecated: false,
-    canBeEstimated: true,
-    menu: MenuTaskStargateBridge,
-    component: TaskStargateBridge,
-    descFn(task) {
-      let p = task.stargateBridgeTask
-      return ` (${p?.fromNetwork} ${p?.fromToken} to ${p?.toNetwork} ${p?.toToken})`
-    },
-    service: {
-      name: 'Stargate',
-      img: '/icons/stg.svg',
-      link: 'https://stargate.finance/',
-      op: 'bridge',
-    },
-    networks: new Set<Network>([
-      Network.BinanaceBNB,
-      Network.POLIGON,
-      Network.AVALANCHE,
-      Network.OPTIMISM,
-      Network.ARBITRUM,
-      Network.ZKSYNCERA]),
-    job: TaskJob.Bridge,
-    airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync]),
-    profileType: new Set([ProfileType.EVM])
-  },
-  WithdrawExchange: {
-    deprecated: false,
-    canBeEstimated: false,
-    menu: MenuExchangeWithdraw,
-    component: TaskExchangeWithdraw,
-    descFn(task) {
-      let p = task.withdrawExchangeTask
-      return ` (${p?.network} am: ${p?.sendAllCoins ? 'all' : `[${p?.amountMin}:${p?.amountMax}]`} ${p?.token})`
-    },
-    service: {
-      name: 'Вывод',
-      img: '',
-      link: '',
-      op: 'вывод',
-    },
-    job: TaskJob.Exchange,
-    networks: new Set<Network>(allNetworks),
-    airdrops: new Set<Airdrop>(Universal),
-    profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
-  },
-  OkexDeposit: {
-    deprecated: false,
-    canBeEstimated: true,
-    menu: MenuOkexDeposit,
-    component: TaskOkexDeposit,
-    descFn(task) {
-      let p = task.okexDepositTask
-      return ` (${p?.network} ${p?.token})`
-    },
-    service: {
-      name: 'Депозит',
-      link: 'https://www.okx.com/',
-      img: '',
-      op: 'депозит',
-    },
-    job: TaskJob.Exchange,
-    networks: new Set<Network>(allNetworks),
-    airdrops: new Set<Airdrop>(Universal),
-    profileType: new Set([ProfileType.EVM])
-  },
+  StargateBridge: StargateBridgeSpec,
+  WithdrawExchange: ExchangeWithdrawSpec,
+  OkexDeposit: ExchangeDeposit,
   TestNetBridgeSwap: {
     deprecated: false,
     canBeEstimated: false,
@@ -527,26 +454,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
     profileType: new Set([ProfileType.EVM])
   },
-  TraderJoeSwap: {
-    deprecated: false,
-    canBeEstimated: true,
-    descFn(task) {
-      const p = task.traderJoeSwapTask
-      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
-    },
-    component: TaskTraderJoeSwap,
-    menu: MenuTaskTraderJoeSwap,
-    service: {
-      name: 'TraderJoe',
-      link: 'https://traderjoexyz.com/arbitrum/trade',
-      img: '/icons/traderjoe.png',
-      op: 'trade',
-    },
-    job: TaskJob.Swap,
-    networks: new Set<Network>([Network.ARBITRUM]),
-    airdrops: new Set<Airdrop>(Universal),
-    profileType: new Set([ProfileType.EVM])
-  },
+  TraderJoeSwap: TraderJoeSpec,
   MerklyMintAndBridgeNFT: {
     deprecated: false,
     canBeEstimated: true,

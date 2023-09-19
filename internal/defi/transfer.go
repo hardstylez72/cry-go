@@ -197,7 +197,7 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 		Data:      data,
 	})
 
-	signedTx, err := types.SignTx(tx, types.NewLondonSigner(c.Cfg.networkId), r.Wallet.PrivateKey)
+	signedTx, err := types.SignTx(tx, types.NewLondonSigner(c.Cfg.NetworkId), r.Wallet.PrivateKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "types.SignTx")
 	}

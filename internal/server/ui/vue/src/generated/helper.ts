@@ -311,6 +311,28 @@ export class HelperService {
   /**
    *
    */
+  helperServiceUsePromo(
+    params: {
+      /**  */
+      body: UsePromoReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<UsePromoRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/promo/use';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   helperServiceSupportMessage(
     params: {
       /**  */
@@ -456,6 +478,12 @@ export interface GetOrderStatusReq {
 export interface GetOrderStatusRes {
   /**  */
   status: string;
+
+  /**  */
+  bonus?: string;
+
+  /**  */
+  promo?: string;
 }
 
 export interface GetUserRequest {}
@@ -481,6 +509,9 @@ export interface GetUserResponse {
 
   /**  */
   groups: string[];
+
+  /**  */
+  promo?: string;
 }
 
 export interface Order {
@@ -547,6 +578,19 @@ export interface TransactionsDailyImpactRes {
 
   /**  */
   topImpact: string;
+}
+
+export interface UsePromoReq {
+  /**  */
+  promo: string;
+}
+
+export interface UsePromoRes {
+  /**  */
+  valid: boolean;
+
+  /**  */
+  bonus: number;
 }
 
 export interface ValidatePKRequest {

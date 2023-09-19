@@ -214,7 +214,12 @@ func (t *OkexDepositTask) OkexSubMainTransfer(ctx context.Context, a *Input) err
 		return err
 	}
 
-	b, err := subb.GetBalance(ctx, p.Token.String())
+	token := p.Token.String()
+	if p.Token == v1.Token_USDCBridged {
+		token = "USDC"
+	}
+
+	b, err := subb.GetBalance(ctx, token)
 	if err != nil {
 		return err
 	}
@@ -227,7 +232,7 @@ func (t *OkexDepositTask) OkexSubMainTransfer(ctx context.Context, a *Input) err
 	}
 
 	if err := main.SubsToMain(ctx, &okex.SubsToMainReq{
-		Ccy: p.Token.String(),
+		Ccy: token,
 	}); err != nil {
 		return err
 	}
@@ -249,7 +254,12 @@ func GetOkexDepositAddr(ctx context.Context, profile *halp.Profile, p *v1.OkexDe
 		return nil, err
 	}
 
-	addrMap, err := okexCli.GetDepositAddress(ctx, p.Token.String())
+	token := p.Token.String()
+	if p.Token == v1.Token_USDCBridged {
+		token = "USDC"
+	}
+
+	addrMap, err := okexCli.GetDepositAddress(ctx, token)
 	if err != nil {
 		return nil, err
 	}

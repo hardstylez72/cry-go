@@ -11,23 +11,22 @@
     </template>
 
     <v-card>
-      <v-card-title>Balance TopUp</v-card-title>
+      <v-card-title>Пополнение</v-card-title>
       <v-card-text>
-        <div class="d-flex justify-space-between my-4">
+        <v-form ref="form" class="d-flex justify-space-between my-4">
           <v-text-field
             class="mr-3"
             type="number"
             v-model="amInput"
             density="compact"
             variant="outlined"
-            placeholder="enter amount in USDT"
+            placeholder="введите количество USDT"
             :disabled="amInputDisabled"
             :rules="[onlyInteger,required]"
             suffix="USDT"
-            hide-details
           />
-          <v-btn v-if="!amInputDisabled" rounded="false" @click="amountFilled">Next</v-btn>
-        </div>
+          <v-btn v-if="!amInputDisabled" rounded="false" @click="createOrder">Next</v-btn>
+        </v-form>
         <div v-if="amInputDisabled">
           <span>Send exact amount of <b>{{ amToSend }} <a :href="coinAddrUrl"
                                                           target="_blank">USDT</a></b>
@@ -65,14 +64,20 @@
 import {defineComponent} from 'vue';
 import {helperService} from "@/generated/services";
 import {onlyInteger, required} from "@/components/tasks/menu/helper";
+import {mapStores} from "pinia";
+import {useUserStore} from "@/plugins/pinia";
 
 export default defineComponent({
   name: "TopUp",
   created() {
   },
+  computed: {
+    ...mapStores(useUserStore),
+  },
   data() {
     return {
       amInput: "",
+      promo: "",
       dialog: false,
       amInputDisabled: false,
       orderCreating: false,
@@ -89,8 +94,13 @@ export default defineComponent({
   methods: {
     required,
     onlyInteger,
-    async amountFilled() {
+    async createOrder() {
       try {
+
+        if (!await this.validateForm()) {
+          return
+        }
+
         this.orderCreating = true
         const res = await helperService.helperServiceCreateOrder({body: {am: this.amInput}})
         this.amInputDisabled = true
@@ -125,6 +135,13 @@ export default defineComponent({
         clearInterval(this.pollerTimer)
       }
     },
+    async validateForm(): Promise<boolean> {
+      // @ts-ignore попизди мне еще что руки из жопы у меня ага
+      // спасибо китайцам скажи лучше
+      const {valid} = await this["$refs"]['form'].validate()
+
+      return valid
+    },
     async checkOrder() {
       try {
         const res = await helperService.helperServiceGetOrderStatus({body: {orderId: this.orderId}})
@@ -134,6 +151,7 @@ export default defineComponent({
 
         } else if (res.status === 'Processed') {
           this.finished = true
+          await this.userStore.syncUser()
           this.stopPolling()
         }
       } finally {

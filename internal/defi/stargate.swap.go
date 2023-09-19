@@ -13,15 +13,15 @@ import (
 var (
 	PoolIdMap = map[v1.Network]map[Token]int64{
 		v1.Network_ARBITRUM: {
-			v1.Token_USDC: 1,
-			v1.Token_USDT: 2,
+			v1.Token_USDCBridged: 1,
+			v1.Token_USDT:        2,
 			//"FRAX":    7,
 			v1.Token_ETH: 13,
 			//"LUSD":    15,
 			//"MAI":     16,
 		},
 		v1.Network_OPTIMISM: {
-			v1.Token_USDC: 1,
+			v1.Token_USDCBridged: 1,
 			//"DAI":     3,
 			//"FRAX":    7,
 			v1.Token_ETH: 13,

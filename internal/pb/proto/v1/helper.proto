@@ -77,6 +77,32 @@ service HelperService {
       body: "*"
     };
   }
+
+  rpc UsePromo(UsePromoReq) returns (UsePromoRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/promo/use",
+      body: "*"
+    };
+  }
+}
+
+message UsePromoReq {
+  string promo = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["promo"]
+    }
+  };
+}
+
+message UsePromoRes {
+  bool valid = 1;
+  double bonus = 2;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["valid", "bonus"]
+    }
+  };
 }
 
 message SupportMessageReq {
@@ -144,6 +170,8 @@ message GetOrderStatusReq {
 
 message GetOrderStatusRes {
   string status = 1;
+  string bonus = 2;
+  string promo = 3;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["status"]
@@ -235,6 +263,7 @@ message GetUserResponse {
   repeated task.TaskType payable_tasks = 5;
   repeated task.TaskType nonpayable_tasks = 6;
   repeated string groups = 7;
+  optional string promo = 8;
 
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

@@ -107,7 +107,7 @@ func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq)
 	head, errHead := c.Cli.HeaderByNumber(ctx, nil)
 	if errHead == nil && head.BaseFee != nil {
 		txx := &types.DynamicFeeTx{
-			ChainID:   c.Cfg.networkId,
+			ChainID:   c.Cfg.NetworkId,
 			Nonce:     nonce,
 			GasTipCap: nil,
 			GasFeeCap: head.BaseFee,
@@ -130,7 +130,7 @@ func (c *EtheriumClient) TraderJoeSwap(ctx context.Context, req *DefaultSwapReq)
 		tx = types.NewTx(txx)
 	}
 
-	opt, err := bind.NewKeyedTransactorWithChainID(tr.PrivateKey, c.Cfg.networkId)
+	opt, err := bind.NewKeyedTransactorWithChainID(tr.PrivateKey, c.Cfg.NetworkId)
 	if err != nil {
 		return nil, errors.Wrap(err, "bind.NewKeyedTransactorWithChainID")
 	}

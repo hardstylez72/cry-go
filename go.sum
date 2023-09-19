@@ -339,8 +339,8 @@ github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 h1:UH//fgunKIs4JdUbpDl1VZCDa
 github.com/grpc-ecosystem/go-grpc-middleware v1.4.0/go.mod h1:g5qyo/la0ALbONm6Vbp88Yd8NsDy6rZz+RcrMPxvld8=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 h1:YBftPWNWd4WwGqtY2yeZL2ef8rHAxPBD8KFhJpmcqms=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0/go.mod h1:YN5jB8ie0yfIUg6VvR9Kz84aCaG7AsGZnLjhHbUqwPg=
-github.com/hardstylez72/cry-pay v0.0.9 h1:PDQR1ZaHjr+XO3JMYPpDTsJGqoSQUHALVeHpnW1mlc0=
-github.com/hardstylez72/cry-pay v0.0.9/go.mod h1:oWpgV/vDU//w90hLGJDaal65o7X6WNZ/X7cSzDW95Fk=
+github.com/hardstylez72/cry-stats v0.0.10 h1:9BB0Xkv5rOAooD1M2uHdD4yqNGJwfkLmdMVoJNBBFlY=
+github.com/hardstylez72/cry-stats v0.0.10/go.mod h1:oWpgV/vDU//w90hLGJDaal65o7X6WNZ/X7cSzDW95Fk=
 github.com/hashicorp/go-bexpr v0.1.10 h1:9kuI5PFotCboP3dkDYFr/wi0gg0QVbSNz5oFRpxn4uE=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=

@@ -2,6 +2,8 @@ module github.com/hardstylez72/cry
 
 go 1.20
 
+replace github.com/hardstylez72/cry-pay v0.0.10 => github.com/hardstylez72/cry-stats v0.0.10
+
 require (
 	github.com/adshao/go-binance/v2 v2.4.1
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
@@ -20,7 +22,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
-	github.com/hardstylez72/cry-pay v0.0.9
+	github.com/hardstylez72/cry-pay v0.0.10
 	github.com/jackc/pgconn v1.14.0
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/jmoiron/sqlx v1.3.5
