@@ -63,9 +63,11 @@ func (c *odosMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*
 	}
 	inString := prepared.InputTokens[0].Amount
 
+	value := v
+
 	return &bozdo.TxData{
 		Data:         data,
-		Value:        v,
+		Value:        value,
 		ContractAddr: c.CA,
 		Details:      bozdo.NewOdos(inString, outString, v1.Network_ZKSYNCERA, req.FromToken, req.ToToken, quote.PercentDiff),
 		Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, out),
@@ -124,6 +126,10 @@ func (c *odosMaker) Quote(ctx context.Context, in *defi.DefaultSwapReq) (*QuoteR
 	if !supported {
 		return nil, defi.ErrTokenNotSupportedFn(in.FromToken)
 	}
+	if in.FromToken == v1.Token_ETH {
+		fromToken = ZEROADDR
+	}
+
 	toToken, supported := c.Cli.Cfg.TokenMap[in.ToToken]
 	if !supported {
 		return nil, defi.ErrTokenNotSupportedFn(in.FromToken)
@@ -206,7 +212,7 @@ func (c *odosMaker) Assemble(ctx context.Context, in *defi.DefaultSwapReq, in2 *
 	b := AssembleReq{
 		UserAddr: wt.WalletAddrHR,
 		PathId:   in2.PathId,
-		Simulate: false,
+		Simulate: in.FromToken == v1.Token_ETH,
 	}
 
 	body, err := json.Marshal(&b)

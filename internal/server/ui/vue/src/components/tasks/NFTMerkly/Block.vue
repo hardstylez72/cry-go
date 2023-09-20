@@ -1,36 +1,21 @@
 <template>
   <v-card-actions>
     <v-container>
-      <div class="mb-3">use <a target="_blank"
-                               :href="taskProps.MerklyMintAndBridgeNFT.service.link">{{
-          taskProps.MerklyMintAndBridgeNFT.service.name
-        }}</a>
-        to see
-        available options
-      </div>
       <v-row>
         <v-col cols="6">
-          <v-select
-            density="compact"
-            variant="outlined"
+          <NetworkSelector
             label="from network"
-            :rules="[required]"
             :items="getFromNetworks"
+            :disabled="disabled"
             v-model="item.fromNetwork"
-            :disabled="true"
-            hide-details
           />
         </v-col>
         <v-col cols="6">
-          <v-select
-            density="compact"
-            variant="outlined"
+          <NetworkSelector
             label="to network"
-            :rules="[required]"
             :items="getToNetworks"
-            v-model="item.toNetwork"
             :disabled="disabled"
-            hide-details
+            v-model="item.toNetwork"
           />
         </v-col>
       </v-row>
@@ -45,10 +30,11 @@ import WEIInputField from "@/components/WEIInputField.vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
 import {required} from "@/components/tasks/menu/helper";
 import {taskProps} from "@/components/tasks/tasks";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
 export default defineComponent({
   name: "TaskMerklyNFT",
-  components: {AmountInput, WEIInputField},
+  components: {NetworkSelector, AmountInput, WEIInputField},
   emits: ['taskChanged'],
   props: {
     weight: {
@@ -69,10 +55,18 @@ export default defineComponent({
       return taskProps
     },
     getFromNetworks(): Network[] {
-      return this.networks
+      const out = []
+      this.networks.forEach((n, v) => {
+        out.push(v)
+      })
+      return out
     },
     getToNetworks(): Network[] {
-      return this.networks.filter((n) => n !== this.item.fromNetwork)
+      const out = []
+      this.networks.get(this.item.fromNetwork).forEach(n => {
+        out.push(n)
+      })
+      return out
     }
   },
   watch: {
@@ -94,16 +88,71 @@ export default defineComponent({
 
   data() {
     return {
-      networks: [
-        Network.ZKSYNCERA,
-        Network.OPTIMISM,
-        Network.ARBITRUM,
-        Network.AVALANCHE,
-        Network.POLIGON,
-        Network.BinanaceBNB,
-      ] as Network[],
+      networks: new Map<Network, Set<Network>>([
+        [Network.ZKSYNCERA, new Set([
+          Network.OPTIMISM,
+          Network.ARBITRUM,
+          Network.AVALANCHE,
+          Network.POLIGON,
+          Network.BinanaceBNB,
+          Network.ArbitrumNova,
+          Network.Base,
+          Network.Canto,
+          Network.Fantom,
+          Network.Meter,
+          Network.opBNB,
+          Network.PolygonZKEVM,
+          Network.Tenet,
+        ])],
+        [Network.BinanaceBNB, new Set([
+          Network.ZKSYNCERA,
+          Network.OPTIMISM,
+          Network.ARBITRUM,
+          Network.AVALANCHE,
+          Network.POLIGON,
+          Network.ArbitrumNova,
+          Network.Base,
+          Network.Canto,
+          Network.Fantom,
+          Network.Meter,
+          Network.opBNB,
+          Network.PolygonZKEVM,
+          Network.Tenet,
+        ])],
+        [Network.ARBITRUM, new Set([
+          Network.BinanaceBNB,
+          Network.ZKSYNCERA,
+          Network.OPTIMISM,
+          Network.AVALANCHE,
+          Network.POLIGON,
+          Network.ArbitrumNova,
+          Network.Base,
+          Network.Canto,
+          Network.Fantom,
+          Network.Meter,
+          Network.opBNB,
+          Network.PolygonZKEVM,
+          Network.Tenet,
+        ])],
+        [Network.POLIGON, new Set([
+          Network.BinanaceBNB,
+          Network.ZKSYNCERA,
+          Network.OPTIMISM,
+          Network.AVALANCHE,
+          Network.ARBITRUM,
+          Network.ArbitrumNova,
+          Network.Base,
+          Network.Canto,
+          Network.Fantom,
+          Network.Meter,
+          Network.opBNB,
+          Network.PolygonZKEVM,
+          Network.Tenet,
+        ])]
+      ]),
       item: {
         fromNetwork: Network.ZKSYNCERA,
+        toNetwork: Network.Fantom,
       } as MerklyMintAndBridgeNFTTask,
     }
   },

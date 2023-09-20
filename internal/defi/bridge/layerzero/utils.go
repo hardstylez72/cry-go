@@ -16,15 +16,23 @@ const (
 const LayerZeroBoostPercent = 5
 
 var LayerZeroChainMap = map[v1.Network]uint16{
-	v1.Network_Etherium:    101,
-	v1.Network_BinanaceBNB: 102,
-	v1.Network_AVALANCHE:   106,
-	v1.Network_POLIGON:     109,
-	v1.Network_ARBITRUM:    110,
-	v1.Network_OPTIMISM:    111,
-	v1.Network_GOERLIETH:   154,
-	v1.Network_ZKSYNCERA:   165,
-	//SBNameFantom:        112,
+	v1.Network_Etherium:     101,
+	v1.Network_BinanaceBNB:  102,
+	v1.Network_AVALANCHE:    106,
+	v1.Network_POLIGON:      109,
+	v1.Network_ARBITRUM:     110,
+	v1.Network_OPTIMISM:     111,
+	v1.Network_GOERLIETH:    154,
+	v1.Network_ZKSYNCERA:    165,
+	v1.Network_Meter:        176,
+	v1.Network_Tenet:        173,
+	v1.Network_Canto:        159,
+	v1.Network_ArbitrumNova: 175,
+	v1.Network_PolygonZKEVM: 158,
+	v1.Network_Fantom:       112,
+	v1.Network_Base:         184,
+	v1.Network_opBNB:        202,
+
 	//SBNameMetis:         151,
 }
 

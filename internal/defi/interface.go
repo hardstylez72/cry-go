@@ -30,7 +30,7 @@ type Balancer interface {
 
 type MintAndBridgeNFT interface {
 	Networker
-	MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, *big.Int, *big.Int, error)
+	MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, error)
 	MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error)
 	GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.Int, error)
 }

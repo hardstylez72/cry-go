@@ -182,7 +182,7 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 		e, err = task.NewTraderJoeSwapTask().EstimateCost(ctx, profile, p, nil)
 	case v1.TaskType_MerklyMintAndBridgeNFT:
 		p := t.Task.Task.(*v1.Task_MerklyMintAndBridgeNFTTask).MerklyMintAndBridgeNFTTask
-		e1, _, err := task.EstimateMerklyMintCost(ctx, profile, p, nil)
+		e1, err := task.EstimateMerklyMintCost(ctx, profile, p, nil)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateMerklyMintCost")
 		}

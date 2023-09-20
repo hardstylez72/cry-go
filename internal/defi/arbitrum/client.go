@@ -33,6 +33,9 @@ var Dict = defi.Dict{
 		StargateRouterEthAddress: common.HexToAddress("0xbf22f0f184bCcbeA268dF387a49fF5238dD23E40"),
 	},
 	TestNetBridgeSwapAddress: common.HexToAddress("0x0A9f824C05A74F577A536A8A0c673183a872Dff4"),
+	Merkly: defi.Merkly{
+		NFT: common.HexToAddress("0xAa58e77238f0E4A565343a89A79b4aDDD744d649"),
+	},
 }
 
 type Client struct {

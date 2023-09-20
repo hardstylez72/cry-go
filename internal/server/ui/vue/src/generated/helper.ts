@@ -645,7 +645,15 @@ export enum Network {
   'ZKSYNCERA' = 'ZKSYNCERA',
   'ZKSYNCERATESTNET' = 'ZKSYNCERATESTNET',
   'ZKSYNCLITE' = 'ZKSYNCLITE',
-  'StarkNet' = 'StarkNet'
+  'StarkNet' = 'StarkNet',
+  'Meter' = 'Meter',
+  'Tenet' = 'Tenet',
+  'Canto' = 'Canto',
+  'ArbitrumNova' = 'ArbitrumNova',
+  'PolygonZKEVM' = 'PolygonZKEVM',
+  'Fantom' = 'Fantom',
+  'Base' = 'Base',
+  'opBNB' = 'opBNB'
 }
 
 export enum ProfileSubType {

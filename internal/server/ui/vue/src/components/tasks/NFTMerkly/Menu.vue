@@ -1,9 +1,5 @@
 <template>
-  <div class="d-inline-flex"><a :href="taskProps.MerklyMintAndBridgeNFT.service.link"
-                                target="_blank">{{ taskProps.MerklyMintAndBridgeNFT.service.name }}</a>
-    <MenuTaskSettings :network="item.fromNetwork"/>
-  </div>
-
+  <MenuTaskSettings :network="item.fromNetwork"/>
   <div>From <b>{{ item.fromNetwork }}</b> to <b>{{ item.toNetwork }}</b></div>
   <div>Status:
     <span :style="`color: ${getTxStatusColor}`">{{ getTxStatus }}</span>
@@ -20,7 +16,7 @@ import {
 } from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import {ProcessStatus} from "@/generated/process";
-import {getAmountSend} from "./helper";
+import {getAmountSend} from "../menu/helper";
 import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
 import GasOptions from "@/components/tasks/menu/Details.vue";

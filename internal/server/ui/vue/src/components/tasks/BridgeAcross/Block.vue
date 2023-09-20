@@ -3,28 +3,19 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-select
-            ref="stargate-bridge-form"
-            density="compact"
-            variant="outlined"
+          <NetworkSelector
             label="from network"
-            v-on:change="inputChanged"
-            :rules="[required]"
             :items="networks"
+            :disabled="disabled"
             v-model="fromNetwork"
-            :disabled="true"
           />
         </v-col>
         <v-col>
-          <v-select
-            density="compact"
-            variant="outlined"
+          <NetworkSelector
             label="to network"
-            v-on:change="inputChanged"
-            :rules="[required]"
             :items="GetToNetworks"
-            v-model="toNetwork"
             :disabled="disabled"
+            v-model="toNetwork"
           />
         </v-col>
       </v-row>
@@ -62,10 +53,11 @@ import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
 import {BridgePair, tokenBridgePair} from "@/components/helper";
 import {required} from "@/components/tasks/menu/helper";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
 export default defineComponent({
   name: "TaskAcrossBridgeBlock",
-  components: {AmountInput},
+  components: {NetworkSelector, AmountInput},
   emits: ['taskChanged'],
   props: {
     weight: {

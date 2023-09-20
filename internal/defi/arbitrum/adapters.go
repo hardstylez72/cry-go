@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
 
@@ -61,4 +62,16 @@ func (c *Client) GetPublicKey(pk string, subType v1.ProfileSubType) (string, err
 
 func (c *Client) Network() v1.Network {
 	return c.defi.Cfg.Network
+}
+
+func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.Int, error) {
+	return c.defi.GetMerklyNFTId(ctx, txHash)
+}
+
+func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, error) {
+	return c.defi.MerklyMintNft(ctx, req)
+}
+
+func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error) {
+	return c.defi.MerklyBridgeNft(ctx, req)
 }

@@ -1,8 +1,8 @@
 import {Network} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
-import Block from "@/components/tasks/TraderJoe/TraderJoeSwap.vue";
-import Menu from "@/components/tasks/TraderJoe/MenuTraderJoeSwap.vue";
+import Block from "@/components/tasks/TraderJoe/Block.vue";
+import Menu from "@/components/tasks/TraderJoe/Menu.vue";
 
 export const TraderJoeSpec: TaskSpec = {
   deprecated: false,

@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, *big.Int, *big.Int, error) {
+func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, error) {
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
 		Cli:      c.ClientL2,
@@ -20,16 +20,16 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
 	}
 
-	txData, mintId, err := m.MakeMintTx(ctx)
+	txData, _, err := m.MakeMintTx(ctx)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, err
 	}
 
 	result := &bozdo.DefaultRes{}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, err
 	}
 
 	tx := CreateFunctionCallTransaction(
@@ -44,7 +44,7 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 
 	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, transactor.Signer)
 	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "Make712Tx")
+		return nil, errors.Wrap(err, "Make712Tx")
 	}
 
 	estimate.Name = "Mint"
@@ -52,17 +52,17 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 	result.ECost = estimate
 
 	if req.EstimateOnly {
-		return result, mintId, txData.Value, nil
+		return result, nil
 	}
 
 	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
 	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
 	}
 
 	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
 
-	return result, mintId, txData.Value, nil
+	return result, nil
 }
 func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error) {
 	m := &merkly.Maker{

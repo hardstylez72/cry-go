@@ -515,7 +515,6 @@ func (_Minter *MinterCaller) Fee(opts *bind.CallOpts) (*big.Int, error) {
 	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
 
 	return out0, err
-
 }
 
 // Fee is a free data retrieval call binding the contract method 0xddca3f43.

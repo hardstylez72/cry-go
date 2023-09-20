@@ -1,13 +1,12 @@
 package bnb
 
 import (
-	"context"
 	"math/big"
 	"net/http"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
@@ -31,6 +30,9 @@ var Dict = defi.Dict{
 	Stargate: defi.Stargate{
 		StargateRouterAddress:    common.HexToAddress("0x4a364f8c717cAAD9A442737Eb7b8A55cc6cf18D8"),
 		StargateRouterEthAddress: common.HexToAddress("not supported"),
+	},
+	Merkly: defi.Merkly{
+		NFT: common.HexToAddress("0xFDc9018aF0E37AbF89233554C937eB5068127080"),
 	},
 }
 
@@ -63,21 +65,14 @@ func NewClient(c *ClientConfig) (*Client, error) {
 		TxViewFn: func(txId string) string {
 			return "https://bscscan.com/tx/" + txId
 		},
+		NetworkId: bozdo.ChainMap[v1.Network_BinanaceBNB],
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum net: "+c.RPCEndpoint)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	networkId, err := ethcli.GetNetworkId(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Client{
 		defi:      ethcli,
-		NetworkId: networkId,
+		NetworkId: bozdo.ChainMap[v1.Network_BinanaceBNB],
 	}, nil
 }

@@ -20,6 +20,11 @@ const RetryMax = 1
 type Dict struct {
 	Stargate                 Stargate
 	TestNetBridgeSwapAddress common.Address
+	Merkly                   Merkly
+}
+
+type Merkly struct {
+	NFT common.Address
 }
 
 type SyncSwap struct {

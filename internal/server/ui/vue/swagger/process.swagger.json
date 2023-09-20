@@ -1082,7 +1082,15 @@
         "ZKSYNCERA",
         "ZKSYNCERATESTNET",
         "ZKSYNCLITE",
-        "StarkNet"
+        "StarkNet",
+        "Meter",
+        "Tenet",
+        "Canto",
+        "ArbitrumNova",
+        "PolygonZKEVM",
+        "Fantom",
+        "Base",
+        "opBNB"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"

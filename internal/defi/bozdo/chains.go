@@ -7,6 +7,7 @@ import (
 )
 
 var ChainMap = map[v1.Network]*big.Int{
-	v1.Network_ZKSYNCERA: big.NewInt(324),
-	v1.Network_ARBITRUM:  big.NewInt(42161),
+	v1.Network_ZKSYNCERA:   big.NewInt(324),
+	v1.Network_ARBITRUM:    big.NewInt(42161),
+	v1.Network_BinanaceBNB: big.NewInt(56),
 }

@@ -307,7 +307,47 @@ export const networkProps: Record<Network, network> = {
     name: 'StarkNet',
     img: '/icons/starknet.svg',
     value: Network.StarkNet,
-  }
+  },
+  Meter: {
+    name: 'Meter',
+    img: '/icons/networks/meter.svg',
+    value: Network.Meter,
+  },
+  Tenet: {
+    name: 'Tenet',
+    img: '/icons/networks/tenet.svg',
+    value: Network.Tenet,
+  },
+  Canto: {
+    name: 'Canto',
+    img: '/icons/networks/canto.svg',
+    value: Network.Canto,
+  },
+  ArbitrumNova: {
+    name: 'Arbitrum Nova',
+    img: '/icons/networks/arb-nova.svg',
+    value: Network.ArbitrumNova,
+  },
+  PolygonZKEVM: {
+    name: 'Polygon zkEVM',
+    img: '/icons/networks/polygon-zkevm.svg',
+    value: Network.PolygonZKEVM,
+  },
+  Fantom: {
+    name: 'Fantom',
+    img: '/icons/networks/fantom.svg',
+    value: Network.Fantom,
+  },
+  Base: {
+    name: 'Base',
+    img: '/icons/networks/base.svg',
+    value: Network.Base,
+  },
+  opBNB: {
+    name: 'opBNB',
+    img: '/icons/networks/opbnb.svg',
+    value: Network.opBNB,
+  },
 }
 
 

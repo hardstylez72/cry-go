@@ -3,16 +3,11 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-select
-            ref="stargate-bridge-form"
-            density="compact"
-            variant="outlined"
+          <NetworkSelector
             label="network"
-            v-on:change="inputChanged"
-            :rules="[required]"
             :items="networks"
+            :disabled="disabled"
             v-model="item.network"
-            :disabled="true"
           />
         </v-col>
         <v-col>
@@ -45,8 +40,12 @@ import {taskProps} from "@/components/tasks/tasks";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
 import DefaultSwapTask from "@/components/tasks/block/base/DefaultSwapTask.js";
 import {Component} from "vue-facing-decorator";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
-@Component({name: 'TraderJoeSwap'})
+@Component({
+  name: 'TraderJoeSwap',
+  components: {NetworkSelector}
+})
 export default class TraderJoeSwap extends DefaultSwapTask {
 
   networks = [Network.ARBITRUM]

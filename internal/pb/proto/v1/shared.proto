@@ -19,6 +19,14 @@ enum Network {
   ZKSYNCERATESTNET = 8;//deprecated
   ZKSYNCLITE = 9;
   StarkNet = 10;
+  Meter = 11;
+  Tenet = 12;
+  Canto = 13;
+  ArbitrumNova = 14;
+  PolygonZKEVM = 15;
+  Fantom = 16;
+  Base = 17;
+  opBNB = 18;
 }
 
 enum Token {

@@ -4,14 +4,11 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-select
-            density="compact"
-            variant="outlined"
+          <NetworkSelector
             label="network"
-            :rules="[required]"
             :items="networks"
-            v-model="item.network"
             :disabled="disabled"
+            v-model="item.network"
           />
         </v-col>
         <v-col>
@@ -36,10 +33,11 @@ import {Network, OkexDepositTask, Task, TaskType, Token} from "@/generated/flow"
 import {defineComponent, PropType} from "vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
 import {required} from "@/components/tasks/menu/helper";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
 export default defineComponent({
   name: "TaskOkexDeposit",
-  components: {AmountInput},
+  components: {NetworkSelector, AmountInput},
   emits: ['taskChanged'],
   props: {
     weight: {
