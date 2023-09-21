@@ -16,6 +16,102 @@
     "application/json"
   ],
   "paths": {
+    "/api/gw/v1/flow-shared": {
+      "post": {
+        "operationId": "FlowService_SharedFlow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/SharedFlowRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SharedFlowReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
+    "/api/gw/v1/flow-shared/use": {
+      "post": {
+        "operationId": "FlowService_UseSharedFlow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/UseSharedFlowRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UseSharedFlowReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
+    "/api/gw/v1/flow/copy": {
+      "post": {
+        "operationId": "FlowService_CopyFlow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/CopyFlowRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CopyFlowReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
     "/api/gw/v1/flow/create": {
       "post": {
         "operationId": "FlowService_CreateFlow",
@@ -112,6 +208,38 @@
         ]
       }
     },
+    "/api/gw/v1/flow/hide": {
+      "post": {
+        "operationId": "FlowService_HideFlow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/HideFlowRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/HideFlowReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
     "/api/gw/v1/flow/list": {
       "post": {
         "operationId": "FlowService_ListFlow",
@@ -136,6 +264,70 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/ListFlowRequest"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
+    "/api/gw/v1/flow/publish": {
+      "post": {
+        "operationId": "FlowService_ShareFlow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ShareFlowRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ShareFlowReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
+    "/api/gw/v1/flow/shared/list": {
+      "post": {
+        "operationId": "FlowService_SharedFlows",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/SharedFlowsRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SharedFlowsReq"
             }
           }
         ],
@@ -238,6 +430,28 @@
         }
       },
       "additionalProperties": {}
+    },
+    "CopyFlowReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "CopyFlowRes": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
     },
     "CreateFlowRequest": {
       "type": "object",
@@ -425,6 +639,50 @@
         "tx"
       ]
     },
+    "FlowShared": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "parentId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Task"
+          }
+        },
+        "creatorId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "label",
+        "parentId",
+        "createdAt",
+        "tasks",
+        "creatorId"
+      ]
+    },
     "GetFlowRequest": {
       "type": "object",
       "properties": {
@@ -446,6 +704,20 @@
       "required": [
         "flow"
       ]
+    },
+    "HideFlowReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "HideFlowRes": {
+      "type": "object"
     },
     "LiquidityBridgeTask": {
       "type": "object",
@@ -691,6 +963,72 @@
       ],
       "default": "StatusReady",
       "title": "- StatusStop: delete"
+    },
+    "ShareFlowReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "description"
+      ]
+    },
+    "ShareFlowRes": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "SharedFlowReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "SharedFlowRes": {
+      "type": "object",
+      "properties": {
+        "flow": {
+          "$ref": "#/definitions/FlowShared"
+        }
+      },
+      "required": [
+        "flow"
+      ]
+    },
+    "SharedFlowsReq": {
+      "type": "object"
+    },
+    "SharedFlowsRes": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/FlowShared"
+          }
+        }
+      },
+      "required": [
+        "items"
+      ]
     },
     "SimpleTask": {
       "type": "object",
@@ -1203,6 +1541,28 @@
       },
       "required": [
         "flow"
+      ]
+    },
+    "UseSharedFlowReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "UseSharedFlowRes": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
       ]
     },
     "WETHTask": {

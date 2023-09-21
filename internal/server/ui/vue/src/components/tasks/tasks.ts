@@ -698,7 +698,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   AcrossBridge: AcrossBridgeSpec,
 }
 
-export const getFlow = (flow: flow_Flow): string[] => {
+export const getFlow = (flow: { tasks: Task[] }): string[] => {
   const result: string[] = []
   if (!flow || !flow.tasks) {
     return result

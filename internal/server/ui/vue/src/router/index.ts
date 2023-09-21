@@ -63,7 +63,12 @@ const routes = [
   {
     name: 'Constructor',
     path: '/constructor',
-    component: () => import('@/components/flow/flows.vue'),
+    component: () => import('@/components/flow/FlowList.vue'),
+  },
+  {
+    name: 'SharedFlowList',
+    path: '/constructor/shared',
+    component: () => import('@/components/flow/SharedFlowList.vue'),
   },
   {
     name: 'Processes',
@@ -71,9 +76,17 @@ const routes = [
     component: () => import('@/components/process/Processes.vue'),
   },
   {
-    name: 'ViewFlow',
+    name: 'SharedFlow',
+    path: '/shared-flow/:id',
+    component: () => import('@/components/flow/SharedFlow.vue'),
+    props: {
+      id: String,
+    }
+  },
+  {
+    name: 'Flow',
     path: '/flow/:id',
-    component: () => import('@/components/flow/ViewFlow.vue'),
+    component: () => import('@/components/flow/Flow.vue'),
     props: {
       id: String,
     }

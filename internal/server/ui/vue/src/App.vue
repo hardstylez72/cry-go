@@ -48,7 +48,8 @@
                      @click="$router.push({name: 'Processes'})"></v-list-item>
         <v-list-item v-if="userLoggedIn" prepend-icon="mdi-cog" title="Настройки" color="green" value="Настройки"
                      @click="$router.push({name: 'Settings'})"></v-list-item>
-        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-cash-multiple" title="Биллинг" color="green" value="Мани"
+        <v-list-item v-if="userLoggedIn" prepend-icon="mdi-hand-heart-outline" title="Биллинг" color="green"
+                     value="Мани"
                      @click="$router.push({name: 'Billing'})"></v-list-item>
 
         <v-list-item prepend-icon="mdi-chart-bar" title="Статистика" color="green"

@@ -53,10 +53,10 @@ type StatRepository interface {
 }
 
 type FlowRepository interface {
-	CreateFlow(ctx context.Context, req *v1.CreateFlowRequest) (*v1.CreateFlowResponse, error)
-	ListFlows(ctx context.Context, req *v1.ListFlowRequest) (*v1.ListFlowResponse, error)
-	DeleteFlow(ctx context.Context, req *v1.DeleteFlowRequest) (*v1.DeleteFlowResponse, error)
-	GetFlow(ctx context.Context, req *v1.GetFlowRequest) (*v1.GetFlowResponse, error)
+	CreateFlow(ctx context.Context, req *Flow) error
+	ListFlows(ctx context.Context, userId string) ([]Flow, error)
+	DeleteFlow(ctx context.Context, userId, flowId string) error
+	GetFlow(ctx context.Context, userId, flowId string) (*Flow, error)
 	UpdateFlow(ctx context.Context, parentFlowId string, req *Flow) (err error)
 }
 
@@ -122,6 +122,7 @@ type Repository interface {
 	ProfileRepository
 	WithdrawerRepository
 	FlowRepository
+	FlowSharedRepository
 	SettingsRepository
 	UserRepository
 	ProcessRepository

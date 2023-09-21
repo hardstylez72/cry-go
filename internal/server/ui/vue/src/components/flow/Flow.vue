@@ -2,13 +2,34 @@
   <div>
     <NavBar :title="`Сценарий: ${flow.label}`">
       <template v-slot:default>
+
+        <v-btn @click="shareFlow" variant="flat" class="mx-1">
+          <v-icon v-if="isMobile()" icon="mdi-share-variant"/>
+          <span v-else>Поделиться</span>
+        </v-btn>
+
+        <v-btn @click="copyFlow" variant="flat" class="mx-1">
+          <v-icon v-if="isMobile()" icon="mdi-content-copy"/>
+          <span v-else>Копия</span>
+        </v-btn>
+
         <span v-if="!flow.deletedAt && !flow.nextId">
         <v-btn :disabled="selectedProfiles.length > 0" v-if="!editMode" variant="flat" class="mx-1" focused
-               @click="editModeChanged">Изменить</v-btn>
-        <v-btn v-else @click="updateFlow" variant="flat" class="mx-1">Сохранить</v-btn>
+               @click="editModeChanged">
+          <v-icon v-if="isMobile()" icon="mdi-note-edit-outline"/>
+          <span v-else>Изменить</span>
+        </v-btn>
+
+        <v-btn v-else @click="updateFlow" variant="flat" class="mx-1">
+          <v-icon v-if="isMobile()" icon="mdi-content-save"/>
+          <span v-else>Сохранить</span>
+        </v-btn>
         </span>
+
         <v-btn variant="flat" :disabled="selectedProfiles.length > 0" v-if="!flow.deletedAt && !flow.nextId"
-               color="red" @click="DeleteFlow">Удалить
+               color="red" @click="DeleteFlow">
+          <v-icon v-if="isMobile()" icon="mdi-delete"/>
+          <span v-else>Удалить</span>
         </v-btn>
       </template>
     </NavBar>
@@ -35,7 +56,6 @@
               @flow-changed="flowChanged"/>
   </v-form>
 
-
 </template>
 
 <script lang="ts">
@@ -48,13 +68,13 @@ import {Profile} from "@/generated/profile";
 import TaskDelay from "@/components/tasks/block/Delay.vue";
 import ProfileCard from "@/components/profile/ProfileCard.vue";
 import {taskComponentMap, TaskArg, taskTypes} from "@/components/tasks/tasks";
-import {Delay, Timer} from "@/components/helper";
+import {Delay, isMobile, Timer} from "@/components/helper";
 import FlowForm from "@/components/flow/FlowForm.vue";
 import ProfileSearch from "@/components/profile/ProfileSearch.vue";
 import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
-  name: "ViewFlow",
+  name: "Flow",
   components: {NavBar, ProfileSearch, FlowForm, ProfileCard},
   props: {
     propId: {
@@ -82,6 +102,24 @@ export default defineComponent({
     }
   },
   methods: {
+    isMobile,
+    async shareFlow() {
+      try {
+        const res = await flowService.flowServiceShareFlow({body: {id: this.flowId, description: ''}})
+        this.$router.push(`/shared-flow/${res.id}`, {force: true})
+      } finally {
+
+      }
+    },
+    async copyFlow() {
+      try {
+        const res = await flowService.flowServiceCopyFlow({body: {id: this.flowId}})
+        this.$router.push(`/flow/${res.id}`, {force: true})
+        window.location.assign(`/flow/${res.id}`)
+      } finally {
+
+      }
+    },
     async validateForm(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
       // спасибо китайцам скажи лучше
@@ -140,25 +178,27 @@ export default defineComponent({
       } catch (e) {
 
       }
+    },
+    async loadFlow() {
+      if (this.propId) {
+        this.flowId = this.propId
+      } else if (this.$route.params.id) {
+        this.flowId = this.$route.params.id.toString()
+      }
 
+      try {
+        this.flowLoading = true
+        const res = await flowService.flowServiceGetFlow({body: {id: this.flowId}})
+        this.flow = res.flow
+        this.tasks = this.flow.tasks
+      } finally {
+        this.flowLoading = false
+      }
     }
   },
   async mounted() {
+    await this.loadFlow()
 
-    if (this.propId) {
-      this.flowId = this.propId
-    } else if (this.$route.params.id) {
-      this.flowId = this.$route.params.id.toString()
-    }
-
-    try {
-      this.flowLoading = true
-      const res = await flowService.flowServiceGetFlow({body: {id: this.flowId}})
-      this.flow = res.flow
-      this.tasks = this.flow.tasks
-    } finally {
-      this.flowLoading = false
-    }
   }
 })
 

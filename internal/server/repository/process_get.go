@@ -42,14 +42,16 @@ func (r *pgRepository) GetProcessArg(ctx context.Context, req *v1.GetProcessRequ
 
 	p.Profiles = prfs
 
-	flow, err := r.GetFlow(ctx, &v1.GetFlowRequest{
-		Id: p.Process.FlowId,
-	})
+	flow, err := r.GetFlow(ctx, userId, p.Process.FlowId)
 	if err != nil {
 		return nil, err
 	}
 
-	pb, err := p.ToPB(flow.Flow)
+	fpb, err := flow.ToPB()
+	if err != nil {
+		return nil, err
+	}
+	pb, err := p.ToPB(fpb)
 	if err != nil {
 		return nil, err
 	}

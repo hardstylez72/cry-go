@@ -221,9 +221,7 @@ func (r *pgRepository) ListProcessByUser(ctx context.Context, userId string, sta
 	for i := range tmp {
 		p := &tmp[i]
 
-		flow, err := r.GetFlow(ctx, &v1.GetFlowRequest{
-			Id: p.FlowId,
-		})
+		flow, err := r.GetFlow(ctx, userId, p.FlowId)
 		if err != nil {
 			return nil, err
 		}
@@ -250,7 +248,11 @@ func (r *pgRepository) ListProcessByUser(ctx context.Context, userId string, sta
 
 		p.Profiles = profiles
 
-		pb, err := p.ToPB(flow.Flow)
+		fpb, err := flow.ToPB()
+		if err != nil {
+			return nil, err
+		}
+		pb, err := p.ToPB(fpb)
 		if err != nil {
 			return nil, err
 		}

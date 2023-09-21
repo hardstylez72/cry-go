@@ -30,7 +30,7 @@
 import {defineComponent} from 'vue';
 import {processService} from "@/generated/services"
 import {Process, ProcessProfile, ProcessStatus, ProcessTask} from "@/generated/process";
-import ViewFlow from "@/components/flow/ViewFlow.vue";
+import ViewFlow from "@/components/flow/Flow.vue";
 import StatusCard from "@/components/StatusCard.vue";
 import {formatTime, GetStatusColor, Timer} from "@/components/helper";
 import ProcessTaskMenu from "@/components/process/ProcessTaskMenu.vue";

@@ -97,7 +97,7 @@
 import {defineComponent, PropType} from 'vue';
 import {processService} from "@/generated/services"
 import {ProcessStatus, ProcessTask, ProcessTaskHistoryRecord, TaskType, Transaction} from "@/generated/process";
-import ViewFlow from "@/components/flow/ViewFlow.vue";
+import ViewFlow from "@/components/flow/Flow.vue";
 import StatusCard from "@/components/StatusCard.vue";
 import {Delay, formatTime, GetStatusColor, GetStatusText} from "@/components/helper";
 import dayjs from "dayjs";

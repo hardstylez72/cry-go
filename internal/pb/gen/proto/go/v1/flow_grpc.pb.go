@@ -27,6 +27,12 @@ type FlowServiceClient interface {
 	GetFlow(ctx context.Context, in *GetFlowRequest, opts ...grpc.CallOption) (*GetFlowResponse, error)
 	ListFlow(ctx context.Context, in *ListFlowRequest, opts ...grpc.CallOption) (*ListFlowResponse, error)
 	DeleteFlow(ctx context.Context, in *DeleteFlowRequest, opts ...grpc.CallOption) (*DeleteFlowResponse, error)
+	CopyFlow(ctx context.Context, in *CopyFlowReq, opts ...grpc.CallOption) (*CopyFlowRes, error)
+	ShareFlow(ctx context.Context, in *ShareFlowReq, opts ...grpc.CallOption) (*ShareFlowRes, error)
+	HideFlow(ctx context.Context, in *HideFlowReq, opts ...grpc.CallOption) (*HideFlowRes, error)
+	SharedFlows(ctx context.Context, in *SharedFlowsReq, opts ...grpc.CallOption) (*SharedFlowsRes, error)
+	SharedFlow(ctx context.Context, in *SharedFlowReq, opts ...grpc.CallOption) (*SharedFlowRes, error)
+	UseSharedFlow(ctx context.Context, in *UseSharedFlowReq, opts ...grpc.CallOption) (*UseSharedFlowRes, error)
 }
 
 type flowServiceClient struct {
@@ -82,6 +88,60 @@ func (c *flowServiceClient) DeleteFlow(ctx context.Context, in *DeleteFlowReques
 	return out, nil
 }
 
+func (c *flowServiceClient) CopyFlow(ctx context.Context, in *CopyFlowReq, opts ...grpc.CallOption) (*CopyFlowRes, error) {
+	out := new(CopyFlowRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/CopyFlow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) ShareFlow(ctx context.Context, in *ShareFlowReq, opts ...grpc.CallOption) (*ShareFlowRes, error) {
+	out := new(ShareFlowRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/ShareFlow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) HideFlow(ctx context.Context, in *HideFlowReq, opts ...grpc.CallOption) (*HideFlowRes, error) {
+	out := new(HideFlowRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/HideFlow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) SharedFlows(ctx context.Context, in *SharedFlowsReq, opts ...grpc.CallOption) (*SharedFlowsRes, error) {
+	out := new(SharedFlowsRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/SharedFlows", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) SharedFlow(ctx context.Context, in *SharedFlowReq, opts ...grpc.CallOption) (*SharedFlowRes, error) {
+	out := new(SharedFlowRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/SharedFlow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) UseSharedFlow(ctx context.Context, in *UseSharedFlowReq, opts ...grpc.CallOption) (*UseSharedFlowRes, error) {
+	out := new(UseSharedFlowRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/UseSharedFlow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FlowServiceServer is the server API for FlowService service.
 // All implementations must embed UnimplementedFlowServiceServer
 // for forward compatibility
@@ -91,6 +151,12 @@ type FlowServiceServer interface {
 	GetFlow(context.Context, *GetFlowRequest) (*GetFlowResponse, error)
 	ListFlow(context.Context, *ListFlowRequest) (*ListFlowResponse, error)
 	DeleteFlow(context.Context, *DeleteFlowRequest) (*DeleteFlowResponse, error)
+	CopyFlow(context.Context, *CopyFlowReq) (*CopyFlowRes, error)
+	ShareFlow(context.Context, *ShareFlowReq) (*ShareFlowRes, error)
+	HideFlow(context.Context, *HideFlowReq) (*HideFlowRes, error)
+	SharedFlows(context.Context, *SharedFlowsReq) (*SharedFlowsRes, error)
+	SharedFlow(context.Context, *SharedFlowReq) (*SharedFlowRes, error)
+	UseSharedFlow(context.Context, *UseSharedFlowReq) (*UseSharedFlowRes, error)
 	mustEmbedUnimplementedFlowServiceServer()
 }
 
@@ -112,6 +178,24 @@ func (UnimplementedFlowServiceServer) ListFlow(context.Context, *ListFlowRequest
 }
 func (UnimplementedFlowServiceServer) DeleteFlow(context.Context, *DeleteFlowRequest) (*DeleteFlowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFlow not implemented")
+}
+func (UnimplementedFlowServiceServer) CopyFlow(context.Context, *CopyFlowReq) (*CopyFlowRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CopyFlow not implemented")
+}
+func (UnimplementedFlowServiceServer) ShareFlow(context.Context, *ShareFlowReq) (*ShareFlowRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ShareFlow not implemented")
+}
+func (UnimplementedFlowServiceServer) HideFlow(context.Context, *HideFlowReq) (*HideFlowRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HideFlow not implemented")
+}
+func (UnimplementedFlowServiceServer) SharedFlows(context.Context, *SharedFlowsReq) (*SharedFlowsRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SharedFlows not implemented")
+}
+func (UnimplementedFlowServiceServer) SharedFlow(context.Context, *SharedFlowReq) (*SharedFlowRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SharedFlow not implemented")
+}
+func (UnimplementedFlowServiceServer) UseSharedFlow(context.Context, *UseSharedFlowReq) (*UseSharedFlowRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UseSharedFlow not implemented")
 }
 func (UnimplementedFlowServiceServer) mustEmbedUnimplementedFlowServiceServer() {}
 
@@ -216,6 +300,114 @@ func _FlowService_DeleteFlow_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FlowService_CopyFlow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CopyFlowReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).CopyFlow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/CopyFlow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).CopyFlow(ctx, req.(*CopyFlowReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_ShareFlow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShareFlowReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).ShareFlow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/ShareFlow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).ShareFlow(ctx, req.(*ShareFlowReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_HideFlow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HideFlowReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).HideFlow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/HideFlow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).HideFlow(ctx, req.(*HideFlowReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_SharedFlows_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SharedFlowsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).SharedFlows(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/SharedFlows",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).SharedFlows(ctx, req.(*SharedFlowsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_SharedFlow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SharedFlowReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).SharedFlow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/SharedFlow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).SharedFlow(ctx, req.(*SharedFlowReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_UseSharedFlow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UseSharedFlowReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).UseSharedFlow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/UseSharedFlow",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).UseSharedFlow(ctx, req.(*UseSharedFlowReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FlowService_ServiceDesc is the grpc.ServiceDesc for FlowService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +434,30 @@ var FlowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteFlow",
 			Handler:    _FlowService_DeleteFlow_Handler,
+		},
+		{
+			MethodName: "CopyFlow",
+			Handler:    _FlowService_CopyFlow_Handler,
+		},
+		{
+			MethodName: "ShareFlow",
+			Handler:    _FlowService_ShareFlow_Handler,
+		},
+		{
+			MethodName: "HideFlow",
+			Handler:    _FlowService_HideFlow_Handler,
+		},
+		{
+			MethodName: "SharedFlows",
+			Handler:    _FlowService_SharedFlows_Handler,
+		},
+		{
+			MethodName: "SharedFlow",
+			Handler:    _FlowService_SharedFlow_Handler,
+		},
+		{
+			MethodName: "UseSharedFlow",
+			Handler:    _FlowService_UseSharedFlow_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

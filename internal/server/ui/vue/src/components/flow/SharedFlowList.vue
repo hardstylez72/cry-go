@@ -1,21 +1,10 @@
 <template>
   <div>
-    <NavBar title="Сценарии">
-      <template v-slot:default>
-        <div class="d-flex justify-end">
-          <v-btn @click=CreateFlow :class="noFlow ? 'onboarding ma-3' : 'ma-3'" variant="flat">Добавить</v-btn>
-        </div>
-      </template>
-    </NavBar>
+    <NavBar title="Общие сценарии"/>
     <Loader v-if="loading"/>
     <div v-else>
 
-      <div v-if="noFlow" class="my-8 mx-8 text-center">
-        Для создания сценария вам потребуются профили, если вы уже завели профили - нажмите добавить, для вас будет
-        пре-заполнен демонстрационный
-        бесплатный сценарий
-      </div>
-      <v-list v-else max-width="96vw" class="px-5">
+      <v-list max-width="96vw" class="px-5">
         <v-list-item
           density="compact"
           variant="plain"
@@ -27,12 +16,15 @@
           elevation="1"
           @click="viewFlow(item.id)"
         >
-          <div>
+          <v-list-item-title>
             <div class="mr-2"><b>{{ `${item.label}` }}</b></div>
-            <div>
-              <div class="mr-2" v-for="(d, i) in getFlow(item)">
-                <b>{{ i + 1 }})</b> {{ d }}
-              </div>
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            {{ item.description }}
+          </v-list-item-subtitle>
+          <div>
+            <div class="mr-2" v-for="(d, i) in getFlow(item)">
+              <b>{{ i + 1 }})</b> {{ d }}
             </div>
           </div>
         </v-list-item>
@@ -45,7 +37,7 @@
 
 import {defineComponent} from 'vue';
 import {flowService} from "@/generated/services"
-import {flow_Flow as Flow, TaskType} from "@/generated/flow";
+import {flow_Flow as Flow, FlowShared, TaskType} from "@/generated/flow";
 import CreateFlow from "@/components/flow/CreateFlow.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import {getFlow} from "@/components/tasks/tasks";
@@ -53,7 +45,7 @@ import Loader from "@/components/Loader.vue";
 import NavBar from "@/components/NavBar.vue";
 
 export default defineComponent({
-  name: "Constructor",
+  name: "SharedFlowList",
   components: {
     NavBar,
     Loader,
@@ -63,7 +55,7 @@ export default defineComponent({
   props: {},
   data() {
     return {
-      list: [] as Flow[],
+      list: [] as FlowShared[],
       loading: true,
       loadingError: false,
     }
@@ -72,14 +64,14 @@ export default defineComponent({
     noFlow() {
       return this.getList.length === 0
     },
-    getList(): Flow[] {
+    getList(): FlowShared[] {
       return this.list
     },
   },
   methods: {
     getFlow,
     viewFlow(id: string) {
-      this.$router.push({name: 'ViewFlow', params: {id}})
+      this.$router.push({name: 'SharedFlow', params: {id}})
     },
     showStep(flow: Flow): string {
       if (!flow || !flow.tasks) {
@@ -102,8 +94,8 @@ export default defineComponent({
       try {
         this.loadingError = false
         this.loading = true
-        const res = await flowService.flowServiceListFlow()
-        this.list = res.flows
+        const res = await flowService.flowServiceSharedFlows()
+        this.list = res.items
         this.selected = new Set<string>()
       } catch (e) {
         this.loadingError = true
@@ -111,13 +103,6 @@ export default defineComponent({
         this.loading = false
       }
 
-    },
-    CreateFlow() {
-      if (this.noFlow) {
-        this.$router.push({name: 'CreateFlow', query: {demo: true}})
-      } else {
-        this.$router.push({name: 'CreateFlow'})
-      }
     },
   },
   created() {

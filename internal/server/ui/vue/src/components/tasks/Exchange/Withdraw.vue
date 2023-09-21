@@ -4,7 +4,7 @@
       <v-row>
         <WithdrawerSelect v-model="item.withdrawerId" :disabled="disabled"/>
       </v-row>
-      <v-row v-if="item.withdrawerId">
+      <v-row>
         <v-autocomplete
           ref="exchange-withdraw-form-token"
           density="compact"

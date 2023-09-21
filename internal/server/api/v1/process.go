@@ -65,9 +65,12 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 		return nil, err
 	}
 
-	flow, err := s.flowRepository.GetFlow(ctx, &v1.GetFlowRequest{
-		Id: req.FlowId,
-	})
+	f, err := s.flowRepository.GetFlow(ctx, userId, req.FlowId)
+	if err != nil {
+		return nil, err
+	}
+
+	flow, err := f.ToPB()
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +81,8 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 
 		processTasks := make([]*v1.ProcessTask, 0)
 
-		for i := range flow.Flow.Tasks {
-			t := flow.Flow.Tasks[i]
+		for i := range flow.Tasks {
+			t := flow.Tasks[i]
 
 			marshal, err := task.GetTaskDesc(t)
 			if err != nil {

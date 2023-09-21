@@ -11,6 +11,7 @@ import {Delay} from "@/components/helper";
 
 export const useUserStore = defineStore('user', {
   state: () => ({
+    id: '',
     drawer: false,
     isMobile: true,
     login: false,
@@ -27,6 +28,7 @@ export const useUserStore = defineStore('user', {
     promo: '',
     support: false,
     controlledBy: false,
+    publisher: false,
   }),
   actions: {
     async redirectToGeneralPage() {
@@ -59,10 +61,13 @@ export const useUserStore = defineStore('user', {
           if (res.groups.find(g => g === 'support')) {
             state.support = true
           }
+          if (res.groups.find(g => g === 'support')) {
+            state.publisher = true
+          }
           if (res.groups.find(g => g === 'worker')) {
             state.controlledBy = true
           }
-
+          state.id = res.id
         })
       } catch (e) {
         this.$patch((state) => {
@@ -73,6 +78,8 @@ export const useUserStore = defineStore('user', {
           state.support = false
           state.controlledBy = false
           state.promo = ''
+          state.publisher = false
+          state.id = ''
         })
 
         await this.redirectToGeneralPage()

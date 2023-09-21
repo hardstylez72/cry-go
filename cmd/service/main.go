@@ -360,7 +360,7 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 		profileService:       v1.NewProfileService(profileRepository, settingsService, starknetNewClient),
 		helperService:        v1.NewHelperService(settingsService, profileRepository, userRepository, payService, statRepository, processRepository, tgBot, starknetNewClient),
 		withdrawerService:    v1.NewWithdrawerService(withdrawerRepository, userRepository, profileRepository, starknetNewClient),
-		flowService:          v1.NewFlowService(flowRepository),
+		flowService:          v1.NewFlowService(flowRepository, rep),
 		processService:       v1.NewProcessService(processRepository, dispatcher, flowRepository, settingsService),
 		settingsService:      v1.NewSettingsService(settingsService),
 		swap1inchService:     v1.NewSwap1inchService(),

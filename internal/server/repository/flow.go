@@ -5,10 +5,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/google/uuid"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository/pg"
-	"github.com/hardstylez72/cry/internal/server/user"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -90,36 +88,13 @@ func (r *pgRepository) UpdateFlow(ctx context.Context, parentFlowId string, req 
 	return nil
 }
 
-func (r *pgRepository) CreateFlow(ctx context.Context, req *v1.CreateFlowRequest) (*v1.CreateFlowResponse, error) {
+func (r *pgRepository) CreateFlow(ctx context.Context, req *Flow) error {
 
-	userId, err := user.ResolveUserId(ctx)
-	if err != nil {
-		return nil, err
-	}
-	pb := &v1.Flow{
-		Id:        uuid.New().String(),
-		Label:     req.Label,
-		Tasks:     req.Tasks,
-		CreatedAt: timestamppb.Now(),
+	if err := createFlow(ctx, r.conn, req); err != nil {
+		return err
 	}
 
-	a := &Flow{}
-	if err := a.FromPB(pb, userId); err != nil {
-		return nil, err
-	}
-
-	if err := createFlow(ctx, r.conn, a); err != nil {
-		return nil, err
-	}
-
-	res, err := r.GetFlow(ctx, &v1.GetFlowRequest{Id: a.Id})
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.CreateFlowResponse{
-		Flow: res.Flow,
-	}, nil
+	return nil
 }
 
 func updateFlowParent(ctx context.Context, driver pg.SqlDriver, flowId, nextFlowId string) error {
@@ -139,70 +114,46 @@ func createFlow(ctx context.Context, driver pg.SqlDriver, req *Flow) error {
 	return nil
 }
 
-func (r *pgRepository) GetFlow(ctx context.Context, req *v1.GetFlowRequest) (*v1.GetFlowResponse, error) {
-	res, err := getFlow(ctx, r.conn, req.Id)
+func (r *pgRepository) GetFlow(ctx context.Context, userId, flowId string) (*Flow, error) {
+	res, err := getFlow(ctx, r.conn, flowId, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	t, err := res.ToPB()
-	if err != nil {
-		return nil, err
-	}
-	return &v1.GetFlowResponse{
-		Flow: t,
-	}, nil
+	return res, nil
 }
 
-func getFlow(ctx context.Context, conn *sqlx.DB, id string) (*Flow, error) {
-	q := `select * from flow where id = $1`
+func getFlow(ctx context.Context, conn *sqlx.DB, id, userId string) (*Flow, error) {
+	q := `select * from flow where id = $1 and user_id = $2`
 	var a Flow
-	if err := conn.GetContext(ctx, &a, q, id); err != nil {
+	if err := conn.GetContext(ctx, &a, q, id, userId); err != nil {
 		return nil, err
 	}
 	return &a, nil
 }
 
-func (r *pgRepository) ListFlows(ctx context.Context, req *v1.ListFlowRequest) (*v1.ListFlowResponse, error) {
-
-	userId, err := user.ResolveUserId(ctx)
-	if err != nil {
-		return nil, err
-	}
+func (r *pgRepository) ListFlows(ctx context.Context, userId string) ([]Flow, error) {
 
 	res, err := listFlows(ctx, r.conn, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.ListFlowResponse{
-		Flows: res,
-	}, nil
+	return res, nil
 }
 
-func listFlows(ctx context.Context, conn *sqlx.DB, userId string) ([]*v1.Flow, error) {
+func listFlows(ctx context.Context, conn *sqlx.DB, userId string) ([]Flow, error) {
 	q := "select * from flow where user_id = $1 and next_id is null and deleted_at is null order by created_at desc"
 	out := make([]Flow, 0)
 	if err := conn.SelectContext(ctx, &out, q, userId); err != nil {
 		return nil, err
 	}
 
-	tmp := make([]*v1.Flow, 0)
-	for i := range out {
-
-		p, err := out[i].ToPB()
-		if err != nil {
-			continue
-		}
-
-		tmp = append(tmp, p)
-	}
-
-	return tmp, nil
+	return out, nil
 }
-func (r *pgRepository) DeleteFlow(ctx context.Context, req *v1.DeleteFlowRequest) (*v1.DeleteFlowResponse, error) {
-	if _, err := r.conn.ExecContext(ctx, "update flow set deleted_at = now() where id = $1", req.Id); err != nil {
-		return nil, err
+func (r *pgRepository) DeleteFlow(ctx context.Context, userId, flowId string) error {
+	if _, err := r.conn.ExecContext(ctx, "update flow set deleted_at = now() where id = $1 and user_id = $2", flowId, userId); err != nil {
+		return err
 	}
-	return nil, nil
+	return nil
 }

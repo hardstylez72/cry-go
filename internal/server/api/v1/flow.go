@@ -7,16 +7,19 @@ import (
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/server/user"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type FlowService struct {
 	v1.UnimplementedFlowServiceServer
-	repository repository.FlowRepository
+	repository    repository.FlowRepository
+	flowSharedRep repository.FlowSharedRepository
 }
 
-func NewFlowService(repository repository.FlowRepository) *FlowService {
+func NewFlowService(repository repository.FlowRepository, flowSharedRep repository.FlowSharedRepository) *FlowService {
 	return &FlowService{
-		repository: repository,
+		repository:    repository,
+		flowSharedRep: flowSharedRep,
 	}
 }
 
@@ -39,26 +42,132 @@ func (s *FlowService) UpdateFlow(ctx context.Context, req *v1.UpdateFlowRequest)
 		return nil, err
 	}
 
-	flow, err := s.repository.GetFlow(ctx, &v1.GetFlowRequest{Id: req.Flow.Id})
+	flow, err := s.repository.GetFlow(ctx, userId, req.Flow.Id)
 	if err != nil {
 		return nil, err
 	}
+
+	t, err := flow.ToPB()
+	if err != nil {
+		return nil, err
+	}
+
 	return &v1.UpdateFlowResponse{
-		Flow: flow.Flow,
+		Flow: t,
 	}, nil
 }
 
 func (s *FlowService) CreateFlow(ctx context.Context, req *v1.CreateFlowRequest) (*v1.CreateFlowResponse, error) {
-	return s.repository.CreateFlow(ctx, req)
+
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	pb := &v1.Flow{
+		Id:        uuid.New().String(),
+		Label:     req.Label,
+		Tasks:     req.Tasks,
+		CreatedAt: timestamppb.Now(),
+	}
+
+	a := &repository.Flow{}
+	if err := a.FromPB(pb, userId); err != nil {
+		return nil, err
+	}
+
+	if err := s.repository.CreateFlow(ctx, a); err != nil {
+		return nil, err
+	}
+
+	out, err := s.repository.GetFlow(ctx, userId, a.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	pb, err = out.ToPB()
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.CreateFlowResponse{Flow: pb}, nil
 }
 func (s *FlowService) ListFlow(ctx context.Context, req *v1.ListFlowRequest) (*v1.ListFlowResponse, error) {
-	return s.repository.ListFlows(ctx, req)
+
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	out, err := s.repository.ListFlows(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	tmp := make([]*v1.Flow, 0)
+	for i := range out {
+
+		p, err := out[i].ToPB()
+		if err != nil {
+			continue
+		}
+
+		tmp = append(tmp, p)
+	}
+
+	return &v1.ListFlowResponse{
+		Flows: tmp,
+	}, nil
 }
 func (s *FlowService) DeleteFlow(ctx context.Context, req *v1.DeleteFlowRequest) (*v1.DeleteFlowResponse, error) {
-	s.repository.DeleteFlow(ctx, req)
+
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.repository.DeleteFlow(ctx, userId, req.Id); err != nil {
+		return nil, err
+	}
 	return &v1.DeleteFlowResponse{}, nil
 }
 
 func (s *FlowService) GetFlow(ctx context.Context, req *v1.GetFlowRequest) (*v1.GetFlowResponse, error) {
-	return s.repository.GetFlow(ctx, req)
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	t, err := s.repository.GetFlow(ctx, userId, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := t.ToPB()
+	if err != nil {
+		return nil, err
+	}
+	return &v1.GetFlowResponse{Flow: pb}, nil
+}
+
+func (s *FlowService) CopyFlow(ctx context.Context, req *v1.CopyFlowReq) (*v1.CopyFlowRes, error) {
+
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	flow, err := s.repository.GetFlow(ctx, userId, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+
+	flow.Id = uuid.New().String()
+	flow.Label = flow.Label + " [копия]"
+
+	err = s.repository.CreateFlow(ctx, flow)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.CopyFlowRes{
+		Id: flow.Id,
+	}, nil
 }

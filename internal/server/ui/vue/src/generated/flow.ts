@@ -113,6 +113,72 @@ export class FlowService {
   /**
    *
    */
+  flowServiceSharedFlow(
+    params: {
+      /**  */
+      body: SharedFlowReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<SharedFlowRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow-shared';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  flowServiceUseSharedFlow(
+    params: {
+      /**  */
+      body: UseSharedFlowReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<UseSharedFlowRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow-shared/use';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  flowServiceCopyFlow(
+    params: {
+      /**  */
+      body: CopyFlowReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<CopyFlowRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow/copy';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   flowServiceCreateFlow(
     params: {
       /**  */
@@ -179,6 +245,28 @@ export class FlowService {
   /**
    *
    */
+  flowServiceHideFlow(
+    params: {
+      /**  */
+      body: HideFlowReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<HideFlowRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow/hide';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   flowServiceListFlow(
     params: {
       /**  */
@@ -188,6 +276,50 @@ export class FlowService {
   ): Promise<ListFlowResponse> {
     return new Promise((resolve, reject) => {
       let url = basePath + '/api/gw/v1/flow/list';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  flowServiceShareFlow(
+    params: {
+      /**  */
+      body: ShareFlowReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<ShareFlowRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow/publish';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  flowServiceSharedFlows(
+    params: {
+      /**  */
+      body: SharedFlowsReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<SharedFlowsRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow/shared/list';
 
       const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
 
@@ -260,6 +392,16 @@ export interface Amount {
 
   /**  */
   gasEstimated?: AmUni;
+}
+
+export interface CopyFlowReq {
+  /**  */
+  id: string;
+}
+
+export interface CopyFlowRes {
+  /**  */
+  id: string;
 }
 
 export interface CreateFlowRequest {
@@ -376,6 +518,32 @@ export interface DeployStarkNetAccountTask {
   tx: TaskTx;
 }
 
+export interface FlowShared {
+  /**  */
+  id: string;
+
+  /**  */
+  description: string;
+
+  /**  */
+  label: string;
+
+  /**  */
+  parentId: string;
+
+  /**  */
+  createdAt: Date;
+
+  /**  */
+  deletedAt?: Date;
+
+  /**  */
+  tasks: Task[];
+
+  /**  */
+  creatorId: string;
+}
+
 export interface GetFlowRequest {
   /**  */
   id: string;
@@ -385,6 +553,13 @@ export interface GetFlowResponse {
   /**  */
   flow: flow_Flow;
 }
+
+export interface HideFlowReq {
+  /**  */
+  id: string;
+}
+
+export interface HideFlowRes {}
 
 export interface LiquidityBridgeTask {
   /**  */
@@ -523,6 +698,36 @@ export interface OrbiterBridgeTask {
 
   /**  */
   tx?: TaskTx;
+}
+
+export interface ShareFlowReq {
+  /**  */
+  id: string;
+
+  /**  */
+  description: string;
+}
+
+export interface ShareFlowRes {
+  /**  */
+  id: string;
+}
+
+export interface SharedFlowReq {
+  /**  */
+  id: string;
+}
+
+export interface SharedFlowRes {
+  /**  */
+  flow: FlowShared;
+}
+
+export interface SharedFlowsReq {}
+
+export interface SharedFlowsRes {
+  /**  */
+  items: FlowShared[];
 }
 
 export interface SimpleTask {
@@ -816,6 +1021,16 @@ export interface UpdateFlowRequest {
 export interface UpdateFlowResponse {
   /**  */
   flow: flow_Flow;
+}
+
+export interface UseSharedFlowReq {
+  /**  */
+  id: string;
+}
+
+export interface UseSharedFlowRes {
+  /**  */
+  id: string;
 }
 
 export interface WETHTask {

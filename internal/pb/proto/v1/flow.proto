@@ -9,6 +9,25 @@ import "v1/task.proto";
 package flow;
 option go_package = "grpc/v1";
 
+
+message FlowShared {
+  string id = 1;
+  string description = 2;
+  string label = 3;
+  string parent_id = 4;
+  google.protobuf.Timestamp created_at = 5;
+  optional google.protobuf.Timestamp deleted_at = 6;
+  repeated Task tasks = 7;
+  string creator_id = 8;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "description", "label", "parent_id", "created_at", "tasks", "creator_id"]
+
+    }
+  };
+}
+
 service FlowService {
   rpc UpdateFlow(UpdateFlowRequest) returns (UpdateFlowResponse) {
     option (google.api.http) = {
@@ -43,6 +62,145 @@ service FlowService {
       body: "*"
     };
   }
+
+  rpc CopyFlow(CopyFlowReq) returns (CopyFlowRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow/copy",
+      body: "*"
+    };
+  }
+
+  rpc ShareFlow(ShareFlowReq) returns (ShareFlowRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow/publish",
+      body: "*"
+    };
+  }
+
+  rpc HideFlow(HideFlowReq) returns (HideFlowRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow/hide",
+      body: "*"
+    };
+  }
+
+  rpc SharedFlows(SharedFlowsReq) returns (SharedFlowsRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow/shared/list",
+      body: "*"
+    };
+  }
+
+  rpc SharedFlow(SharedFlowReq) returns (SharedFlowRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow-shared",
+      body: "*"
+    };
+  }
+
+  rpc UseSharedFlow(UseSharedFlowReq) returns (UseSharedFlowRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow-shared/use",
+      body: "*"
+    };
+  }
+}
+
+message UseSharedFlowReq {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+}
+
+message UseSharedFlowRes {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+}
+
+message SharedFlowRes {
+  FlowShared flow = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["flow"]
+    }
+  };
+}
+
+message SharedFlowReq {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+}
+
+message SharedFlowsReq {
+
+}
+
+message SharedFlowsRes {
+  repeated FlowShared items = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["items"]
+    }
+  };
+}
+
+message ShareFlowReq {
+  string id = 1;
+  string description = 2;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "description"]
+    }
+  };
+}
+
+message ShareFlowRes {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+}
+
+message HideFlowReq {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+}
+
+message HideFlowRes{}
+
+message CopyFlowReq {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+}
+
+message CopyFlowRes {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
 }
 
 message GetFlowRequest {

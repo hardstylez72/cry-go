@@ -8,9 +8,15 @@ import (
 
 const GroupSupport = "support"
 const GroupWorker = "worker"
+const GroupPublisher = "publisher"
 
 var support = map[string]string{
 	"korotkovcv77@gmail.com": GroupSupport,
+}
+
+var publisher = map[string]string{
+	"korotkovcv77@gmail.com":     GroupPublisher,
+	"cryptodoubleplus@gmail.com": GroupPublisher,
 }
 
 type User struct {
@@ -25,6 +31,11 @@ func Groups(u *User) (*lib.Set[string], error) {
 	_, ok := support[u.Email]
 	if ok {
 		out.Set(GroupSupport)
+	}
+
+	_, ok = publisher[u.Email]
+	if ok {
+		out.Set(GroupPublisher)
 	}
 
 	if u.ControlledBy.Valid {

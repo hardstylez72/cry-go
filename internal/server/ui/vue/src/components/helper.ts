@@ -357,3 +357,8 @@ export const profileTitle = (item: any): string => {
   }
   return `${item.num} (${item.type} ${item.subType})`
 }
+
+
+export const isMobile = () => {
+  return window.innerWidth < 1280
+}
