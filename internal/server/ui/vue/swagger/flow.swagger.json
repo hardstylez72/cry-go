@@ -1341,6 +1341,9 @@
         },
         "acrossBridgeTask": {
           "$ref": "#/definitions/DefaultBridge"
+        },
+        "avnuSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -1452,7 +1455,8 @@
         "Dmail",
         "StarkNetIdMint",
         "OdosSwap",
-        "AcrossBridge"
+        "AcrossBridge",
+        "AvnuSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

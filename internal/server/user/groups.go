@@ -17,6 +17,7 @@ var support = map[string]string{
 var publisher = map[string]string{
 	"korotkovcv77@gmail.com":     GroupPublisher,
 	"cryptodoubleplus@gmail.com": GroupPublisher,
+	"fred.khamzin@gmail.com":     GroupPublisher,
 }
 
 type User struct {

@@ -37,7 +37,9 @@ export const useUserStore = defineStore('user', {
       if (path === "/"
         || path === '/modules'
         || path === '/stats'
-        || path === '/stats/swap') {
+        || path === '/stats/swap'
+        || path === '/constructor/shared'
+        || path.search('\/shared-flow/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$') !== -1) {
         return
       }
 

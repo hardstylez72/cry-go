@@ -188,7 +188,8 @@
         "Dmail",
         "StarkNetIdMint",
         "OdosSwap",
-        "AcrossBridge"
+        "AcrossBridge",
+        "AvnuSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

@@ -107,6 +107,14 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Mint StarkNet ID',
           quest: ''
+        },
+        {
+          name: taskProps.AvnuSwap.service.name,
+          link: taskProps.AvnuSwap.service.link,
+          img: taskProps.AvnuSwap.service.img,
+          status: Status.integrated,
+          action: 'Swap (ETH <-> USDC)',
+          quest: ''
         }
       ],
     }

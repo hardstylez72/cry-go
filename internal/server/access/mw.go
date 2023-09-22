@@ -17,6 +17,11 @@ func Access(r repository.UserRepository) func(ctx context.Context) (context.Cont
 		if err != nil {
 			return nil, status.New(codes.Unauthenticated, "").Err()
 		}
+		
+		if id == user.GuestUserId {
+			return ctx, nil
+		}
+
 		u, err := r.GetUserById(ctx, id)
 		if err != nil {
 			return nil, status.New(codes.Unauthenticated, "").Err()

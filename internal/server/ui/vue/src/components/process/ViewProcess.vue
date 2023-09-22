@@ -4,7 +4,7 @@
       <template v-slot:default>
         <BtnProcessStopResume class="mx-1" size="comfortable" :item="process" @updated="processUpdated"/>
         <v-btn variant="flat" class="mx-1"
-               @click="$router.push({name: 'ViewFlow', params: {id: process.flowId}})">Сценарий
+               @click="$router.push({name: 'Flow', params: {id: process.flowId}})">Сценарий
         </v-btn>
         <DeleteProcess class="mx-1" :process-id="processId"/>
       </template>

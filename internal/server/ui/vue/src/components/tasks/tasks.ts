@@ -75,6 +75,7 @@ import {Airdrop, allNetworks, TaskJob, TaskSpec, Universal} from "@/components/t
 import {StargateBridgeSpec} from "@/components/tasks/BridgeStargate";
 import {TraderJoeSpec} from "@/components/tasks/TraderJoe";
 import {ExchangeDeposit, ExchangeWithdrawSpec} from "@/components/tasks/Exchange";
+import {SwapAvnuSpec} from "@/components/tasks/SwapAvnu";
 
 
 export interface TaskArg {
@@ -696,6 +697,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     profileType: new Set([ProfileType.EVM])
   },
   AcrossBridge: AcrossBridgeSpec,
+  AvnuSwap: SwapAvnuSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

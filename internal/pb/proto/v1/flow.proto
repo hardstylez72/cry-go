@@ -290,6 +290,7 @@ message Task {
     task.SimpleTask starkNetIdMintTask = 38;
     task.DefaultSwap odosSwapTask = 39;
     task.DefaultBridge acrossBridgeTask = 40;
+    task.DefaultSwap avnuSwapTask = 41;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

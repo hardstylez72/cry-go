@@ -18,6 +18,8 @@ type ControlledByUser struct {
 
 var ErrUserNotFound = errors.New("user not found in context")
 
+const GuestUserId = "2d4980a5-19cd-4e28-a703-b67e7767d0a1"
+
 func SetUserIdContext(ctx context.Context, id string) context.Context {
 	ctx = context.WithValue(ctx, &userIdKey{}, id)
 	return ctx

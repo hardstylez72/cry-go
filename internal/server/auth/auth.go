@@ -21,7 +21,17 @@ var (
 func AuthGRPC(ctx context.Context) (context.Context, error) {
 
 	stream := grpc.ServerTransportStreamFromContext(ctx)
-	if strings.Contains(stream.Method(), "/public.publicService/") {
+	if stream.Method() == "/public.publicService/" {
+		ctx = user.SetUserIdContext(ctx, user.GuestUserId)
+		return ctx, nil
+	}
+
+	if stream.Method() == "/flow.FlowService/SharedFlows" {
+		ctx = user.SetUserIdContext(ctx, user.GuestUserId)
+		return ctx, nil
+	}
+	if stream.Method() == "/flow.FlowService/SharedFlow" {
+		ctx = user.SetUserIdContext(ctx, user.GuestUserId)
 		return ctx, nil
 	}
 
@@ -37,7 +47,11 @@ func AuthGRPC(ctx context.Context) (context.Context, error) {
 
 	u, _, err := ExtractUserAndTokenFromStringToken(token)
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "session not found")
+		return nil, status.Error(codes.Unauthenticated, "нет такой буквы, вращайте барабан")
+	}
+
+	if u.UserId == user.GuestUserId {
+		return nil, status.Error(codes.Unauthenticated, "ну ты и пидор конечно")
 	}
 
 	ctx = user.SetUserIdContext(ctx, u.UserId)

@@ -1212,6 +1212,9 @@ export interface Task {
 
   /**  */
   acrossBridgeTask?: DefaultBridge;
+
+  /**  */
+  avnuSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1480,7 +1483,8 @@ export enum TaskType {
   'Dmail' = 'Dmail',
   'StarkNetIdMint' = 'StarkNetIdMint',
   'OdosSwap' = 'OdosSwap',
-  'AcrossBridge' = 'AcrossBridge'
+  'AcrossBridge' = 'AcrossBridge',
+  'AvnuSwap' = 'AvnuSwap'
 }
 
 export enum Token {

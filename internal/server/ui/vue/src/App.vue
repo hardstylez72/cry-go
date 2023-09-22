@@ -76,6 +76,13 @@
                 <span class="ml-2">Сообщество</span>
               </div>
             </a>
+            <br/>
+            <a href="https://github.com/hardstylez72/cry-service" target="_blank">
+              <div style="height: 20px" class="d-inline-flex">
+                <v-img src="/icons/github.png"/>
+                <span class="ml-2">Github</span>
+              </div>
+            </a>
 
           </div>
 
