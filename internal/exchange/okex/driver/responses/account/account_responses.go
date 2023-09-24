@@ -6,6 +6,10 @@ import (
 )
 
 type (
+	GetTradingBalance struct {
+		responses.Basic
+		Balances []*models.BalanceTrading `json:"data,omitempty"`
+	}
 	GetBalance struct {
 		responses.Basic
 		Balances []*models.Balance `json:"data,omitempty"`

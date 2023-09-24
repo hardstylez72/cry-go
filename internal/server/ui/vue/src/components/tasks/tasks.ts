@@ -74,7 +74,7 @@ import {AcrossBridgeSpec} from "@/components/tasks/BridgeAcross";
 import {Airdrop, allNetworks, TaskJob, TaskSpec, Universal} from "@/components/tasks/utils";
 import {StargateBridgeSpec} from "@/components/tasks/BridgeStargate";
 import {TraderJoeSpec} from "@/components/tasks/TraderJoe";
-import {ExchangeDeposit, ExchangeWithdrawSpec} from "@/components/tasks/Exchange";
+import {ExchangeDeposit, ExchangeSwapSpec, ExchangeWithdrawSpec} from "@/components/tasks/Exchange";
 import {SwapAvnuSpec} from "@/components/tasks/SwapAvnu";
 import {SwapFibrousSpec} from "@/components/tasks/SwapFibrous";
 
@@ -700,6 +700,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   AcrossBridge: AcrossBridgeSpec,
   AvnuSwap: SwapAvnuSpec,
   FibrousSwap: SwapFibrousSpec,
+  ExchangeSwap: ExchangeSwapSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

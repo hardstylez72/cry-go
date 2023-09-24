@@ -2,12 +2,10 @@ package okex
 
 import (
 	"context"
-	"strconv"
 	"testing"
 
-	"github.com/google/uuid"
-	okex "github.com/hardstylez72/cry/internal/exchange/okex/driver"
-	requests "github.com/hardstylez72/cry/internal/exchange/okex/driver/requests/rest/trade"
+	"github.com/hardstylez72/cry/internal/exchange"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,49 +22,26 @@ func TestName(t *testing.T) {
 	assert.NoError(t, err)
 	ctx := context.Background()
 
-	id := strconv.Itoa(int(uuid.New().ID()))
-	println("id: " + id)
-	cid := strconv.Itoa(int(uuid.New().ID()))
-	println("cid: " + id)
+	req := &exchange.SwapReq{
+		From:      v1.Token_ETH,
+		To:        v1.Token_USDC,
+		AmPercent: 10,
+	}
 
-	res, err := s.cli.Rest.Trade.PlaceOrder(ctx, []requests.PlaceOrder{
-		{
-			InstID:     "ETH-USDT",
-			ClOrdID:    cid,   //клиентский
-			ReduceOnly: false, // -
-			Sz:         0.01,
-			TdMode:     okex.TradeCashMode,
-			Side:       okex.OrderSell,
-			OrdType:    okex.OrderMarket,
-			TgtCcy:     "", // quote_ccy for buy, base_ccy
-		},
-	})
+	//err = s.Before(ctx, req)
+	//assert.NoError(t, err)
 
-	o, err := s.cli.Rest.Trade.GetOrderDetail(requests.OrderDetails{
-		InstID:  "ETH-USDT",
-		ClOrdID: res.PlaceOrders[0].ClOrdID,
+	res, err := s.Swap(ctx, req)
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+
+	err = s.WaitSwapComplete(ctx, &exchange.SwapRes{
+		Pair:    res.Pair,
+		TradeId: res.TradeId,
 	})
-	println(len(o.Orders))
-	//opt, err := s.GetExchangeWithdrawOptions(context.Background(), &v1.GetExchangeWithdrawOptionsRequest{})
-	//assert.NoError(t, err)
-	//assert.NotNil(t, opt)
-	//
-	//for i := range opt.Tokens {
-	//	l := opt.Tokens[i]
-	//	if l.Token == "USDT" {
-	//		println(1)
-	//	}
-	//}
-	//
-	//wd, err := s.Withdraw(context.Background(), &exchange.WithdrawRequest{
-	//	ToAddress: "0x4A6e7c137a6691D55693CA3Bc7E5C698d9d43815",
-	//	Amount:    "10",
-	//	Network:   "USDT-Arbitrum one",
-	//	Token:     "USDT",
-	//})
-	//assert.NoError(t, err)
-	//
-	//txId, err := s.WaitConfirm(context.Background(), wd.WithdrawId)
-	//assert.NoError(t, err)
-	//assert.NotNil(t, txId)
+	assert.NoError(t, err)
+
+	err = s.After(ctx, req)
+	assert.NoError(t, err)
+
 }

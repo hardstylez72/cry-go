@@ -50,7 +50,7 @@ enum TaskType {
   AcrossBridge = 36;
   AvnuSwap = 37;
   FibrousSwap = 38;
-  OkexSwap = 39;
+  ExchangeSwap = 39;
 }
 
 
@@ -111,6 +111,28 @@ message SimpleTask {
     json_schema: {
       required: [
         "network"
+      ]
+    }
+  };
+}
+
+message ExchangeSwapTask {
+  shared.Amount amount = 1;
+  shared.Token from_token = 3;
+  shared.Token to_token = 4;
+  string withdrawer_id = 6;
+
+  optional string trade_id = 5;
+  optional string pair = 7;
+  optional bool before = 8;
+  optional bool after = 9;
+  optional bool swap_completed = 10;
+
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "amount", "withdrawer_id", "from_token","to_token"
       ]
     }
   };

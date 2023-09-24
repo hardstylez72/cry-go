@@ -849,7 +849,7 @@
         "AcrossBridge",
         "AvnuSwap",
         "FibrousSwap",
-        "OkexSwap"
+        "ExchangeSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

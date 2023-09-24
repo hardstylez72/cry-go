@@ -639,6 +639,44 @@
         "tx"
       ]
     },
+    "ExchangeSwapTask": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/Amount"
+        },
+        "fromToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "toToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "withdrawerId": {
+          "type": "string"
+        },
+        "tradeId": {
+          "type": "string"
+        },
+        "pair": {
+          "type": "string"
+        },
+        "before": {
+          "type": "boolean"
+        },
+        "after": {
+          "type": "boolean"
+        },
+        "swapCompleted": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "amount",
+        "withdrawerId",
+        "fromToken",
+        "toToken"
+      ]
+    },
     "FlowShared": {
       "type": "object",
       "properties": {
@@ -1347,6 +1385,9 @@
         },
         "fibrousSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "exchangeSwapTask": {
+          "$ref": "#/definitions/ExchangeSwapTask"
         }
       },
       "required": [
@@ -1460,7 +1501,8 @@
         "OdosSwap",
         "AcrossBridge",
         "AvnuSwap",
-        "FibrousSwap"
+        "FibrousSwap",
+        "ExchangeSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

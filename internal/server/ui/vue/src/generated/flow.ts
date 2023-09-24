@@ -518,6 +518,35 @@ export interface DeployStarkNetAccountTask {
   tx: TaskTx;
 }
 
+export interface ExchangeSwapTask {
+  /**  */
+  amount: Amount;
+
+  /**  */
+  fromToken: Token;
+
+  /**  */
+  toToken: Token;
+
+  /**  */
+  withdrawerId: string;
+
+  /**  */
+  tradeId?: string;
+
+  /**  */
+  pair?: string;
+
+  /**  */
+  before?: boolean;
+
+  /**  */
+  after?: boolean;
+
+  /**  */
+  swapCompleted?: boolean;
+}
+
 export interface FlowShared {
   /**  */
   id: string;
@@ -951,6 +980,9 @@ export interface Task {
 
   /**  */
   fibrousSwapTask?: DefaultSwap;
+
+  /**  */
+  exchangeSwapTask?: ExchangeSwapTask;
 }
 
 export interface TaskTx {
@@ -1203,7 +1235,8 @@ export enum TaskType {
   'OdosSwap' = 'OdosSwap',
   'AcrossBridge' = 'AcrossBridge',
   'AvnuSwap' = 'AvnuSwap',
-  'FibrousSwap' = 'FibrousSwap'
+  'FibrousSwap' = 'FibrousSwap',
+  'ExchangeSwap' = 'ExchangeSwap'
 }
 
 export enum Token {

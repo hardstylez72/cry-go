@@ -40,6 +40,11 @@ func (s *FlowService) ShareFlow(ctx context.Context, req *v1.ShareFlowReq) (*v1.
 				t.WithdrawExchangeTask.WithdrawAddr = nil
 				t.WithdrawExchangeTask.WithdrawOrderId = nil
 			}
+		case v1.TaskType_ExchangeSwap:
+			t, ok := el.Task.(*v1.Task_ExchangeSwapTask)
+			if ok {
+				t.ExchangeSwapTask.WithdrawerId = ""
+			}
 		}
 	}
 

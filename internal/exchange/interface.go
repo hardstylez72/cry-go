@@ -27,3 +27,21 @@ type Withdrawer interface {
 	GetFundingBalance(ctx context.Context, coin string) (float64, error)
 	WithdrawStatus(ctx context.Context, withdrawId string) (string, error)
 }
+
+type SwapReq struct {
+	From      v1.Token
+	To        v1.Token
+	AmPercent float64
+}
+
+type SwapRes struct {
+	Pair    string
+	TradeId string
+}
+
+type Swapper interface {
+	Before(ctx context.Context, r *SwapReq) error
+	Swap(ctx context.Context, r *SwapReq) (*SwapRes, error)
+	WaitSwapComplete(ctx context.Context, s *SwapRes) error
+	After(ctx context.Context, r *SwapReq) error
+}

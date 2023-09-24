@@ -132,7 +132,7 @@ func FloatToString(v float64) string {
 }
 
 func StringToFloat(s string) (float64, error) {
-	return strconv.ParseFloat(s, 10)
+	return strconv.ParseFloat(s, 4)
 }
 
 func IntToString(v int64) string {

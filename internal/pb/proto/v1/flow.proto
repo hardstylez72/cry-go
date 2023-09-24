@@ -292,7 +292,7 @@ message Task {
     task.DefaultBridge acrossBridgeTask = 40;
     task.DefaultSwap avnuSwapTask = 41;
     task.DefaultSwap fibrousSwapTask = 42;
-    task.DefaultSwap okexSwapTask = 43;
+    task.ExchangeSwapTask exchangeSwapTask = 43;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

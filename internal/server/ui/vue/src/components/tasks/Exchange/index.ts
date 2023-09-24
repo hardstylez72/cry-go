@@ -5,6 +5,8 @@ import Menu from "@/components/tasks/Exchange/WithdrawMenu.vue";
 import Block from "@/components/tasks/Exchange/Withdraw.vue";
 import MenuOkexDeposit from "@/components/tasks/Exchange/DepositMenu.vue";
 import TaskOkexDeposit from "@/components/tasks/Exchange/Deposit.vue";
+import Swap from "@/components/tasks/Exchange/Swap.vue";
+import SwapMenu from "@/components/tasks/Exchange/SwapMenu.vue";
 
 export const ExchangeWithdrawSpec: TaskSpec = {
   deprecated: false,
@@ -16,7 +18,7 @@ export const ExchangeWithdrawSpec: TaskSpec = {
     return ` (${p?.network} am: ${p?.sendAllCoins ? 'all' : `[${p?.amountMin}:${p?.amountMax}]`} ${p?.token})`
   },
   service: {
-    name: 'Вывод',
+    name: 'Withdrawal',
     img: '',
     link: '',
     op: 'вывод',
@@ -37,7 +39,7 @@ export const ExchangeDeposit: TaskSpec = {
     return ` (${p?.network} ${p?.token})`
   },
   service: {
-    name: 'Депозит',
+    name: 'Deposit',
     link: 'https://www.okx.com/',
     img: '',
     op: 'депозит',
@@ -45,5 +47,26 @@ export const ExchangeDeposit: TaskSpec = {
   job: TaskJob.Exchange,
   networks: new Set<Network>(allNetworks),
   airdrops: new Set<Airdrop>(Universal),
-  profileType: new Set([ProfileType.EVM])
+  profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
+}
+
+export const ExchangeSwapSpec: TaskSpec = {
+  deprecated: false,
+  canBeEstimated: false,
+  menu: SwapMenu,
+  component: Swap,
+  descFn(task) {
+    let p = task.exchangeSwapTask
+    return ` (${p?.fromToken} ${p?.toToken})`
+  },
+  service: {
+    name: 'Swap',
+    link: 'https://www.okx.com/',
+    img: '',
+    op: 'swap',
+  },
+  job: TaskJob.Exchange,
+  networks: new Set<Network>(allNetworks),
+  airdrops: new Set<Airdrop>(Universal),
+  profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
 }

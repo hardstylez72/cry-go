@@ -104,6 +104,7 @@ var NonPayableTasks = []v1.TaskType{
 	v1.TaskType_Delay,
 	v1.TaskType_OkexDeposit,
 	v1.TaskType_WithdrawExchange,
+	v1.TaskType_ExchangeSwap,
 }
 
 var executors = map[v1.TaskType]Tasker{
@@ -145,6 +146,7 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_AcrossBridge:                     &Wrap{Tasker: NewAcrossBridgeTask()},
 	v1.TaskType_AvnuSwap:                         &Wrap{Tasker: NewAvnuSwapTask()},
 	v1.TaskType_FibrousSwap:                      &Wrap{Tasker: NewFibrousSwapTask()},
+	v1.TaskType_ExchangeSwap:                     &Wrap{Tasker: &ExchangeSwapTask{}},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -378,6 +380,12 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_FibrousSwapTask)")
 		}
 		return Marshal(t.FibrousSwapTask)
+	case v1.TaskType_ExchangeSwap:
+		t, ok := m.Task.(*v1.Task_ExchangeSwapTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_ExchangeSwapTask)")
+		}
+		return Marshal(t.ExchangeSwapTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}

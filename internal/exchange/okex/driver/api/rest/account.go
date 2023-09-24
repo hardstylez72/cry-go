@@ -45,6 +45,24 @@ func (c *Account) GetBalance(ctx context.Context, req requests.GetBalance) (resp
 	return
 }
 
+func (c *Account) GetTradingBalance(ctx context.Context, req requests.GetBalance) (response responses.GetTradingBalance, err error) {
+	p := "/api/v5/account/balance"
+	m := okex.S2M(req)
+	if len(req.Ccy) > 0 {
+		m["ccy"] = strings.Join(req.Ccy, ",")
+	}
+	_, b, err := c.client.DoCtx(ctx, http.MethodGet, p, true, m)
+	if err != nil {
+		return
+	}
+
+	if err := json.Unmarshal(b, &response); err != nil {
+		return responses.GetTradingBalance{}, err
+	}
+
+	return
+}
+
 // GetPositions
 // Retrieve information on your positions. When the account is in net mode, net positions will be displayed, and when the account is in long/short mode, long or short positions will be displayed.
 //
