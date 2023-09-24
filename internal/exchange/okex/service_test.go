@@ -2,8 +2,12 @@ package okex
 
 import (
 	"context"
+	"strconv"
 	"testing"
 
+	"github.com/google/uuid"
+	okex "github.com/hardstylez72/cry/internal/exchange/okex/driver"
+	requests "github.com/hardstylez72/cry/internal/exchange/okex/driver/requests/rest/trade"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,11 +22,31 @@ func TestName(t *testing.T) {
 		HttpClient: c.Cli,
 	})
 	assert.NoError(t, err)
+	ctx := context.Background()
 
-	s.SubsToMain(context.Background(), &SubsToMainReq{
-		Ccy: "USDT",
+	id := strconv.Itoa(int(uuid.New().ID()))
+	println("id: " + id)
+	cid := strconv.Itoa(int(uuid.New().ID()))
+	println("cid: " + id)
+
+	res, err := s.cli.Rest.Trade.PlaceOrder(ctx, []requests.PlaceOrder{
+		{
+			InstID:     "ETH-USDT",
+			ClOrdID:    cid,   //клиентский
+			ReduceOnly: false, // -
+			Sz:         0.01,
+			TdMode:     okex.TradeCashMode,
+			Side:       okex.OrderSell,
+			OrdType:    okex.OrderMarket,
+			TgtCcy:     "", // quote_ccy for buy, base_ccy
+		},
 	})
 
+	o, err := s.cli.Rest.Trade.GetOrderDetail(requests.OrderDetails{
+		InstID:  "ETH-USDT",
+		ClOrdID: res.PlaceOrders[0].ClOrdID,
+	})
+	println(len(o.Orders))
 	//opt, err := s.GetExchangeWithdrawOptions(context.Background(), &v1.GetExchangeWithdrawOptionsRequest{})
 	//assert.NoError(t, err)
 	//assert.NotNil(t, opt)

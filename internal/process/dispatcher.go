@@ -231,7 +231,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_AvnuSwap:
 		p := t.Task.Task.(*v1.Task_AvnuSwapTask).AvnuSwapTask
 		e, err = task.NewAvnuSwapTask().EstimateCost(ctx, profile, p, nil)
-
+	case v1.TaskType_FibrousSwap:
+		p := t.Task.Task.(*v1.Task_FibrousSwapTask).FibrousSwapTask
+		e, err = task.NewFibrousSwapTask().EstimateCost(ctx, profile, p, nil)
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
 	}
@@ -548,6 +550,7 @@ func (d *Dispatcher) estimateStarknetSwapRatio(ctx context.Context, t1, t2 v1.To
 		task.NewMySwapSwapTask(),
 		task.NewJediSwapTask(),
 		task.NewAvnuSwapTask(),
+		task.NewFibrousSwapTask(),
 	}
 
 	for _, tasker := range tasks {

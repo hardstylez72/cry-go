@@ -128,7 +128,7 @@ func SyncSwapLP(ctx context.Context, profile *halp.Profile, p *v1.DefaultLP, cli
 			Token:         p.A,
 		})
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "client.GetBalance")
+			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 		b = balance.WEI
 		am, err = defi.ResolveAmount(p.Amount, balance.WEI)

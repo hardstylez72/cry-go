@@ -189,7 +189,8 @@
         "StarkNetIdMint",
         "OdosSwap",
         "AcrossBridge",
-        "AvnuSwap"
+        "AvnuSwap",
+        "FibrousSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

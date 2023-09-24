@@ -30,6 +30,10 @@ func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if strings.Contains(r.RequestURI, ".js") {
+		w.Header().Set("Content-Type", "text/javascript")
+	}
+
 	sub, err := fs.Sub(ui, "build")
 	if err != nil {
 		return

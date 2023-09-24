@@ -123,7 +123,7 @@ func DeployStarkNetAccount(ctx context.Context, profile *halp.Profile, p *v1.Dep
 		Token:         v1.Token_ETH,
 	})
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "client.GetBalance")
+		return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 	}
 
 	estimateOnly := estimation == nil

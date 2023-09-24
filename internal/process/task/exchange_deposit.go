@@ -219,7 +219,7 @@ func (t *OkexDepositTask) OkexSubMainTransfer(ctx context.Context, a *Input) err
 		token = "USDC"
 	}
 
-	b, err := subb.GetBalance(ctx, token)
+	b, err := subb.GetFundingBalance(ctx, token)
 	if err != nil {
 		return err
 	}

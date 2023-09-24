@@ -93,6 +93,6 @@ func (a *Adapter) GetDepositAddr(ctx context.Context, network, coin string) (str
 	return a.s.GetDepositAddr(ctx, network, coin)
 }
 
-func (a *Adapter) GetBalance(ctx context.Context, coin string) (float64, error) {
+func (a *Adapter) GetFundingBalance(ctx context.Context, coin string) (float64, error) {
 	return a.s.getUserAsset(ctx, coin)
 }

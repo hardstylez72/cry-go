@@ -21,7 +21,7 @@ func Test(t *testing.T) {
 
 	//t.Run("balance", func(t *testing.T) {
 	//	t.Skip()
-	//	b, err := r.GetBalance(context.Background(), &defi.GetBalanceReq{
+	//	b, err := r.GetFundingBalance(context.Background(), &defi.GetBalanceReq{
 	//		WalletAddress: tests.GetConfig().Wallet,
 	//		Token:         defi.TokenSTG,
 	//	})

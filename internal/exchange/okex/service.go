@@ -62,8 +62,26 @@ func (s *Service) IsSubAccount(ctx context.Context) (bool, error) {
 	return false, err
 }
 
-func (s *Service) GetBalance(ctx context.Context, ccy string) (float64, error) {
+func (s *Service) GetFundingBalance(ctx context.Context, ccy string) (float64, error) {
 	balance, err := s.cli.Rest.Funding.GetBalance(ctx, funding.GetBalance{
+		Ccy: []string{ccy},
+	})
+
+	if err != nil {
+		return -1, err
+	}
+
+	for _, b := range balance.Balances {
+		if b.Ccy == ccy {
+			return lib.StringToFloat(b.AvailBal)
+		}
+	}
+
+	return 0, nil
+}
+
+func (s *Service) GetTradingBalance(ctx context.Context, ccy string) (float64, error) {
+	balance, err := s.cli.Rest.Account.GetBalance(ctx, account.GetBalance{
 		Ccy: []string{ccy},
 	})
 

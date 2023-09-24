@@ -948,6 +948,9 @@ export interface Task {
 
   /**  */
   avnuSwapTask?: DefaultSwap;
+
+  /**  */
+  fibrousSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1199,7 +1202,8 @@ export enum TaskType {
   'StarkNetIdMint' = 'StarkNetIdMint',
   'OdosSwap' = 'OdosSwap',
   'AcrossBridge' = 'AcrossBridge',
-  'AvnuSwap' = 'AvnuSwap'
+  'AvnuSwap' = 'AvnuSwap',
+  'FibrousSwap' = 'FibrousSwap'
 }
 
 export enum Token {

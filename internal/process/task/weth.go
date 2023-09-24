@@ -76,7 +76,7 @@ func (t *WethTask) Run(ctx context.Context, a *Input) (_ *v1.ProcessTask, err er
 			Token:         token,
 		})
 		if err != nil {
-			return nil, errors.Wrap(err, "client.GetBalance")
+			return nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 
 		am, err := defi.ResolveAmount(p.Amount, b.WEI)

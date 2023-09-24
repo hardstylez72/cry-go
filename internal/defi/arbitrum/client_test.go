@@ -26,7 +26,7 @@ func Test(t *testing.T) {
 	//assert.NoError(t, err)
 	//assert.NotNil(t, wallet)
 	//
-	//b, err := r.GetBalance(context.Background(), &defi.GetBalanceReq{
+	//b, err := r.GetFundingBalance(context.Background(), &defi.GetBalanceReq{
 	//	WalletAddress: wallet.WalletAddr,
 	//	Token:         v1.Token_ETH,
 	//})
@@ -66,7 +66,7 @@ func Test(t *testing.T) {
 
 	//t.Run("balance", func(t *testing.T) {
 	//	t.Skip()
-	//	b, err := r.GetBalance(context.Background(), &defi.GetBalanceReq{
+	//	b, err := r.GetFundingBalance(context.Background(), &defi.GetBalanceReq{
 	//		WalletAddress: tests.GetConfig().Wallet,
 	//		Token:         defi.TokenETH,
 	//	})
@@ -114,7 +114,7 @@ func Test(t *testing.T) {
 	//	wallet, err := defi.NewWalletTransactor(tests.GetConfig().PK)
 	//	assert.NoError(t, err)
 	//
-	//	b, err := r.GetBalance(context.Background(), &defi.GetBalanceReq{
+	//	b, err := r.GetFundingBalance(context.Background(), &defi.GetBalanceReq{
 	//		WalletAddress: tests.GetConfig().Wallet,
 	//		Token:         defi.TokenUSDC,
 	//	})

@@ -153,7 +153,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 		Token:         p.FromToken,
 	})
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "client.GetBalance")
+		return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 	}
 
 	am, err := defi.ResolveAmount(p.Amount, balance.WEI)
@@ -182,7 +182,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 			Token:         client.GetNetworkToken(),
 		})
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "client.GetBalance")
+			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
 			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balance.WEI)

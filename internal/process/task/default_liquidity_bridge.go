@@ -188,7 +188,7 @@ func (h *DefaultLiquidityBridgeTaskHalper) Execute(ctx context.Context, from, to
 		Token:         p.Token,
 	})
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "client.GetBalance")
+		return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 	}
 
 	percent, err := defi.GetPercent(p.Amount)
@@ -212,7 +212,7 @@ func (h *DefaultLiquidityBridgeTaskHalper) Execute(ctx context.Context, from, to
 			Token:         networker.GetNetworkToken(),
 		})
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "client.GetBalance")
+			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
 			return nil, nil, ErrProfileHasInsufficientBalance(networker.GetNetworkToken(), &Gas.TotalGas, balance.WEI)

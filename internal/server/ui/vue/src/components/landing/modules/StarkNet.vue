@@ -113,7 +113,15 @@ export default defineComponent({
           link: taskProps.AvnuSwap.service.link,
           img: taskProps.AvnuSwap.service.img,
           status: Status.integrated,
-          action: 'Swap (ETH <-> USDC)',
+          action: 'Swap (ETH <-> USDC, USDT, USDC <-> USDT)',
+          quest: ''
+        },
+        {
+          name: taskProps.FibrousSwap.service.name,
+          link: taskProps.FibrousSwap.service.link,
+          img: taskProps.FibrousSwap.service.img,
+          status: Status.integrated,
+          action: 'Swap (ETH <-> USDC, USDT, USDC <-> USDT)',
           quest: ''
         }
       ],

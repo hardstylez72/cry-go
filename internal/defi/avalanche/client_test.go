@@ -29,7 +29,7 @@ func Test(t *testing.T) {
 	//assert.NotNil(t, r)
 	//
 	//t.Run("balance", func(t *testing.T) {
-	//	b, err := r.GetBalance(context.Background(), &defi.GetBalanceReq{
+	//	b, err := r.GetFundingBalance(context.Background(), &defi.GetBalanceReq{
 	//		WalletAddress: tests.GetConfig().Wallet,
 	//		Token:         v1.Token_MATIC,
 	//	})

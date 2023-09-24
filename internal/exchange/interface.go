@@ -24,6 +24,6 @@ type Withdrawer interface {
 	Withdraw(ctx context.Context, req *WithdrawRequest) (*WithdrawResponse, error)
 	WaitConfirm(ctx context.Context, id WithdrawId) (*string, error)
 	Ping(ctx context.Context) error
-	GetBalance(ctx context.Context, coin string) (float64, error)
+	GetFundingBalance(ctx context.Context, coin string) (float64, error)
 	WithdrawStatus(ctx context.Context, withdrawId string) (string, error)
 }

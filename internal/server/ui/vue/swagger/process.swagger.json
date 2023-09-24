@@ -1794,6 +1794,9 @@
         },
         "avnuSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "fibrousSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -1906,7 +1909,8 @@
         "StarkNetIdMint",
         "OdosSwap",
         "AcrossBridge",
-        "AvnuSwap"
+        "AvnuSwap",
+        "FibrousSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

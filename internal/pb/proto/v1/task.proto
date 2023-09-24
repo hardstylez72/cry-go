@@ -49,6 +49,8 @@ enum TaskType {
   OdosSwap = 35;
   AcrossBridge = 36;
   AvnuSwap = 37;
+  FibrousSwap = 38;
+  OkexSwap = 39;
 }
 
 

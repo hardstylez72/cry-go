@@ -22,7 +22,7 @@ func Test1(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
-	//b, err := c.GetBalance(ctx, &defi.GetBalanceReq{
+	//b, err := c.GetFundingBalance(ctx, &defi.GetBalanceReq{
 	//	WalletAddress: tests.GetConfig().Wallet,
 	//	Token:         v1.Token_ETH,
 	//})

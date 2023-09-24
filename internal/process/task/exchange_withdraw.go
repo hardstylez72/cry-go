@@ -122,9 +122,9 @@ func (t *WithdrawExchange) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 	}
 
 	if *p.SendAllCoins {
-		b, err := exchangeWithdrawer.GetBalance(ctx, p.Token)
+		b, err := exchangeWithdrawer.GetFundingBalance(ctx, p.Token)
 		if err != nil {
-			return nil, errors.Wrap(err, "exchangeWithdrawer.GetBalance")
+			return nil, errors.Wrap(err, "exchangeWithdrawer.GetFundingBalance")
 		}
 		amount := lib.FloatToString(b)
 		p.Amount = &amount

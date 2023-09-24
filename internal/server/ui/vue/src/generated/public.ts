@@ -205,5 +205,6 @@ export enum TaskType {
   'StarkNetIdMint' = 'StarkNetIdMint',
   'OdosSwap' = 'OdosSwap',
   'AcrossBridge' = 'AcrossBridge',
-  'AvnuSwap' = 'AvnuSwap'
+  'AvnuSwap' = 'AvnuSwap',
+  'FibrousSwap' = 'FibrousSwap'
 }

@@ -81,6 +81,7 @@ func NewClient(cfg *ClientConfig) (*Client, error) {
 		TokenMap: map[v1.Token]string{
 			v1.Token_ETH:  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
 			v1.Token_USDC: "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+			v1.Token_USDT: "0x68f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8",
 		},
 	}, nil
 }

@@ -27,7 +27,7 @@ func TestClient(t *testing.T) {
 	//})
 	//assert.NotNil(t, r)
 
-	//c.GetBalance(ctx, &defi.GetBalanceReq{
+	//c.GetFundingBalance(ctx, &defi.GetBalanceReq{
 	//	WalletAddress: tests.GetConfig().StarkNetPuvlic,
 	//	Token:         v1.Token_ETH,
 	//})

@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -25,7 +26,7 @@ func NewTrade(c *ClientRest) *Trade {
 // You can place an order only if you have sufficient funds.
 //
 // https://www.okex.com/docs-v5/en/#rest-api-trade-get-positions
-func (c *Trade) PlaceOrder(req []requests.PlaceOrder) (response responses.PlaceOrder, err error) {
+func (c *Trade) PlaceOrder(ctx context.Context, req []requests.PlaceOrder) (response responses.PlaceOrder, err error) {
 	p := "/api/v5/trade/order"
 	var tmp interface{}
 	tmp = req[0]
@@ -34,13 +35,13 @@ func (c *Trade) PlaceOrder(req []requests.PlaceOrder) (response responses.PlaceO
 		p = "/api/trade/batch-orders"
 	}
 	m := okex.S2M(tmp)
-	res, err := c.client.Do(http.MethodPost, p, true, m)
+	_, b, err := c.client.DoCtx(ctx, http.MethodPost, p, true, m)
 	if err != nil {
 		return
 	}
-	defer res.Body.Close()
-	d := json.NewDecoder(res.Body)
-	err = d.Decode(&response)
+	if err := json.Unmarshal(b, &response); err != nil {
+		return responses.PlaceOrder{}, err
+	}
 
 	return
 }
@@ -138,16 +139,17 @@ func (c *Trade) ClosePosition(req requests.ClosePosition) (response responses.Cl
 // Retrieve order details.
 //
 // https://www.okex.com/docs-v5/en/#rest-api-trade-get-order-details
-func (c *Trade) GetOrderDetail(req requests.OrderDetails) (response responses.OrderList, err error) {
+func (c *Trade) GetOrderDetail(ctx context.Context, req requests.OrderDetails) (response responses.OrderList, err error) {
 	p := "/api/v5/trade/order"
 	m := okex.S2M(req)
-	res, err := c.client.Do(http.MethodGet, p, true, m)
+	_, b, err := c.client.DoCtx(ctx, http.MethodGet, p, true, m)
 	if err != nil {
 		return
 	}
-	defer res.Body.Close()
-	d := json.NewDecoder(res.Body)
-	err = d.Decode(&response)
+
+	if err := json.Unmarshal(b, &response); err != nil {
+		return responses.OrderList{}, err
+	}
 	return
 }
 

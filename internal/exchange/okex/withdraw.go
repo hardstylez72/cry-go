@@ -199,7 +199,7 @@ func (s *Service) GetExchangeWithdrawOptions(ctx context.Context, req *v1.GetExc
 				Ccy: p,
 			})
 			if err != nil {
-				log.Log.Warn("Rest.Funding.GetBalance", zap.Error(err))
+				log.Log.Warn("Rest.Funding.GetFundingBalance", zap.Error(err))
 				return
 			}
 			for _, b := range balance.Balances {

@@ -14,6 +14,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewFibrousSwapTask() *StarkNetSwap {
+	return NewStarkNetSwapTask(v1.TaskType_FibrousSwap, func(a *Input) (*v1.DefaultSwap, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_FibrousSwapTask)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_FibrousSwapTask) call an ambulance!")
+		}
+		return l.FibrousSwapTask, nil
+	})
+}
+
 func NewAvnuSwapTask() *StarkNetSwap {
 	return NewStarkNetSwapTask(v1.TaskType_AvnuSwap, func(a *Input) (*v1.DefaultSwap, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_AvnuSwapTask)
@@ -247,7 +257,7 @@ func (h *StarketSwapHalper) Execute(ctx context.Context, profile *halp.Profile, 
 		Token:         p.FromToken,
 	})
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "client.GetBalance")
+		return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 	}
 
 	am, err := defi.ResolveAmount(p.Amount, balance.WEI)
@@ -276,7 +286,7 @@ func (h *StarketSwapHalper) Execute(ctx context.Context, profile *halp.Profile, 
 			Token:         client.NativeToken,
 		})
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "client.GetBalance")
+			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
 			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balanceNative.WEI)
@@ -317,7 +327,7 @@ func StarkNetApprove(ctx context.Context, token v1.Token, client *starknet.Clien
 		Token:         token,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "client.GetBalance")
+		return nil, errors.Wrap(err, "client.GetFundingBalance")
 	}
 
 	spender := ""
@@ -338,6 +348,8 @@ func StarkNetApprove(ctx context.Context, token v1.Token, client *starknet.Clien
 		spender = "0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af"
 	case v1.TaskType_AvnuSwap:
 		spender = "0x04270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f"
+	case v1.TaskType_FibrousSwap:
+		spender = "0x01b23ed400b210766111ba5b1e63e33922c6ba0c45e6ad56ce112e5f4c578e62"
 	default:
 		return nil, errors.New("StarkNetApprove. unknown task type: " + taskType.String())
 	}
