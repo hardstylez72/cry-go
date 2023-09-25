@@ -80,7 +80,7 @@
               <v-card>
                 <div class="d-inline-flex my-1 mx-1">
                   Доступна для типов профилей: [
-                  <div v-for="t of taskSpec(element).profileType.values()"><b>{{ t }}</b></div>
+                  <div v-for="t of taskSpec(element).profileType.values()"><b>{{ t + " " }}</b></div>
                   ]
                 </div>
 

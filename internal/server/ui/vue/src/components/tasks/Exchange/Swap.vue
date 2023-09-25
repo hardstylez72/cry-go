@@ -36,7 +36,7 @@ import WithdrawerSelect from "@/components/exchange.acc/WithdrawerSelect.vue";
 import {ExchangeSwapTask, Task, TaskType, Token} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import {withdrawerService} from "@/generated/services";
-import {Withdrawer} from "@/generated/withdraw";
+import {ExchangeType, Withdrawer} from "@/generated/withdraw";
 import AmountInput from "@/components/tasks/AmountInput.vue";
 import {required} from "@/components/tasks/menu/helper";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
@@ -122,6 +122,7 @@ export default defineComponent({
     this.syncTask()
     try {
       const res = await withdrawerService.withdrawerServiceListWithdrawer()
+      res.withdrawers = res.withdrawers.filter(w => w.exchangeType === ExchangeType.Okex)
       this.accounts = res.withdrawers.map((w) => {
         w.label = `${w.label} [${w.exchangeType}]`
         return w

@@ -27,7 +27,6 @@ var ZEROADDR = common.HexToAddress("0x0000000000000000000000000000000000000000")
 type SyncSwap struct {
 	RouterSwap         common.Address
 	ClassicPoolFactory common.Address
-	ClassicPool        common.Address
 }
 
 type Muteio struct {
@@ -107,60 +106,59 @@ var DefaultDeadLine = func() *big.Int {
 	return new(big.Int).SetInt64(time.Now().Add(time.Second * 20).Unix())
 }
 
+var TokenAddress = map[v1.Token]common.Address{
+	v1.Token_ETH:   common.HexToAddress("0x5aea5775959fbc2557cc8789bc1bf90a239d9a91"), // mainnet
+	v1.Token_USDC:  common.HexToAddress("0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4"), // mainnet
+	v1.Token_USDT:  common.HexToAddress("0x493257fd37edb34451f62edf8d2a0c418852ba4c"),
+	v1.Token_WETH:  common.HexToAddress("0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91"),
+	v1.Token_LSD:   common.HexToAddress("0x458A2E32eAbc7626187E6b75f29D7030a5202bD4"),
+	v1.Token_LUSD:  common.HexToAddress("0x503234F203fC7Eb888EEC8513210612a43Cf6115"),
+	v1.Token_MUTE:  common.HexToAddress("0x0e97C7a0F8B2C9885C8ac9fC6136e829CbC21d42"),
+	v1.Token_MAV:   common.HexToAddress("0x787c09494Ec8Bcb24DcAf8659E7d5D69979eE508"),
+	v1.Token_SPACE: common.HexToAddress("0x47260090cE5e83454d5f05A0AbbB2C953835f777"),
+	v1.Token_VC:    common.HexToAddress("0x85D84c774CF8e9fF85342684b0E795Df72A24908"),
+	v1.Token_IZI:   common.HexToAddress("0x16a9494e257703797d747540f01683952547ee5b"),
+	v1.Token_BUSD:  common.HexToAddress("0x2039bb4116b4efc145ec4f0e2ea75012d6c0f181"),
+}
+
 func NewMainNetClient(c *ClientConfig) (*Client, error) {
 
 	syncSwap := SyncSwap{
-		RouterSwap:         common.HexToAddress("0x2da10A1e27bF85cEdD8FFb1AbBe97e53391C0295"), // mainnet
-		ClassicPoolFactory: common.HexToAddress("0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb"), // mainnet
-		ClassicPool:        common.HexToAddress(""),
-	}
-
-	var TokenAddress = map[v1.Token]common.Address{
-		v1.Token_ETH:   common.HexToAddress("0x5aea5775959fbc2557cc8789bc1bf90a239d9a91"), // mainnet
-		v1.Token_USDC:  common.HexToAddress("0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4"), // mainnet
-		v1.Token_USDT:  common.HexToAddress("0x493257fd37edb34451f62edf8d2a0c418852ba4c"),
-		v1.Token_WETH:  common.HexToAddress("0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91"),
-		v1.Token_LSD:   common.HexToAddress("0x458A2E32eAbc7626187E6b75f29D7030a5202bD4"),
-		v1.Token_LUSD:  common.HexToAddress("0x503234F203fC7Eb888EEC8513210612a43Cf6115"),
-		v1.Token_MUTE:  common.HexToAddress("0x0e97C7a0F8B2C9885C8ac9fC6136e829CbC21d42"),
-		v1.Token_MAV:   common.HexToAddress("0x787c09494Ec8Bcb24DcAf8659E7d5D69979eE508"),
-		v1.Token_SPACE: common.HexToAddress("0x47260090cE5e83454d5f05A0AbbB2C953835f777"),
-		v1.Token_VC:    common.HexToAddress("0x85D84c774CF8e9fF85342684b0E795Df72A24908"),
-		v1.Token_IZI:   common.HexToAddress("0x16a9494e257703797d747540f01683952547ee5b"),
-		v1.Token_BUSD:  common.HexToAddress("0x2039bb4116b4efc145ec4f0e2ea75012d6c0f181"),
+		RouterSwap:         SpecMap["syncSwapRouter"].Addr,      // mainnet
+		ClassicPoolFactory: SpecMap["syncSwapPoolFactory"].Addr, // mainnet
 	}
 
 	muteio := Muteio{
-		RouterSwap: common.HexToAddress("0x8B791913eB07C32779a16750e3868aA8495F5964"),
+		RouterSwap: SpecMap["muteio"].Addr,
 	}
 
 	maverick := Maverick{
-		Router: common.HexToAddress("0x39E098A153Ad69834a9Dac32f0FCa92066aD03f4"),
+		Router: SpecMap["maverik"].Addr,
 	}
 
 	spaceFI := SpaceFI{
-		Router: common.HexToAddress("0xbE7D1FD1f6748bbDefC4fbaCafBb11C6Fc506d1d"),
+		Router: SpecMap["spaceFiRouter"].Addr,
 	}
 
 	velocore := Velocore{
-		Router: common.HexToAddress("0xd999E16e68476bC749A28FC14a0c3b6d7073F50c"),
+		Router: SpecMap["velocore"].Addr,
 	}
 
 	izumi := IZUMI{
-		Router: common.HexToAddress("0x943ac2310D9BC703d6AB5e5e76876e212100f894"),
-		Quoter: common.HexToAddress("0x30C089574551516e5F1169C32C6D429C92bf3CD7"),
+		Router: SpecMap["izumiRouter"].Addr,
+		Quoter: SpecMap["izumiQuoter"].Addr,
 	}
 
 	vesync := VeSync{
-		Router: common.HexToAddress("0x6C31035D62541ceba2Ac587ea09891d1645D6D07"),
+		Router: SpecMap["veSyncRouter"].Addr,
 	}
 
 	ezkalibur := Ezkalibur{
-		Router: common.HexToAddress("0x498f7bB59c61307De7dEA005877220e4406470e9"),
+		Router: SpecMap["ezkaliburRouter"].Addr,
 	}
 
 	ZkSwap := ZkSwap{
-		Router: common.HexToAddress("0x18381c0f738146Fb694DE18D1106BdE2BE040Fa4"),
+		Router: SpecMap["zkSwapRouter"].Addr,
 	}
 
 	return newClient(
@@ -256,4 +254,55 @@ func (c *Client) NewTx(id common.Hash, code defi.TxCode, Details []bozdo.TxDetai
 		Url:     c.TxViewFn(id.String()),
 		Details: Details,
 	}
+}
+
+var SpecMap = map[string]defi.Spec{
+	"zkSwapRouter": {
+		Addr:     common.HexToAddress("0x18381c0f738146Fb694DE18D1106BdE2BE040Fa4"),
+		TaskType: v1.TaskType_ZkSwap,
+	},
+	"ezkaliburRouter": {
+		Addr:     common.HexToAddress("0x498f7bB59c61307De7dEA005877220e4406470e9"),
+		TaskType: v1.TaskType_EzkaliburSwap,
+	},
+	"veSyncRouter": {
+		Addr:     common.HexToAddress("0x6C31035D62541ceba2Ac587ea09891d1645D6D07"),
+		TaskType: v1.TaskType_VeSyncSwap,
+	},
+	"izumiQuoter": {
+		Addr:     common.HexToAddress("0x30C089574551516e5F1169C32C6D429C92bf3CD7"),
+		TaskType: v1.TaskType_IzumiSwap,
+	},
+	"izumiRouter": {
+		Addr:     common.HexToAddress("0x943ac2310D9BC703d6AB5e5e76876e212100f894"),
+		TaskType: v1.TaskType_IzumiSwap,
+	},
+	"velocore": {
+		Addr:     common.HexToAddress("0xd999E16e68476bC749A28FC14a0c3b6d7073F50c"),
+		TaskType: v1.TaskType_VelocoreSwap,
+	},
+	"spaceFiRouter": {
+		Addr:     common.HexToAddress("0xbE7D1FD1f6748bbDefC4fbaCafBb11C6Fc506d1d"),
+		TaskType: v1.TaskType_SpaceFISwap,
+	},
+	"maverik": {
+		Addr:     common.HexToAddress("0x39E098A153Ad69834a9Dac32f0FCa92066aD03f4"),
+		TaskType: v1.TaskType_MaverickSwap,
+	},
+	"muteio": {
+		Addr:     common.HexToAddress("0x8B791913eB07C32779a16750e3868aA8495F5964"),
+		TaskType: v1.TaskType_MuteioSwap,
+	},
+	"syncSwapRouter": {
+		Addr:     common.HexToAddress("0x2da10A1e27bF85cEdD8FFb1AbBe97e53391C0295"),
+		TaskType: v1.TaskType_SyncSwap,
+	},
+	"syncSwapPoolFactory": {
+		Addr:     common.HexToAddress("0xf2DAd89f2788a8CD54625C60b55cD3d2D0ACa7Cb"),
+		TaskType: v1.TaskType_SyncSwap,
+	},
+	"merkly": {
+		Addr:     common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
+		TaskType: v1.TaskType_MerklyMintAndBridgeNFT,
+	},
 }

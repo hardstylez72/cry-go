@@ -11,9 +11,17 @@
         rounded
         title="Свапалки и мосты (Swap/Bridge)"
         elevation="1"
-      >
+      />
 
-      </v-list-item>
+      <v-list-item
+        variant="flat"
+        density="comfortable"
+        to="/stats/zksync"
+        rounded
+        title="ZkSync"
+        elevation="1"
+      />
+
     </v-list>
   </v-container>
 </template>

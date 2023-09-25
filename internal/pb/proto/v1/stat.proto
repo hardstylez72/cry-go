@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "v1/shared.proto";
+import "v1/task.proto";
+
+package stat;
+option go_package = "grpc/v1";
+
+
+message Stat {
+  optional int64 active_days = 1;
+  optional int64 active_months = 2;
+  optional google.protobuf.Timestamp last_activity = 3;
+  repeated Interaction interactions = 4;
+  double total_usd_amount = 5;
+  int64 tx_count = 6;
+  int64 uniq_address = 7;
+}
+
+message Interaction {
+  string to = 2;
+  string to_url = 3;
+  string service_name = 4;
+  optional string service_url = 5;
+  repeated InteractionAmount amounts = 6;
+  int64 txs = 7;
+  double amount_usd = 8;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["to", "to_url", "tx_count", "amounts", "txs", "amount_usd"]
+    }
+  };
+
+}
+
+message InteractionAmount {
+  optional shared.Token token = 4;
+  string token_url = 1;
+  string amount_wei = 2;
+  optional string amount_usd = 3;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["token_url", "amount_wei", "tx_count"]
+    }
+  };
+}
+
+
+service StatService {
+  rpc ZkSyncStat(ZkSyncStatReq) returns (ZkSyncStatRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/stat/profile/zksync",
+      body: "*"
+    };
+  }
+}
+
+message ZkSyncStatReq {
+  string profile_id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["profile_id"]
+    }
+  };
+}
+
+message ZkSyncStatRes {
+    Stat stat = 1;
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["stat"]
+      }
+    };
+}

@@ -18,6 +18,7 @@ import {serviceOptions as so6, Swap1InchService} from './swap1inch'
 import {serviceOptions as so7, OrbiterService} from './orbiter'
 import {serviceOptions as so8, PublicService} from './public'
 import {serviceOptions as so9, IssueService} from './issue'
+import {serviceOptions as so10, StatService} from './stat'
 
 
 export const instance = axios.create({
@@ -57,6 +58,7 @@ so6.axios = instance
 so7.axios = instance
 so8.axios = instance
 so9.axios = instance
+so10.axios = instance
 
 
 export const profileService = new ProfileService()
@@ -69,6 +71,7 @@ export const swap1inchService = new Swap1InchService()
 export const orbiterService = new OrbiterService()
 export const publicService = new PublicService()
 export const issueService = new IssueService()
+export const statService = new StatService()
 
 
 

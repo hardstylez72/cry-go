@@ -115,3 +115,14 @@ codegen({
   include: ['*'],
   fileName: 'issue.ts'
 });
+
+codegen({
+  methodNameMode: 'operationId',
+  source: require(path.resolve(__dirname, 'swagger/stat.swagger.json')),
+  outputDir: path.resolve(__dirname, 'src/generated/'),
+  useCustomerRequestInstance: true,
+  serviceNameSuffix: '',
+  useStaticMethod: false,
+  include: ['*'],
+  fileName: 'stat.ts'
+});

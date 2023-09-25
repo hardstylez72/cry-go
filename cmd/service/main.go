@@ -59,10 +59,10 @@ type (
 		flowService       *v1.FlowService
 		processService    *v1.ProcessService
 		settingsService   *v1.SettingsService
-		swap1inchService  *v1.Swap1inchService
 		orbiterService    *v1.OrbiterService
 		publicService     *v1.PublicService
 		issueService      *v1.IssueService
+		statService       *v1.StatService
 
 		processRepository    repository.ProcessRepository
 		flowRepository       repository.FlowRepository
@@ -173,6 +173,9 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 	if err := core.RegisterIssueServiceHandler(ctx, mux, conn); err != nil {
 		return err
 	}
+	if err := core.RegisterStatServiceHandler(ctx, mux, conn); err != nil {
+		return err
+	}
 
 	h := http.Handler(mux)
 
@@ -257,10 +260,10 @@ func ListenGRPC(ctx context.Context, port string, s *services) error {
 	core.RegisterFlowServiceServer(server, s.flowService)
 	core.RegisterProcessServiceServer(server, s.processService)
 	core.RegisterSettingsServiceServer(server, s.settingsService)
-	core.RegisterSwap1InchServiceServer(server, s.swap1inchService)
 	core.RegisterOrbiterServiceServer(server, s.orbiterService)
 	core.RegisterPublicServiceServer(server, s.publicService)
 	core.RegisterIssueServiceServer(server, s.issueService)
+	core.RegisterStatServiceServer(server, s.statService)
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -363,9 +366,9 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 		flowService:          v1.NewFlowService(flowRepository, rep),
 		processService:       v1.NewProcessService(processRepository, dispatcher, flowRepository, settingsService),
 		settingsService:      v1.NewSettingsService(settingsService),
-		swap1inchService:     v1.NewSwap1inchService(),
 		orbiterService:       v1.NewOrbiterService(orbiterService),
 		publicService:        v1.NewPublicService(dispatcher),
+		statService:          v1.NewStatService(profileRepository, starknetNewClient),
 		issueService:         issueService,
 		processRepository:    processRepository,
 		flowRepository:       flowRepository,

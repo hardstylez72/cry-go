@@ -17,7 +17,7 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 		TokenMap: c.Cfg.TokenMap,
 		Cli:      c.ClientL2,
 		Network:  c.Cfg.Network,
-		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
+		CA:       SpecMap["merkly"].Addr,
 	}
 
 	txData, _, err := m.MakeMintTx(ctx)
@@ -69,7 +69,7 @@ func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) 
 		TokenMap: c.Cfg.TokenMap,
 		Cli:      c.ClientL2,
 		Network:  c.Cfg.Network,
-		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
+		CA:       SpecMap["merkly"].Addr,
 	}
 
 	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
@@ -128,7 +128,7 @@ func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.I
 		TokenMap: c.Cfg.TokenMap,
 		Cli:      c.ClientL2,
 		Network:  c.Cfg.Network,
-		CA:       common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768"),
+		CA:       SpecMap["merkly"].Addr,
 	}
 
 	//maxId := big.NewInt(1999999)
@@ -147,7 +147,7 @@ func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.I
 	}
 
 	for _, log := range logs {
-		if log.Address.String() != common.HexToAddress("0x6dd28C2c5B91DD63b4d4E78EcAC7139878371768").String() {
+		if log.Address.String() != SpecMap["merkly"].Addr.String() {
 			continue
 		}
 		for _, topic := range log.Topics {

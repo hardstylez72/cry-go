@@ -14,6 +14,11 @@ type Token = v1.Token
 
 type Network = v1.Network
 
+type Spec struct {
+	Addr     common.Address
+	TaskType v1.TaskType
+}
+
 type Networker interface {
 	TxViewFn(id string) string
 	GetNetworkId() *big.Int
