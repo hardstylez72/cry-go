@@ -83,6 +83,10 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 
 		p.MintTx = NewTx(res.Tx, gas)
 
+		if err := a.AddTx2(ctx, p.GetMintTx()); err != nil {
+			return nil, err
+		}
+
 		if err := a.AddTx(ctx, res.ApproveTx); err != nil {
 			return nil, err
 		}
@@ -97,36 +101,34 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 		if err := WaitTxComplete(taskContext, p.GetMintTx(), task, client, a); err != nil {
 			return nil, err
 		}
-		if err := a.AddTx2(ctx, p.GetMintTx()); err != nil {
-			return nil, err
-		}
 	}
-
-	nftId, err := client.GetMerklyNFTId(ctx, common.HexToHash(p.GetMintTx().GetTxId()))
-	if err != nil {
-		tx := p.MintTx
-		if tx.RetryCount > 20 {
-			tx.TxCompleted = false
-			tx.RetryCount = 0
-			tx.TxId = ""
-			if err := a.UpdateTask(ctx, task); err != nil {
-				return nil, err
-			}
-		} else {
-			tx.RetryCount++
-			if err := a.UpdateTask(ctx, task); err != nil {
-				return nil, err
-			}
-			return a.Task, nil
-		}
-
-		return nil, err
-	}
-	tmp := nftId.String()
-	p.NftId = &tmp
 
 	// bridge
 	if p.GetBridgeTx().GetTxId() == "" {
+
+		nftId, err := client.GetMerklyNFTId(ctx, common.HexToHash(p.GetMintTx().GetTxId()), common.HexToAddress(profile.Addr))
+		if err != nil {
+			tx := p.MintTx
+			if tx.RetryCount > 20 {
+				tx.TxCompleted = false
+				tx.RetryCount = 0
+				tx.TxId = ""
+				if err := a.UpdateTask(ctx, task); err != nil {
+					return nil, err
+				}
+			} else {
+				tx.RetryCount++
+				if err := a.UpdateTask(ctx, task); err != nil {
+					return nil, err
+				}
+				return a.Task, nil
+			}
+
+			return nil, err
+		}
+		tmp := nftId.String()
+		p.NftId = &tmp
+
 		estimation, err := EstimateMerklyBridgeCost(taskContext, profile, p, client)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateMerklyBridgeCost")
@@ -137,7 +139,9 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 		}
 
 		p.BridgeTx = NewTx(res.Tx, gas)
-
+		if err := a.AddTx2(ctx, p.GetBridgeTx()); err != nil {
+			return nil, err
+		}
 		if err := a.UpdateTask(ctx, task); err != nil {
 			return nil, err
 		}
@@ -149,9 +153,6 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 	// bridge wait
 	if !p.GetBridgeTx().GetTxCompleted() {
 		if err := WaitTxComplete(taskContext, p.GetBridgeTx(), task, client, a); err != nil {
-			return nil, err
-		}
-		if err := a.AddTx2(ctx, p.GetBridgeTx()); err != nil {
 			return nil, err
 		}
 	}

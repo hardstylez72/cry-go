@@ -6,12 +6,14 @@ import (
 	"math/big"
 	"strings"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/pkg/errors"
 	"github.com/zksync-sdk/zksync2-go/accounts"
 	"github.com/zksync-sdk/zksync2-go/contracts/ethtoken"
+	"github.com/zksync-sdk/zksync2-go/types"
 	"github.com/zksync-sdk/zksync2-go/utils"
 )
 
@@ -74,6 +76,8 @@ func (c *Client) BridgeFromEthereumNetwork(ctx context.Context, req *L1L2BridgeR
 		return nil, errors.Wrap(err, "zksync2.NewWallet")
 	}
 
+	priority := big.NewInt(5e7) //1.5GWEI
+
 	msg := accounts.DepositCallMsg{
 		To:                w.Address(),
 		Token:             utils.EthAddress,
@@ -81,22 +85,50 @@ func (c *Client) BridgeFromEthereumNetwork(ctx context.Context, req *L1L2BridgeR
 		OperatorTip:       nil,
 		BridgeAddress:     nil,
 		L2GasLimit:        nil,
-		GasPerPubdataByte: nil,
+		GasPerPubdataByte: utils.RequiredL1ToL2GasPerPubdataLimit,
 		RefundRecipient:   w.Address(),
 		CustomBridgeData:  nil,
-		Value:             req.Amount,
+		Value:             nil,
 		Gas:               0,
 		GasPrice:          nil,
 		GasFeeCap:         nil,
-		GasTipCap:         nil,
+		GasTipCap:         priority,
 		AccessList:        nil,
 	}
+
+	// L2 gas
+	to := w.Address()
+	gasLimitL2, err := c.ClientL2.EstimateL1ToL2Execute(ctx, types.CallMsg{
+		CallMsg: ethereum.CallMsg{
+			From:  w.Address(),
+			To:    &to,
+			Value: req.Amount,
+		},
+		Meta: &types.Eip712Meta{
+			GasPerPubdata: utils.NewBig(msg.GasPerPubdataByte.Int64()),
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "EstimateL1ToL2Execute")
+	}
+
+	gasLimitL2 *= 3
+
+	l2GasPrice, err := c.ClientL2.SuggestGasPrice(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "SuggestGasPrice")
+	}
+
+	msg.L2GasLimit = big.NewInt(0).SetUint64(gasLimitL2)
+
+	gasL2 := defi.MinerGasLegacy(l2GasPrice, gasLimitL2)
 
 	result := &L1L2BridgeRes{}
 	var gas uint64
 	var gasPrice *big.Int
 	if !req.Gas.RuleSet() {
 
+		// L1 gas
 		header, err := c.ClientL1.HeaderByNumber(ctx, nil)
 		if err != nil {
 			return nil, errors.Wrap(err, "SuggestGasPrice")
@@ -104,25 +136,29 @@ func (c *Client) BridgeFromEthereumNetwork(ctx context.Context, req *L1L2BridgeR
 
 		msg.GasFeeCap = bozdo.BigIntSum(header.BaseFee, bozdo.Percent(header.BaseFee, 50))
 
-		gasPrice = msg.GasFeeCap
-		gas, err = w.EstimateGasDeposit(ctx, msg)
+		gasPrice = big.NewInt(0).Add(priority, msg.GasFeeCap)
+		gasLimitL1, err := w.EstimateGasDeposit(ctx, msg)
 		if err != nil {
 			return nil, errors.Wrap(err, "EstimateGasDeposit")
 		}
-
-		gas *= 5
+		gas = gasLimitL1 * 8
 
 	} else {
-		gasPrice = &req.Gas.GasPrice
+
+		gasPrice = big.NewInt(0).Sub(&req.Gas.GasPrice, priority)
 		gas = req.Gas.GasLimit.Uint64()
 	}
 
+	totalGas := bozdo.BigIntSum(defi.MinerGas(gasPrice, priority, gas), gasL2)
+	l1GasLimit := gas
+	gasPriceSpecial := big.NewInt(0).Div(totalGas, big.NewInt(0).SetUint64(l1GasLimit))
+
 	result.EstimatedGasCost = &bozdo.EstimatedGasCost{
-		Type:        bozdo.TxTypeLegacy,
+		Type:        bozdo.TxTypeDynamic,
 		Name:        "deposit",
-		GasLimit:    big.NewInt(0).SetUint64(gas),
-		GasPrice:    gasPrice,
-		TotalGasWei: defi.MinerGasLegacy(gasPrice, gas),
+		GasLimit:    big.NewInt(0).SetUint64(l1GasLimit),
+		GasPrice:    gasPriceSpecial,
+		TotalGasWei: totalGas,
 		Details:     nil,
 	}
 
@@ -130,10 +166,36 @@ func (c *Client) BridgeFromEthereumNetwork(ctx context.Context, req *L1L2BridgeR
 		return result, nil
 	}
 
-	msg.GasPrice = gasPrice
 	msg.Gas = gas
+	msg.L2GasLimit = big.NewInt(0).SetUint64(gasLimitL2)
 
-	tx, err := w.Deposit(nil, msg.ToDepositTransaction())
+	l1Gas := big.NewInt(0).Sub(totalGas, gasL2)
+	gasPrice = big.NewInt(0).Div(l1Gas, big.NewInt(0).SetUint64(gas))
+	gasPrice = big.NewInt(0).Sub(gasPrice, priority)
+
+	req.Amount = bozdo.Percent(req.Amount, 99)
+
+	opt := &accounts.TransactOpts{
+		Nonce:     nil,
+		Value:     bozdo.BigIntSum(req.Amount, gasL2),
+		GasPrice:  nil,
+		GasFeeCap: gasPrice,
+		GasTipCap: priority,
+		GasLimit:  gas,
+		Context:   ctx,
+	}
+
+	// 86433205000000
+	// 3378824906437992
+
+	b, _ := c.ClientL1.BalanceAt(ctx, w.Address(), nil)
+
+	println("v-am: " + big.NewInt(0).Sub(opt.Value, req.Amount).String())
+	println("b-v: " + big.NewInt(0).Sub(b, opt.Value).String())
+	println("b-tx-fee: " + big.NewInt(0).Sub(b, defi.MinerGas(opt.GasFeeCap, opt.GasTipCap, opt.GasLimit)).String())
+	println("diff: " + big.NewInt(0).Sub(b, bozdo.BigIntSum(opt.Value, defi.MinerGas(opt.GasFeeCap, opt.GasTipCap, opt.GasLimit))).String())
+
+	tx, err := w.Deposit(opt, msg.ToDepositTransaction())
 	if err != nil {
 		return nil, errors.Wrap(err, "Deposit")
 	}
@@ -141,6 +203,12 @@ func (c *Client) BridgeFromEthereumNetwork(ctx context.Context, req *L1L2BridgeR
 	result.TxHash = c.NewTx(tx.Hash(), defi.CodeContract, nil)
 
 	return &L1L2BridgeRes{
-		TxHash: c.NewTx(tx.Hash(), defi.CodeContract, nil),
+		TxHash: &bozdo.Transaction{
+			Code:    defi.CodeContract,
+			Network: c.Cfg.Network,
+			Id:      tx.Hash().String(),
+			Url:     "https://etherscan.io/tx/" + tx.Hash().String(),
+			Details: nil,
+		},
 	}, nil
 }

@@ -40,6 +40,7 @@ const (
 	CodeBridge   TxCode = "bridge"
 	CodeDmail    TxCode = "dmail"
 	CodeMint     TxCode = "mint"
+	CodeLP       TxCode = "lp"
 )
 
 type Transaction struct {

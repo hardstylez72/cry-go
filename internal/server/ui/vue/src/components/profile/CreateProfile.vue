@@ -14,18 +14,6 @@
         <div> каждая строка должна быть вида:
           "приватный ключ (обязательно)", "socks5 proxy (опционально)", "название (опционально)"
         </div>
-        <ul>
-
-          Допустимые варианты ввода:
-          <li> 4374d77b231f6ed16f2fc23a6e28706615f852bdaf223685475f7337487ae51d, "123.456.67.89:5436:login:password",
-            "profile_1" - все поля заданы
-          </li>
-          <li>4374d77b231f6ed16f2fc23a6e28706615f852bdaf223685475f7337487ae51d, "",
-            "profile_1" - прокси не задан
-          </li>
-          <li>4374d77b231f6ed16f2fc23a6e28706615f852bdaf223685475f7337487ae51d, "", "" - задан только приватный ключ
-          </li>
-        </ul>
       </div>
 
       <v-btn :loading="loading" @click="validate" class="mb-4 mx-4">
@@ -61,8 +49,6 @@
           <v-radio class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
           <v-radio class="mx-8" :value="ProfileType.StarkNet">StarkNet</v-radio>
         </v-radio-group>
-
-
       </div>
       <v-radio-group
         class="my-2"
@@ -77,8 +63,29 @@
           }}
         </v-radio>
       </v-radio-group>
+
+      <div>
+        <v-list>
+          <v-list-item
+            elevation="1"
+            v-for="item in items"
+          >
+            <div>
+              <span class="mx-1" :style="`color: ${getStatusColor(item)}`">{{ `[ status: ${item.status} ]` }}</span>
+              <span class="mx-1">PK: {{ item.pk }}</span>
+              <span class="mx-1">Proxy: {{ item.proxy || 'Не задан' }}</span>
+              <span class="mx-1">Label: {{ item.label || 'Не задан' }}</span>
+
+            </div>
+
+
+          </v-list-item>
+        </v-list>
+      </div>
+
       <v-textarea
         auto-grow
+        @input="preparseText"
         density="compact"
         clearable="true"
         variant="outlined"
@@ -88,16 +95,8 @@
         :disabled="loading"
       />
       <div v-if="valid">Number of profiles: <b>{{ items.length }}</b></div>
-      <div v-if="mode">Mode: <b>{{ mode }}</b></div>
-
       <br/>
 
-      <div v-for="item in items">
-        <span :style="`color: ${getStatusColor(item)}`">{{ `[ status: ${item.status} ]` }}</span>
-        {{
-          `- pk: ${item.pk} proxy: ${item.proxy} label: ${item.label}`
-        }}
-      </div>
     </v-container>
   </div>
 
@@ -175,6 +174,7 @@ export default defineComponent({
     generated(text: string) {
       this.needSave = true
       this.text = text
+      this.preparseText()
     },
     getStatusColor(item: Item): string {
       if (item.status === 'ok') {
@@ -194,14 +194,11 @@ export default defineComponent({
     print(data: string[][]) {
       this.text = this.format(data)
     },
-    async save() {
-      this.needSave = false
-      this.loading = true
-      this.mode = 'validate and save'
-      this.items = []
+
+    preparseText() {
       try {
-        this.valid = false
-        this.validError = ""
+        this.errorMessage = ''
+        this.items = []
         const data = this.preparse(this.text)
         data.forEach((line) => {
           this.items.push({
@@ -212,14 +209,16 @@ export default defineComponent({
           })
         })
         this.print(data)
-        this.valid = true
       } catch (e) {
-        this.validError = "invalid input"
-        this.valid = false
-        this.loading = false
-        return
+        this.errorMessage = e.message
       }
 
+    },
+    async save() {
+      this.needSave = false
+      this.mode = 'validate and save'
+
+      this.loading = true
       for (let i = 0; i < this.items.length; i++) {
         let item = this.items[i]
         try {
@@ -243,27 +242,6 @@ export default defineComponent({
     async validate() {
       this.loading = true
       this.mode = 'validate only'
-      this.items = []
-      try {
-        this.valid = false
-        this.validError = ""
-        const data = this.preparse(this.text)
-        data.forEach((line) => {
-          this.items.push({
-            pk: line[0],
-            proxy: line[1] ? line[1] : '',
-            label: line[2] ? line[2] : '',
-            status: 'ready'
-          })
-        })
-        this.print(data)
-        this.valid = true
-      } catch (e) {
-        this.validError = "invalid input"
-        this.valid = false
-        this.loading = false
-        return
-      }
 
       for (let i = 0; i < this.items.length; i++) {
         let item = this.items[i]
@@ -314,12 +292,45 @@ export default defineComponent({
       text = text.replaceAll(" ", "")
       this.errorMessage = ''
       const result = Papa.parse<string[]>(text, {skipEmptyLines: true, delimitersToGuess: [';', ',']})
-      result.data.forEach((line: string[]) => {
-        if (line.length !== 3) {
-          throw new Error('line length is not 3 words')
+      result.data.forEach((line: string[], i) => {
+        try {
+          if (line.length >= 1) {
+            this.simpleValidatePK(line[0])
+          }
+
+          if (line.length >= 2) {
+            this.simpleValidateProxy(line[1])
+          }
+          if (line.length !== 3) {
+            throw new Error(`Строка должна иметь вид: [pk,proxy,label]. В качестве разделителя можно использовать: ',' или ';'. \n
+          Пример(metamask): 4374d77b231f6ed16f2fc23a6e28706615f852bdaf223685475f7337487ae51d,,`)
+          }
+        } catch (e) {
+          throw new Error(`Ошибка в строке ${i + 1}. ` + e.message)
         }
+
       })
       return result.data
+    },
+    simpleValidateProxy(proxy: string) {
+      proxy = proxy.replaceAll(" ", "")
+      if (proxy === '') {
+        return
+      }
+
+      const parts = proxy.split(':')
+      if (parts.length != 4) {
+        throw new Error(`Proxy должен иметь вид [ip:port:login:password]. Пример: 123.456.67.89:5436:user1:password1`)
+      }
+    },
+    simpleValidatePK(pk: string) {
+      if (this.selectProfileType === ProfileType.EVM) {
+        const res = pk.search(/(^[a-f0-9]{64}$)/g)
+        if (res === -1) {
+          throw new Error(`Приватный ключ должен состоять из 64 символов. Пример: 69efc3b091b176542c7d7eee1bbf7321244a5c83d026d693a7288e072e663b81`)
+        }
+      }
+
     },
     format(data: string[][]): string {
       let formatted = ""

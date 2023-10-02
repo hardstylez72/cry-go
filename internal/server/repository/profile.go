@@ -134,7 +134,7 @@ func (r *pgRepository) CreateProfile(ctx context.Context, req *Profile) (err err
 	return nil
 }
 func SelectProfileMaxNumByUser(ctx context.Context, conn pg.SqlDriver, userId string, profileType string) (int64, error) {
-	q := `select coalesce(max(num), 0) from profiles where user_id = $1 and type = $2`
+	q := `select coalesce(max(num), 0) from profiles where user_id = $1 and type = $2 and deleted_at is null`
 	var num int64 = 1
 	if err := conn.GetContext(ctx, &num, q, userId, profileType); err != nil {
 		return 0, err

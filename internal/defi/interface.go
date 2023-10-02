@@ -37,7 +37,7 @@ type MintAndBridgeNFT interface {
 	Networker
 	MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, error)
 	MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error)
-	GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.Int, error)
+	GetMerklyNFTId(ctx context.Context, txHash common.Hash, owner common.Address) (*big.Int, error)
 }
 
 type StargateSwapper interface {
@@ -173,4 +173,30 @@ type SimpleReq struct {
 	PK      string
 	SubType v1.ProfileSubType
 	*bozdo.BaseReq
+}
+
+type LP interface {
+	LP(ctx context.Context, req *LPReq, taskType v1.TaskType) (*LPRes, error)
+	Networker
+}
+
+type LPReq struct {
+	Amount *big.Int
+	Tokens []v1.Token
+
+	PK  string
+	Add bool
+
+	EstimateOnly bool
+	Gas          *bozdo.Gas
+	debug        bool
+
+	PSubType v1.ProfileSubType
+}
+
+type LPRes struct {
+	Tx        *bozdo.Transaction
+	Approves  []bozdo.Transaction
+	ECost     *bozdo.EstimatedGasCost
+	TxDetails []bozdo.TxDetail
 }

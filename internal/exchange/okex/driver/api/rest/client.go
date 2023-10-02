@@ -7,7 +7,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -115,11 +114,6 @@ func (c *ClientRest) DoCtx(ctx context.Context, method, path string, private boo
 		return nil, nil, err
 	}
 
-	if res.StatusCode != 200 {
-		b, _ := io.ReadAll(res.Body)
-		return nil, nil, errors.New(string(b))
-	}
-
 	b, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, nil, err
@@ -131,7 +125,7 @@ func (c *ClientRest) DoCtx(ctx context.Context, method, path string, private boo
 	}
 
 	if response.Code != 0 {
-		return nil, nil, errors.New(string(b))
+		return nil, nil, &response
 	}
 
 	return res, b, nil

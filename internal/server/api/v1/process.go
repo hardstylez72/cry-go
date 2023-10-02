@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -289,4 +290,54 @@ func (s *ProcessService) GetProfileTransactions(ctx context.Context, req *v1.Get
 	return &v1.GetProfileTransactionsRes{
 		Transactions: tmp,
 	}, nil
+}
+
+func (s *ProcessService) StopAllProcess(ctx context.Context, req *v1.StopAllProcessReq) (*v1.StopAllProcessRes, error) {
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ids, err := s.processRepository.ProcessIDsUser(ctx, userId, v1.ProcessStatus_StatusRunning)
+	if err != nil {
+		return nil, err
+	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(len(ids))
+
+	for _, id := range ids {
+		go func(id string) {
+			defer wg.Done()
+			_ = s.dispatcher.StopProcess(ctx, id)
+		}(id)
+	}
+
+	wg.Wait()
+
+	return &v1.StopAllProcessRes{}, nil
+}
+
+func (s *ProcessService) ResumeAllProcess(ctx context.Context, req *v1.ResumeAllProcessReq) (*v1.ResumeAllProcessRes, error) {
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ids, err := s.processRepository.ProcessIDsUser(ctx, userId, v1.ProcessStatus_StatusStop)
+	if err != nil {
+		return nil, err
+	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(len(ids))
+
+	for _, id := range ids {
+		go func(id string) {
+			defer wg.Done()
+			_ = s.dispatcher.ResumeProcess(ctx, id)
+		}(id)
+	}
+
+	wg.Wait()
+
+	return &v1.ResumeAllProcessRes{}, nil
 }

@@ -25,15 +25,20 @@
               <ProxyInput v-model="withdrawer.proxy" :required="true"/>
             </v-col>
           </v-row>
-          <v-row>
+          
+          <v-row class="d-flex justify-center my-1">
             <v-col>
-              <div class="d-flex justify-center my-2 mb-5">
-                <v-btn width="100%" v-if="WithdrawerChanged" class="my-3" :loading="updating" @click="update">Update
+              <div>
+                <v-btn width="100%" v-if="WithdrawerChanged" :loading="updating" @click="update">Update
                 </v-btn>
-                <div v-if="updatingError">{{ updatingError }}</div>
               </div>
             </v-col>
 
+          </v-row>
+          <v-row class="d-flex justify-center my-2">
+            <v-col>
+              <div style="color: red" v-if="updatingError">{{ updatingError }}</div>
+            </v-col>
           </v-row>
         </v-form>
 
@@ -226,7 +231,10 @@ export default defineComponent({
           }
         })
         this.updatingError = res.error
-        await this.getWithdrawer()
+        if (!this.updatingError) {
+          await this.getWithdrawer()
+        }
+
       } finally {
         this.updating = false
       }

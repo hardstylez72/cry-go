@@ -79,7 +79,7 @@ func (r *pgRepository) GetProfileRelations(ctx context.Context, req *GetProfileR
 }
 
 func (r *pgRepository) profiles(ctx context.Context, p1Type v1.ProfileType, p1SubType v1.ProfileSubType, userId string) ([]ProfileRel, error) {
-	q := `select id,num, type, sub_type from profiles where type = $1 and sub_type = $2 and user_id = $3`
+	q := `select id,num, type, sub_type from profiles where type = $1 and sub_type = $2 and user_id = $3 and deleted_at is null`
 	out := make([]ProfileRel, 0)
 
 	if err := r.conn.SelectContext(ctx, &out, q, p1Type.String(), p1SubType.String(), userId); err != nil {
@@ -99,7 +99,7 @@ func (r *pgRepository) profileRelations(ctx context.Context, p1Type, p2Type v1.P
                join profiles p on (pr.p2_id = p.id)
                where p1_type = $1 and p2_type = $2
 			and p1_sub_type = $3 and p2_sub_type = $4
-			and pr.user_id = $5`
+			and pr.user_id = $5 and p.deleted_at is null`
 	out := make([]ProfileRelationSpecial, 0)
 
 	if err := r.conn.SelectContext(ctx, &out, q, p1Type.String(), p2Type.String(), p1SubType.String(), p2SubType.String(), userId); err != nil {

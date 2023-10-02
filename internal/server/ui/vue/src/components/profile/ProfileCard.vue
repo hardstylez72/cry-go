@@ -18,12 +18,11 @@
             <i class="mx-2">{{ profile.subType }}</i>
             <b class="mx-2" v-if="profile.type === ProfileType.StarkNet &&!deployed && !loading" style="color: red">not
               deployed</b>
-            <v-icon icon="mdi-eye" @click="addrShow = true" v-if="!addrShow"/>
+            <ProfileAddress :addr="profile.mmskId" v-model="addrShow"/>
           </div>
           <v-icon icon="mdi-close" @click="menu = false"/>
         </div>
 
-        <div v-if="addrShow" class="my-2">{{ profile.mmskId }}</div>
 
         <div class="d-flex justify-space-between" v-if="this.profile.type === ProfileType.StarkNet">
           <div>
@@ -94,10 +93,11 @@ import Withdraw from "@/components/exchange.acc/ExchangeAccounts.vue";
 import TopUpProfile from "@/components/exchange.acc/TopUpProfile.vue";
 import {Transaction} from "@/generated/process";
 import {formatTime} from "../helper";
+import ProfileAddress from "@/components/profile/ProfileAddress.vue";
 
 export default defineComponent({
   name: "ProfileCard",
-  components: {TopUpProfile, Withdraw, TopUp, Balance},
+  components: {ProfileAddress, TopUpProfile, Withdraw, TopUp, Balance},
   props: {
     profileId: {
       type: String,

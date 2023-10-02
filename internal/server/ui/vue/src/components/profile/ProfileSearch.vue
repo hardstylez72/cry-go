@@ -28,11 +28,16 @@
         ></v-chip>
       </template>
     </v-autocomplete>
-    <v-radio-group v-model="selectProfileType" inline="" hide-details density="compact" :disabled="disabled">
-      Выберите тип профилей:
-      <v-radio class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
-      <v-radio class="mx-8" :value="ProfileType.StarkNet">StarkNet</v-radio>
-    </v-radio-group>
+    <div class="d-inline-flex align-center">
+      <v-radio-group v-model="selectProfileType" inline="" hide-details density="compact" :disabled="disabled">
+        Выберите тип профилей:
+        <v-radio v-if="profileTypeAllowed(ProfileType.EVM)" class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
+        <v-radio v-if="profileTypeAllowed(ProfileType.StarkNet)" class="mx-8" :value="ProfileType.StarkNet">StarkNet
+        </v-radio>
+      </v-radio-group>
+      <v-switch class="mx-2" v-if="shufflable" v-model="shuffle" label="перетасовать" density="compact" hide-details/>
+    </div>
+
   </div>
 </template>
 
@@ -53,9 +58,28 @@ export default defineComponent({
         this.selectedProfiles = []
         this.searchProfiles()
       }
+    },
+    shuffle: {
+      handler() {
+        if (this.shuffle) {
+          shuffleArray(this.selectedProfiles)
+        } else {
+          this.selectedProfiles.sort((a, b) => a.num - b.num)
+        }
+      }
     }
   },
   props: {
+    shufflable: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    profileTypeFilter: {
+      type: Array as PropType<ProfileType[]>,
+      required: false,
+      default: [ProfileType.EVM, ProfileType.StarkNet]
+    },
     multiple: {
       type: Boolean,
       required: false,
@@ -75,9 +99,11 @@ export default defineComponent({
       profilesLoading: false,
       suggestedProfile: "",
       suggestedProfiles: [] as Profile[],
+      suggestedProfilesOrig: [] as Profile[],
       timer: new Timer(),
       hideNoData: false,
-      selectProfileType: ProfileType.EVM
+      selectProfileType: ProfileType.EVM,
+      shuffle: false,
     }
   },
   computed: {
@@ -94,6 +120,13 @@ export default defineComponent({
     }
   },
   methods: {
+    profileTypeAllowed(t: ProfileType): boolean {
+      if (!this.profileTypeFilter) {
+        return true
+      }
+
+      return this.profileTypeFilter.some(p => p === t)
+    },
     profileTitle,
     required,
     async searchProfiles(v: string) {
@@ -121,7 +154,9 @@ export default defineComponent({
 
             }
             this.selectedProfiles.push(...this.suggestedProfiles)
-            shuffleArray(this.selectedProfiles)
+
+            this.suggestedProfilesOrig.push(...this.selectedProfiles)
+
           } finally {
             this.profilesLoading = false
           }
@@ -136,6 +171,7 @@ export default defineComponent({
             })
             this.suggestedProfiles = []
             this.suggestedProfiles.push(...res.profiles)
+            this.suggestedProfilesOrig.push(...this.selectedProfiles)
           } finally {
             this.profilesLoading = false
           }

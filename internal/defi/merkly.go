@@ -148,7 +148,7 @@ func (c *EtheriumClient) MerklyBridgeNft(ctx context.Context, req *merkly.Bridge
 	return res, nil
 }
 
-func (c *EtheriumClient) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.Int, error) {
+func (c *EtheriumClient) GetMerklyNFTId(ctx context.Context, txHash common.Hash, owner common.Address) (*big.Int, error) {
 	minId := big.NewInt(1000000)
 
 	receipt, err := c.Cli.TransactionReceipt(ctx, txHash)
@@ -177,20 +177,22 @@ func (c *EtheriumClient) GetMerklyNFTId(ctx context.Context, txHash common.Hash)
 		return nil, err
 	}
 	for _, log := range logs {
-		if log.Address.String() != c.Cfg.Dict.Merkly.NFT.String() {
-			continue
-		}
+		//if log.Address.String() != c.Cfg.Dict.Merkly.NFT.String() {
+		//	continue
+		//}
 		for _, topic := range log.Topics {
 
 			topicBig := topic.Big()
 			if topicBig.Cmp(minId) >= 0 { // &&  maxId.Cmp(topicBig) >= 0
 
-				_, err := caller.OwnerOf(&bind.CallOpts{Context: ctx}, topicBig)
+				owner1, err := caller.OwnerOf(&bind.CallOpts{Context: ctx}, topicBig)
 				if err != nil {
 					continue
 				}
-
-				return topicBig, nil
+				//24134178
+				if owner.String() == owner1.String() {
+					return topicBig, nil
+				}
 			}
 
 		}

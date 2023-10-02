@@ -354,11 +354,11 @@ func (s *WithdrawerService) CreateWithdrawer(ctx context.Context, req *v1.Create
 
 	wd, err := uniclient.NewExchangeWithdrawer(a, nil)
 	if err != nil {
-		return nil, err
+		return nil, Rus(err)
 	}
 
 	if err := wd.Ping(ctx); err != nil {
-		return nil, errors.Wrap(err, "can't connect to exchange")
+		return nil, Rus(err)
 	}
 
 	res, err := s.repository.CreateWithdrawer(ctx, a)
@@ -437,17 +437,17 @@ func (s *WithdrawerService) UpdateWithdrawer(ctx context.Context, req *v1.Update
 
 	wd, err := uniclient.NewExchangeWithdrawer(source, nil)
 	if err != nil {
-		e := err.Error()
+		e := Rus(err).Error()
 		return &v1.UpdateWithdrawerResponse{
 			Error: &e,
-		}, err
+		}, nil
 	}
 
 	if err := wd.Ping(ctx); err != nil {
-		e := err.Error()
+		e := Rus(err).Error()
 		return &v1.UpdateWithdrawerResponse{
 			Error: &e,
-		}, err
+		}, nil
 	}
 
 	err = s.repository.UpdateWithdrawer(ctx, &repository.Withdrawer{
@@ -459,7 +459,6 @@ func (s *WithdrawerService) UpdateWithdrawer(ctx context.Context, req *v1.Update
 		},
 		UserId: userId,
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -516,14 +515,14 @@ func (s *WithdrawerService) Withdraw(ctx context.Context, req *v1.WithdrawReq) (
 
 	wd, err := uniclient.NewExchangeWithdrawer(w, nil)
 	if err != nil {
-		e := err.Error()
+		e := Rus(err).Error()
 		return &v1.WithdrawRes{
 			ErrorMessage: &e,
 		}, nil
 	}
 
 	if err := wd.Ping(ctx); err != nil {
-		e := err.Error()
+		e := Rus(err).Error()
 		return &v1.WithdrawRes{
 			ErrorMessage: &e,
 		}, nil
@@ -551,7 +550,7 @@ func (s *WithdrawerService) Withdraw(ctx context.Context, req *v1.WithdrawReq) (
 		Token:     req.Token,
 	})
 	if err != nil {
-		e := err.Error()
+		e := Rus(err).Error()
 		return &v1.WithdrawRes{
 			ErrorMessage: &e,
 		}, nil

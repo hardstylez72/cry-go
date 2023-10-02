@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -20,29 +21,45 @@ import (
 )
 
 func (s *Service) Currency(ctx context.Context, ccy string) (responses.GetCurrencies, error) {
-	return s.cli.Rest.Funding.GetCurrency(ctx, ccy)
+	res, err := s.cli.Rest.Funding.GetCurrency(ctx, ccy)
+	if err != nil {
+		return responses.GetCurrencies{}, errors.Wrap(err, "Rest.Funding.GetCurrency")
+	}
+	return res, nil
 }
 func (s *Service) Withdraw(ctx context.Context, req *exchange.WithdrawRequest) (*exchange.WithdrawResponse, error) {
 
+	l := log.Log.With("fn", "okex.Withdraw").With("req", zap.Any("req", req))
 	maxTry := 5
 	try := 0
 	fee := "-1"
-	for try < maxTry && fee == "-1" {
+
+	for try < maxTry {
+		l.Info("try: ", try)
 		try++
 		ccy, err := s.Currency(ctx, req.Token)
 		if err != nil {
+			l.Info(zap.Any("req", req), zap.Error(err))
 			continue
 		}
 
 		for _, c := range ccy.Currencies {
-			if c.Ccy == req.Token && req.Network == c.Chain {
+			if strings.ToLower(c.Ccy) == strings.ToLower(req.Token) && strings.ToLower(req.Network) == strings.ToLower(c.Chain) {
 				fee = c.MinFee
 				break
 			}
 		}
+
+		if fee != "-1" {
+			break
+		}
+
+		time.Sleep(time.Second * 2)
 	}
 
-	if fee == "" {
+	l.Info("fee: ", fee)
+
+	if fee == "" || fee == "-1" {
 		return nil, errors.New("okex did not send fee value...")
 	}
 
@@ -56,6 +73,10 @@ func (s *Service) Withdraw(ctx context.Context, req *exchange.WithdrawRequest) (
 		return nil, errors.Wrap(err, "lib.StringToFloat(fee)")
 	}
 
+	if strings.ToLower(req.Network) == strings.ToLower("ETH-StarkNet") {
+		req.Network = "ETH-Starknet"
+	}
+
 	res, err := s.cli.Rest.Funding.Withdrawal(ctx, funding.Withdrawal{
 		Ccy:    req.Token,
 		Chain:  req.Network,
@@ -66,7 +87,7 @@ func (s *Service) Withdraw(ctx context.Context, req *exchange.WithdrawRequest) (
 		Dest:   okex.WithdrawalDigitalAddressDestination,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "cli.Rest.Funding.Withdrawal")
+		return nil, WrapErr(err)
 	}
 
 	var id string

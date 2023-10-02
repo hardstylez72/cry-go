@@ -153,9 +153,25 @@ func (r *pgRepository) GetProcessUpdatedAt(ctx context.Context, processId string
 	return &a, nil
 }
 
-func (r *pgRepository) ListProcessIdsByStatus(ctx context.Context, statuses ...v1.ProcessStatus) ([]string, error) {
+func (r *pgRepository) ProcessIds(ctx context.Context, statuses ...v1.ProcessStatus) ([]string, error) {
 
 	q, args, err := sqlx.In(`select distinct id from process where status in (?) and deleted_at is null`, statuses)
+	if err != nil {
+		return nil, err
+	}
+
+	q = sqlx.Rebind(sqlx.DOLLAR, q)
+	tmp := make([]string, 0)
+	if err := r.conn.SelectContext(ctx, &tmp, q, args...); err != nil {
+		return nil, err
+	}
+
+	return tmp, nil
+}
+
+func (r *pgRepository) ProcessIDsUser(ctx context.Context, userId string, statuses ...v1.ProcessStatus) ([]string, error) {
+
+	q, args, err := sqlx.In(`select distinct id from process where status in (?) and deleted_at is null and user_id = ?`, statuses, userId)
 	if err != nil {
 		return nil, err
 	}

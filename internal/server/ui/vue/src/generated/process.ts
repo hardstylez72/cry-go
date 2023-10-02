@@ -311,6 +311,28 @@ export class ProcessService {
   /**
    *
    */
+  processServiceResumeAllProcess(
+    params: {
+      /**  */
+      body: ResumeAllProcessReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<ResumeAllProcessRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/process/resume/all';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   processServiceRetryProcess(
     params: {
       /**  */
@@ -342,6 +364,28 @@ export class ProcessService {
   ): Promise<StopProcessResponse> {
     return new Promise((resolve, reject) => {
       let url = basePath + '/api/gw/v1/process/stop';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  processServiceStopAllProcess(
+    params: {
+      /**  */
+      body: StopAllProcessReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<StopAllProcessRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/process/stop/all';
 
       const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
 
@@ -546,6 +590,18 @@ export interface DefaultLP {
 
   /**  */
   add: boolean;
+
+  /**  */
+  approveA?: TaskTx;
+
+  /**  */
+  approveB?: TaskTx;
+
+  /**  */
+  tokens?: Token[];
+
+  /**  */
+  approves?: TaskTx[];
 }
 
 export interface DefaultSwap {
@@ -986,6 +1042,10 @@ export interface ProcessTaskHistoryRecord {
   msg?: string;
 }
 
+export interface ResumeAllProcessReq {}
+
+export interface ResumeAllProcessRes {}
+
 export interface ResumeProcessRequest {
   /**  */
   processId: string;
@@ -1072,6 +1132,10 @@ export interface StargateBridgeTask {
   /**  */
   tx?: TaskTx;
 }
+
+export interface StopAllProcessReq {}
+
+export interface StopAllProcessRes {}
 
 export interface StopProcessRequest {
   /**  */
@@ -1250,6 +1314,9 @@ export interface Task {
 
   /**  */
   exchangeSwapTask?: ExchangeSwapTask;
+
+  /**  */
+  zkLandLPTask?: DefaultLP;
 }
 
 export interface TaskTx {
@@ -1521,7 +1588,8 @@ export enum TaskType {
   'AcrossBridge' = 'AcrossBridge',
   'AvnuSwap' = 'AvnuSwap',
   'FibrousSwap' = 'FibrousSwap',
-  'ExchangeSwap' = 'ExchangeSwap'
+  'ExchangeSwap' = 'ExchangeSwap',
+  'ZkLandLP' = 'ZkLandLP'
 }
 
 export enum Token {

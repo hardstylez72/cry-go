@@ -530,16 +530,39 @@
           "$ref": "#/definitions/Network"
         },
         "a": {
-          "$ref": "#/definitions/Token"
+          "$ref": "#/definitions/Token",
+          "title": "deprecated"
         },
         "b": {
-          "$ref": "#/definitions/Token"
+          "$ref": "#/definitions/Token",
+          "title": "deprecated"
         },
         "tx": {
           "$ref": "#/definitions/TaskTx"
         },
         "add": {
           "type": "boolean"
+        },
+        "approveA": {
+          "$ref": "#/definitions/TaskTx",
+          "title": "deprecated"
+        },
+        "approveB": {
+          "$ref": "#/definitions/TaskTx",
+          "title": "deprecated"
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Token"
+          }
+        },
+        "approves": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/TaskTx"
+          }
         }
       },
       "required": [
@@ -1388,6 +1411,9 @@
         },
         "exchangeSwapTask": {
           "$ref": "#/definitions/ExchangeSwapTask"
+        },
+        "zkLandLPTask": {
+          "$ref": "#/definitions/DefaultLP"
         }
       },
       "required": [
@@ -1502,7 +1528,8 @@
         "AcrossBridge",
         "AvnuSwap",
         "FibrousSwap",
-        "ExchangeSwap"
+        "ExchangeSwap",
+        "ZkLandLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

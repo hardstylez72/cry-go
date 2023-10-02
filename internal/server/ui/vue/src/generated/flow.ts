@@ -461,6 +461,18 @@ export interface DefaultLP {
 
   /**  */
   add: boolean;
+
+  /**  */
+  approveA?: TaskTx;
+
+  /**  */
+  approveB?: TaskTx;
+
+  /**  */
+  tokens?: Token[];
+
+  /**  */
+  approves?: TaskTx[];
 }
 
 export interface DefaultSwap {
@@ -983,6 +995,9 @@ export interface Task {
 
   /**  */
   exchangeSwapTask?: ExchangeSwapTask;
+
+  /**  */
+  zkLandLPTask?: DefaultLP;
 }
 
 export interface TaskTx {
@@ -1236,7 +1251,8 @@ export enum TaskType {
   'AcrossBridge' = 'AcrossBridge',
   'AvnuSwap' = 'AvnuSwap',
   'FibrousSwap' = 'FibrousSwap',
-  'ExchangeSwap' = 'ExchangeSwap'
+  'ExchangeSwap' = 'ExchangeSwap',
+  'ZkLandLP' = 'ZkLandLP'
 }
 
 export enum Token {

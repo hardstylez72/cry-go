@@ -51,6 +51,7 @@ enum TaskType {
   AvnuSwap = 37;
   FibrousSwap = 38;
   ExchangeSwap = 39;
+  ZkLandLP = 40;
 }
 
 
@@ -214,10 +215,15 @@ message DeployStarkNetAccountTask {
 message DefaultLP {
   shared.Amount amount = 1;
   shared.Network network = 2;
-  shared.Token a = 3;
-  shared.Token b = 4;
+  shared.Token a = 3; //deprecated
+  shared.Token b = 4; //deprecated
   optional TaskTx tx = 5;
   bool add = 6;
+  optional TaskTx approveA = 7; //deprecated
+  optional TaskTx approveB = 8; //deprecated
+
+  repeated shared.Token tokens = 9;
+  repeated TaskTx approves = 10;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {

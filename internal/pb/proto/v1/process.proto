@@ -205,6 +205,35 @@ service ProcessService {
       body: "*"
     };
   }
+
+  rpc StopAllProcess(StopAllProcessReq) returns (StopAllProcessRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/process/stop/all",
+      body: "*"
+    };
+  }
+  rpc ResumeAllProcess(ResumeAllProcessReq) returns (ResumeAllProcessRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/process/resume/all",
+      body: "*"
+    };
+  }
+}
+
+message ResumeAllProcessRes {
+
+}
+
+message ResumeAllProcessReq {
+
+}
+
+message StopAllProcessReq {
+
+}
+
+message StopAllProcessRes {
+
 }
 
 message GetProfileTransactionsReq {

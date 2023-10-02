@@ -202,7 +202,7 @@ func (s *Service) Ping(ctx context.Context) error {
 		Ccy: []string{"ETH"},
 	})
 
-	return err
+	return WrapErr(err)
 }
 
 type addr = string

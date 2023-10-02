@@ -304,6 +304,38 @@
         ]
       }
     },
+    "/api/gw/v1/process/resume/all": {
+      "post": {
+        "operationId": "ProcessService_ResumeAllProcess",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ResumeAllProcessRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ResumeAllProcessReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProcessService"
+        ]
+      }
+    },
     "/api/gw/v1/process/retry": {
       "post": {
         "operationId": "ProcessService_RetryProcess",
@@ -360,6 +392,38 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/StopProcessRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ProcessService"
+        ]
+      }
+    },
+    "/api/gw/v1/process/stop/all": {
+      "post": {
+        "operationId": "ProcessService_StopAllProcess",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/StopAllProcessRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StopAllProcessReq"
             }
           }
         ],
@@ -649,16 +713,39 @@
           "$ref": "#/definitions/Network"
         },
         "a": {
-          "$ref": "#/definitions/Token"
+          "$ref": "#/definitions/Token",
+          "title": "deprecated"
         },
         "b": {
-          "$ref": "#/definitions/Token"
+          "$ref": "#/definitions/Token",
+          "title": "deprecated"
         },
         "tx": {
           "$ref": "#/definitions/TaskTx"
         },
         "add": {
           "type": "boolean"
+        },
+        "approveA": {
+          "$ref": "#/definitions/TaskTx",
+          "title": "deprecated"
+        },
+        "approveB": {
+          "$ref": "#/definitions/TaskTx",
+          "title": "deprecated"
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Token"
+          }
+        },
+        "approves": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/TaskTx"
+          }
         }
       },
       "required": [
@@ -1446,6 +1533,12 @@
         "startStatus"
       ]
     },
+    "ResumeAllProcessReq": {
+      "type": "object"
+    },
+    "ResumeAllProcessRes": {
+      "type": "object"
+    },
     "ResumeProcessRequest": {
       "type": "object",
       "properties": {
@@ -1632,6 +1725,12 @@
           }
         }
       }
+    },
+    "StopAllProcessReq": {
+      "type": "object"
+    },
+    "StopAllProcessRes": {
+      "type": "object"
     },
     "StopProcessRequest": {
       "type": "object",
@@ -1838,6 +1937,9 @@
         },
         "exchangeSwapTask": {
           "$ref": "#/definitions/ExchangeSwapTask"
+        },
+        "zkLandLPTask": {
+          "$ref": "#/definitions/DefaultLP"
         }
       },
       "required": [
@@ -1952,7 +2054,8 @@
         "AcrossBridge",
         "AvnuSwap",
         "FibrousSwap",
-        "ExchangeSwap"
+        "ExchangeSwap",
+        "ZkLandLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

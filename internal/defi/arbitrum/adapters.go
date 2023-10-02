@@ -64,8 +64,8 @@ func (c *Client) Network() v1.Network {
 	return c.defi.Cfg.Network
 }
 
-func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.Int, error) {
-	return c.defi.GetMerklyNFTId(ctx, txHash)
+func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash, owner common.Address) (*big.Int, error) {
+	return c.defi.GetMerklyNFTId(ctx, txHash, owner)
 }
 
 func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, error) {

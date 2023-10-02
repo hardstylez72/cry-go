@@ -37,6 +37,8 @@ type ProcessServiceClient interface {
 	EstimateCost(ctx context.Context, in *EstimateCostRequest, opts ...grpc.CallOption) (*EstimateCostResponse, error)
 	GetTaskTransactions(ctx context.Context, in *GetTaskTransactionsReq, opts ...grpc.CallOption) (*GetTaskTransactionsRes, error)
 	GetProfileTransactions(ctx context.Context, in *GetProfileTransactionsReq, opts ...grpc.CallOption) (*GetProfileTransactionsRes, error)
+	StopAllProcess(ctx context.Context, in *StopAllProcessReq, opts ...grpc.CallOption) (*StopAllProcessRes, error)
+	ResumeAllProcess(ctx context.Context, in *ResumeAllProcessReq, opts ...grpc.CallOption) (*ResumeAllProcessRes, error)
 }
 
 type processServiceClient struct {
@@ -182,6 +184,24 @@ func (c *processServiceClient) GetProfileTransactions(ctx context.Context, in *G
 	return out, nil
 }
 
+func (c *processServiceClient) StopAllProcess(ctx context.Context, in *StopAllProcessReq, opts ...grpc.CallOption) (*StopAllProcessRes, error) {
+	out := new(StopAllProcessRes)
+	err := c.cc.Invoke(ctx, "/process.ProcessService/StopAllProcess", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *processServiceClient) ResumeAllProcess(ctx context.Context, in *ResumeAllProcessReq, opts ...grpc.CallOption) (*ResumeAllProcessRes, error) {
+	out := new(ResumeAllProcessRes)
+	err := c.cc.Invoke(ctx, "/process.ProcessService/ResumeAllProcess", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProcessServiceServer is the server API for ProcessService service.
 // All implementations must embed UnimplementedProcessServiceServer
 // for forward compatibility
@@ -201,6 +221,8 @@ type ProcessServiceServer interface {
 	EstimateCost(context.Context, *EstimateCostRequest) (*EstimateCostResponse, error)
 	GetTaskTransactions(context.Context, *GetTaskTransactionsReq) (*GetTaskTransactionsRes, error)
 	GetProfileTransactions(context.Context, *GetProfileTransactionsReq) (*GetProfileTransactionsRes, error)
+	StopAllProcess(context.Context, *StopAllProcessReq) (*StopAllProcessRes, error)
+	ResumeAllProcess(context.Context, *ResumeAllProcessReq) (*ResumeAllProcessRes, error)
 	mustEmbedUnimplementedProcessServiceServer()
 }
 
@@ -252,6 +274,12 @@ func (UnimplementedProcessServiceServer) GetTaskTransactions(context.Context, *G
 }
 func (UnimplementedProcessServiceServer) GetProfileTransactions(context.Context, *GetProfileTransactionsReq) (*GetProfileTransactionsRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProfileTransactions not implemented")
+}
+func (UnimplementedProcessServiceServer) StopAllProcess(context.Context, *StopAllProcessReq) (*StopAllProcessRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopAllProcess not implemented")
+}
+func (UnimplementedProcessServiceServer) ResumeAllProcess(context.Context, *ResumeAllProcessReq) (*ResumeAllProcessRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResumeAllProcess not implemented")
 }
 func (UnimplementedProcessServiceServer) mustEmbedUnimplementedProcessServiceServer() {}
 
@@ -536,6 +564,42 @@ func _ProcessService_GetProfileTransactions_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProcessService_StopAllProcess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopAllProcessReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProcessServiceServer).StopAllProcess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/process.ProcessService/StopAllProcess",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProcessServiceServer).StopAllProcess(ctx, req.(*StopAllProcessReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProcessService_ResumeAllProcess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResumeAllProcessReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProcessServiceServer).ResumeAllProcess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/process.ProcessService/ResumeAllProcess",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProcessServiceServer).ResumeAllProcess(ctx, req.(*ResumeAllProcessReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProcessService_ServiceDesc is the grpc.ServiceDesc for ProcessService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -602,6 +666,14 @@ var ProcessService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfileTransactions",
 			Handler:    _ProcessService_GetProfileTransactions_Handler,
+		},
+		{
+			MethodName: "StopAllProcess",
+			Handler:    _ProcessService_StopAllProcess_Handler,
+		},
+		{
+			MethodName: "ResumeAllProcess",
+			Handler:    _ProcessService_ResumeAllProcess_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -849,7 +849,8 @@
         "AcrossBridge",
         "AvnuSwap",
         "FibrousSwap",
-        "ExchangeSwap"
+        "ExchangeSwap",
+        "ZkLandLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

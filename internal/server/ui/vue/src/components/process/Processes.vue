@@ -1,41 +1,54 @@
 <template>
   <div>
-    <NavBar title="Процессы"/>
+    <NavBar title="Процессы">
+      <template v-slot:default>
+        <v-btn @click="stopAll" variant="elevated" class="mx-1" :loading="stopLoading" color="red-lighten-3">
+          <v-icon v-if="isMobile()" size="30" icon="mdi-stop-circle-outline" color="white"/>
+          <span v-else>Остановить всех</span>
+        </v-btn>
+        <v-btn @click="resumeAll" variant="elevated" class="mx-1" :loading="resumeLoading" color="green">
+          <v-icon v-if="isMobile()" size="30" icon="mdi-play-circle-outline"/>
+          <span v-else>Возобновить всех</span>
+        </v-btn>
+      </template>
+    </NavBar>
     <Loader v-if="loading"/>
     <div v-else>
-      <div class="d-flex flex-wrap ">
-        <v-checkbox class="mx-2" color="blue" v-model="StatusReadyW" direction="horizontal" hide-details
-                    density="compact">
-          <template v-slot:label>
-            <StatusCard :status="ProcessStatus.StatusReady"/>
-          </template>
-        </v-checkbox>
-        <v-checkbox class="mx-2" color="blue" v-model="StatusRetryW" direction="horizontal" hide-details
-                    density="compact">
-          <template v-slot:label>
-            <StatusCard :status="ProcessStatus.StatusRetry"/>
-          </template>
-        </v-checkbox>
-        <v-checkbox class="mx-2" color="blue" v-model="StatusStopW" direction="horizontal" hide-details
-                    density="compact">
-          <template v-slot:label>
-            <StatusCard :status="ProcessStatus.StatusStop"/>
-          </template>
-        </v-checkbox>
-        <v-checkbox class="mx-2" color="blue" v-model="StatusErrorW" direction="horizontal" hide-details
-                    density="compact">
-          <template v-slot:label>
-            <StatusCard :status="ProcessStatus.StatusError"/>
-          </template>
-        </v-checkbox>
-        <v-checkbox class="mx-2" color="blue" v-model="StatusRunningW" direction="horizontal" hide-details
-                    density="compact">
-          <template v-slot:label>
-            <StatusCard :status="ProcessStatus.StatusRunning"/>
-          </template>
-        </v-checkbox>
+      <div class="d-flex justify-start flex-wrap">
+        <div class="mx-2" style="width: 80px">
+          <v-checkbox color="blue" v-model="StatusReadyW" direction="horizontal" hide-details
+                      density="compact">
+            <template v-slot:label>
+              <StatusCard :status="ProcessStatus.StatusReady"/>
+            </template>
+          </v-checkbox>
+        </div>
+        <div class="mx-2" style="width: 80px">
+          <v-checkbox color="blue" v-model="StatusStopW" direction="horizontal" hide-details
+                      density="compact">
+            <template v-slot:label>
+              <StatusCard :status="ProcessStatus.StatusStop"/>
+            </template>
+          </v-checkbox>
+        </div>
+        <div class="mx-2" style="width: 80px">
+          <v-checkbox color="blue" v-model="StatusErrorW" direction="horizontal" hide-details
+                      density="compact">
+            <template v-slot:label>
+              <StatusCard :status="ProcessStatus.StatusError"/>
+            </template>
+          </v-checkbox>
+        </div>
+        <div class="mx-2" style="width: 90px">
+          <v-checkbox color="blue" v-model="StatusRunningW" direction="horizontal" hide-details
+                      density="compact">
+            <template v-slot:label>
+              <StatusCard :status="ProcessStatus.StatusRunning"/>
+            </template>
+          </v-checkbox>
+        </div>
         <v-checkbox class="mx-2" color="blue" v-model="StatusDoneW" direction="horizontal" hide-details
-                    density="compact">
+                    density="compact" style="width: 50px">
           <template v-slot:label>
             <StatusCard :status="ProcessStatus.StatusDone"/>
           </template>
@@ -103,44 +116,40 @@ import BtnProcessStopResume from "@/components/BtnProcessStopResume.vue";
 import {getFlow} from "@/components/tasks/tasks";
 import Loader from "@/components/Loader.vue";
 import NavBar from "@/components/NavBar.vue";
+import {Delay, isMobile, Timer} from "@/components/helper";
+import {fi} from "vuetify/locale";
 
 export default defineComponent({
   name: "Processes",
   watch: {
     StatusRetryW: {
       handler() {
-        this.reset()
-        this.UpdateList()
+        this.statusChanged()
       }
     },
     StatusStopW: {
       handler() {
-        this.reset()
-        this.UpdateList()
+        this.statusChanged()
       }
     },
     StatusErrorW: {
       handler() {
-        this.reset()
-        this.UpdateList()
+        this.statusChanged()
       }
     },
     StatusRunningW: {
       handler() {
-        this.reset()
-        this.UpdateList()
+        this.statusChanged()
       }
     },
     StatusDoneW: {
       handler() {
-        this.reset()
-        this.UpdateList()
+        this.statusChanged()
       }
     },
     StatusReadyW: {
       handler() {
-        this.reset()
-        this.UpdateList()
+        this.statusChanged()
       }
     },
   },
@@ -155,12 +164,6 @@ export default defineComponent({
   props: {},
   data() {
     return {
-      StatusRetryW: false,
-      StatusStopW: true,
-      StatusErrorW: true,
-      StatusRunningW: true,
-      StatusDoneW: false,
-      StatusReadyW: true,
 
       offset: 0,
       loading: false,
@@ -168,10 +171,114 @@ export default defineComponent({
       list: [] as Process[],
       showCreateFlowDialog: false,
       selected: new Set<string>(),
-      nextLoading: false
+      nextLoading: false,
+
+      resumeLoading: false,
+      stopLoading: false,
+      timer: new Timer()
     }
   },
   computed: {
+    StatusStopW: {
+      async set(id: string) {
+        this.$router.push({query: {...this.$route.query, stop: id}})
+      },
+      get(): boolean {
+        const s = this.$route.query.stop
+        if (s === null || Array.isArray(s)) {
+          return false
+        }
+        if (s === 'true') {
+          return true
+        }
+
+        if (s === undefined) {
+          this.$router.push({query: {...this.$route.query, stop: 'true'}})
+        }
+
+        return false
+      }
+    },
+    StatusErrorW: {
+      async set(id: string) {
+        this.$router.push({query: {...this.$route.query, error: id}})
+      },
+      get(): boolean {
+        const s = this.$route.query.error
+        if (s === null || Array.isArray(s)) {
+          return false
+        }
+
+        if (s === undefined) {
+          this.$router.push({query: {...this.$route.query, error: 'true'}})
+        }
+
+        if (s === 'true') {
+          return true
+        }
+        return false
+      }
+    },
+    StatusRunningW: {
+      async set(id: string) {
+        this.$router.push({query: {...this.$route.query, running: id}})
+      },
+      get(): boolean {
+        const s = this.$route.query.running
+        if (s === null || Array.isArray(s)) {
+          return false
+        }
+
+        if (s === undefined) {
+          this.$router.push({query: {...this.$route.query, running: 'true'}})
+        }
+
+        if (s === 'true') {
+          return true
+        }
+        return false
+      }
+    },
+    StatusDoneW: {
+      async set(id: string) {
+        this.$router.push({query: {...this.$route.query, done: id}})
+      },
+      get(): boolean {
+        const s = this.$route.query.done
+        if (s === null || Array.isArray(s)) {
+          return false
+        }
+
+        if (s === undefined) {
+          this.$router.push({query: {...this.$route.query, done: 'false'}})
+        }
+
+        if (s === 'true') {
+          return true
+        }
+        return false
+      }
+    },
+    StatusReadyW: {
+      async set(id: string) {
+        this.$router.push({query: {...this.$route.query, ready: id}})
+      },
+      get(): boolean {
+        const s = this.$route.query.ready
+        if (s === null || Array.isArray(s)) {
+          return false
+        }
+
+        if (s === undefined) {
+          this.$router.push({query: {...this.$route.query, ready: 'false'}})
+        }
+
+        if (s === 'true') {
+          return true
+        }
+        return false
+      }
+    },
     noProcesses() {
       return this.getList.length === 0
     },
@@ -195,6 +302,14 @@ export default defineComponent({
     }
   },
   methods: {
+    statusChanged() {
+      this.timer.add(100)
+      this.timer.cb(() => {
+        this.reset()
+        this.UpdateList()
+      })
+    },
+    isMobile,
     getFlow,
     viewProcess(id: string) {
       this.$router.push({name: 'ViewProcess', params: {id: id}});
@@ -250,6 +365,53 @@ export default defineComponent({
     viewRoute(id: string) {
       window.open("/process/" + id, "_blank")
     },
+    async resumeAll() {
+      try {
+        this.resumeLoading = true
+        await processService.processServiceResumeAllProcess()
+        this.StatusStopW = true
+        await Delay(10)
+        this.StatusErrorW = false
+        await Delay(10)
+        this.StatusRunningW = true
+        await Delay(10)
+
+
+        this.StatusDoneW = false
+        await Delay(10)
+        this.StatusReadyW = false
+        await Delay(10)
+
+        this.statusChanged()
+      } catch (e) {
+
+      } finally {
+        this.resumeLoading = false
+      }
+    },
+    async stopAll() {
+      try {
+        this.stopLoading = true
+        await processService.processServiceStopAllProcess()
+        this.StatusStopW = true
+        await Delay(10)
+        this.StatusRunningW = true
+        await Delay(10)
+        this.StatusErrorW = false
+        await Delay(10)
+
+        this.StatusDoneW = false
+        await Delay(10)
+        this.StatusReadyW = false
+        await Delay(10)
+
+        this.statusChanged()
+      } catch (e) {
+
+      } finally {
+        this.stopLoading = false
+      }
+    },
     getStatuses() {
       const statuses: ProcessStatus[] = []
       if (this.StatusDoneW) {
@@ -304,8 +466,8 @@ export default defineComponent({
       this.UpdateList()
     }
   },
-  created() {
-    this.UpdateList()
+  async created() {
+    await this.statusChanged()
   }
 })
 

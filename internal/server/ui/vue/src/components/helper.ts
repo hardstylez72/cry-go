@@ -362,3 +362,21 @@ export const profileTitle = (item: any): string => {
 export const isMobile = () => {
   return window.innerWidth < 1280
 }
+
+export const copyToClipboard = async (text) => {
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(text)
+    return //codes below wont be executed
+  }
+  const textArea = document.createElement("textarea")
+  textArea.value = text
+
+  document.body.appendChild(textArea)
+
+  textArea.focus()
+  textArea.select()
+
+  document.execCommand('copy')
+
+  document.body.removeChild(textArea)
+}

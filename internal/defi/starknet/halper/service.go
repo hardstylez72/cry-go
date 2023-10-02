@@ -52,8 +52,19 @@ type TransferReq struct {
 	Amount string `json:"amount"`
 }
 
+type ZkLendReq struct {
+	BaseTx
+	Token  string `json:"token"`
+	Amount string `json:"amount"`
+	Op     string `json:"op"`
+}
+
 type TransferRes struct {
 	DefaultRes
+}
+
+func (s *Service) ZkLend(ctx context.Context, req *ZkLendReq) (*ZkLendRes, error) {
+	return Request[ZkLendReq, ZkLendRes](ctx, s.cli, s.c.Host+"/starknet/zklend", req)
 }
 
 func (s *Service) Transfer(ctx context.Context, req *TransferReq) (*TransferRes, error) {

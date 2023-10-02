@@ -73,15 +73,15 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Run(ctx context.Context, a *Input
 		}
 
 		p.Tx = NewTx(tx, nil)
+		if err := a.AddTx2(ctx, p.Tx); err != nil {
+			return nil, err
+		}
 		if err := a.UpdateTask(ctx, task); err != nil {
 			return nil, err
 		}
 	}
 
 	if err := WaitTxComplete(taskContext, p.Tx, task, ethClient, a); err != nil {
-		return nil, err
-	}
-	if err := a.AddTx2(ctx, p.Tx); err != nil {
 		return nil, err
 	}
 
@@ -151,6 +151,9 @@ func (t *ZksyncOfficialBridgeFromEthereumTask) Withdrawal(ctx context.Context, a
 	return result, nil
 }
 
+// 2503241972553024
+// 3890138828593930
+// 6643704998402254
 func EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx context.Context, profile *halp.Profile, p *v1.ZkSyncOfficialBridgeFromEthereumTask) (*v1.EstimationTx, error) {
 
 	network := v1.Network_ZKSYNCERA

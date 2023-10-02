@@ -122,7 +122,7 @@ func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) 
 	return result, nil
 }
 
-func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.Int, error) {
+func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash, targetOwner common.Address) (*big.Int, error) {
 
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
@@ -159,7 +159,7 @@ func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash) (*big.I
 					continue
 				}
 
-				if owner.String() == tx.From.String() {
+				if owner.String() == targetOwner.String() {
 					return topicBig, nil
 				}
 			}

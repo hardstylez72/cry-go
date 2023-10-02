@@ -14,17 +14,17 @@
 
     <Loader v-if="loading && offset === 0"/>
     <div v-else>
-      <div class="mr-9 d-flex justify-start">
+      <div class="mr-6 d-flex justify-start">
         <v-radio-group v-model="selectProfileType" inline="true" hide-details density="compact">
           <v-radio class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
           <v-radio class="mx-8" :value="ProfileType.StarkNet">StarkNet</v-radio>
-          <v-btn class="mx-2" density="compact" @click="$router.push({name: 'ProfileRelations'})">Связи</v-btn>
+          <v-btn class="mx-3 my-2" density="default" @click="$router.push({name: 'ProfileRelations'})">Связи</v-btn>
         </v-radio-group>
 
-        <div>
+        <div style="width: 100px">
           <v-checkbox
             density="compact"
-            label="Address"
+            label="Адреса"
             v-model="showWalletAddrs"
             hide-details
           />

@@ -72,6 +72,10 @@ type AccountGenerated struct {
 	Pub  string `json:"pub"`
 }
 
+type ZkLendRes struct {
+	DefaultRes
+}
+
 type LiquidityBridgeReq struct {
 	Proxy        string `json:"proxy"`
 	PKEth        string `json:"pkEth"`
@@ -105,4 +109,5 @@ type HalperService interface {
 	SendDmail(ctx context.Context, req *SendDmailReq) (*SendDmailRes, error)
 	Mint(ctx context.Context, req *MintReq) (*MintRes, error)
 	Transfer(ctx context.Context, req *TransferReq) (*TransferRes, error)
+	ZkLend(ctx context.Context, req *ZkLendReq) (*ZkLendRes, error)
 }
