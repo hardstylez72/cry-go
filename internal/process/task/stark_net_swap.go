@@ -350,6 +350,8 @@ func StarkNetApprove(ctx context.Context, token v1.Token, client *starknet.Clien
 		spender = "0x04270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f"
 	case v1.TaskType_FibrousSwap:
 		spender = "0x01b23ed400b210766111ba5b1e63e33922c6ba0c45e6ad56ce112e5f4c578e62"
+	case v1.TaskType_ZkLendLP:
+		spender = "0x04c0a5193d58f74fbace4b74dcf65481e734ed1714121bdc571da345540efa05"
 	default:
 		return nil, errors.New("StarkNetApprove. unknown task type: " + taskType.String())
 	}

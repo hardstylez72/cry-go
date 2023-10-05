@@ -14,15 +14,17 @@ import (
 
 func NewZkLendLPTask() *DefaultLPTask {
 	return &DefaultLPTask{
-		taskType: v1.TaskType_ZkLandLP,
+		taskType: v1.TaskType_ZkLendLP,
 		extractor: func(a *Input) (*v1.DefaultLP, error) {
-			l, ok := a.Task.Task.Task.(*v1.Task_ZkLandLPTask)
+			l, ok := a.Task.Task.Task.(*v1.Task_ZkLendLPTask)
 			if !ok {
 				return nil, errors.New("Task.(*v1.Task_ZkLandLPTask) call an ambulance!")
 			}
-			return l.ZkLandLPTask, nil
+			return l.ZkLendLPTask, nil
 		},
-		DefaultLPTaskHalper: &DefaultLPTaskHalper{},
+		DefaultLPTaskHalper: &DefaultLPTaskHalper{
+			TaskType: v1.TaskType_ZkLendLP,
+		},
 	}
 }
 
@@ -92,16 +94,16 @@ func (t *DefaultLPTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, err
 			return nil, err
 		}
 
-		for _, token := range p.Tokens {
-			txId, err := StarkNetApprove(taskContext, token, client, profile, t.taskType)
+		for i := range p.Tokens {
+			token := p.Tokens[i]
+			txId, err := StarkNetApprove(taskContext, token.Token, client, profile, t.taskType)
 			if err != nil {
 				return nil, err
 			}
 
 			if txId != nil {
-				approveTx := NewStarkNetApproveTx(*txId)
-				p.Approves = append(p.Approves, approveTx)
-				if err := a.AddTx2(ctx, approveTx); err != nil {
+				token.ApproveTx = NewStarkNetApproveTx(*txId)
+				if err := a.AddTx2(ctx, token.ApproveTx); err != nil {
 					return nil, err
 				}
 				if err := a.UpdateTask(ctx, task); err != nil {
@@ -115,11 +117,11 @@ func (t *DefaultLPTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, err
 
 		estimation, err := t.EstimateLPCost(taskContext, profile, p, client)
 		if err != nil {
-			return nil, errors.Wrap(err, "EstimateSyncSwapLPCost")
+			return nil, errors.Wrap(err, "EstimateLPCost")
 		}
 		res, gas, err := t.Execute(taskContext, profile, p, client, estimation)
 		if err != nil {
-			return nil, errors.Wrap(err, "SyncSwapLP")
+			return nil, errors.Wrap(err, "Execute")
 		}
 
 		p.Tx = NewTx(res.Tx, gas)
@@ -166,12 +168,18 @@ func (h *DefaultLPTaskHalper) Execute(ctx context.Context, profile *halp.Profile
 		}
 	}
 
-	var am *big.Int
+	var am = big.NewInt(0)
 
 	if p.Add {
+
+		if len(p.Tokens) == 0 {
+			return nil, nil, errors.New("invalid params. tokens are empty")
+		}
+		tokenA := p.Tokens[0].Token
+
 		balance, err := client.GetBalance(ctx, &defi.GetBalanceReq{
 			WalletAddress: profile.Addr,
-			Token:         p.A,
+			Token:         tokenA,
 		})
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
@@ -203,7 +211,7 @@ func (h *DefaultLPTaskHalper) Execute(ctx context.Context, profile *halp.Profile
 
 	res, err := client.LP(ctx, &defi.LPReq{
 		Amount:       am,
-		Tokens:       p.Tokens,
+		Tokens:       CastLPTokens(p.Tokens),
 		PK:           profile.WalletPK,
 		Add:          p.Add,
 		EstimateOnly: estimateOnly,
@@ -224,4 +232,13 @@ func (h *DefaultLPTaskHalper) EstimateLPCost(ctx context.Context, profile *halp.
 	}
 
 	return GasStation(res.ECost, p.Network), nil
+}
+
+func CastLPTokens(in []*v1.LPToken) []v1.Token {
+	out := make([]v1.Token, 0)
+
+	for _, el := range in {
+		out = append(out, el.Token)
+	}
+	return out
 }

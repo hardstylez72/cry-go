@@ -92,7 +92,7 @@ func WaitTxComplete(ctx context.Context, ptx *v1.TaskTx, task *v1.ProcessTask, n
 		}
 
 		if tx.GetNetwork() == v1.Network_StarkNet {
-			if !starkNetTxReady(tx, 30) {
+			if !starkNetTxReady(tx, 60) {
 				return ErrTransactionIsNotReady
 			}
 		}

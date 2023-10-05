@@ -47,6 +47,7 @@ message Process {
   optional google.protobuf.Timestamp deleted_at = 12;
   bool auto_retry = 13;
   flow.Flow flow = 14;
+  optional google.protobuf.Timestamp run_after = 15;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
@@ -486,6 +487,7 @@ message GetProcessResponse {
 message CreateProcessRequest {
   string flow_id = 1;
   repeated string profile_ids = 2;
+  optional google.protobuf.Timestamp run_after = 8;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["flow_id", "profile_ids"]

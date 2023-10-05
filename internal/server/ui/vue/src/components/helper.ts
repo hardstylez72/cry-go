@@ -93,6 +93,23 @@ export const formatTime = (d: Date): string => {
   return dayjs(d).utc().tz(tz, false).format('YYYY-MM-DD HH:mm:ss')
 }
 
+export const getTime = (): string => {
+  const tz = dayjs.tz.guess()
+  const d = new Date()
+  return dayjs(d).utc().tz(tz, false).format('HH:mm')
+}
+
+export const getDate = (): string => {
+  const tz = dayjs.tz.guess()
+  const d = new Date()
+  return dayjs(d).utc().tz(tz, false).format('YYYY-MM-DD')
+}
+
+export const ts = (date: string, time: string): Date => {
+  const tz = dayjs.tz.guess()
+  return dayjs(date + " " + time).utc().tz(tz, false).toDate()
+}
+
 export const humanDuration = (s?: string | Number): string => {
   let totalSeconds = Number(s)
   const hours = Math.floor(totalSeconds / 3600);

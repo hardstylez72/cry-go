@@ -4,7 +4,7 @@
          color="orange">Стоп
   </v-btn>
   <v-btn variant="flat" v-else-if="item.status !== ProcessStatus.StatusDone && !errorHappen()" :loading="loading"
-        
+
          @click="Resume(item.id)" color="green">
     {{ processNotStarted() ? "Старт" : "Возобновить" }}
   </v-btn>
@@ -49,6 +49,10 @@ export default defineComponent({
     },
     processCanBeStopped(): boolean {
 
+      if (this.item.status === ProcessStatus.StatusReady) {
+        return false
+      }
+
       if (this.item.status === ProcessStatus.StatusStop) {
         return false
       }
@@ -60,6 +64,11 @@ export default defineComponent({
     },
 
     processNotStarted(): boolean {
+
+      if (this.item.status === ProcessStatus.StatusReady) {
+        return true
+      }
+
       if (this.item.status !== ProcessStatus.StatusStop) {
         return false
       }

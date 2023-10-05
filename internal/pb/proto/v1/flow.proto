@@ -293,7 +293,7 @@ message Task {
     task.DefaultSwap avnuSwapTask = 41;
     task.DefaultSwap fibrousSwapTask = 42;
     task.ExchangeSwapTask exchangeSwapTask = 43;
-    task.DefaultLP zkLandLPTask = 44;
+    task.DefaultLP zkLendLPTask = 44;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

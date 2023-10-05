@@ -14,7 +14,7 @@ import (
 func (c *Client) LP(ctx context.Context, req *defi.LPReq, taskType v1.TaskType) (*defi.LPRes, error) {
 
 	switch taskType {
-	case v1.TaskType_ZkLandLP:
+	case v1.TaskType_ZkLendLP:
 		return c.zklendLP(ctx, req)
 	default:
 		return nil, errors.New("unsupported task type: " + taskType.String())

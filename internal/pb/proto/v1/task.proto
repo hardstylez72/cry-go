@@ -51,7 +51,7 @@ enum TaskType {
   AvnuSwap = 37;
   FibrousSwap = 38;
   ExchangeSwap = 39;
-  ZkLandLP = 40;
+  ZkLendLP = 40;
 }
 
 
@@ -80,6 +80,19 @@ message TxDetail {
     json_schema: {
       required: [
         "key", "value"
+      ]
+    }
+  };
+}
+
+message LPToken {
+  shared.Token token = 1;
+  optional TaskTx  approveTx = 2;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: [
+        "token"
       ]
     }
   };
@@ -222,13 +235,12 @@ message DefaultLP {
   optional TaskTx approveA = 7; //deprecated
   optional TaskTx approveB = 8; //deprecated
 
-  repeated shared.Token tokens = 9;
-  repeated TaskTx approves = 10;
+  repeated LPToken tokens = 9;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: [
-        "amount", "network", "a","b", "add"
+        "amount", "network", "a","b", "add", "tokens"
       ]
     }
   };

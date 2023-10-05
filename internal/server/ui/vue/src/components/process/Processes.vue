@@ -87,6 +87,7 @@
             </div>
 
             <div class="mr-2"><b>{{ `flow: ${item.flowLabel}` }}</b></div>
+            <div class="mr-2" v-if="item.runAfter"> Запуск запланирован {{ formatTime(item.runAfter) }}</div>
           </div>
           <div class="mr-2">Created: {{ dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
           <div class="mr-2">Profiles: <b>[{{ getProfiles(item) }}]</b></div>
@@ -116,7 +117,7 @@ import BtnProcessStopResume from "@/components/BtnProcessStopResume.vue";
 import {getFlow} from "@/components/tasks/tasks";
 import Loader from "@/components/Loader.vue";
 import NavBar from "@/components/NavBar.vue";
-import {Delay, isMobile, Timer} from "@/components/helper";
+import {Delay, formatTime, isMobile, Timer} from "@/components/helper";
 import {fi} from "vuetify/locale";
 
 export default defineComponent({
@@ -302,6 +303,7 @@ export default defineComponent({
     }
   },
   methods: {
+    formatTime,
     statusChanged() {
       this.timer.add(100)
       this.timer.cb(() => {

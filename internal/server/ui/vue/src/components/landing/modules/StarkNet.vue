@@ -123,6 +123,14 @@ export default defineComponent({
           status: Status.integrated,
           action: 'Swap (ETH <-> USDC, USDT, USDC <-> USDT)',
           quest: ''
+        },
+        {
+          name: taskProps.ZkLendLP.service.name,
+          link: taskProps.ZkLendLP.service.link,
+          img: taskProps.ZkLendLP.service.img,
+          status: Status.integrated,
+          action: 'LP (ETH, USDC, USDT)',
+          quest: ''
         }
       ],
     }

@@ -648,6 +648,10 @@
           "items": {
             "type": "string"
           }
+        },
+        "runAfter": {
+          "type": "string",
+          "format": "date-time"
         }
       },
       "required": [
@@ -737,14 +741,8 @@
         "tokens": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Token"
-          }
-        },
-        "approves": {
-          "type": "array",
-          "items": {
             "type": "object",
-            "$ref": "#/definitions/TaskTx"
+            "$ref": "#/definitions/LPToken"
           }
         }
       },
@@ -753,7 +751,8 @@
         "network",
         "a",
         "b",
-        "add"
+        "add",
+        "tokens"
       ]
     },
     "DefaultSwap": {
@@ -1097,6 +1096,20 @@
         "transactions"
       ]
     },
+    "LPToken": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/Token"
+        },
+        "approveTx": {
+          "$ref": "#/definitions/TaskTx"
+        }
+      },
+      "required": [
+        "token"
+      ]
+    },
     "LiquidityBridgeTask": {
       "type": "object",
       "properties": {
@@ -1396,6 +1409,10 @@
         },
         "flow": {
           "$ref": "#/definitions/flow.Flow"
+        },
+        "runAfter": {
+          "type": "string",
+          "format": "date-time"
         }
       },
       "required": [
@@ -1938,7 +1955,7 @@
         "exchangeSwapTask": {
           "$ref": "#/definitions/ExchangeSwapTask"
         },
-        "zkLandLPTask": {
+        "zkLendLPTask": {
           "$ref": "#/definitions/DefaultLP"
         }
       },
@@ -2055,7 +2072,7 @@
         "AvnuSwap",
         "FibrousSwap",
         "ExchangeSwap",
-        "ZkLandLP"
+        "ZkLendLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

@@ -554,14 +554,8 @@
         "tokens": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Token"
-          }
-        },
-        "approves": {
-          "type": "array",
-          "items": {
             "type": "object",
-            "$ref": "#/definitions/TaskTx"
+            "$ref": "#/definitions/LPToken"
           }
         }
       },
@@ -570,7 +564,8 @@
         "network",
         "a",
         "b",
-        "add"
+        "add",
+        "tokens"
       ]
     },
     "DefaultSwap": {
@@ -779,6 +774,20 @@
     },
     "HideFlowRes": {
       "type": "object"
+    },
+    "LPToken": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/Token"
+        },
+        "approveTx": {
+          "$ref": "#/definitions/TaskTx"
+        }
+      },
+      "required": [
+        "token"
+      ]
     },
     "LiquidityBridgeTask": {
       "type": "object",
@@ -1412,7 +1421,7 @@
         "exchangeSwapTask": {
           "$ref": "#/definitions/ExchangeSwapTask"
         },
-        "zkLandLPTask": {
+        "zkLendLPTask": {
           "$ref": "#/definitions/DefaultLP"
         }
       },
@@ -1529,7 +1538,7 @@
         "AvnuSwap",
         "FibrousSwap",
         "ExchangeSwap",
-        "ZkLandLP"
+        "ZkLendLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

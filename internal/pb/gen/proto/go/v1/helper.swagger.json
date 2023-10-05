@@ -850,7 +850,7 @@
         "AvnuSwap",
         "FibrousSwap",
         "ExchangeSwap",
-        "ZkLandLP"
+        "ZkLendLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

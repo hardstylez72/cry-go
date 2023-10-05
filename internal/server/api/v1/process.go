@@ -112,15 +112,21 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 		})
 	}
 
+	status := v1.ProcessStatus_StatusStop
+	if req.RunAfter != nil {
+		status = v1.ProcessStatus_StatusReady
+	}
+
 	var pb = &v1.Process{
 		Id:         uuid.New().String(),
-		Status:     v1.ProcessStatus_StatusStop,
+		Status:     status,
 		Profiles:   profiles,
 		FlowId:     req.FlowId,
 		CreatedAt:  timestamppb.Now(),
 		UpdatedAt:  timestamppb.Now(),
 		FinishedAt: nil,
 		StartedAt:  nil,
+		RunAfter:   req.RunAfter,
 	}
 
 	a := &repository.ProcessArg{}

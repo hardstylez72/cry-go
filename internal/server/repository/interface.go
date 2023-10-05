@@ -71,6 +71,7 @@ type ProcessRepository interface {
 	ProcessIds(ctx context.Context, statuses ...v1.ProcessStatus) ([]string, error)
 	ProcessIDsUser(ctx context.Context, userId string, statuses ...v1.ProcessStatus) ([]string, error)
 	ListProcessIdsForAutoRetry(ctx context.Context) ([]string, error)
+	ProcessIdsReady(ctx context.Context, ts time.Time) ([]string, error)
 	GetProcessUser(ctx context.Context, processId string) (*string, error)
 	UpdateProcessTime(ctx context.Context, id string) error
 	UpdateProcessAutoRetry(ctx context.Context, id string, enable bool) error

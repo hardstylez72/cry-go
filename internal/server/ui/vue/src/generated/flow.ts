@@ -469,10 +469,7 @@ export interface DefaultLP {
   approveB?: TaskTx;
 
   /**  */
-  tokens?: Token[];
-
-  /**  */
-  approves?: TaskTx[];
+  tokens: LPToken[];
 }
 
 export interface DefaultSwap {
@@ -601,6 +598,14 @@ export interface HideFlowReq {
 }
 
 export interface HideFlowRes {}
+
+export interface LPToken {
+  /**  */
+  token: Token;
+
+  /**  */
+  approveTx?: TaskTx;
+}
 
 export interface LiquidityBridgeTask {
   /**  */
@@ -997,7 +1002,7 @@ export interface Task {
   exchangeSwapTask?: ExchangeSwapTask;
 
   /**  */
-  zkLandLPTask?: DefaultLP;
+  zkLendLPTask?: DefaultLP;
 }
 
 export interface TaskTx {
@@ -1252,7 +1257,7 @@ export enum TaskType {
   'AvnuSwap' = 'AvnuSwap',
   'FibrousSwap' = 'FibrousSwap',
   'ExchangeSwap' = 'ExchangeSwap',
-  'ZkLandLP' = 'ZkLandLP'
+  'ZkLendLP' = 'ZkLendLP'
 }
 
 export enum Token {

@@ -30,6 +30,7 @@ type Process struct {
 	Progress   int          `db:"progress"`
 	DeletedAt  sql.NullTime `db:"deleted_at"`
 	AutoRetry  bool         `db:"auto_retry"`
+	RunAfter   sql.NullTime `db:"run_after"`
 }
 
 func (a *ProcessArg) FromPB(pb *v1.Process, userId string) error {
@@ -73,6 +74,11 @@ func (a *ProcessArg) FromPB(pb *v1.Process, userId string) error {
 		a.DeletedAt.Time = pb.DeletedAt.AsTime()
 	}
 
+	if pb.RunAfter != nil {
+		a.RunAfter.Valid = true
+		a.RunAfter.Time = pb.RunAfter.AsTime()
+	}
+
 	a.AutoRetry = pb.AutoRetry
 
 	return nil
@@ -110,6 +116,10 @@ func (a *ProcessArg) ToPB(flow *v1.Flow) (*v1.Process, error) {
 
 	if a.DeletedAt.Valid {
 		out.DeletedAt = timestamppb.New(a.DeletedAt.Time)
+	}
+
+	if a.RunAfter.Valid {
+		out.RunAfter = timestamppb.New(a.RunAfter.Time)
 	}
 
 	pr := make([]*v1.ProcessProfile, 0)
@@ -201,6 +211,22 @@ func (r *pgRepository) ListProcessIdsForAutoRetry(ctx context.Context) ([]string
 	return tmp, nil
 }
 
+func (r *pgRepository) ProcessIdsReady(ctx context.Context, ts time.Time) ([]string, error) {
+
+	q, args, err := sqlx.In(`select distinct id from process where status in (?) and deleted_at is null and run_after <= ?`, v1.ProcessStatus_StatusReady.String(), ts)
+	if err != nil {
+		return nil, err
+	}
+
+	q = sqlx.Rebind(sqlx.DOLLAR, q)
+	tmp := make([]string, 0)
+	if err := r.conn.SelectContext(ctx, &tmp, q, args...); err != nil {
+		return nil, err
+	}
+
+	return tmp, nil
+}
+
 func (r *pgRepository) ListProcessByUser(ctx context.Context, userId string, statuses []string, offset, limit int) ([]*v1.Process, error) {
 
 	q := `select * from process where 
@@ -276,11 +302,6 @@ func (r *pgRepository) ListProcessByUser(ctx context.Context, userId string, sta
 	}
 
 	return out, nil
-}
-
-type Valid[T any] struct {
-	Valid bool
-	T     any
 }
 
 type UpdateProcess struct {

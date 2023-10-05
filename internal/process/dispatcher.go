@@ -234,8 +234,8 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_FibrousSwap:
 		p := t.Task.Task.(*v1.Task_FibrousSwapTask).FibrousSwapTask
 		e, err = task.NewFibrousSwapTask().EstimateCost(ctx, profile, p, nil)
-	case v1.TaskType_ZkLandLP:
-		p := t.Task.Task.(*v1.Task_ZkLandLPTask).ZkLandLPTask
+	case v1.TaskType_ZkLendLP:
+		p := t.Task.Task.(*v1.Task_ZkLendLPTask).ZkLendLPTask
 		e, err = task.NewZkLendLPTask().EstimateLPCost(ctx, profile, p, nil)
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
@@ -295,7 +295,7 @@ func (d *Dispatcher) RunDispatcher(ctx context.Context) {
 
 	go func() {
 
-		processIds, err := d.r.ProcessIds(ctx, v1.ProcessStatus_StatusReady, v1.ProcessStatus_StatusRunning)
+		processIds, err := d.r.ProcessIds(ctx, v1.ProcessStatus_StatusRunning)
 		if err != nil {
 			log.Log.Error(errors.Wrap(err, "ProcessIds"))
 		}
@@ -313,8 +313,18 @@ func (d *Dispatcher) RunDispatcher(ctx context.Context) {
 				log.Log.Info("resolver.start")
 				pIds, err := d.r.ListProcessIdsForAutoRetry(ctx)
 				if err != nil {
-					log.Log.Error(errors.Wrap(err, "ProcessIds"))
+					log.Log.Error(errors.Wrap(err, "RunDispatcher.ListProcessIdsForAutoRetry"))
 					continue
+				}
+
+				readyIds, err := d.r.ProcessIdsReady(ctx, time.Now().UTC())
+				if err != nil {
+					log.Log.Error(errors.Wrap(err, "RunDispatcher.ProcessIdsReady"))
+					continue
+				}
+
+				for _, el := range readyIds {
+					d.StartProcess(el)
 				}
 
 				for _, pId := range pIds {
@@ -327,7 +337,7 @@ func (d *Dispatcher) RunDispatcher(ctx context.Context) {
 				log.Log.Info("resolver.end")
 
 			case <-ticker.C:
-				pIds, err := d.r.ProcessIds(ctx, v1.ProcessStatus_StatusReady, v1.ProcessStatus_StatusRunning)
+				pIds, err := d.r.ProcessIds(ctx, v1.ProcessStatus_StatusRunning)
 				if err != nil {
 					log.Log.Error(errors.Wrap(err, "ProcessIds"))
 					continue

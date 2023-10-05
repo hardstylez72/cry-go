@@ -41,8 +41,8 @@ func (r *pgRepository) CreateProcess(ctx context.Context, req *ProcessArg) error
 }
 
 func createProcess(ctx context.Context, conn *sqlx.Tx, req *ProcessArg) error {
-	q := `insert into process (id, status, payload, user_id, flow_id, updated_at, created_at) values 
-      (:id, :status, :payload, :user_id, :flow_id, :updated_at, :created_at)                                                                 `
+	q := `insert into process (id, status, payload, user_id, flow_id, updated_at, created_at, run_after) values 
+      (:id, :status, :payload, :user_id, :flow_id, :updated_at, :created_at, :run_after)                                                                 `
 	if _, err := conn.NamedExecContext(ctx, q, req); err != nil {
 		return err
 	}

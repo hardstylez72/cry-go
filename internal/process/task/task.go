@@ -98,7 +98,7 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_AcrossBridge,
 	v1.TaskType_AvnuSwap,
 	v1.TaskType_FibrousSwap,
-	v1.TaskType_ZkLandLP,
+	v1.TaskType_ZkLendLP,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -148,7 +148,7 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_AvnuSwap:                         &Wrap{Tasker: NewAvnuSwapTask()},
 	v1.TaskType_FibrousSwap:                      &Wrap{Tasker: NewFibrousSwapTask()},
 	v1.TaskType_ExchangeSwap:                     &Wrap{Tasker: &ExchangeSwapTask{}},
-	v1.TaskType_ZkLandLP:                         &Wrap{Tasker: NewZkLendLPTask()},
+	v1.TaskType_ZkLendLP:                         &Wrap{Tasker: NewZkLendLPTask()},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -388,12 +388,12 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_ExchangeSwapTask)")
 		}
 		return Marshal(t.ExchangeSwapTask)
-	case v1.TaskType_ZkLandLP:
-		t, ok := m.Task.(*v1.Task_ZkLandLPTask)
+	case v1.TaskType_ZkLendLP:
+		t, ok := m.Task.(*v1.Task_ZkLendLPTask)
 		if !ok {
 			return nil, errors.New("m.Task.(*v1.Task_ZkLandLPTask)")
 		}
-		return Marshal(t.ZkLandLPTask)
+		return Marshal(t.ZkLendLPTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}
