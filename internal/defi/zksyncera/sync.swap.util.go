@@ -104,6 +104,9 @@ func (c *Client) syncSwapPoolRates(ctx context.Context, addr common.Address) (*b
 
 	ratio0 := new(big.Float).Quo(new(big.Float).SetInt(totalSuply), new(big.Float).SetInt(r0))
 	ratio2 := new(big.Float).Quo(new(big.Float).SetInt(totalSuply), new(big.Float).SetInt(r1))
+
+	println(ratio0.String())
+	println(ratio2.String())
 	return ratio0, ratio2, nil
 }
 

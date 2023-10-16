@@ -30,7 +30,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		return nil, err
 	}
 
-	wt, err := newWalletTransactor(req.WalletPk)
+	wt, err := NewWalletTransactor(req.WalletPk)
 	if err != nil {
 		return nil, err
 	}
@@ -39,12 +39,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		return nil, err
 	}
 
-	chainID, err := c.GetNetworkId(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	opt, err := bind.NewKeyedTransactorWithChainID(wt.PrivateKey, chainID)
+	opt, err := bind.NewKeyedTransactorWithChainID(wt.PrivateKey, c.Cfg.NetworkId)
 	if err != nil {
 		return nil, errors.Wrap(err, "bind.NewKeyedTransactorWithChainID")
 	}
@@ -107,7 +102,7 @@ func (c *EtheriumClient) StargateBridgeSwapToken(ctx context.Context, req *Starg
 		if err != nil {
 			return nil, err
 		}
-		details = append(details, bozdo.NewOpimismFeeDetails(l1Gasfee, c.Cfg.Network, v1.Token_ETH))
+		details = append(details, bozdo.NewL1FeeDetails(l1Gasfee, c.Cfg.Network, v1.Token_ETH))
 	}
 
 	details = append(details, bozdo.NewLZFeeDetails(fee.Fee1, c.Cfg.Network, req.FromToken))

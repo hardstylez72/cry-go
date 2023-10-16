@@ -142,7 +142,7 @@ func (s *ProfileService) CreateProfile(ctx context.Context, req *v1.CreateProfil
 		a.MmskId = []byte(publicKey)
 	}
 
-	if req.Proxy != nil {
+	if req.GetProxy() != "" {
 		p, err := socks5.NewSock5ProxyString(req.GetProxy(), "")
 		if err != nil {
 			return nil, errors.New("invalid proxy")
@@ -338,7 +338,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 			if err != nil {
 				return
 			}
-			
+
 			b, err := balancer.GetBalance(ctx, &defi.GetBalanceReq{
 				WalletAddress: pubKey,
 				Token:         tokens[i],

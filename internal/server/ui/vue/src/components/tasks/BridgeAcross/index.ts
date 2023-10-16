@@ -20,7 +20,12 @@ export const AcrossBridgeSpec: TaskSpec = {
     op: 'bridge',
   },
   job: TaskJob.Bridge,
-  networks: new Set<Network>([Network.ZKSYNCERA]),
-  airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+  networks: new Set<Network>([
+    Network.ZKSYNCERA,
+    Network.Base,
+    Network.ARBITRUM,
+    Network.OPTIMISM,
+  ]),
+  airdrops: new Set<Airdrop>([Airdrop.ZkSync, Airdrop.Base]),
   profileType: new Set([ProfileType.EVM])
 }

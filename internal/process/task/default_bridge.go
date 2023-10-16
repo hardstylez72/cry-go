@@ -113,6 +113,7 @@ func (t *DefaultBridge) Run(ctx context.Context, a *Input) (*v1.ProcessTask, err
 		}
 
 		p.Tx = NewTx(res.Tx, gas)
+		p.Tx.Details = append(p.Tx.Details)
 		if err := a.AddTx2(ctx, p.Tx); err != nil {
 			return nil, err
 		}
@@ -126,7 +127,7 @@ func (t *DefaultBridge) Run(ctx context.Context, a *Input) (*v1.ProcessTask, err
 	}
 
 	if !p.GetReceived() {
-		if err := client.WaitForConfirm(ctx, p.GetTx().GetTxId()); err != nil {
+		if err := client.WaitForConfirm(ctx, p.GetTx().GetTxId(), t.taskType, profile.Addr); err != nil {
 			return nil, err
 		}
 		p.Received = true
@@ -209,7 +210,7 @@ func (h *DefaultBridgeTaskHalper) Execute(ctx context.Context, profile *halp.Pro
 		Gas:          Gas,
 		Slippage:     getSlippage(s.Source, h.TaskType),
 		EstimateOnly: estimateOnly,
-		Debug:        false,
+		Debug:        true,
 		SubType:      profile.SubType,
 	}, h.TaskType)
 	if err != nil {

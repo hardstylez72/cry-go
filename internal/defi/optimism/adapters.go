@@ -4,10 +4,11 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/across"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/pkg/errors"
 )
 
 func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi.GetBalanceRes, error) {
@@ -38,7 +39,7 @@ func (c *Client) GetNetworkId() *big.Int {
 }
 
 func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
-	return c.defi.WaitTxComplete(ctx, common.HexToHash(tx))
+	return c.defi.WaitTxComplete(ctx, tx)
 }
 
 func (c *Client) TestNetBridgeSwap(ctx context.Context, req *defi.TestNetBridgeSwapReq) (*defi.TestNetBridgeSwapRes, error) {
@@ -50,9 +51,28 @@ func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) 
 }
 
 func (c *Client) GetPublicKey(pk string, subType v1.ProfileSubType) (string, error) {
-	return c.defi.GetPublicKey(pk)
+	return c.defi.GetPublicKey(pk, subType)
 }
 
 func (c *Client) Network() v1.Network {
 	return c.defi.Cfg.Network
+}
+
+func (c *Client) Bridge(ctx context.Context, req *defi.DefaultBridgeReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
+	switch taskType {
+	case v1.TaskType_AcrossBridge:
+		b := across.NewAcrossBridge(c.defi)
+		return b.Bridge(ctx, req)
+	default:
+		return nil, errors.New("bridge unsupported")
+	}
+}
+func (c *Client) WaitForConfirm(ctx context.Context, txId string, taskType v1.TaskType, receiver string) error {
+	switch taskType {
+	case v1.TaskType_AcrossBridge:
+		b := across.NewAcrossBridge(c.defi)
+		return b.WaitForConfirm(ctx, txId, receiver)
+	default:
+		return errors.New("bridge unsupported")
+	}
 }

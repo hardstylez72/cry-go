@@ -6,9 +6,7 @@
         <thead>
         <tr>
           <th class="text-left">Product</th>
-          <th class="text-left">Status</th>
           <th class="text-left">Actions</th>
-          <th class="text-left">Quest</th>
         </tr>
         </thead>
         <tbody>
@@ -17,43 +15,10 @@
             <v-img height="20px" :src="item.img" class="mr-2"/>
             {{ item.name }}
           </a></td>
-          <td>{{ item.status }}</td>
           <td>{{ item.action }}</td>
-          <td>{{ item.quest }}</td>
         </tr>
         </tbody>
       </v-table>
-      <div>
-        <!--        <div v-for="item in links">-->
-        <!--          <a :href="item.link">{{ item.name }}</a>-->
-        <!--        </div>-->
-
-        <v-expansion-panels>
-          <v-expansion-panel
-            title="Мнения"
-          >
-            <v-expansion-panel-text>
-              links:
-              <a href="https://dune.com/sixdegree/zksync-airdrop-simulation-ranking" target="_blank">Dune dashboard</a>
-              <br/>
-              <div>
-                Мнение от <a href="https://t.me/+oRCEEsa_d-Y4ODQy" target="_blank">ProMint</a>
-                <ul>
-                  <li>100+ транзакций в Era</li>
-                  <li>10+ транзакций в Lite</li>
-                  <li>Взаимодействие с zkBridge с обеих сторон</li>
-                  <li>20-30 смарт-контрактов</li>
-                  <li>Баланс кошелька 0.005 ETH</li>
-                  <li>Активность в каждом месяце</li>
-                  <li>2-10к объём</li>
-                </ul>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-
-
-      </div>
 
     </div>
 
@@ -189,7 +154,7 @@ export default defineComponent({
           link: taskProps.AcrossBridge.service.link,
           img: taskProps.AcrossBridge.service.img,
           status: Status.integrated,
-          action: 'Bridge USDC -> Arbitrum',
+          action: 'EVM мост (ввод/вывод ETH/USDC)',
           quest: ''
         }
       ],

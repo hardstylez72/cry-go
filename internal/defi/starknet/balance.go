@@ -5,11 +5,8 @@ import (
 	"math/big"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/starknet/halper"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
-	"github.com/hardstylez72/cry/starknet.go/felt"
-	"github.com/hardstylez72/cry/starknet.go/rpc"
-	"github.com/hardstylez72/cry/starknet.go/types"
-	"github.com/hardstylez72/cry/starknet.go/utils"
 )
 
 func (c *Client) GetNetworkToken() v1.Token {
@@ -23,42 +20,22 @@ func (c *Client) GetNetworkId() *big.Int {
 
 func (c *Client) GetBalance(ctx context.Context, req *defi.GetBalanceReq) (*defi.GetBalanceRes, error) {
 
-	ca, ok := c.TokenMap[req.Token]
+	res, err := c.halper.Balance(ctx, &halper.BalanceReq{
+		ChainRPC: c.cfg.RPCEndpoint,
+		Proxy:    c.cfg.Proxy,
+		Pub:      req.WalletAddress,
+		Token:    req.Token.String(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	b, ok := big.NewInt(0).SetString(res.WEI, 10)
 	if !ok {
-		return nil, defi.ErrTokenNotSupportedFn(req.Token)
+		b = big.NewInt(0)
 	}
 
-	addrFelt, err := utils.HexToFelt(ca)
-	if err != nil {
-		return nil, err
-	}
-
-	selectorFelt := types.GetSelectorFromNameFelt("balanceOf")
-	if err != nil {
-		return nil, err
-	}
-
-	wFelt, err := utils.HexToFelt(req.WalletAddress)
-	if err != nil {
-		return nil, err
-	}
-	tx := rpc.FunctionCall{
-		ContractAddress:    addrFelt,
-		EntryPointSelector: selectorFelt,
-		Calldata:           []*felt.Felt{wFelt},
-	}
-
-	res, err := c.GWP.Call(ctx, tx, rpc.BlockID{Tag: "latest"})
-	if err != nil {
-		return nil, err
-	}
-
-	var balance *big.Int
-	if len(res) == 2 {
-		balance = types.HexToBN(res[0])
-	}
-
-	return c.getBalance(balance, req), nil
+	return c.getBalance(b, req), nil
 }
 
 func (c *Client) getBalance(wei *big.Int, req *defi.GetBalanceReq) *defi.GetBalanceRes {

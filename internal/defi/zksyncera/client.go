@@ -203,12 +203,12 @@ func newClient(
 		config = c
 	}
 
-	rpcL2Client, err := rpc.DialOptions(context.Background(), defi.ResolveANKR(c.RPCEndpoint), rpc.WithHTTPClient(config.HttpCli))
+	rpcL2Client, err := rpc.DialOptions(context.Background(), c.RPCEndpoint, rpc.WithHTTPClient(config.HttpCli))
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to blockchain node: "+c.RPCEndpoint)
 	}
 
-	rpcL1Client, err := rpc.DialOptions(context.Background(), defi.ResolveANKR("https://rpc.ankr.com/eth"), rpc.WithHTTPClient(config.HttpCli))
+	rpcL1Client, err := rpc.DialOptions(context.Background(), "https://rpc.ankr.com/eth", rpc.WithHTTPClient(config.HttpCli))
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ETH: "+c.RPCEndpoint)
 	}

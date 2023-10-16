@@ -6,9 +6,7 @@
         <thead>
         <tr>
           <th class="text-left">Product</th>
-          <th class="text-left">Status</th>
           <th class="text-left">Actions</th>
-          <th class="text-left">Quest</th>
         </tr>
         </thead>
         <tbody>
@@ -17,9 +15,7 @@
             <v-img height="20px" :src="item.img" class="mr-2"/>
             {{ item.name }}
           </a></td>
-          <td>{{ item.status }}</td>
           <td>{{ item.action }}</td>
-          <td>{{ item.quest }}</td>
         </tr>
         </tbody>
       </v-table>

@@ -11,6 +11,11 @@ import (
 var Log = Nop
 var Nop = zap.NewNop().Sugar()
 
+func init() {
+	l, _ := zap.NewDevelopment()
+	Log = l.Sugar()
+}
+
 func NewLogger(project, name string) (*zap.SugaredLogger, error) {
 	//timeString := time.Now().Format("2006_01_02-15_04_05")
 	//pathName := strings.ToLower("logs_" + project + "_" + name)

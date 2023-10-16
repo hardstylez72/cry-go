@@ -1,16 +1,11 @@
 <template>
   <v-card-actions>
     <v-container>
-      <div class="mb-3">use <a :href="taskProps.StargateBridge.service.link"
-                               target="_blank">{{ taskProps.StargateBridge.service.name }}</a> to see
-        available swap
-        options
-      </div>
       <v-row>
         <v-col>
           <NetworkSelector
             label="from network"
-            :items="networks"
+            :items="GetFromNetworks"
             :disabled="disabled"
             v-model="fromNetwork"
           />
@@ -83,7 +78,7 @@ export default defineComponent({
     "toNetwork": {
       handler() {
         this.item.toNetwork = this.toNetwork
-        if (this.toNetwork && this.fromNetwork) {
+        if (!this.init) {
           this.pair = null
         }
       }
@@ -91,7 +86,8 @@ export default defineComponent({
     "fromNetwork": {
       handler() {
         this.item.fromNetwork = this.fromNetwork
-        if (this.toNetwork && this.fromNetwork) {
+        if (!this.init) {
+          this.toNetwork = null
           this.pair = null
         }
       }
@@ -99,13 +95,16 @@ export default defineComponent({
     pair: {
       handler() {
         if (!this.pair) {
+          this.item.fromToken = undefined
+          this.item.toToken = undefined
           return
         }
         this.item.fromToken = this.pair.from
         this.item.toToken = this.pair.to
-        this.toNetwork = this.pair.toNetwork
+        this.item.fromNetwork = this.pair.fromNetwork
+        this.item.toNetwork = this.pair.toNetwork
         this.fromNetwork = this.pair.fromNetwork
-
+        this.toNetwork = this.pair.toNetwork
       },
     },
     item: {
@@ -118,6 +117,9 @@ export default defineComponent({
       handler(b, a) {
         if (JSON.stringify(a) !== JSON.stringify(b)) {
           this.syncTask()
+          this.$nextTick(() => {
+            this.init = false
+          })
         }
       },
       deep: true
@@ -126,14 +128,7 @@ export default defineComponent({
 
   data() {
     return {
-      networks: [
-        Network.BinanaceBNB,
-        Network.ARBITRUM,
-        Network.OPTIMISM,
-        Network.POLIGON,
-        Network.AVALANCHE,
-        Network.ZKSYNCERA,
-      ] as Network[],
+      init: true,
       pairs: [
 
         // from ARBITRUM
@@ -285,8 +280,34 @@ export default defineComponent({
     link() {
       return link
     },
+    GetFromNetworks(): Network[] {
+      const m = new Set<Network>()
+      this.pairs.forEach((p) => {
+        m.add(p.fromNetwork)
+      })
+
+      const out = []
+      m.forEach(v => {
+        out.push(v)
+      })
+
+      return out
+    },
     GetToNetworks(): Network[] {
-      return this.networks.filter((n) => n !== this.item.fromNetwork);
+      const m = new Set<Network>()
+
+      this.pairs.forEach((p) => {
+        if (p.fromNetwork == this.fromNetwork) {
+          m.add(p.toNetwork)
+        }
+      })
+
+      const out = []
+      m.forEach(v => {
+        out.push(v)
+      })
+
+      return out
     },
   },
   created() {

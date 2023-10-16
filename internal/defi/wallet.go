@@ -19,14 +19,14 @@ type WalletTransactor struct {
 }
 
 func GetEMVPublicKey(s string) (string, error) {
-	w, err := newWalletTransactor(s)
+	w, err := NewWalletTransactor(s)
 	if err != nil {
 		return "", err
 	}
 	return w.WalletAddrHR, nil
 }
 
-func newWalletTransactor(privateKey string) (*WalletTransactor, error) {
+func NewWalletTransactor(privateKey string) (*WalletTransactor, error) {
 
 	pkb, err := hex.DecodeString(privateKey)
 	if err != nil {

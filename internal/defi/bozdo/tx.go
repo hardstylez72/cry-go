@@ -14,20 +14,23 @@ import (
 type TxDetailKey = string
 
 const (
-	TxDetailKeyProtocolFee         = "ProtocolFee"
-	TxDetailKeyLayerZeroFee        = "LayerZeroFee"
-	TxDetailKeyOptimismL1Fee       = "OptimismL1Fee"
+	TxDetailKeyProtocolFee  = "ProtocolFee"
+	TxDetailKeyL1Fee        = "l1Fee"
+	TxDetailKeyLayerZeroFee = "LayerZeroFee"
+
 	TxDetailKeyTokenBalanceBefore  = "TokenBalanceBefore"
 	TxDetailKeyTokenBalanceAfter   = "TokenBalanceAfter"
 	TxDetailKeyNativeBalanceBefore = "NativeBalanceBefore"
 	TxDetailKeyNativeBalanceAfter  = "NativeBalanceAfter"
-	TxDetailKeyTxFee               = "TxFee"
-	TxDetailEaxchnageRateRatio     = "RateRatio"
+
+	TxDetailKeyTxFee           = "TxFee"
+	TxDetailEaxchnageRateRatio = "RateRatio"
+	TxDetailAcrossRelayFee     = "AcrossRelayFee"
 )
 
 type TxDetail struct {
-	Key   TxDetailKey
-	Value string
+	Key   TxDetailKey `json:"key"`
+	Value string      `json:"value"`
 }
 
 type TxCode = string
@@ -65,6 +68,7 @@ type TxData struct {
 	Details      []TxDetail
 	Rate         *float64
 	Gas          *big.Int
+	ExtraFee     *big.Int
 }
 
 type BaseReq struct {
@@ -136,16 +140,32 @@ func NewProtocolFeeDetails(s *big.Int, network v1.Network, token v1.Token) TxDet
 	}
 }
 
-func NewLZFeeDetails(s *big.Int, network v1.Network, token v1.Token) TxDetail {
+func NewL1FeeDetails(s *big.Int, network v1.Network, token v1.Token) TxDetail {
 	return TxDetail{
-		Key:   TxDetailKeyLayerZeroFee,
+		Key:   TxDetailKeyL1Fee,
 		Value: CastUSD(s, network, token) + " USD",
 	}
 }
 
-func NewOpimismFeeDetails(s *big.Int, network v1.Network, token v1.Token) TxDetail {
+func NewAcrossDetails(relayFee string, token v1.Token, network v1.Network) TxDetail {
+
+	b, ok := big.NewInt(0).SetString(relayFee, 10)
+	if !ok {
+		return TxDetail{
+			Key:   TxDetailAcrossRelayFee,
+			Value: "- USD",
+		}
+	}
+
 	return TxDetail{
-		Key:   TxDetailKeyOptimismL1Fee,
+		Key:   TxDetailAcrossRelayFee,
+		Value: CastUSD(b, network, token) + " USD",
+	}
+}
+
+func NewLZFeeDetails(s *big.Int, network v1.Network, token v1.Token) TxDetail {
+	return TxDetail{
+		Key:   TxDetailKeyLayerZeroFee,
 		Value: CastUSD(s, network, token) + " USD",
 	}
 }
@@ -188,22 +208,41 @@ func NewSwapRateRatio(exchange, pool float64) TxDetail {
 }
 
 func CastUSD(wei *big.Int, network v1.Network, token v1.Token) string {
-	gasTokenPrice := pub.Price().ETH
-	switch network {
-	case v1.Network_ZKSYNCERA, v1.Network_ZKSYNCLITE,
-		v1.Network_Etherium, v1.Network_ARBITRUM,
-		v1.Network_OPTIMISM, v1.Network_GOERLIETH:
-		gasTokenPrice = pub.Price().ETH
-	case v1.Network_POLIGON:
-		gasTokenPrice = pub.Price().MATIC
-	case v1.Network_BinanaceBNB:
-		gasTokenPrice = pub.Price().BNB
-	case v1.Network_AVALANCHE:
-		gasTokenPrice = pub.Price().AVAX
+	var gasTokenPrice float64
+
+	switch token {
+	case v1.Token_USDC, v1.Token_USDT, v1.Token_USDCBridged:
+		gasTokenPrice = 1
+		amEth := WeiToToken(wei, token)
+		return amEth.String()
+	case v1.Token_ETH:
+		switch network {
+		case v1.Network_ZKSYNCERA, v1.Network_ZKSYNCLITE,
+			v1.Network_Etherium, v1.Network_ARBITRUM,
+			v1.Network_OPTIMISM, v1.Network_GOERLIETH:
+			gasTokenPrice = pub.Price().ETH
+		case v1.Network_POLIGON:
+			gasTokenPrice = pub.Price().MATIC
+		case v1.Network_BinanaceBNB:
+			gasTokenPrice = pub.Price().BNB
+		case v1.Network_AVALANCHE:
+			gasTokenPrice = pub.Price().AVAX
+		}
+		amEth := WEIToEther(wei)
+		amUsd := EthToUsd(amEth, gasTokenPrice)
+		return amUsd.String()
 	}
-	amEth := WEIToEther(wei)
-	amUsd := EthToUsd(amEth, gasTokenPrice)
-	return amUsd.String()
+
+	return "-1"
+}
+
+func WeiToToken(wei *big.Int, token v1.Token) *big.Float {
+	switch token {
+	case v1.Token_USDT, v1.Token_USDC, v1.Token_USDCBridged:
+		return new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(params.Ether*1e-12))
+	default:
+		return new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(params.Ether))
+	}
 }
 
 func WEIToEther(wei *big.Int) *big.Float {

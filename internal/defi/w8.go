@@ -10,7 +10,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *EtheriumClient) WaitTxComplete(ctx context.Context, txId common.Hash) error {
+func (c *EtheriumClient) WaitTxComplete(ctx context.Context, s string) error {
+
+	txId := common.HexToHash(s)
 
 	ticker := time.NewTicker(time.Second * 10)
 	defer ticker.Stop()

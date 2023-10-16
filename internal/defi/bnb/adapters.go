@@ -35,7 +35,7 @@ func (c *Client) GetNetworkId() *big.Int {
 }
 
 func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
-	return c.defi.WaitTxComplete(ctx, common.HexToHash(tx))
+	return c.defi.WaitTxComplete(ctx, tx)
 }
 
 func (c *Client) Transfer(ctx context.Context, r *defi.TransferReq) (*defi.TransferRes, error) {
@@ -47,7 +47,7 @@ func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) 
 }
 
 func (c *Client) GetPublicKey(pk string, subType v1.ProfileSubType) (string, error) {
-	return c.defi.GetPublicKey(pk)
+	return c.defi.GetPublicKey(pk, subType)
 }
 
 func (c *Client) Network() v1.Network {

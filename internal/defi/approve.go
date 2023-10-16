@@ -112,7 +112,7 @@ func (c *EtheriumClient) TokenLimitChecker(ctx context.Context, req *TokenLimitC
 		r.ApproveTx = tx.Tx
 
 		time.Sleep(time.Second * 5)
-		_ = c.WaitTxComplete(ctx, tx.Tx.Hash())
+		_ = c.WaitTxComplete(ctx, tx.Tx.Hash().String())
 	}
 
 	return r, nil
@@ -122,7 +122,7 @@ func (c *EtheriumClient) TokenApprove(ctx context.Context, req *ApproveReq) (*Ap
 	return c.tokenApprove(ctx, req)
 }
 
-func (r *ApproveReq) Validate(c *ClientConfig) error {
+func (r *ApproveReq) Validate(c *Config) error {
 
 	if r.Wallet == nil {
 		return errors.New("empty wallet")

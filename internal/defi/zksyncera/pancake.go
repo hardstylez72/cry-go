@@ -109,9 +109,7 @@ func (c *pancakeMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 		if err != nil {
 			return nil, err
 		}
-
-		//t, _ :=	pancakeswap.NewRouterTransactor()
-		//	t.SwapExactTokensForETH()
+		
 		data, err := a.Pack("swapExactTokensForETH", amountIn, amountOutMin, path, to, deadline)
 		if err != nil {
 			return nil, err

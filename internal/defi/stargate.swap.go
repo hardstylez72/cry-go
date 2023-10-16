@@ -122,7 +122,7 @@ func (r *StargateBridgeSwapReq) Validate(currentChain v1.Network) error {
 // https://stargateprotocol.gitbook.io/stargate/developers/how-to-swap
 func (c *EtheriumClient) StargateBridgeSwap(ctx context.Context, req *DefaultBridgeReq) (*bozdo.DefaultRes, error) {
 
-	wallet, err := newWalletTransactor(req.PK)
+	wallet, err := NewWalletTransactor(req.PK)
 	if err != nil {
 		return nil, err
 	}

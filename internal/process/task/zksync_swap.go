@@ -117,7 +117,7 @@ func NewZkSwapTask() *ZkSyncSwap {
 	})
 }
 
-func NewPancakeSwapTask() *ZkSyncSwap {
+func NewPancakeZkSyncSwapTask() *ZkSyncSwap {
 	return NewZkSyncSwapTask(v1.TaskType_PancakeSwap, func(a *Input) (*v1.DefaultSwap, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_PancakeSwapTask)
 		if !ok {

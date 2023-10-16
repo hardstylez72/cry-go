@@ -2,9 +2,9 @@ package zksyncera
 
 import (
 	"context"
-	"net/http"
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,13 +15,15 @@ func Test(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 
-	d := AcrossBridge{
-		cli:     r,
-		HttpCli: &http.Client{},
-		Debug:   true,
-	}
-
-	d.WaitTxComplete(context.Background(), "0x34cd2eddfc129d7040fa87f292e82cd0433f37b71b4204ccc3e2342925059ec0")
+	r.syncSwapPoolRates(context.Background(), common.HexToAddress("0x80115c708E12eDd42E504c1cD52Aea96C547c05c"))
+	//d := AcrossBridge{
+	//	cli:     r,
+	//	HttpCli: &http.Client{},
+	//	Debug:   true,
+	//}
+	//
+	//
+	//d.WaitTxComplete(context.Background(), "0x34cd2eddfc129d7040fa87f292e82cd0433f37b71b4204ccc3e2342925059ec0")
 
 	//d.MakeBridgeTx(context.Background(), &defi.DefaultBridgeReq{
 	//	FromNetwork:  v1.Network_ZKSYNCERA,

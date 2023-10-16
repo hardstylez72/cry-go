@@ -6,6 +6,7 @@ import (
 
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/exchange/pub"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
 	"github.com/hardstylez72/cry/internal/uniclient"
@@ -19,6 +20,16 @@ func NewTraderJoeSwapTask() *DefaultSwapTask {
 			return nil, errors.New("Task.(*v1.Task_TraderJoeSwapTask) call an ambulance!")
 		}
 		return l.TraderJoeSwapTask, nil
+	})
+}
+
+func NewPancakeSwapTask() *DefaultSwapTask {
+	return NewDefaultSwapTaskTask(v1.TaskType_PancakeSwap, func(a *Input) (*v1.DefaultSwap, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_PancakeSwapTask)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_PancakeSwapTask) call an ambulance!")
+		}
+		return l.PancakeSwapTask, nil
 	})
 }
 
@@ -197,9 +208,10 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 		WalletPK:     profile.WalletPK,
 		EstimateOnly: estimateOnly,
 		Gas:          Gas,
-		Debug:        false,
+		Debug:        true,
 		Slippage:     getSlippage(s.Source, h.TaskType),
 		SubType:      profile.SubType,
+		ExchangeRate: pub.GetExchangeRate(p.FromToken, p.ToToken),
 	}, h.TaskType)
 	if err != nil {
 		return nil, nil, err

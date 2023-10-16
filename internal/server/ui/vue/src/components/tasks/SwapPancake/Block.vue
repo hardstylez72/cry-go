@@ -3,17 +3,7 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-select
-            ref="stargate-bridge-form"
-            density="compact"
-            variant="outlined"
-            label="network"
-            v-on:change="inputChanged"
-            :rules="[required]"
-            :items="networks"
-            v-model="item.network"
-            :disabled="true"
-          />
+          <NetworkSelector label="сеть" :items="networks" v-model="item.network" :disabled="disabled"/>
         </v-col>
         <v-col>
           <v-autocomplete
@@ -45,11 +35,15 @@ import {taskProps} from "@/components/tasks/tasks";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
 import DefaultSwapTask from "@/components/tasks/block/base/DefaultSwapTask.js";
 import {Component} from "vue-facing-decorator";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
-@Component({name: 'PancakeSwap'})
+@Component({
+  name: 'PancakeSwap',
+  components: {NetworkSelector}
+})
 export default class PancakeSwap extends DefaultSwapTask {
 
-  networks = [Network.ZKSYNCERA]
+  networks = [Network.ZKSYNCERA, Network.Base]
 
   item: DefaultSwap = {
     network: Network.ZKSYNCERA,
@@ -62,6 +56,12 @@ export default class PancakeSwap extends DefaultSwapTask {
   pairs: SwapPair[] = [
     tokenSwapPair(Token.ETH, Token.USDC),
     tokenSwapPair(Token.USDC, Token.ETH),
+
+    tokenSwapPair(Token.USDCBridged, Token.ETH),
+    tokenSwapPair(Token.ETH, Token.USDCBridged),
+
+    tokenSwapPair(Token.USDCBridged, Token.USDC),
+    tokenSwapPair(Token.USDC, Token.USDCBridged),
   ]
 
   created() {

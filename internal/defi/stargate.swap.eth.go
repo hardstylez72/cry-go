@@ -112,7 +112,7 @@ func (c *EtheriumClient) StargateBridgeSwapEth(ctx context.Context, req *Stargat
 		if err != nil {
 			return nil, err
 		}
-		details = append(details, bozdo.NewOpimismFeeDetails(l1Gasfee, c.Cfg.Network, v1.Token_ETH))
+		details = append(details, bozdo.NewL1FeeDetails(l1Gasfee, c.Cfg.Network, v1.Token_ETH))
 	}
 
 	details = append(details, bozdo.NewLZFeeDetails(fee.Fee1, c.Cfg.Network, v1.Token_ETH))

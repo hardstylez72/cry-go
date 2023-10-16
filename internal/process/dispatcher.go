@@ -505,7 +505,7 @@ func (d *Dispatcher) estimateZkSyncSwapRatio(ctx context.Context, t1, t2 v1.Toke
 		task.NewVelocoreSwapTask(),
 		task.NewMuteioSwapTask(),
 		task.NewEzkaliburSwapTask(),
-		task.NewPancakeSwapTask(),
+		task.NewPancakeZkSyncSwapTask(),
 		task.NewVeSyncSwapTask(),
 		task.NewIzumiSwapTask(),
 		task.NewSpaceFiSwapTask(),

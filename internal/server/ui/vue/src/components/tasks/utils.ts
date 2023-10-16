@@ -10,7 +10,8 @@ export const allNetworks: Network[] = [
   Network.BinanaceBNB,
   Network.POLIGON,
   Network.OPTIMISM,
-  Network.Etherium
+  Network.Etherium,
+  Network.Base,
 ]
 
 interface Service {
@@ -61,7 +62,8 @@ export enum Airdrop {
   ZkSync = "ZkSync",
   StarkNet = "StarkNet",
   Orbiter = "Orbiter",
+  Base = "Base",
 }
 
-export const Universal = [Airdrop.ZkSync, Airdrop.StarkNet, Airdrop.Orbiter, Airdrop.LayerZero]
+export const Universal = [Airdrop.ZkSync, Airdrop.StarkNet, Airdrop.Orbiter, Airdrop.LayerZero, Airdrop.Base]
 

@@ -63,6 +63,10 @@ type TransferRes struct {
 	DefaultRes
 }
 
+func (s *Service) Balance(ctx context.Context, req *BalanceReq) (*BalanceRes, error) {
+	return Request[BalanceReq, BalanceRes](ctx, s.cli, s.c.Host+"/starknet/balance", req)
+}
+
 func (s *Service) ZkLend(ctx context.Context, req *ZkLendReq) (*ZkLendRes, error) {
 	return Request[ZkLendReq, ZkLendRes](ctx, s.cli, s.c.Host+"/starknet/zklend", req)
 }

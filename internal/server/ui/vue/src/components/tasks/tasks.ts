@@ -52,8 +52,8 @@ import DeployStarkNetAccount from "@/components/tasks/menu/DeployStarkNetAccount
 import {ProfileType} from "@/generated/profile";
 import swap10k from "@/components/tasks/block/swap10k.vue";
 import swap10kMenu from "@/components/tasks/menu/MenuSwap10k.vue";
-import TaskPancakeSwap from "@/components/tasks/block/PancakeSwap.vue";
-import PancakeSwap from "@/components/tasks/menu/MenuPancakeSwap.vue";
+import TaskPancakeSwap from "@/components/tasks/SwapPancake/Block.vue";
+import PancakeSwap from "@/components/tasks/SwapPancake/Menu.vue";
 import SithSwap from "@/components/tasks/block/SithSwap.vue";
 import MenuSithSwap from "@/components/tasks/menu/MenuSithSwap.vue";
 import MenuJediSwap from "@/components/tasks/menu/MenuJediSwap.vue";
@@ -78,6 +78,7 @@ import {ExchangeDeposit, ExchangeSwapSpec, ExchangeWithdrawSpec} from "@/compone
 import {SwapAvnuSpec} from "@/components/tasks/SwapAvnu";
 import {SwapFibrousSpec} from "@/components/tasks/SwapFibrous";
 import {LPZkLendLPSpec} from "@/components/tasks/LPZkLend";
+import {PancakeSwapSpec} from "@/components/tasks/SwapPancake";
 
 
 export interface TaskArg {
@@ -518,26 +519,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     airdrops: new Set<Airdrop>([Airdrop.StarkNet]),
     profileType: new Set([ProfileType.StarkNet])
   },
-  PancakeSwap: {
-    deprecated: false,
-    canBeEstimated: true,
-    descFn(task) {
-      const p = task.pancakeSwapTask
-      return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
-    },
-    component: TaskPancakeSwap,
-    menu: PancakeSwap,
-    service: {
-      name: 'PancakeSwap',
-      link: 'https://pancakeswap.finance/',
-      img: '/icons/pancake.ico',
-      op: 'swap',
-    },
-    job: TaskJob.Swap,
-    networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
-    profileType: new Set([ProfileType.EVM])
-  },
+  PancakeSwap: PancakeSwapSpec,
   SithSwap: {
     deprecated: false,
     canBeEstimated: true,

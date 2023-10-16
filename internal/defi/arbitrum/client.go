@@ -1,6 +1,7 @@
 package arbitrum
 
 import (
+	"context"
 	"math/big"
 	"net/http"
 
@@ -36,6 +37,10 @@ var Dict = defi.Dict{
 	Merkly: defi.Merkly{
 		NFT: common.HexToAddress("0xAa58e77238f0E4A565343a89A79b4aDDD744d649"),
 	},
+	Across: defi.Across{
+		RouterETH:   common.HexToAddress("0x269727F088F16E1Aea52Cf5a97B1CD41DAA3f02D"),
+		RouterToken: common.HexToAddress("0xe35e9842fceaCA96570B734083f4a58e8F7C5f2A"),
+	},
 }
 
 type Client struct {
@@ -61,15 +66,18 @@ func NewClient(c *ClientConfig) (*Client, error) {
 		config = c
 	}
 
-	ethcli, err := defi.NewEVMClient(&defi.ClientConfig{
+	ethcli, err := defi.NewEVMClient(&defi.Config{
 		Network:   v1.Network_ARBITRUM,
 		MainToken: v1.Token_ETH,
-		MainNet:   defi.ResolveANKR(c.RPCEndpoint),
+		MainNet:   c.RPCEndpoint,
 		TokenMap:  TokenAddress,
-		Dict:      &Dict,
+		Dict:      Dict,
 		Httpcli:   config.HttpCli,
 		TxViewFn:  TxViewer,
 		NetworkId: bozdo.ChainMap[v1.Network_ARBITRUM],
+		EstimateL1Gas: func(ctx context.Context, data []byte) (*big.Int, error) {
+			return big.NewInt(0), nil
+		},
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum main: "+c.RPCEndpoint)

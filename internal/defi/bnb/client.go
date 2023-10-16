@@ -55,12 +55,12 @@ func NewClient(c *ClientConfig) (*Client, error) {
 		config = c
 	}
 
-	ethcli, err := defi.NewEVMClient(&defi.ClientConfig{
+	ethcli, err := defi.NewEVMClient(&defi.Config{
 		Network:   v1.Network_BinanaceBNB,
 		MainToken: v1.Token_BNB,
-		MainNet:   defi.ResolveANKR(c.RPCEndpoint),
+		MainNet:   c.RPCEndpoint,
 		TokenMap:  TokenAddress,
-		Dict:      &Dict,
+		Dict:      Dict,
 		Httpcli:   config.HttpCli,
 		TxViewFn: func(txId string) string {
 			return "https://bscscan.com/tx/" + txId

@@ -98,6 +98,17 @@ type LiquidityBridgeRes struct {
 	TxHash       *string
 }
 
+type BalanceReq struct {
+	ChainRPC string `json:"chainRPC"`
+	Proxy    string `json:"proxy"`
+	Pub      string `json:"pub"`
+	Token    string `json:"token"`
+}
+
+type BalanceRes struct {
+	WEI string `json:"wei"`
+}
+
 type HalperService interface {
 	IsAccountDeployed(ctx context.Context, req *IsAccountDeployedReq) (*IsAccountDeployedRes, error)
 	DeployAccount(ctx context.Context, req *DeployAccountReq) (*DeployAccountRes, error)
@@ -110,4 +121,5 @@ type HalperService interface {
 	Mint(ctx context.Context, req *MintReq) (*MintRes, error)
 	Transfer(ctx context.Context, req *TransferReq) (*TransferRes, error)
 	ZkLend(ctx context.Context, req *ZkLendReq) (*ZkLendRes, error)
+	Balance(ctx context.Context, req *BalanceReq) (*BalanceRes, error)
 }

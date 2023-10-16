@@ -98,7 +98,7 @@ func (c *EtheriumClient) TestNetBridgeSwap(ctx context.Context, req *TestNetBrid
 		return nil, errors.Wrap(err, "TestNetBridgeSwap")
 	}
 
-	tr, err := newWalletTransactor(req.PK)
+	tr, err := NewWalletTransactor(req.PK)
 	if err != nil {
 		return nil, err
 	}

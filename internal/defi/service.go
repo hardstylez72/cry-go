@@ -10,17 +10,29 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/config"
 	"github.com/hardstylez72/cry/internal/traderjoe"
 	"github.com/pkg/errors"
 )
 
-const RetryMax = 1
-
 type Dict struct {
 	Stargate                 Stargate
 	TestNetBridgeSwapAddress common.Address
 	Merkly                   Merkly
+	Pancake                  Pancake
+	Across                   Across
+}
+
+type Across struct {
+	RouterETH   common.Address `json:"router"`
+	RouterToken common.Address `json:"routerToken"`
+}
+
+type Pancake struct {
+	Router  common.Address `json:"router"`
+	Factory common.Address `json:"factory"`
+	Quoter  common.Address `json:"quoter"`
 }
 
 type Merkly struct {
@@ -39,23 +51,42 @@ type Stargate struct {
 
 type EtheriumClient struct {
 	Cli              *ethclient.Client
-	Cfg              *ClientConfig
+	Cfg              *Config
 	RpcCli           *rpc.Client
 	traderJoeService *traderjoe.Service
 }
 
-type ClientConfig struct {
-	Network   Network
-	MainToken Token
-	MainNet   string
-	TokenMap  map[Token]common.Address
-	Dict      *Dict
-	Httpcli   *http.Client
-	TxViewFn  func(s string) string
-	NetworkId *big.Int
+func (c *EtheriumClient) Network() v1.Network {
+	return c.Cfg.Network
 }
 
-func NewEVMClient(c *ClientConfig) (*EtheriumClient, error) {
+func (c *EtheriumClient) GetNetworkId() *big.Int {
+	return c.Cfg.NetworkId
+}
+
+func (c *EtheriumClient) GetPublicKey(pk string, subType v1.ProfileSubType) (string, error) {
+	t, err := NewWalletTransactor(pk)
+	if err != nil {
+		return "", err
+	}
+	return t.WalletAddrHR, nil
+}
+
+type EstimateL1Gas func(ctx context.Context, data []byte) (*big.Int, error)
+
+type Config struct {
+	Network       Network
+	MainToken     Token
+	MainNet       string
+	TokenMap      map[Token]common.Address
+	Dict          Dict
+	Httpcli       *http.Client
+	TxViewFn      func(s string) string
+	NetworkId     *big.Int
+	EstimateL1Gas EstimateL1Gas
+}
+
+func NewEVMClient(c *Config) (*EtheriumClient, error) {
 
 	rpcClient, err := rpc.DialOptions(context.Background(), c.MainNet, rpc.WithHTTPClient(c.Httpcli))
 	if err != nil {

@@ -1,13 +1,12 @@
 package poligon
 
 import (
-	"context"
 	"math/big"
 	"net/http"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
@@ -59,26 +58,19 @@ func NewClient(c *ClientConfig) (*Client, error) {
 		config = c
 	}
 
-	ethcli, err := defi.NewEVMClient(&defi.ClientConfig{
+	ethcli, err := defi.NewEVMClient(&defi.Config{
 		Network:   v1.Network_POLIGON,
 		MainToken: v1.Token_MATIC,
-		MainNet:   defi.ResolveANKR(c.RPCEndpoint),
+		MainNet:   c.RPCEndpoint,
 		TokenMap:  TokenAddress,
-		Dict:      &Dict,
+		Dict:      Dict,
 		Httpcli:   config.HttpCli,
 		TxViewFn:  TxViewer,
+		NetworkId: bozdo.ChainMap[v1.Network_POLIGON],
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum main: "+c.RPCEndpoint)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	networkId, err := ethcli.GetNetworkId(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Client{defi: ethcli, NetworkId: networkId}, nil
+	return &Client{defi: ethcli, NetworkId: bozdo.ChainMap[v1.Network_POLIGON]}, nil
 }

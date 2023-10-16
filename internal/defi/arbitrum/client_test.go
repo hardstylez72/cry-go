@@ -1,8 +1,12 @@
 package arbitrum
 
 import (
+	"context"
+	"math/big"
 	"testing"
 
+	"github.com/hardstylez72/cry/internal/defi"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -12,6 +16,22 @@ func Test(t *testing.T) {
 	r, err := NewClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
+
+	res, err := r.Bridge(context.Background(), &defi.DefaultBridgeReq{
+		FromNetwork:  v1.Network_ARBITRUM,
+		ToNetwork:    v1.Network_Base,
+		PK:           tests.GetConfig().PK,
+		Amount:       big.NewInt(1e16),
+		FromToken:    v1.Token_ETH,
+		ToToken:      v1.Token_ETH,
+		Gas:          nil,
+		Slippage:     "0.1",
+		EstimateOnly: true,
+		Debug:        true,
+		SubType:      v1.ProfileSubType_Metamask,
+	}, v1.TaskType_AcrossBridge)
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
 
 	//tx, err := defi.NewWalletTransactor(tests.GetConfig().PK)
 

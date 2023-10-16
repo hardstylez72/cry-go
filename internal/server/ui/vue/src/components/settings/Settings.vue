@@ -38,8 +38,8 @@ export default defineComponent({
         Network.BinanaceBNB,
         Network.POLIGON,
         Network.Etherium,
-        Network.ZKSYNCLITE,
         Network.StarkNet,
+        Network.Base,
       ] as Network[],
     }
   },

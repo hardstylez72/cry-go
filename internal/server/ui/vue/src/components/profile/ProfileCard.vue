@@ -54,7 +54,7 @@
               <Balance :profile-id="profileId" :network="Network.AVALANCHE"/>
             </v-card-item>
             <v-card-item>
-              <Balance :profile-id="profileId" :network="Network.ZKSYNCLITE"/>
+              <Balance :profile-id="profileId" :network="Network.Base"/>
             </v-card-item>
             <v-card-item>
               <Balance :profile-id="profileId" :network="Network.ZKSYNCERA"/>

@@ -4,7 +4,6 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -34,7 +33,7 @@ func (c *Client) GetNetworkId() *big.Int {
 }
 
 func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
-	return c.defi.WaitTxComplete(ctx, common.HexToHash(tx))
+	return c.defi.WaitTxComplete(ctx, tx)
 }
 
 func (c *Client) Transfer(ctx context.Context, r *defi.TransferReq) (*defi.TransferRes, error) {
@@ -62,7 +61,7 @@ type L1L2BridgeRes struct {
 }
 
 func (c *Client) GetPublicKey(pk string, subType v1.ProfileSubType) (string, error) {
-	return c.defi.GetPublicKey(pk)
+	return c.defi.GetPublicKey(pk, subType)
 }
 
 func (c *Client) Network() v1.Network {

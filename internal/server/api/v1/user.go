@@ -10,12 +10,11 @@ import (
 	"github.com/hardstylez72/cry/internal/process/task"
 	"github.com/hardstylez72/cry/internal/server/repository/pg"
 	"github.com/hardstylez72/cry/internal/server/user"
+	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
-
-const lastSettingsUpdateTime = "2023-09-04 7:40:05"
 
 func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.GetUserResponse, error) {
 	userId, err := user.ResolveUserId(ctx)
@@ -23,7 +22,7 @@ func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.
 		return nil, status.New(codes.Unauthenticated, "").Err()
 	}
 
-	settingsLastUpdateDate, err := time.Parse(time.DateTime, lastSettingsUpdateTime)
+	settingsLastUpdateDate, err := time.Parse(time.DateTime, settings.LastSettingsUpdateTime)
 	if err != nil {
 		return nil, err
 	}

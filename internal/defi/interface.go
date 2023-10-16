@@ -3,6 +3,7 @@ package defi
 import (
 	"context"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
@@ -18,6 +19,12 @@ type Spec struct {
 	Addr     common.Address
 	TaskType v1.TaskType
 }
+
+var DeadLine = func() *big.Int {
+	return new(big.Int).SetInt64(time.Now().Add(time.Second * 20).Unix())
+}
+
+var ZeroAddress = common.HexToAddress("0x0000000000000000000000000000000000000000")
 
 type Networker interface {
 	TxViewFn(id string) string
@@ -58,7 +65,7 @@ type Swapper interface {
 type Bridger interface {
 	Networker
 	Bridge(ctx context.Context, req *DefaultBridgeReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)
-	WaitForConfirm(ctx context.Context, txId string) error
+	WaitForConfirm(ctx context.Context, txId string, taskType v1.TaskType, receiver string) error
 }
 
 type OrbiterSwapper interface {
@@ -199,4 +206,16 @@ type LPRes struct {
 	Approves  []bozdo.Transaction
 	ECost     *bozdo.EstimatedGasCost
 	TxDetails []bozdo.TxDetail
+}
+
+func CalcRate(from, to v1.Token, amIn, amOut *big.Int) *float64 {
+	fam := WeiToToken(amIn, from)
+	tam := WeiToToken(amOut, to)
+
+	ratio, _ := big.NewFloat(0).Quo(tam, fam).Float64()
+
+	if ratio < 1 {
+		ratio = 1 / ratio
+	}
+	return &ratio
 }

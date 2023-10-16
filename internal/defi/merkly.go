@@ -14,7 +14,7 @@ import (
 )
 
 func (c *EtheriumClient) newTxOpt(ctx context.Context, pk string) (*bind.TransactOpts, error) {
-	w, err := newWalletTransactor(pk)
+	w, err := NewWalletTransactor(pk)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (c *EtheriumClient) MerklyBridgeNft(ctx context.Context, req *merkly.Bridge
 	var _zroPaymentAddress common.Address //+
 	var _adapterParams []byte             //+
 
-	tr, err := newWalletTransactor(req.WalletPK)
+	tr, err := NewWalletTransactor(req.WalletPK)
 	if err != nil {
 		return nil, err
 	}
