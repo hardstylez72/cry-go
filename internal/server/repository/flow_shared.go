@@ -46,7 +46,8 @@ var (
 func (a *FlowShared) ToPB() (*v1.FlowShared, error) {
 
 	var f v1.FlowShared
-	if err := protojson.Unmarshal([]byte(a.Payload), &f); err != nil {
+	parser := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err := parser.Unmarshal([]byte(a.Payload), &f); err != nil {
 		return nil, err
 	}
 	p := &v1.FlowShared{

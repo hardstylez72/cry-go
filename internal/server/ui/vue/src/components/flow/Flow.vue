@@ -206,6 +206,7 @@ export default defineComponent({
           this.tasks.push(t.task)
         }
       })
+      this.validateForm()
     },
     async updateFlow() {
       if (!(await this.validateForm())) {

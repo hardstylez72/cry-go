@@ -3,7 +3,7 @@
     <v-container>
       <v-row>
         <v-col>
-          <NetworkSelector label="сеть" :items="networks" v-model="item.network" :disabled="disabled"/>
+          <NetworkSelector label="сеть" :items="GetFromNetworks" v-model="network" :disabled="disabled"/>
         </v-col>
         <v-col>
           <v-autocomplete
@@ -12,7 +12,7 @@
             label="direction"
             v-on:change="inputChanged"
             :rules="[required]"
-            :items="pairs"
+            :items="getPairs"
             v-model="pair"
             :disabled="disabled"
             item-title="name"
@@ -42,26 +42,20 @@ import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
   components: {NetworkSelector}
 })
 export default class PancakeSwap extends DefaultSwapTask {
-
-  networks = [Network.ZKSYNCERA, Network.Base]
-
-  item: DefaultSwap = {
-    network: Network.ZKSYNCERA,
-    amount: {
-      sendAll: true,
-    },
-    toToken: Token.USDC,
-    fromToken: Token.ETH,
-  }
+  
   pairs: SwapPair[] = [
-    tokenSwapPair(Token.ETH, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.ETH),
 
-    tokenSwapPair(Token.USDCBridged, Token.ETH),
-    tokenSwapPair(Token.ETH, Token.USDCBridged),
+    tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.USDC),
+    tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.ETH),
 
-    tokenSwapPair(Token.USDCBridged, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.USDCBridged),
+    tokenSwapPair(Network.Base, Token.ETH, Token.USDC),
+    tokenSwapPair(Network.Base, Token.USDC, Token.ETH),
+
+    tokenSwapPair(Network.Base, Token.USDCBridged, Token.ETH),
+    tokenSwapPair(Network.Base, Token.ETH, Token.USDCBridged),
+
+    tokenSwapPair(Network.Base, Token.USDCBridged, Token.USDC),
+    tokenSwapPair(Network.Base, Token.USDC, Token.USDCBridged),
   ]
 
   created() {
@@ -86,7 +80,10 @@ export default class PancakeSwap extends DefaultSwapTask {
     if (this.task) {
       if (this.task.pancakeSwapTask) {
         this.item = this.task.pancakeSwapTask
-        this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
+        this.network = this.item.network
+        if (this.item.network && this.item.fromToken && this.item.toToken) {
+          this.pair = tokenSwapPair(this.item.network, this.item.fromToken, this.item.toToken)
+        }
         this.$emit('taskChanged', this.getTask())
       }
     }

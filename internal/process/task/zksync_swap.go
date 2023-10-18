@@ -17,7 +17,8 @@ type SyncSwapTask struct {
 	*ZkSyncSwap
 }
 
-func NewOdosSwapTask() *ZkSyncSwap {
+// deprecated
+func NewOdosSwapTaskZksync() *ZkSyncSwap {
 	return NewZkSyncSwapTask(v1.TaskType_OdosSwap, func(a *Input) (*v1.DefaultSwap, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_OdosSwapTask)
 		if !ok {
@@ -117,6 +118,7 @@ func NewZkSwapTask() *ZkSyncSwap {
 	})
 }
 
+// deprecated
 func NewPancakeZkSyncSwapTask() *ZkSyncSwap {
 	return NewZkSyncSwapTask(v1.TaskType_PancakeSwap, func(a *Input) (*v1.DefaultSwap, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_PancakeSwapTask)

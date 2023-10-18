@@ -36,6 +36,9 @@ var Dict = defi.Dict{
 		RouterETH:   common.HexToAddress("0x269727F088F16E1Aea52Cf5a97B1CD41DAA3f02D"),
 		RouterToken: common.HexToAddress("0x09aea4b2242abC8bb4BB78D537A67a245A7bEC64"),
 	},
+	Odos: defi.Odos{
+		Router: common.HexToAddress("0x19cEeAd7105607Cd444F5ad10dd51356436095a1"),
+	},
 }
 
 type Client struct {

@@ -59,22 +59,22 @@ export default class TraderJoeSwap extends DefaultSwapTask {
     fromToken: Token.USDC,
   }
   pairs: SwapPair[] = [
-    tokenSwapPair(Token.STG, Token.ETH),
+    tokenSwapPair(Network.ARBITRUM, Token.STG, Token.ETH),
 
-    tokenSwapPair(Token.ETH, Token.USDT),
-    tokenSwapPair(Token.USDT, Token.ETH),
+    tokenSwapPair(Network.ARBITRUM, Token.ETH, Token.USDT),
+    tokenSwapPair(Network.ARBITRUM, Token.USDT, Token.ETH),
 
-    tokenSwapPair(Token.ETH, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.ETH),
+    tokenSwapPair(Network.ARBITRUM, Token.ETH, Token.USDC),
+    tokenSwapPair(Network.ARBITRUM, Token.USDC, Token.ETH),
 
-    tokenSwapPair(Token.USDT, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.USDT),
+    tokenSwapPair(Network.ARBITRUM, Token.USDT, Token.USDC),
+    tokenSwapPair(Network.ARBITRUM, Token.USDC, Token.USDT),
 
-    tokenSwapPair(Token.USDC, Token.USDCBridged),
-    tokenSwapPair(Token.USDCBridged, Token.USDC),
+    tokenSwapPair(Network.ARBITRUM, Token.USDC, Token.USDCBridged),
+    tokenSwapPair(Network.ARBITRUM, Token.USDCBridged, Token.USDC),
 
-    tokenSwapPair(Token.ETH, Token.USDCBridged),
-    tokenSwapPair(Token.USDCBridged, Token.ETH),
+    tokenSwapPair(Network.ARBITRUM, Token.ETH, Token.USDCBridged),
+    tokenSwapPair(Network.ARBITRUM, Token.USDCBridged, Token.ETH),
   ]
 
   created() {
@@ -99,7 +99,7 @@ export default class TraderJoeSwap extends DefaultSwapTask {
     if (this.task) {
       if (this.task.traderJoeSwapTask) {
         this.item = this.task.traderJoeSwapTask
-        this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
+        this.pair = tokenSwapPair(this.item.network, this.item.fromToken, this.item.toToken)
         this.$emit('taskChanged', this.getTask())
       }
     }

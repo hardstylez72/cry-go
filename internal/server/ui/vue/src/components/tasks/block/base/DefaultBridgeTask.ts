@@ -5,6 +5,7 @@ import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
 import {BridgePair, tokenBridgePair, tokenSwapPair} from "@/components/helper";
 import {Component, Prop, Vue, Watch} from "vue-facing-decorator";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
 
 @Component({
@@ -56,7 +57,7 @@ import {Component, Prop, Vue, Watch} from "vue-facing-decorator";
     </v-card-actions>
   `,
   name: 'TaskDefaultBridge',
-  components: {AmountInput, WEIInputField},
+  components: {NetworkSelector, AmountInput, WEIInputField},
   emits: ['taskChanged'],
 })
 export default class TaskDefaultBridge extends Vue {
@@ -121,14 +122,14 @@ export default class TaskDefaultBridge extends Vue {
   pairs: BridgePair[] = []
   pair = null as BridgePair | null
   item: TaskSignature = {
-    fromNetwork: Network.ZKSYNCERA,
-    toNetwork: Network.ZKSYNCERA,
+    fromNetwork: null,
+    toNetwork: null,
     received: false,
     amount: {
       sendAll: true,
     },
-    toToken: Token.USDC,
-    fromToken: Token.ETH,
+    toToken: null,
+    fromToken: null,
   }
 
   get taskProps() {

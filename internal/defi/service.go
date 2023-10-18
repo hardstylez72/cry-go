@@ -22,6 +22,11 @@ type Dict struct {
 	Merkly                   Merkly
 	Pancake                  Pancake
 	Across                   Across
+	Odos                     Odos
+}
+
+type Odos struct {
+	Router common.Address
 }
 
 type Across struct {

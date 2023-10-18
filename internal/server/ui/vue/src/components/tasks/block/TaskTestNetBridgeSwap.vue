@@ -1,9 +1,6 @@
 <template>
   <v-card-actions>
     <v-container>
-      <div class="mb-3">use <a :href="link.testnetbridge" target="_blank">TestNetBridge</a> to see
-        available swap options
-      </div>
       <v-row>
         <v-col>
           <v-select

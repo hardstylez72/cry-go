@@ -1,23 +1,13 @@
 <template>
   <v-card-actions>
     <v-container>
-      <div class="mb-3">use <a :href="link.syncSwap" target="_blank">SyncSwap</a> to see
-        available swap
-        options
-      </div>
       <v-row>
         <v-col>
-          <v-select
-            ref="stargate-bridge-form"
-            density="compact"
-            variant="outlined"
-            label="network"
-            v-on:change="inputChanged"
-            :rules="[required]"
+          <NetworkSelector
+            label="from network"
             :items="networks"
-            v-model="item.network"
             :disabled="disabled"
-            hide-details
+            v-model="item.network"
           />
         </v-col>
       </v-row>
@@ -65,10 +55,11 @@ import WEIInputField from "@/components/WEIInputField.vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
 import {link} from "@/components/tasks/links";
 import {required} from "@/components/tasks/menu/helper";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
 export default defineComponent({
   name: "TaskWethSwap",
-  components: {AmountInput, WEIInputField},
+  components: {NetworkSelector, AmountInput, WEIInputField},
   emits: ['taskChanged'],
   props: {
     weight: {

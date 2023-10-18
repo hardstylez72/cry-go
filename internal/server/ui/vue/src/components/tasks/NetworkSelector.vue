@@ -7,7 +7,6 @@
     :items="items"
     v-model="selected"
     :disabled="disabled"
-    hide-details
   >
     <template v-slot:item="{item, props}">
       <v-list-item v-bind="props" title="">

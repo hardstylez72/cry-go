@@ -3,16 +3,11 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-select
-            ref="stargate-bridge-form"
-            density="compact"
-            variant="outlined"
-            label="network"
-            v-on:change="inputChanged"
-            :rules="[required]"
-            :items="networks"
-            v-model="item.network"
-            :disabled="true"
+          <NetworkSelector
+            label="from network"
+            :items="GetFromNetworks"
+            :disabled="disabled"
+            v-model="network"
           />
         </v-col>
         <v-col>
@@ -22,7 +17,7 @@
             label="direction"
             v-on:change="inputChanged"
             :rules="[required]"
-            :items="pairs"
+            :items="getPairs"
             v-model="pair"
             :disabled="disabled"
             item-title="name"
@@ -48,29 +43,18 @@ import {Component} from "vue-facing-decorator";
 
 @Component({name: 'IzumiSwap'})
 export default class IzumiSwap extends DefaultSwapTask {
-
-  networks = [Network.ZKSYNCERA]
-
-  item: DefaultSwap = {
-    network: Network.ZKSYNCERA,
-    amount: {
-      sendAll: true,
-    },
-    toToken: Token.USDC,
-    fromToken: Token.ETH,
-  }
   pairs: SwapPair[] = [
-    tokenSwapPair(Token.ETH, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.ETH),
+    tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.USDC),
+    tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.ETH),
 
-    tokenSwapPair(Token.ETH, Token.IZI),
-    tokenSwapPair(Token.IZI, Token.ETH),
+    tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.IZI),
+    tokenSwapPair(Network.ZKSYNCERA, Token.IZI, Token.ETH),
 
-    tokenSwapPair(Token.WETH, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.WETH),
+    tokenSwapPair(Network.ZKSYNCERA, Token.WETH, Token.USDC),
+    tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.WETH),
 
-    tokenSwapPair(Token.WETH, Token.IZI),
-    tokenSwapPair(Token.IZI, Token.WETH),
+    tokenSwapPair(Network.ZKSYNCERA, Token.WETH, Token.IZI),
+    tokenSwapPair(Network.ZKSYNCERA, Token.IZI, Token.WETH),
   ]
 
   created() {
@@ -95,7 +79,10 @@ export default class IzumiSwap extends DefaultSwapTask {
     if (this.task) {
       if (this.task.izumiSwapTask) {
         this.item = this.task.izumiSwapTask
-        this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
+        this.network = this.item.network
+        if (this.item.network && this.item.fromToken && this.item.toToken) {
+          this.pair = tokenSwapPair(this.item.network, this.item.fromToken, this.item.toToken)
+        }
         this.$emit('taskChanged', this.getTask())
       }
     }

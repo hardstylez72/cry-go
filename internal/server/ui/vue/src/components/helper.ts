@@ -230,13 +230,15 @@ export const shuffleArray = <T = any>(array: T[]) => {
 }
 
 export interface SwapPair {
+  network: Network
   name: string
   from: Token
   to: Token
 }
 
-export const tokenSwapPair = (t1: Token, t2: Token): SwapPair => {
+export const tokenSwapPair = (n: Network, t1: Token, t2: Token): SwapPair => {
   return {
+    network: n,
     name: `${t1} -> ${t2}`,
     from: t1,
     to: t2

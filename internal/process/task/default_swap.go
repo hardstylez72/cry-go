@@ -33,6 +33,16 @@ func NewPancakeSwapTask() *DefaultSwapTask {
 	})
 }
 
+func NewOdosSwapTask() *DefaultSwapTask {
+	return NewDefaultSwapTaskTask(v1.TaskType_OdosSwap, func(a *Input) (*v1.DefaultSwap, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_OdosSwapTask)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_OdosSwapTask) call an ambulance!")
+		}
+		return l.OdosSwapTask, nil
+	})
+}
+
 type DefaultSwapTask struct {
 	taskType  v1.TaskType
 	extractor func(a *Input) (*v1.DefaultSwap, error)

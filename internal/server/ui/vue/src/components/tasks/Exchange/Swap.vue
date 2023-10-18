@@ -13,7 +13,7 @@
             density="compact"
             variant="outlined"
             label="direction"
-            :items="pairs"
+            :items="getPairs"
             :rules="[required]"
             v-model="pair"
             :disabled="disabled"
@@ -40,6 +40,7 @@ import {ExchangeType, Withdrawer} from "@/generated/withdraw";
 import AmountInput from "@/components/tasks/AmountInput.vue";
 import {required} from "@/components/tasks/menu/helper";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
+import {Network} from "@/generated/process";
 
 
 export default defineComponent({
@@ -81,13 +82,13 @@ export default defineComponent({
 
   data() {
     return {
-      pair: tokenSwapPair(Token.ETH, Token.USDC) as SwapPair,
+      pair: tokenSwapPair(Network.StarkNet, Token.ETH, Token.USDC) as SwapPair,
       pairs: [
-        tokenSwapPair(Token.ETH, Token.USDC),
-        tokenSwapPair(Token.USDC, Token.ETH),
+        tokenSwapPair(Network.StarkNet, Token.ETH, Token.USDC),
+        tokenSwapPair(Network.StarkNet, Token.USDC, Token.ETH),
 
-        tokenSwapPair(Token.ETH, Token.USDT),
-        tokenSwapPair(Token.USDT, Token.ETH),
+        tokenSwapPair(Network.StarkNet, Token.ETH, Token.USDT),
+        tokenSwapPair(Network.StarkNet, Token.USDT, Token.ETH),
 
       ] as SwapPair[],
       accounts: [] as Withdrawer[],

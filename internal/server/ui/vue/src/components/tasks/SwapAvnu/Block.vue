@@ -3,7 +3,7 @@
     <v-container>
       <v-row>
         <v-col>
-          <NetworkSelector label="сеть" :items="networks" v-model="item.network" :disabled="true"/>
+          <NetworkSelector label="сеть" :items="GetFromNetworks" v-model="network" :disabled="disabled"/>
         </v-col>
         <v-col>
           <v-autocomplete
@@ -12,7 +12,7 @@
             label="direction"
             v-on:change="inputChanged"
             :rules="[required]"
-            :items="pairs"
+            :items="getPairs"
             v-model="pair"
             :disabled="disabled"
             item-title="name"
@@ -34,8 +34,9 @@ import {Task, TaskType, Token} from "@/generated/flow";
 import {taskProps} from "@/components/tasks/tasks";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
 import DefaultSwapTask from "@/components/tasks/block/base/DefaultSwapTask.js";
-import {Component, toNative} from "vue-facing-decorator";
+import {Component} from "vue-facing-decorator";
 import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
+import {Network} from "@/generated/process";
 
 @Component({
   name: 'AvnuSwap',
@@ -44,14 +45,14 @@ import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 export default class AvnuSwap extends DefaultSwapTask {
 
   pairs: SwapPair[] = [
-    tokenSwapPair(Token.ETH, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.ETH),
+    tokenSwapPair(Network.StarkNet, Token.ETH, Token.USDC),
+    tokenSwapPair(Network.StarkNet, Token.USDC, Token.ETH),
 
-    tokenSwapPair(Token.ETH, Token.USDT),
-    tokenSwapPair(Token.USDT, Token.ETH),
+    tokenSwapPair(Network.StarkNet, Token.ETH, Token.USDT),
+    tokenSwapPair(Network.StarkNet, Token.USDT, Token.ETH),
 
-    tokenSwapPair(Token.USDC, Token.USDT),
-    tokenSwapPair(Token.USDT, Token.USDC),
+    tokenSwapPair(Network.StarkNet, Token.USDC, Token.USDT),
+    tokenSwapPair(Network.StarkNet, Token.USDT, Token.USDC),
   ]
 
   getTask(): Task {
@@ -70,7 +71,10 @@ export default class AvnuSwap extends DefaultSwapTask {
     if (this.task) {
       if (this.task.avnuSwapTask) {
         this.item = this.task.avnuSwapTask
-        this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
+        this.network = this.item.network
+        if (this.item.network && this.item.fromToken && this.item.toToken) {
+          this.pair = tokenSwapPair(this.item.network, this.item.fromToken, this.item.toToken)
+        }
         this.$emit('taskChanged', this.getTask())
       }
     }

@@ -3,6 +3,7 @@ package base
 import (
 	"context"
 	"math/big"
+	"net/http"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
@@ -11,6 +12,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/base/pancake"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/odos"
 	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"go.uber.org/zap"
@@ -18,21 +20,31 @@ import (
 
 func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
 
+	wt, err := defi.NewWalletTransactor(req.WalletPK)
+	if err != nil {
+		return nil, err
+	}
+
 	var data *bozdo.TxData
-	var err error
 	switch taskType {
 	case v1.TaskType_PancakeSwap:
 		cli := &pancake.Swapper{EtheriumClient: c.defi}
+		data, err = cli.MakeSwapTx(ctx, req)
+	case v1.TaskType_OdosSwap:
+		cli := &odos.OdosMaker{
+			CA:       c.defi.Cfg.Dict.Odos.Router,
+			TokenMap: c.defi.Cfg.TokenMap,
+			CliHttp:  &http.Client{},
+			ChainId:  c.NetworkId,
+			Network:  c.Network(),
+			Addr:     wt.WalletAddr,
+		}
 		data, err = cli.MakeSwapTx(ctx, req)
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	wt, err := defi.NewWalletTransactor(req.WalletPK)
-	if err != nil {
-		return nil, err
-	}
 	approve, err := c.defi.TokenLimitChecker(ctx, &defi.TokenLimitCheckerReq{
 		Token:       req.FromToken,
 		Wallet:      wt,
@@ -129,7 +141,7 @@ func (c *Client) LondonReadyTx(ctx context.Context, opt *TxOpt, data *bozdo.TxDa
 	dynamic.Value = bozdo.BigIntSum(dynamic.Value)
 
 	r := &bozdo.DefaultRes{
-		ECost: defi.Estimate(types.NewTx(&dynamic), nil, "", nil),
+		ECost: defi.Estimate(types.NewTx(&dynamic), nil, "", data.Details),
 	}
 
 	r.ECost.Details = append(r.ECost.Details, bozdo.NewProtocolFeeDetails(l1Fee, v1.Network_Base, c.defi.Cfg.MainToken))

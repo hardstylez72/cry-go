@@ -8,6 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/odos"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
@@ -21,10 +22,12 @@ func TestOdos(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	m := odosMaker{
-		CA:      common.HexToAddress("0x4bba932e9792a2b917d47830c93a9bc79320e4f7"),
-		Cli:     cli,
-		CliHttp: &http.Client{},
+	m := odos.OdosMaker{
+		CA:       common.HexToAddress("0x4bba932e9792a2b917d47830c93a9bc79320e4f7"),
+		TokenMap: cli.Cfg.TokenMap,
+		CliHttp:  &http.Client{},
+		ChainId:  cli.NetworkId,
+		Addr:     tests.GetConfig().Wallet,
 	}
 
 	req := &defi.DefaultSwapReq{

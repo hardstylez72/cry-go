@@ -509,7 +509,7 @@ func (d *Dispatcher) estimateZkSyncSwapRatio(ctx context.Context, t1, t2 v1.Toke
 		task.NewVeSyncSwapTask(),
 		task.NewIzumiSwapTask(),
 		task.NewSpaceFiSwapTask(),
-		task.NewOdosSwapTask(),
+		task.NewOdosSwapTaskZksync(),
 	}
 
 	for _, tasker := range tasks {

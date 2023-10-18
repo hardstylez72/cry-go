@@ -51,6 +51,7 @@ export default defineComponent({
         }
       })
       this.item.label = label
+      this.validateForm()
     },
     async validateForm(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага

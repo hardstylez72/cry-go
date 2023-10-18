@@ -3,16 +3,11 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-select
-            ref="stargate-bridge-form"
-            density="compact"
-            variant="outlined"
-            label="network"
-            v-on:change="inputChanged"
-            :rules="[required]"
-            :items="networks"
-            v-model="item.network"
-            :disabled="true"
+          <NetworkSelector
+            label="from network"
+            :items="GetFromNetworks"
+            :disabled="disabled"
+            v-model="network"
           />
         </v-col>
         <v-col>
@@ -22,7 +17,7 @@
             label="direction"
             v-on:change="inputChanged"
             :rules="[required]"
-            :items="pairs"
+            :items="getPairs"
             v-model="pair"
             :disabled="disabled"
             item-title="name"
@@ -40,28 +35,19 @@
 </template>
 
 <script lang="ts">
-import {DefaultSwap, Network, Task, TaskType, Token} from "@/generated/flow";
+import {DefaultSwap, Task, TaskType, Token} from "@/generated/flow";
 import {taskProps} from "@/components/tasks/tasks";
 import {SwapPair, tokenSwapPair} from "@/components/helper";
 import DefaultSwapTask from "@/components/tasks/block/base/DefaultSwapTask.js";
-import {Component, toNative} from "vue-facing-decorator";
+import {Component} from "vue-facing-decorator";
+import {Network} from "@/generated/process";
 
 @Component({name: 'EzkaliburSwap'})
 export default class EzkaliburSwap extends DefaultSwapTask {
 
-  networks = [Network.ZKSYNCERA]
-
-  item: DefaultSwap = {
-    network: Network.ZKSYNCERA,
-    amount: {
-      sendAll: true,
-    },
-    toToken: Token.USDC,
-    fromToken: Token.ETH,
-  }
   pairs: SwapPair[] = [
-    tokenSwapPair(Token.ETH, Token.USDC),
-    tokenSwapPair(Token.USDC, Token.ETH),
+    tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.USDC),
+    tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.ETH),
   ]
 
   created() {
@@ -86,7 +72,10 @@ export default class EzkaliburSwap extends DefaultSwapTask {
     if (this.task) {
       if (this.task.ezkaliburSwapTask) {
         this.item = this.task.ezkaliburSwapTask
-        this.pair = tokenSwapPair(this.item.fromToken, this.item.toToken)
+        this.network = this.item.network
+        if (this.item.network && this.item.fromToken && this.item.toToken) {
+          this.pair = tokenSwapPair(this.item.network, this.item.fromToken, this.item.toToken)
+        }
         this.$emit('taskChanged', this.getTask())
       }
     }

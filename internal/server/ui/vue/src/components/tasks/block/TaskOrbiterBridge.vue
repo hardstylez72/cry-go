@@ -6,27 +6,19 @@
       </div>
       <v-row>
         <v-col cols="6">
-          <v-select
-            density="compact"
-            variant="outlined"
+          <NetworkSelector
             label="from network"
-            :rules="[required]"
             :items="getFromNetworks"
-            v-model="item.fromNetwork"
             :disabled="disabled"
-            hide-details
+            v-model="item.fromNetwork"
           />
         </v-col>
         <v-col cols="6">
-          <v-select
-            density="compact"
-            variant="outlined"
-            label="to network"
-            :rules="[required]"
+          <NetworkSelector
+            label="from network"
             :items="getToNetworks"
-            v-model="item.toNetwork"
             :disabled="disabled"
-            hide-details
+            v-model="item.toNetwork"
           />
         </v-col>
       </v-row>
@@ -79,10 +71,11 @@ import {orbiterService} from "@/generated/services";
 import {required} from "@/components/tasks/menu/helper";
 import {GetSwapOptionsRes} from "@/generated/orbiter";
 import {link} from "@/components/tasks/links";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
 export default defineComponent({
   name: "TaskSwap1inch",
-  components: {AmountInput, WEIInputField},
+  components: {NetworkSelector, AmountInput, WEIInputField},
   emits: ['taskChanged'],
   props: {
     weight: {
