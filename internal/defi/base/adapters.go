@@ -61,3 +61,7 @@ func (c *Client) WaitForConfirm(ctx context.Context, txId string, taskType v1.Ta
 		return errors.New("bridge unsupported")
 	}
 }
+
+func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) (*defi.OrbiterBridgeRes, error) {
+	return c.defi.OrbiterBridge(ctx, req)
+}

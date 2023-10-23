@@ -17,8 +17,8 @@ import MenuSnapshotTask from "@/components/tasks/menu/Snapshot.vue";
 import MenuTaskStargateBridge from "@/components/tasks/BridgeStargate/Menu.vue";
 import MenuTaskTestNetBridge from "@/components/tasks/menu/MenuTaskTestNetBridge.vue";
 import TaskZkSyncOfficialBridgeToEth from "@/components/tasks/block/TaskZkSyncOfficialBridgeToEth.vue";
-import TaskOrbiterBridge from "@/components/tasks/block/TaskOrbiterBridge.vue";
-import MenuTaskOrbiterBridge from "@/components/tasks/menu/MenuTaskOrbiterBridge.vue";
+import TaskOrbiterBridge from "@/components/tasks/BridgeOrbiter/Block.vue";
+import MenuTaskOrbiterBridge from "@/components/tasks/BridgeOrbiter/Menu.vue";
 import MenuZkSyncOfficialBridgeToEth from "@/components/tasks/menu/MenuZkSyncOfficialBridgeToEth.vue";
 import TaskZkSyncOfficialBridgeFromEth from "@/components/tasks/block/TaskZkSyncOfficialBridgeFromEth.vue";
 import MenuZkSyncOfficialBridgeFromEth from "@/components/tasks/menu/MenuZkSyncOfficialBridgeFromEth.vue";
@@ -80,6 +80,7 @@ import {SwapFibrousSpec} from "@/components/tasks/SwapFibrous";
 import {LPZkLendLPSpec} from "@/components/tasks/LPZkLend";
 import {PancakeSwapSpec} from "@/components/tasks/SwapPancake";
 import {SwapOdosSpec} from "@/components/tasks/SwapOdos";
+import {OrbiterBridgeSpec} from "@/components/tasks/BridgeOrbiter";
 
 
 export interface TaskArg {
@@ -220,26 +221,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   Mock: deprecated,
   OkexBinance: deprecated,
   Swap1inch: deprecated,
-  OrbiterBridge: {
-    deprecated: false,
-    canBeEstimated: true,
-    menu: MenuTaskOrbiterBridge,
-    component: TaskOrbiterBridge,
-    descFn(task) {
-      let p = task.orbiterBridgeTask
-      return ` (from ${p?.fromNetwork} ${p?.fromToken} to ${p?.toNetwork} ${p?.toToken})`
-    },
-    service: {
-      name: 'Orbiter',
-      img: '/icons/orbiter.ico',
-      link: 'https://www.orbiter.finance/',
-      op: 'bridge',
-    },
-    job: TaskJob.Bridge,
-    networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>(Universal),
-    profileType: new Set([ProfileType.EVM])
-  },
+  OrbiterBridge: OrbiterBridgeSpec,
   ZkSyncOfficialBridgeFromEthereum: {
     deprecated: false,
     canBeEstimated: true,

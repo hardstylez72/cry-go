@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	"github.com/hardstylez72/cry/internal/orbiter"
+	"github.com/hardstylez72/cry/internal/defi/orbiter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
 

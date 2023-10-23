@@ -4,6 +4,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/arbitrum"
 	"github.com/hardstylez72/cry/internal/defi/avalanche"
+	"github.com/hardstylez72/cry/internal/defi/base"
 	"github.com/hardstylez72/cry/internal/defi/bnb"
 	"github.com/hardstylez72/cry/internal/defi/etherium"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
@@ -37,6 +38,8 @@ func NewOrbiterSwapper(network v1.Network, c *BaseClientConfig) (defi.OrbiterSwa
 		cli, err = avalanche.NewClient(&avalanche.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_ZKSYNCERA:
 		cli, err = zksyncera.NewMainNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+	case v1.Network_Base:
+		cli, err = base.NewClient(&base.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	default:
 		return nil, errors.New("network is not supported for Transfer")
 	}

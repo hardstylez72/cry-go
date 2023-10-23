@@ -6,7 +6,7 @@ import (
 	"time"
 
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
-	"github.com/hardstylez72/cry/internal/orbiter"
+	"github.com/hardstylez72/cry/internal/defi/orbiter"
 	"github.com/hardstylez72/cry/internal/pay"
 	"github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"

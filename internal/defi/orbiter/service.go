@@ -36,12 +36,15 @@ type Service struct {
 func NewService() (*Service, error) {
 
 	supportedTokens.Set(v1.Token_ETH)
+	supportedTokens.Set(v1.Token_USDC)
 	supportedNetworks.Set(v1.Network_ZKSYNCLITE)
 	supportedNetworks.Set(v1.Network_OPTIMISM)
 	supportedNetworks.Set(v1.Network_POLIGON)
 	supportedNetworks.Set(v1.Network_ARBITRUM)
 	supportedNetworks.Set(v1.Network_Etherium)
 	supportedNetworks.Set(v1.Network_ZKSYNCERA)
+	supportedNetworks.Set(v1.Network_Base)
+	supportedNetworks.Set(v1.Network_ArbitrumNova)
 
 	chains := make([]Chain, 0)
 	if err := json.Unmarshal(chainsJson, &chains); err != nil {
@@ -235,6 +238,10 @@ func MakeChainMap(in []Chain) *lib.BiMap[v1.Network, string] {
 			out.Set(v1.Network_ZKSYNCERA, c.InternalId)
 		case "56":
 			out.Set(v1.Network_BinanaceBNB, c.InternalId)
+		case "8453":
+			out.Set(v1.Network_Base, c.InternalId)
+		case "42170":
+			out.Set(v1.Network_ArbitrumNova, c.InternalId)
 		}
 	}
 
