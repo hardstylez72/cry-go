@@ -206,14 +206,27 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 		return nil, errors.Wrap(err, "zksync2.NewWallet")
 	}
 
+	addr := common.HexToAddress(r.ToAddr)
+
+	_, err = c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
+		Token:       r.Token,
+		WalletPK:    r.Pk,
+		Amount:      r.Amount,
+		SpenderAddr: to,
+		Gas:         nil,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "zksync2.TokenLimitChecker")
+	}
+
 	tokenAbi, err := abi.JSON(strings.NewReader(erc20.IERC20MetaData.ABI))
 	if err != nil {
 		return nil, fmt.Errorf("failed to load ethTokenAbi: %w", err)
 	}
 
-	data, err := tokenAbi.Pack("transfer", r.ToAddr, r.Amount)
+	data, err := tokenAbi.Pack("transfer", addr, r.Amount)
 	if err != nil {
-		return nil, fmt.Errorf("failed to pack withdraw function: %w", err)
+		return nil, fmt.Errorf("failed to pack transfer function: %w", err)
 	}
 	tx := CreateFunctionCallTransaction(
 		w.Address(),
@@ -232,9 +245,6 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 
 	res.ECost = estimate
 
-	if r.EstimateOnly {
-		return res, nil
-	}
 	if r.EstimateOnly {
 		return res, nil
 	}

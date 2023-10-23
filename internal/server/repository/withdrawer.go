@@ -212,8 +212,7 @@ values (:withdrawer_id, :okex_deposit_addr, :profile_id, :user_id, :sub_type)`
 
 func (r *pgRepository) OkexDepositAddrDetach(ctx context.Context, req *OkexDepositAddr) error {
 	q := `delete from okex_deposit_addr_profile 
-where  withdrawer_id = :withdrawer_id 
-    and okex_deposit_addr = :okex_deposit_addr
+where okex_deposit_addr = :okex_deposit_addr
     and profile_id = :profile_id
   	and sub_type = :sub_type
      and user_id = :user_id`

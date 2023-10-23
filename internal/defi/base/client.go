@@ -17,7 +17,7 @@ const (
 
 // docs https://arbiscan.io/tokens?p=1
 var TokenAddress = map[defi.Token]common.Address{
-	v1.Token_ETH:         common.HexToAddress("0x4200000000000000000000000000000000000006"),
+	v1.Token_ETH:         common.HexToAddress("0x0000000000000000000000000000000000000000"),
 	v1.Token_WETH:        common.HexToAddress("0x4200000000000000000000000000000000000006"),
 	v1.Token_USDC:        common.HexToAddress("0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"),
 	v1.Token_USDCBridged: common.HexToAddress("0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca"),

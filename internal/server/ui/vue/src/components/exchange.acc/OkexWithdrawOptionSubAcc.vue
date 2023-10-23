@@ -1,7 +1,7 @@
 <template>
   <Loader v-if="listLoading"/>
   <div v-else>
-    <v-form ref="formm">
+    <v-form ref="formm" v-if="!hideBase">
       <v-row>
         <v-col><b>Status</b>: {{ withdrawerStatus }}</v-col>
       </v-row>
@@ -141,6 +141,11 @@ export default defineComponent({
       required: true,
       type: String
     },
+    hideBase: {
+      required: false,
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     return {

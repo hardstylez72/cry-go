@@ -13,7 +13,7 @@
             density="compact"
             variant="outlined"
             label="direction"
-            :items="getPairs"
+            :items="pairs"
             :rules="[required]"
             v-model="pair"
             :disabled="disabled"

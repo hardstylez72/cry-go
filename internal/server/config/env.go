@@ -44,7 +44,8 @@ type (
 		TestEVMWalletId      string
 		TestStarkNetWalletId string
 
-		AnkrToken string
+		WebshareProxyUser     string
+		WebshareProxyPassword string
 	}
 
 	App struct {
@@ -124,7 +125,9 @@ func Load() (*Config, error) {
 		Standalone:           mayenv("STANDALONE", "false") == "true",
 		TestEVMWalletId:      mustenv("TEST_EVM_WALLET_ID"),
 		TestStarkNetWalletId: mustenv("TEST_STARKNET_WALLET_ID"),
-		AnkrToken:            mayenv("ANKR_TOKEN", ""),
+
+		WebshareProxyUser:     mustenv("WEBSHARE_PROXY_USER"),
+		WebshareProxyPassword: mustenv("WEBSHARE_PROXY_PASSWORD"),
 	}
 
 	CFG = c

@@ -3,6 +3,7 @@ package socks5
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 
@@ -25,7 +26,7 @@ func (p *Proxy) GetIpStat(ctx context.Context) (*GetIpStatRes, error) {
 	ip := ""
 
 	sub := strings.Split(p.Config.Host, ":")
-	if len(sub) != 2 {
+	if len(sub) != 2 || sub[1] == "80" {
 		res, err := p.GetIp(ctx)
 		if err != nil {
 			return nil, err
@@ -57,14 +58,13 @@ func (p *Proxy) GetIpStat(ctx context.Context) (*GetIpStatRes, error) {
 type GetIpRes struct {
 	Success bool   `json:"success"`
 	Ip      string `json:"ip"`
-	Type    string `json:"type"`
 }
 
 func (p *Proxy) GetIp(ctx context.Context) (*GetIpRes, error) {
 
 	//add,err := net.LookupIP("ispycode.com")
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://api4.my-ip.io/ip.json", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://ipv4.webshare.io/", nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "http.NewRequestWithContext")
 	}
@@ -78,10 +78,13 @@ func (p *Proxy) GetIp(ctx context.Context) (*GetIpRes, error) {
 		defer res.Body.Close()
 	}
 
-	var r GetIpRes
-
-	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		return nil, errors.Wrap(err, "json.NewDecoder().Decode()")
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "ReadAll")
 	}
-	return &r, nil
+
+	return &GetIpRes{
+		Success: true,
+		Ip:      string(b),
+	}, nil
 }

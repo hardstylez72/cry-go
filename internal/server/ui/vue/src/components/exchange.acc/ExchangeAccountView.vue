@@ -25,7 +25,16 @@
               <ProxyInput v-model="withdrawer.proxy" :required="true"/>
             </v-col>
           </v-row>
-          
+          <v-row v-if="withdrawer.exchangeType === ExchangeType.Okex">
+            <v-expansion-panels>
+              <v-expansion-panel title="`Депозитные адреса">
+                <v-expansion-panel-text>
+                  <OkexWithdrawOptionSubAcc :id="withdrawer.id" :hide-base="true"/>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-row>
+
           <v-row class="d-flex justify-center my-1">
             <v-col>
               <div>

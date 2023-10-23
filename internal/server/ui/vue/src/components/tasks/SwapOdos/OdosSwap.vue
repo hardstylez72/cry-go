@@ -47,6 +47,9 @@ export default class OdosSwap extends DefaultSwapTask {
 
   pairs: SwapPair[] = [
 
+    tokenSwapPair(Network.Base, Token.ETH, Token.WETH),
+    tokenSwapPair(Network.Base, Token.WETH, Token.ETH),
+
     tokenSwapPair(Network.Base, Token.ETH, Token.USDC),
     tokenSwapPair(Network.Base, Token.USDC, Token.ETH),
 

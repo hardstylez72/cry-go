@@ -8,7 +8,7 @@
             label="network"
             :items="networks"
             :disabled="disabled"
-            v-model="item.network"
+            v-model="network"
           />
         </v-col>
         <v-col>
@@ -56,6 +56,12 @@ export default defineComponent({
   },
 
   watch: {
+    network: {
+      handler(b, a) {
+        this.item.network = this.network
+        this.item.token = null
+      },
+    },
     item: {
       deep: true,
       handler() {
@@ -74,10 +80,11 @@ export default defineComponent({
 
   data() {
     return {
+      network: Network.ARBITRUM,
       opt: new Map<Network, Token[]>([
         [Network.ARBITRUM, [Token.USDT, Token.USDC, Token.USDCBridged, Token.ETH]],
         [Network.StarkNet, [Token.ETH]],
-        [Network.ZKSYNCERA, [Token.ETH, Token.USDC]],
+        [Network.ZKSYNCERA, [Token.ETH]],
         [Network.Etherium, [Token.ETH, Token.USDC, Token.USDT]],
         [Network.AVALANCHE, [Token.USDC, Token.USDT]],
         [Network.POLIGON, [Token.USDC, Token.USDT]],
@@ -99,10 +106,6 @@ export default defineComponent({
       return tokens
     },
     networks(): Network[] {
-      if (this.item.token === Token.ETH) {
-        return [Network.ARBITRUM, Network.StarkNet]
-      }
-
       return [
         Network.AVALANCHE,
         Network.Etherium,

@@ -45,13 +45,19 @@ export default defineComponent({
           name: taskProps.PancakeSwap.service.name,
           link: taskProps.PancakeSwap.service.link,
           img: taskProps.PancakeSwap.service.img,
-          action: 'Swap (ETH <-> USDC)',
+          action: 'Swap ETH,USDC,USDC.b',
         },
         {
           name: taskProps.AcrossBridge.service.name,
           link: taskProps.AcrossBridge.service.link,
           img: taskProps.AcrossBridge.service.img,
           action: 'EVM мост (ввод/вывод ETH/USDC)',
+        },
+        {
+          name: taskProps.OdosSwap.service.name,
+          link: taskProps.OdosSwap.service.link,
+          img: taskProps.OdosSwap.service.img,
+          action: 'Swap ETH,USDC,USDC.b',
         }
       ],
     }

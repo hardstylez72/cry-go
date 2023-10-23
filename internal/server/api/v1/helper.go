@@ -95,14 +95,14 @@ func (s *HelperService) ValidateProxy(ctx context.Context, req *v1.ValidateProxy
 
 	req.Proxy = strings.TrimSpace(req.Proxy)
 
-	if req.Proxy == "" {
-		return &v1.ValidateProxyResponse{
-			Valid:       true,
-			CountryName: "disabled",
-			CountryCode: "",
-			Ip:          "",
-		}, nil
-	}
+	//if req.Proxy == "" {
+	//	return &v1.ValidateProxyResponse{
+	//		Valid:       true,
+	//		CountryName: "disabled",
+	//		CountryCode: "",
+	//		Ip:          "",
+	//	}, nil
+	//}
 
 	userAgent := lib.DefaultUserAgent
 

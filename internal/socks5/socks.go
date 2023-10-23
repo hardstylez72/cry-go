@@ -7,17 +7,17 @@ import (
 	"time"
 
 	_ "github.com/armon/go-socks5"
+	"github.com/hardstylez72/cry/internal/server/config"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/net/proxy"
 )
 
 type Config struct {
-	Host            string
-	Login           string
-	Password        string
-	Disable         bool
-	UserAgentHeader string
+	Host     string
+	Login    string
+	Password string
+	Disable  bool
 }
 
 type Proxy struct {
@@ -44,7 +44,14 @@ func NewSock5ProxyString(s, userAgentHeader string) (*Proxy, error) {
 		return nil, errors.Wrap(ErrParseError, err.Error())
 	}
 
-	c.UserAgentHeader = userAgentHeader
+	if c.Disable {
+		rotatingProxy := "p.webshare.io:80:" + config.CFG.WebshareProxyUser + ":" + config.CFG.WebshareProxyPassword
+		c, err = ParseProxy(rotatingProxy)
+		if err != nil {
+			return nil, errors.Wrap(ErrParseError, err.Error())
+		}
+	}
+
 	return NewSock5Proxy(c)
 }
 
@@ -79,10 +86,7 @@ func NewSock5Proxy(c *Config) (*Proxy, error) {
 			},
 		}
 
-		p.Cli.Transport = &Client{
-			source:          NewJaegerRoundTripper(p.Cli.Transport),
-			UserAgentHeader: c.UserAgentHeader,
-		}
+		p.Cli.Transport = NewJaegerRoundTripper(p.Cli.Transport)
 		return p, nil
 	}
 
@@ -115,10 +119,7 @@ func NewSock5Proxy(c *Config) (*Proxy, error) {
 		},
 	}
 
-	p.Cli.Transport = &Client{
-		source:          NewJaegerRoundTripper(p.Cli.Transport),
-		UserAgentHeader: c.UserAgentHeader,
-	}
+	p.Cli.Transport = NewJaegerRoundTripper(p.Cli.Transport)
 	return p, nil
 }
 
@@ -126,16 +127,6 @@ func NewJaegerRoundTripper(source http.RoundTripper) http.RoundTripper {
 	return otelhttp.NewTransport(source, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
 		return r.Method + " " + r.URL.Scheme + "://" + r.URL.Host + r.URL.Path
 	}))
-}
-
-type Client struct {
-	source          http.RoundTripper
-	UserAgentHeader string
-}
-
-func (c *Client) RoundTrip(req *http.Request) (*http.Response, error) {
-	//req.Header.Set("User-Agent", c.UserAgentHeader)
-	return c.source.RoundTrip(req)
 }
 
 func ParseProxy(s string) (*Config, error) {

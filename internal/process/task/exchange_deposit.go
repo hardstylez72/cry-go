@@ -68,39 +68,9 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		}
 	}
 
-	//if p.Network == v1.Network_StarkNet {
-	//
-	//	starkClient, err := NewStarkNetClient(profile)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//
-	//	if p.GetApproveTx().GetTxId() == "" {
-	//
-	//		txId, err := StarkNetApprove(taskContext, p.Token, starkClient, profile, t.Type())
-	//		if err != nil {
-	//			return nil, err
-	//		}
-	//
-	//		if txId != nil {
-	//			p.ApproveTx = NewStarkNetApproveTx(*txId)
-	//			if err := a.AddTx2(ctx, p.ApproveTx); err != nil {
-	//				return nil, err
-	//			}
-	//			if err := a.UpdateTask(ctx, task); err != nil {
-	//				return nil, err
-	//			}
-	//		}
-	//	}
-	//
-	//	if err := WaitTxComplete(taskContext, p.ApproveTx, task, client, a); err != nil {
-	//		return nil, err
-	//	}
-	//}
-
 	if p.GetTx().GetTxId() == "" {
 
-		addr, err := GetOkexDepositAddr(taskContext, profile, p, a.WithdrawerRepository)
+		addr, sub, err := GetOkexDepositAddr(taskContext, profile, p, a.WithdrawerRepository)
 		if err != nil {
 			return nil, err
 		}
@@ -154,6 +124,11 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 			return nil, err
 		}
 
+		// если не нужно делать перевод с суб на мейн, мы уже на мейне
+		if !sub {
+			tmp := true
+			p.SubMainTransfer = &tmp
+		}
 		if err := a.UpdateTask(ctx, task); err != nil {
 			return nil, err
 		}
@@ -163,8 +138,7 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		return nil, err
 	}
 
-	// перевод с sub на main okex аккаунт
-	if p.GetTx().GetTxCompleted() && p.SubMainTransfer == nil {
+	if !p.GetSubMainTransfer() {
 		if err := t.OkexSubMainTransfer(taskContext, a); err != nil {
 			if errors.Is(err, ErrZeroBalance) {
 				return task, nil
@@ -173,6 +147,11 @@ func (t *OkexDepositTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, e
 		}
 		tmp := true
 		p.SubMainTransfer = &tmp
+	}
+
+	// перевод с sub на main okex аккаунт
+	if p.GetTx().GetTxCompleted() && p.GetSubMainTransfer() {
+
 		task.Status = v1.ProcessStatus_StatusDone
 		if err := a.UpdateTask(ctx, task); err != nil {
 			return nil, err
@@ -240,18 +219,18 @@ func (t *OkexDepositTask) OkexSubMainTransfer(ctx context.Context, a *Input) err
 	return nil
 }
 
-func GetOkexDepositAddr(ctx context.Context, profile *halp.Profile, p *v1.OkexDepositTask, withdrawerRepository repository.WithdrawerRepository) (*string, error) {
+func GetOkexDepositAddr(ctx context.Context, profile *halp.Profile, p *v1.OkexDepositTask, withdrawerRepository repository.WithdrawerRepository) (*string, bool, error) {
 
 	attached, err := withdrawerRepository.GetAttachedAddr(ctx, profile.Id, profile.UserId, profile.SubType.String())
 	if err != nil {
-		return nil, errors.Wrap(err, "к профилю не привязан адресс депозита с okex")
+		return nil, false, errors.Wrap(err, "к профилю не привязан адресс депозита с okex")
 	}
 
 	addr := attached.Addr
 
 	okexCli, err := GetOkexCli(ctx, withdrawerRepository, attached.WithdrawerId, profile.UserId, profile.UserAgent)
 	if err != nil {
-		return nil, err
+		return nil, false, errors.Wrap(err, "GetOkexCli")
 	}
 
 	token := p.Token.String()
@@ -261,14 +240,22 @@ func GetOkexDepositAddr(ctx context.Context, profile *halp.Profile, p *v1.OkexDe
 
 	addrMap, err := okexCli.GetDepositAddress(ctx, token)
 	if err != nil {
-		return nil, err
+		return nil, false, errors.Wrap(err, "okexCli.GetDepositAddress")
 	}
 
 	_, exist := addrMap[attached.Addr]
 	if !exist {
-		return nil, errors.New("okex deposit address in settings is invalid. update please")
+		return nil, false, errors.New("okex deposit address in settings is invalid. update please")
 	}
-	return &addr, nil
+
+	wd, err := withdrawerRepository.GetWithdrawer(ctx, attached.WithdrawerId, profile.UserId)
+	if err != nil {
+		return nil, false, errors.Wrap(err, "withdrawerRepository.GetWithdrawer")
+	}
+
+	sub := wd.PrevId.Valid
+
+	return &addr, sub, nil
 }
 
 func GetOkexCli(ctx context.Context, rep repository.WithdrawerRepository, withdrawerId, userId, userAgentHeader string) (*okex.Service, error) {
@@ -323,7 +310,7 @@ func EstimateOkexDepositCost(ctx context.Context, profile *halp.Profile, p *v1.O
 		return nil, err
 	}
 
-	addr, err := GetOkexDepositAddr(ctx, profile, p, withdrawerRepository)
+	addr, _, err := GetOkexDepositAddr(ctx, profile, p, withdrawerRepository)
 	if err != nil {
 		return nil, err
 	}

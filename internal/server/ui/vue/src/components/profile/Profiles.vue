@@ -74,7 +74,7 @@
                 <i v-if="item.label">({{ item.label }})</i>
               </v-col>
               <v-col>
-                <BtnCheckProxy v-if="item.proxy" :proxy="item.proxy"/>
+                <BtnCheckProxy :proxy="item.proxy"/>
               </v-col>
               <v-col>
                 <EditProfile :profile-id="item.id" @updated="UpdateList"/>
