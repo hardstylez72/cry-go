@@ -294,6 +294,9 @@ message Task {
     task.DefaultSwap fibrousSwapTask = 42;
     task.ExchangeSwapTask exchangeSwapTask = 43;
     task.DefaultLP zkLendLPTask = 44;
+    task.DefaultSwap woofiSwapTask = 45;
+    task.DefaultLP aaveLPTask = 46;
+    task.SimpleTask mintFunTask = 47;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

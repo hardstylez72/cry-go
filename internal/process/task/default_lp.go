@@ -28,6 +28,22 @@ func NewZkLendLPTask() *DefaultLPTask {
 	}
 }
 
+func NewAaveLPTask() *DefaultLPTask {
+	return &DefaultLPTask{
+		taskType: v1.TaskType_AaveLP,
+		extractor: func(a *Input) (*v1.DefaultLP, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_AaveLPTask)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_AaveLPTask) call an ambulance!")
+			}
+			return l.AaveLPTask, nil
+		},
+		DefaultLPTaskHalper: &DefaultLPTaskHalper{
+			TaskType: v1.TaskType_AaveLP,
+		},
+	}
+}
+
 type DefaultLPTask struct {
 	taskType  v1.TaskType
 	extractor func(a *Input) (*v1.DefaultLP, error)
@@ -217,6 +233,7 @@ func (h *DefaultLPTaskHalper) Execute(ctx context.Context, profile *halp.Profile
 		EstimateOnly: estimateOnly,
 		Gas:          Gas,
 		PSubType:     profile.SubType,
+		Debug:        true,
 	}, h.TaskType)
 	if err != nil {
 		return nil, nil, err

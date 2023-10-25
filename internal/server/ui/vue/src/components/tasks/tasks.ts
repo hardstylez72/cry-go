@@ -2,23 +2,15 @@ import {Network, Task, TaskType} from "@/generated/flow";
 import {flow_Flow} from "@/generated/process";
 
 
-import TaskStargateBridge from "@/components/tasks/BridgeStargate/Block.vue";
 import TaskDelay from "@/components/tasks/block/Delay.vue";
-import TaskExchangeWithdraw from "@/components/tasks/Exchange/Withdraw.vue";
-import TaskOkexDeposit from "@/components/tasks/Exchange/Deposit.vue";
 import TaskTestNetBridgeSwap from "@/components/tasks/block/TaskTestNetBridgeSwap.vue";
 import TaskSnapshotVote from "@/components/tasks/block/TaskSnapshotVote.vue";
 import TaskSyncSwap from "@/components/tasks/block/SyncSwap.vue";
 import MenuTaskSyncSwap from "@/components/tasks/menu/MenuSyncSwap.vue";
 import MenuDelayTask from "@/components/tasks/menu/DelayMenu.vue";
-import MenuExchangeWithdraw from "@/components/tasks/Exchange/WithdrawMenu.vue";
-import MenuOkexDeposit from "@/components/tasks/Exchange/DepositMenu.vue";
 import MenuSnapshotTask from "@/components/tasks/menu/Snapshot.vue";
-import MenuTaskStargateBridge from "@/components/tasks/BridgeStargate/Menu.vue";
 import MenuTaskTestNetBridge from "@/components/tasks/menu/MenuTaskTestNetBridge.vue";
 import TaskZkSyncOfficialBridgeToEth from "@/components/tasks/block/TaskZkSyncOfficialBridgeToEth.vue";
-import TaskOrbiterBridge from "@/components/tasks/BridgeOrbiter/Block.vue";
-import MenuTaskOrbiterBridge from "@/components/tasks/BridgeOrbiter/Menu.vue";
 import MenuZkSyncOfficialBridgeToEth from "@/components/tasks/menu/MenuZkSyncOfficialBridgeToEth.vue";
 import TaskZkSyncOfficialBridgeFromEth from "@/components/tasks/block/TaskZkSyncOfficialBridgeFromEth.vue";
 import MenuZkSyncOfficialBridgeFromEth from "@/components/tasks/menu/MenuZkSyncOfficialBridgeFromEth.vue";
@@ -43,8 +35,6 @@ import TaskEzkaliburSwap from "@/components/tasks/block/EzkaliburSwap.vue";
 import MenuTaskEzkaliburSwap from "@/components/tasks/menu/MenuEzkaliburSwap.vue";
 import TaskZkSwap from "@/components/tasks/block/ZkSwap.vue";
 import MenuTaskZkSwap from "@/components/tasks/menu/MenuZkSwap.vue";
-import TaskTraderJoeSwap from "@/components/tasks/TraderJoe/Block.vue";
-import MenuTaskTraderJoeSwap from "@/components/tasks/TraderJoe/Menu.vue";
 import MenuTaskMerklyNFT from "@/components/tasks/NFTMerkly/Menu.vue";
 import TaskMerklyNFT from "@/components/tasks/NFTMerkly/Block.vue";
 import TaskDeployStarkNetAccount from "@/components/tasks/block/DeployStarkNetAccount.vue";
@@ -52,8 +42,6 @@ import DeployStarkNetAccount from "@/components/tasks/menu/DeployStarkNetAccount
 import {ProfileType} from "@/generated/profile";
 import swap10k from "@/components/tasks/block/swap10k.vue";
 import swap10kMenu from "@/components/tasks/menu/MenuSwap10k.vue";
-import TaskPancakeSwap from "@/components/tasks/SwapPancake/Block.vue";
-import PancakeSwap from "@/components/tasks/SwapPancake/Menu.vue";
 import SithSwap from "@/components/tasks/block/SithSwap.vue";
 import MenuSithSwap from "@/components/tasks/menu/MenuSithSwap.vue";
 import MenuJediSwap from "@/components/tasks/menu/MenuJediSwap.vue";
@@ -68,8 +56,6 @@ import Dmail from "@/components/tasks/block/Dmail.vue";
 import MenuDmail from "@/components/tasks/menu/MenuDmail.vue";
 import StarkNetId from "@/components/tasks/block/StarkNetId.vue";
 import MenuStarkNetId from "@/components/tasks/menu/MenuStarkNetId.vue";
-import MenuOdosSwap from "@/components/tasks/SwapOdos/MenuOdosSwap.vue";
-import OdosSwap from "@/components/tasks/SwapOdos/OdosSwap.vue";
 import {AcrossBridgeSpec} from "@/components/tasks/BridgeAcross";
 import {Airdrop, allNetworks, TaskJob, TaskSpec, Universal} from "@/components/tasks/utils";
 import {StargateBridgeSpec} from "@/components/tasks/BridgeStargate";
@@ -81,6 +67,9 @@ import {LPZkLendLPSpec} from "@/components/tasks/LPZkLend";
 import {PancakeSwapSpec} from "@/components/tasks/SwapPancake";
 import {SwapOdosSpec} from "@/components/tasks/SwapOdos";
 import {OrbiterBridgeSpec} from "@/components/tasks/BridgeOrbiter";
+import {SwapWoofiSpec} from "@/components/tasks/SwapWoofi";
+import {LPAaveSpec} from "@/components/tasks/LPAave";
+import {NFTMintFunSpec} from "@/components/tasks/NFTMintFun";
 
 
 export interface TaskArg {
@@ -649,6 +638,9 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   FibrousSwap: SwapFibrousSpec,
   ExchangeSwap: ExchangeSwapSpec,
   ZkLendLP: LPZkLendLPSpec,
+  WoofiSwap: SwapWoofiSpec,
+  AaveLP: LPAaveSpec,
+  MintFun: NFTMintFunSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

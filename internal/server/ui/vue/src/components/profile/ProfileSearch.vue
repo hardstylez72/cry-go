@@ -35,7 +35,8 @@
         <v-radio v-if="profileTypeAllowed(ProfileType.StarkNet)" class="mx-8" :value="ProfileType.StarkNet">StarkNet
         </v-radio>
       </v-radio-group>
-      <v-switch class="mx-2" v-if="shufflable" v-model="shuffle" label="перетасовать" density="compact" hide-details/>
+      <v-switch class="mx-2" v-if="shufflable && selectedProfiles.length" v-model="shuffle" label="перетасовать"
+                density="compact" hide-details/>
     </div>
 
   </div>

@@ -39,6 +39,15 @@ var Dict = defi.Dict{
 	Odos: defi.Odos{
 		Router: common.HexToAddress("0x19cEeAd7105607Cd444F5ad10dd51356436095a1"),
 	},
+	Woofi: defi.Woofi{
+		Router: common.HexToAddress("0x27425e9fb6a9a625e8484cfd9620851d1fa322e5"),
+	},
+	Aave: defi.Aave{
+		LP: common.HexToAddress("0xA238Dd80C259a72e81d7e4664a9801593F98d1c5"),
+	},
+	MintFun: defi.MintFun{
+		Minter: common.HexToAddress("0x69b69cc6e9f99c62a003fd9e143c126504d49dc2"),
+	},
 }
 
 type Client struct {

@@ -13,6 +13,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewWoofiSwapTask() *DefaultSwapTask {
+	return NewDefaultSwapTaskTask(v1.TaskType_WoofiSwap, func(a *Input) (*v1.DefaultSwap, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_WoofiSwapTask)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_WoofiSwapTask) call an ambulance!")
+		}
+		return l.WoofiSwapTask, nil
+	})
+}
+
 func NewTraderJoeSwapTask() *DefaultSwapTask {
 	return NewDefaultSwapTaskTask(v1.TaskType_TraderJoeSwap, func(a *Input) (*v1.DefaultSwap, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_TraderJoeSwapTask)
@@ -160,12 +170,12 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "profile.GetNetworkSettings")
 	}
 	if client == nil {
 		client, err = uniclient.NewSwapper(p.Network, s.BaseConfig(), h.TaskType)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, "uniclient.NewSwapper")
 		}
 	}
 
@@ -174,12 +184,12 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 		Token:         p.FromToken,
 	})
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
+		return nil, nil, errors.Wrap(err, "client.GetBalance")
 	}
 
 	am, err := defi.ResolveAmount(p.Amount, balance.WEI)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "defi.ResolveAmount")
 	}
 
 	if am == nil || am.Cmp(big.NewInt(0)) == 0 {
@@ -194,7 +204,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 	} else {
 		gas, err := GasManager(estimation, s.Source, p.Network, h.TaskType)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, "GasManager")
 		}
 		Gas = gas
 
@@ -203,7 +213,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 			Token:         client.GetNetworkToken(),
 		})
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
+			return nil, nil, errors.Wrap(err, "client.GetBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
 			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balance.WEI)
@@ -224,7 +234,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 		ExchangeRate: pub.GetExchangeRate(p.FromToken, p.ToToken),
 	}, h.TaskType)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "client.Swap")
 	}
 	return res, Gas, nil
 }
@@ -232,7 +242,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 func (h *DefaultSwapTaskHalper) EstimateCost(ctx context.Context, profile *halp.Profile, p *v1.DefaultSwap, client defi.Swapper) (*v1.EstimationTx, error) {
 	res, _, err := h.Execute(ctx, profile, p, client, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "task.Execute")
 	}
 
 	return GasStation(res.ECost, p.Network), nil

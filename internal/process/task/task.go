@@ -99,6 +99,9 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_AvnuSwap,
 	v1.TaskType_FibrousSwap,
 	v1.TaskType_ZkLendLP,
+	v1.TaskType_WoofiSwap,
+	v1.TaskType_AaveLP,
+	v1.TaskType_MintFun,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -142,13 +145,16 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_ProtossSwap:                      &Wrap{Tasker: NewProtossSwapTask()},
 	v1.TaskType_StarkNetBridge:                   &Wrap{Tasker: NewStarkNetBridgeTask()},
 	v1.TaskType_Dmail:                            &Wrap{Tasker: &DmailTask{}},
-	v1.TaskType_StarkNetIdMint:                   &Wrap{Tasker: &MintTask{}},
+	v1.TaskType_StarkNetIdMint:                   &Wrap{Tasker: NewStarkNetIdMintTask()},
 	v1.TaskType_OdosSwap:                         &Wrap{Tasker: NewOdosSwapTask()},
 	v1.TaskType_AcrossBridge:                     &Wrap{Tasker: NewAcrossBridgeTask()},
 	v1.TaskType_AvnuSwap:                         &Wrap{Tasker: NewAvnuSwapTask()},
 	v1.TaskType_FibrousSwap:                      &Wrap{Tasker: NewFibrousSwapTask()},
 	v1.TaskType_ExchangeSwap:                     &Wrap{Tasker: &ExchangeSwapTask{}},
 	v1.TaskType_ZkLendLP:                         &Wrap{Tasker: NewZkLendLPTask()},
+	v1.TaskType_WoofiSwap:                        &Wrap{Tasker: NewWoofiSwapTask()},
+	v1.TaskType_AaveLP:                           &Wrap{Tasker: NewAaveLPTask()},
+	v1.TaskType_MintFun:                          &Wrap{Tasker: NewMintFunMintTask()},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -394,6 +400,24 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_ZkLandLPTask)")
 		}
 		return Marshal(t.ZkLendLPTask)
+	case v1.TaskType_WoofiSwap:
+		t, ok := m.Task.(*v1.Task_WoofiSwapTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_WoofiSwapTask)")
+		}
+		return Marshal(t.WoofiSwapTask)
+	case v1.TaskType_AaveLP:
+		t, ok := m.Task.(*v1.Task_AaveLPTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_AaveLPTask)")
+		}
+		return Marshal(t.AaveLPTask)
+	case v1.TaskType_MintFun:
+		t, ok := m.Task.(*v1.Task_MintFunTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_MintFunTask)")
+		}
+		return Marshal(t.MintFunTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}

@@ -1003,6 +1003,15 @@ export interface Task {
 
   /**  */
   zkLendLPTask?: DefaultLP;
+
+  /**  */
+  woofiSwapTask?: DefaultSwap;
+
+  /**  */
+  aaveLPTask?: DefaultLP;
+
+  /**  */
+  mintFunTask?: SimpleTask;
 }
 
 export interface TaskTx {
@@ -1138,6 +1147,9 @@ export interface WithdrawExchangeTask {
 
   /**  */
   sendAllCoins?: boolean;
+
+  /**  */
+  sendToRelatedProfile?: boolean;
 }
 
 export interface ZkSyncOfficialBridgeFromEthereumTask {
@@ -1257,7 +1269,10 @@ export enum TaskType {
   'AvnuSwap' = 'AvnuSwap',
   'FibrousSwap' = 'FibrousSwap',
   'ExchangeSwap' = 'ExchangeSwap',
-  'ZkLendLP' = 'ZkLendLP'
+  'ZkLendLP' = 'ZkLendLP',
+  'WoofiSwap' = 'WoofiSwap',
+  'AaveLP' = 'AaveLP',
+  'MintFun' = 'MintFun'
 }
 
 export enum Token {

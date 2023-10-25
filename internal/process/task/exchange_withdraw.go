@@ -6,6 +6,7 @@ import (
 	"github.com/hardstylez72/cry/internal/exchange"
 	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -38,6 +39,21 @@ func (t *WithdrawExchange) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 	}
 	p := l.WithdrawExchangeTask
 
+	withdrawer, err := a.WithdrawerRepository.GetWithdrawer(ctx, p.WithdrawerId, a.UserId)
+	if err != nil {
+		return nil, errors.Wrap(err, "a.WithdrawerRepository.GetWithdrawer")
+	}
+
+	profile, err := a.Halper.Profile(ctx, a.ProfileId)
+	if err != nil {
+		return nil, errors.Wrap(err, "ProfileRepository.GetProfile")
+	}
+
+	exchangeWithdrawer, err := uniclient.NewExchangeWithdrawer(withdrawer, profile.DB)
+	if err != nil {
+		return nil, errors.Wrap(err, "uniclient.NewExchangeWithdrawer")
+	}
+
 	switch a.Task.Status {
 	case v1.ProcessStatus_StatusDone, v1.ProcessStatus_StatusError:
 		return a.Task, nil
@@ -47,21 +63,6 @@ func (t *WithdrawExchange) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 			if err := a.UpdateTask(ctx, task); err != nil {
 				return nil, errors.Wrap(err, "a.UpdateTask")
 			}
-		}
-
-		withdrawer, err := a.WithdrawerRepository.GetWithdrawer(ctx, p.WithdrawerId, a.UserId)
-		if err != nil {
-			return nil, errors.Wrap(err, "a.WithdrawerRepository.GetWithdrawer")
-		}
-
-		profile, err := a.ProfileRepository.GetProfile(ctx, a.ProfileId)
-		if err != nil {
-			return nil, errors.Wrap(err, "a.ProfileRepository.GetProfile")
-		}
-
-		exchangeWithdrawer, err := uniclient.NewExchangeWithdrawer(withdrawer, profile)
-		if err != nil {
-			return nil, errors.Wrap(err, "uniclient.NewExchangeWithdrawer")
 		}
 
 		txId, err := exchangeWithdrawer.WaitConfirm(taskContext, *p.WithdrawOrderId)
@@ -100,23 +101,30 @@ func (t *WithdrawExchange) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 		}
 	}
 
-	profile, err := a.Halper.Profile(ctx, a.ProfileId)
-	if err != nil {
-		return nil, errors.Wrap(err, "ProfileRepository.GetProfile")
-	}
+	if p.GetSendToRelatedProfile() {
 
-	withdrawer, err := a.WithdrawerRepository.GetWithdrawer(ctx, p.WithdrawerId, a.UserId)
-	if err != nil {
-		return nil, errors.Wrap(err, "WithdrawerRepository.GetWithdrawer")
-	}
+		if profile.Type != v1.ProfileType_StarkNet {
+			return nil, errors.New("profile must have starknet type")
+		}
 
-	exchangeWithdrawer, err := uniclient.NewExchangeWithdrawer(withdrawer, profile.DB)
-	if err != nil {
-		return nil, errors.Wrap(err, "uniclient.NewExchangeWithdrawer")
-	}
+		id, err := a.ProfileRepository.GetRelatedProfile(ctx, &repository.GetRelatedProfileReq{
+			ProfileId:          profile.Id,
+			ProfileType:        profile.Type.String(),
+			ProfileSubType:     profile.SubType.String(),
+			WantProfileType:    v1.ProfileType_EVM.String(),
+			WantProfileSubType: v1.ProfileSubType_Metamask.String(),
+			UserId:             profile.UserId,
+		})
+		if err != nil {
+			return nil, errors.New("related EVM profile not found")
+		}
 
-	if p.UseExternalAddr != nil && *p.UseExternalAddr {
+		rp, err := a.Halper.Profile(ctx, *id)
+		if err != nil {
+			return nil, errors.New("related EVM profile not found")
+		}
 
+		p.WithdrawAddr = &rp.Addr
 	} else {
 		p.WithdrawAddr = &profile.Addr
 	}

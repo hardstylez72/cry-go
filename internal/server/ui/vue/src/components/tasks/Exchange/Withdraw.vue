@@ -9,7 +9,7 @@
           ref="exchange-withdraw-form-token"
           density="compact"
           variant="outlined"
-          label="select token"
+          label="Токен"
           :rules="tokenRules()"
           :items="tokens"
           item-title="title"
@@ -24,7 +24,7 @@
           ref="exchange-withdraw-form-network"
           density="compact"
           variant="outlined"
-          label="network"
+          label="Сеть"
           item-value="network"
           item-title="title"
           :rules="networkRules()"
@@ -39,7 +39,7 @@
           :disabled="disabled"
           density="compact"
           focused
-          name="send all coins on balance"
+          name="Отправить все токены"
           v-model="item.sendAllCoins"
           :label="'send all coins from balance'"
           @input="CheckboxChanged">
@@ -50,7 +50,7 @@
           <v-text-field
             ref="exchange-withdraw-form-min"
             type="number"
-            label="min amount"
+            label="Минимум"
             density="compact"
             variant="outlined"
             :rules="getMinRules()"
@@ -61,7 +61,7 @@
           <v-text-field
             ref="exchange-withdraw-form-max"
             type="number"
-            label="max amount"
+            label="Максимум"
             density="compact"
             variant="outlined"
             :rules="getMaxRules()"
@@ -69,6 +69,14 @@
             v-model="item.amountMax"
           />
         </v-col>
+      </v-row>
+      <v-row>
+        <v-checkbox
+          label="Отправить на связанный StarkNet профиль"
+          v-model="item.sendToRelatedProfile"
+          hide-details
+          :disabled="disabled"
+        />
       </v-row>
     </v-container>
   </v-card-actions>
@@ -92,6 +100,7 @@ import {Task, TaskType, WithdrawExchangeTask} from "@/generated/flow";
 import {defineComponent, PropType} from "vue";
 import {withdrawerService} from "@/generated/services";
 import {ExchangeWithdrawNetwork, ExchangeWithdrawOptions, Withdrawer} from "@/generated/withdraw";
+import {required} from "@/components/tasks/menu/helper";
 
 export default defineComponent({
   name: "TaskExchangeWithdraw",
@@ -182,6 +191,7 @@ export default defineComponent({
         withdrawAddr: "",
         useExternalAddr: false,
         sendAllCoins: false,
+        sendToRelatedProfile: false,
       } as WithdrawExchangeTask,
       options: new Map<string, ExchangeWithdrawNetwork[]>(),
     }
@@ -191,20 +201,20 @@ export default defineComponent({
 
     },
     binanceAddrRules() {
-      return [(v: any) => !!this.item.withdrawAddr || 'required',]
+      return [required]
     },
     withdrawIdRules() {
-      return [(v: any) => !!this.item.withdrawerId || 'required',]
+      return [required]
     },
     tokenRules() {
-      return [(v: any) => !!this.item.token || 'required',]
+      return [required]
     },
     networkRules() {
-      return [(v: any) => !!this.item.network || 'required',]
+      return [required]
     },
     getMinRules() {
       return [
-        (v: any) => !!this.item.amountMin || 'required',
+        required,
         (v: any) => {
           if (!this.item.amountMax) {
             return true
@@ -218,7 +228,7 @@ export default defineComponent({
     },
     getMaxRules() {
       return [
-        (v: any) => !!this.item.amountMin || 'required',
+        required,
         (v: any) => {
           if (Number(this.item.amountMin) > Number(this.item.amountMax)) {
             return 'min > max'

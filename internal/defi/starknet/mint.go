@@ -7,10 +7,11 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/starknet/halper"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/starknet.go/gateway"
 )
 
-func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq) (*bozdo.DefaultRes, error) {
+func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
 
 	res, err := c.halper.Mint(ctx, &halper.MintReq{
 		BaseTx: halper.BaseTx{

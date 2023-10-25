@@ -1,14 +1,9 @@
-import {DefaultSwap as TaskSignature, Network, SimpleTask, Task, TaskType, Token} from "@/generated/flow";
-import {defineComponent, PropType, render} from "vue";
+import {Network, SimpleTask, Task, TaskType, Token} from "@/generated/flow";
 import WEIInputField from "@/components/WEIInputField.vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
 import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
-import {required} from "@/components/tasks/menu/helper";
-import {SwapPair, tokenSwapPair} from "@/components/helper";
 import {Component, Prop, Vue, Watch} from "vue-facing-decorator";
-import MenuTaskSettings from "@/components/tasks/menu/Settings.vue";
-import GasOptions from "@/components/tasks/menu/Details.vue";
 
 
 @Component({

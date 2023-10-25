@@ -221,7 +221,7 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 		e, err = task.EstimateDmailSwapCost(ctx, p, profile)
 	case v1.TaskType_StarkNetIdMint:
 		p := t.Task.Task.(*v1.Task_StarkNetIdMintTask).StarkNetIdMintTask
-		e, err = task.EstimateMintCost(ctx, p, profile)
+		e, err = task.NewStarkNetIdMintTask().EstimateCost(ctx, p, profile)
 	case v1.TaskType_OdosSwap:
 		p := t.Task.Task.(*v1.Task_OdosSwapTask).OdosSwapTask
 		e, err = task.NewOdosSwapTask().EstimateCost(ctx, profile, p, nil)
@@ -237,11 +237,21 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_ZkLendLP:
 		p := t.Task.Task.(*v1.Task_ZkLendLPTask).ZkLendLPTask
 		e, err = task.NewZkLendLPTask().EstimateLPCost(ctx, profile, p, nil)
+	case v1.TaskType_WoofiSwap:
+		p := t.Task.Task.(*v1.Task_WoofiSwapTask).WoofiSwapTask
+		e, err = task.NewWoofiSwapTask().EstimateCost(ctx, profile, p, nil)
+	case v1.TaskType_AaveLP:
+		p := t.Task.Task.(*v1.Task_AaveLPTask).AaveLPTask
+		e, err = task.NewAaveLPTask().EstimateLPCost(ctx, profile, p, nil)
+	case v1.TaskType_MintFun:
+		p := t.Task.Task.(*v1.Task_MintFunTask).MintFunTask
+		e, err = task.NewMintFunMintTask().EstimateCost(ctx, p, profile)
+
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "dispatcher.EstimateTaskCost")
 	}
 
 	out = append(out, e)

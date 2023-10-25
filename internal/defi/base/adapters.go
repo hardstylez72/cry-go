@@ -5,8 +5,10 @@ import (
 	"math/big"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/aave"
 	"github.com/hardstylez72/cry/internal/defi/across"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/nft/mintfun"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
@@ -64,4 +66,25 @@ func (c *Client) WaitForConfirm(ctx context.Context, txId string, taskType v1.Ta
 
 func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) (*defi.OrbiterBridgeRes, error) {
 	return c.defi.OrbiterBridge(ctx, req)
+}
+
+func (c *Client) LP(ctx context.Context, req *defi.LPReq, taskType v1.TaskType) (*defi.LPRes, error) {
+
+	switch taskType {
+	case v1.TaskType_AaveLP:
+		cli := aave.NewClient(c.defi.Cfg.Dict.Aave.LP, c.defi)
+		return cli.LP(ctx, req)
+	default:
+		return nil, errors.New("unknown task: " + taskType.String())
+	}
+}
+
+func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
+	switch taskType {
+	case v1.TaskType_MintFun:
+		cli := mintfun.NewClient(c.defi.Cfg.Dict.MintFun.Minter, c.defi)
+		return cli.Mint(ctx, req)
+	default:
+		return nil, errors.New("unknown task type: " + taskType.String())
+	}
 }

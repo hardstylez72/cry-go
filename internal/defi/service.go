@@ -23,6 +23,21 @@ type Dict struct {
 	Pancake                  Pancake
 	Across                   Across
 	Odos                     Odos
+	Woofi                    Woofi
+	Aave                     Aave
+	MintFun                  MintFun
+}
+
+type MintFun struct {
+	Minter common.Address
+}
+
+type Aave struct {
+	LP common.Address
+}
+
+type Woofi struct {
+	Router common.Address
 }
 
 type Odos struct {

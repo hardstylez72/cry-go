@@ -208,5 +208,8 @@ export enum TaskType {
   'AvnuSwap' = 'AvnuSwap',
   'FibrousSwap' = 'FibrousSwap',
   'ExchangeSwap' = 'ExchangeSwap',
-  'ZkLendLP' = 'ZkLendLP'
+  'ZkLendLP' = 'ZkLendLP',
+  'WoofiSwap' = 'WoofiSwap',
+  'AaveLP' = 'AaveLP',
+  'MintFun' = 'MintFun'
 }

@@ -6,7 +6,6 @@
     density="comfortable"
     variant="outlined"
     :rules="labelRules()"
-    @input="labelChanged"
     :loading="loading"
     :disabled="loading"
     hide-details
@@ -35,31 +34,31 @@ export default defineComponent({
         return this.modelValue
       },
       async set(value: string) {
-        await this.labelChanged()
+        // await this.labelChanged()
         this.$emit('update:modelValue', value)
       }
     }
   },
   methods: {
-    async labelChanged() {
-      this.timer.add(1000)
-
-      this.timer.cb(async () => {
-        if (!this.labelName) {
-          return
-        }
-
-        try {
-          this.loading = true
-          if (!await this.validate()) {
-            this.loading = false
-            return
-          }
-        } finally {
-          this.loading = false
-        }
-      })
-    },
+    // async labelChanged() {
+    //   this.timer.add(1000)
+    //
+    //   this.timer.cb(async () => {
+    //     if (!this.labelName) {
+    //       return
+    //     }
+    //
+    //     try {
+    //       this.loading = true
+    //       if (!await this.validate()) {
+    //         this.loading = false
+    //         return
+    //       }
+    //     } finally {
+    //       this.loading = false
+    //     }
+    //   })
+    // },
     async validate(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
       // спасибо китайцам скажи лучше

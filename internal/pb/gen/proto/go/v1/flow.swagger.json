@@ -1423,6 +1423,15 @@
         },
         "zkLendLPTask": {
           "$ref": "#/definitions/DefaultLP"
+        },
+        "woofiSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
+        },
+        "aaveLPTask": {
+          "$ref": "#/definitions/DefaultLP"
+        },
+        "mintFunTask": {
+          "$ref": "#/definitions/SimpleTask"
         }
       },
       "required": [
@@ -1538,7 +1547,10 @@
         "AvnuSwap",
         "FibrousSwap",
         "ExchangeSwap",
-        "ZkLendLP"
+        "ZkLendLP",
+        "WoofiSwap",
+        "AaveLP",
+        "MintFun"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -1707,6 +1719,9 @@
           "type": "boolean"
         },
         "sendAllCoins": {
+          "type": "boolean"
+        },
+        "sendToRelatedProfile": {
           "type": "boolean"
         }
       },

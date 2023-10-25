@@ -13,6 +13,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/base/pancake"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/odos"
+	"github.com/hardstylez72/cry/internal/defi/woofi"
 	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"go.uber.org/zap"
@@ -21,6 +22,30 @@ import (
 func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
 
 	wt, err := defi.NewWalletTransactor(req.WalletPK)
+	if err != nil {
+		return nil, err
+	}
+
+	token, ok := c.defi.Cfg.TokenMap[req.FromToken]
+	if !ok {
+		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
+	}
+	var ca common.Address
+	switch taskType {
+	case v1.TaskType_PancakeSwap:
+		ca = c.defi.Cfg.Dict.Pancake.Router
+	case v1.TaskType_OdosSwap:
+		ca = c.defi.Cfg.Dict.Odos.Router
+	case v1.TaskType_WoofiSwap:
+		ca = c.defi.Cfg.Dict.Woofi.Router
+	}
+
+	approve, err := c.defi.Approve(ctx, &defi.Approve{
+		TokenAddr:   token,
+		PK:          req.WalletPK,
+		Amount:      req.Amount,
+		SpenderAddr: ca,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -40,17 +65,10 @@ func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1
 			Addr:     wt.WalletAddr,
 		}
 		data, err = cli.MakeSwapTx(ctx, req)
+	case v1.TaskType_WoofiSwap:
+		cli := woofi.NewSwapper(c.defi.Cfg.Dict.Woofi.Router, c.defi.Cli, c.defi.Cfg.TokenMap)
+		data, err = cli.MakeSwapTx(ctx, req)
 	}
-	if err != nil {
-		return nil, err
-	}
-
-	approve, err := c.defi.TokenLimitChecker(ctx, &defi.TokenLimitCheckerReq{
-		Token:       req.FromToken,
-		Wallet:      wt,
-		Amount:      req.Amount,
-		SpenderAddr: data.ContractAddr,
-	})
 	if err != nil {
 		return nil, err
 	}

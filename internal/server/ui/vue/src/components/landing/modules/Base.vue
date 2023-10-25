@@ -58,6 +58,24 @@ export default defineComponent({
           link: taskProps.OdosSwap.service.link,
           img: taskProps.OdosSwap.service.img,
           action: 'Swap ETH,USDC,USDC.b',
+        },
+        {
+          name: taskProps.WoofiSwap.service.name,
+          link: taskProps.WoofiSwap.service.link,
+          img: taskProps.WoofiSwap.service.img,
+          action: 'Swap ETH,USDC.b',
+        },
+        {
+          name: taskProps.AaveLP.service.name,
+          link: taskProps.AaveLP.service.link,
+          img: taskProps.AaveLP.service.img,
+          action: 'LP USDC.b',
+        },
+        {
+          name: taskProps.MintFun.service.name,
+          link: taskProps.MintFun.service.link,
+          img: taskProps.MintFun.service.img,
+          action: 'Mint NFT',
         }
       ],
     }

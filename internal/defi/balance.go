@@ -30,6 +30,45 @@ func (c *EtheriumClient) GetNetworkToken() Token {
 func (c *EtheriumClient) GetBalance(ctx context.Context, req *GetBalanceReq) (*GetBalanceRes, error) {
 	return c.getBalance(ctx, req)
 }
+
+type BalanceReq struct {
+	WalletAddress string
+	TokenAddr     common.Address
+}
+
+func (c *EtheriumClient) Balance(ctx context.Context, req *BalanceReq) (*big.Int, error) {
+
+	fromAddress := req.WalletAddress
+
+	if req.TokenAddr.String() == c.Cfg.MainToken.String() {
+		b, err := c.Cli.BalanceAt(ctx, common.HexToAddress(fromAddress), nil)
+		if err != nil {
+			return nil, err
+		}
+
+		return b, nil
+	}
+
+	ta := req.TokenAddr
+
+	s, err := erc_20.NewStorageCaller(ta, c.Cli)
+	if err != nil {
+		return nil, err
+	}
+
+	opt := &bind.CallOpts{
+		Context: ctx,
+	}
+
+	b, err := s.BalanceOf(opt, common.HexToAddress(fromAddress))
+	if err != nil {
+		return nil, err
+	}
+
+	res := b
+
+	return res, nil
+}
 func (c *EtheriumClient) getBalance(ctx context.Context, req *GetBalanceReq) (*GetBalanceRes, error) {
 
 	fromAddress := req.WalletAddress

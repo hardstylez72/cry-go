@@ -172,7 +172,7 @@ type DmailSender interface {
 }
 
 type Minter interface {
-	Mint(ctx context.Context, req *SimpleReq) (*bozdo.DefaultRes, error)
+	Mint(ctx context.Context, req *SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)
 	Networker
 }
 
@@ -196,7 +196,7 @@ type LPReq struct {
 
 	EstimateOnly bool
 	Gas          *bozdo.Gas
-	debug        bool
+	Debug        bool
 
 	PSubType v1.ProfileSubType
 }

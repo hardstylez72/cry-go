@@ -132,6 +132,23 @@ func key(t1, t2 v1.Token) string {
 var exchangeRateMap = lib.NewMap[string, float64]()
 
 func GetExchangeRate(t1, t2 v1.Token) *float64 {
+
+	if t1 == v1.Token_USDCBridged {
+		t1 = v1.Token_USDC
+	}
+
+	if t2 == v1.Token_USDCBridged {
+		t2 = v1.Token_USDC
+	}
+
+	if t1 == v1.Token_WETH {
+		t1 = v1.Token_ETH
+	}
+
+	if t2 == v1.Token_WETH {
+		t2 = v1.Token_ETH
+	}
+
 	rate, ok := exchangeRateMap.Get(t1.String() + t2.String())
 	if ok {
 		if rate < 1 {

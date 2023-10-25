@@ -12,17 +12,58 @@ import (
 	"github.com/pkg/errors"
 )
 
-type MintTask struct {
-	cancel func()
+func NewMintFunMintTask() *DefaultMintTask {
+	return &DefaultMintTask{
+		taskType: v1.TaskType_MintFun,
+		extractor: func(a *Input) (*v1.SimpleTask, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_MintFunTask)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_MintFunTask) call an ambulance!")
+			}
+			return l.MintFunTask, nil
+		},
+		cancel: nil,
+		DefaultMintTaskHalper: &DefaultMintTaskHalper{
+			v1.TaskType_MintFun,
+		},
+	}
 }
 
-func (t *MintTask) Stop() error {
+func NewStarkNetIdMintTask() *DefaultMintTask {
+	return &DefaultMintTask{
+		taskType: v1.TaskType_StarkNetIdMint,
+		extractor: func(a *Input) (*v1.SimpleTask, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_StarkNetIdMintTask)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_StarkNetIdMintTask) call an ambulance!")
+			}
+			return l.StarkNetIdMintTask, nil
+		},
+		cancel: nil,
+		DefaultMintTaskHalper: &DefaultMintTaskHalper{
+			v1.TaskType_StarkNetIdMint,
+		},
+	}
+}
+
+type DefaultMintTask struct {
+	taskType  v1.TaskType
+	extractor func(a *Input) (*v1.SimpleTask, error)
+	cancel    func()
+	*DefaultMintTaskHalper
+}
+
+type DefaultMintTaskHalper struct {
+	TaskType v1.TaskType
+}
+
+func (t *DefaultMintTask) Stop() error {
 	t.cancel()
 	return nil
 }
 
-func (t *MintTask) Type() v1.TaskType {
-	return v1.TaskType_StarkNetIdMint
+func (t *DefaultMintTask) Type() v1.TaskType {
+	return t.taskType
 }
 
 func Timeout(n v1.Network) time.Duration {
@@ -34,15 +75,13 @@ func Timeout(n v1.Network) time.Duration {
 	return tm
 }
 
-func (t *MintTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {
+func (t *DefaultMintTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {
 
 	task := a.Task
-	l, ok := a.Task.Task.Task.(*v1.Task_StarkNetIdMintTask)
-	if !ok {
-		return nil, errors.New("panic.a.Task.Task.Task.(*v1.Task_StarkNetIdMint) call an ambulance!")
+	p, err := t.extractor(a)
+	if err != nil {
+		return nil, err
 	}
-
-	p := l.StarkNetIdMintTask
 
 	taskContext, cancel := context.WithTimeout(ctx, Timeout(p.Network))
 	defer cancel()
@@ -102,7 +141,7 @@ func (t *MintTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {
 
 	if p.GetTx().GetTxId() == "" {
 
-		estimation, err := EstimateMintCost(taskContext, p, profile)
+		estimation, err := t.EstimateCost(taskContext, p, profile)
 		if err != nil {
 			return nil, err
 		}
@@ -137,10 +176,35 @@ func (t *MintTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) {
 	return task, nil
 }
 
-func (t *MintTask) Execute(ctx context.Context, p *v1.SimpleTask, client defi.Minter, profile *halp.Profile, estimation *v1.EstimationTx) (*bozdo.DefaultRes, *bozdo.Gas, error) {
+func (t *DefaultMintTaskHalper) Execute(ctx context.Context, p *v1.SimpleTask, client defi.Minter, profile *halp.Profile, estimation *v1.EstimationTx) (*bozdo.DefaultRes, *bozdo.Gas, error) {
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	if client == nil {
+		client, err = uniclient.NewMintClient(p.Network, s.BaseConfig())
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	if p.Network == v1.Network_StarkNet {
+		client, err := NewStarkNetClient(profile)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		approve, err := StarkNetApprove(ctx, v1.Token_ETH, client, profile, v1.TaskType_StarkNetIdMint)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if approve != nil {
+			if err := client.WaitTxComplete(ctx, *approve); err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 
 	estimateOnly := estimation == nil
@@ -148,7 +212,7 @@ func (t *MintTask) Execute(ctx context.Context, p *v1.SimpleTask, client defi.Mi
 	if estimateOnly {
 		Gas = nil
 	} else {
-		gas, err := GasManager(estimation, s.Source, p.Network, t.Type())
+		gas, err := GasManager(estimation, s.Source, p.Network, t.TaskType)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -159,11 +223,11 @@ func (t *MintTask) Execute(ctx context.Context, p *v1.SimpleTask, client defi.Mi
 		PK:      profile.WalletPK,
 		SubType: profile.SubType,
 		BaseReq: &bozdo.BaseReq{
-			EstimateOnly: false,
+			EstimateOnly: estimateOnly,
 			Debug:        true,
 			Gas:          Gas,
 		},
-	})
+	}, t.TaskType)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -171,47 +235,12 @@ func (t *MintTask) Execute(ctx context.Context, p *v1.SimpleTask, client defi.Mi
 	return res, Gas, nil
 }
 
-func EstimateMintCost(ctx context.Context, p *v1.SimpleTask, profile *halp.Profile) (*v1.EstimationTx, error) {
+func (t *DefaultMintTaskHalper) EstimateCost(ctx context.Context, p *v1.SimpleTask, profile *halp.Profile) (*v1.EstimationTx, error) {
 
-	s, err := profile.GetNetworkSettings(ctx, p.Network)
+	res, _, err := t.Execute(ctx, p, nil, profile, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	if p.Network == v1.Network_StarkNet {
-		client, err := NewStarkNetClient(profile)
-		if err != nil {
-			return nil, err
-		}
-
-		approve, err := StarkNetApprove(ctx, v1.Token_ETH, client, profile, v1.TaskType_StarkNetIdMint)
-		if err != nil {
-			return nil, err
-		}
-
-		if approve != nil {
-			if err := client.WaitTxComplete(ctx, *approve); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	client, err := uniclient.NewMintClient(p.Network, s.BaseConfig())
-	if err != nil {
-		return nil, err
-	}
-
-	swap, err := client.Mint(ctx, &defi.SimpleReq{
-		PK:      profile.WalletPK,
-		SubType: profile.SubType,
-		BaseReq: &bozdo.BaseReq{
-			EstimateOnly: true,
-			Debug:        false,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return GasStation(swap.ECost, p.Network), nil
+	return GasStation(res.ECost, p.Network), nil
 }

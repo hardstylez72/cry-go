@@ -93,15 +93,22 @@ export const formatTime = (d: Date): string => {
   return dayjs(d).utc().tz(tz, false).format('YYYY-MM-DD HH:mm:ss')
 }
 
-export const getTime = (): string => {
+export const getTime = (addMinutes?: number): string => {
   const tz = dayjs.tz.guess()
   const d = new Date()
+  if (addMinutes) {
+    const h = addMinutes / 60
+    return dayjs(d).utc().add(h, 'h').add(addMinutes, 'm').tz(tz, false).format('HH:mm')
+  }
   return dayjs(d).utc().tz(tz, false).format('HH:mm')
 }
 
-export const getDate = (): string => {
+export const getDate = (addDays?: number): string => {
   const tz = dayjs.tz.guess()
   const d = new Date()
+  if (addDays) {
+    return dayjs(d).utc().add(addDays, 'd').tz(tz, false).format('YYYY-MM-DD')
+  }
   return dayjs(d).utc().tz(tz, false).format('YYYY-MM-DD')
 }
 

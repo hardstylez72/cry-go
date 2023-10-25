@@ -42,49 +42,17 @@
         <ProfileCard :label="profile.num" :profile-id="profile.id"/>
       </div>
     </div>
-    <div>
-      <v-checkbox class="mx-8" v-model="runAfter" label="Запланировать запуск процесса"/>
-
-      <v-list v-if="runAfter" variant="plain" rounded>
-        <v-list-item elevation="1" width="95%" v-for="(item, i) in runAfterSchedule" height="auto">
-          <div class="d-inline-flex align-center">
-            <div style="max-width: 200px" class="mx-1 my-2">
-              <v-text-field :rules="[required]" type="date" v-model="item.date" label="Дата запуска" density="compact"
-                            variant="outlined" hide-details/>
-            </div>
-            <div style="max-width: 220px; min-width: 140px" class="mx-1 my-2">
-              <v-text-field :rules="[required]" type="time" v-model="item.time" label="Время запуска" density="compact"
-                            variant="outlined" hide-details/>
-            </div>
-            <v-icon v-if="runAfterSchedule.length -1 === i" icon="mdi-plus" color="green" @click="addRunAfterTime"/>
-            <v-icon v-if="runAfterSchedule.length -1 === i && i !== 0" icon="mdi-close" color="red"
-                    @click="removeRunAfterTime"/>
-            <i class="mx-1">{{ formatTime(runAfterList[i]) }}</i>
-
-          </div>
 
 
-        </v-list-item>
-      </v-list>
-
+    <div class="d-flex flex-wrap mx-8">
       <v-btn
-        class="mx-8"
-        style="width: 80vw"
-        :disabled="selectedProfiles.length === 0"
-        @click="startProcess"
-        v-if="!runAfter"
-      >
-        Создать процесс
+        width="100%"
+        :disabled="selectedProfiles.length === 0" @click="startProcess">
+        Запустить сейчас
       </v-btn>
-      <v-btn
-        class="mx-8"
-        style="width: 80vw"
-        :disabled="selectedProfiles.length === 0"
-        @click="startProcess"
-        v-if="runAfter"
-      >
-        Запланировать процесс
-      </v-btn>
+      <div class="my-3" style="width: 100%;">
+        <Schedule :disabled="selectedProfiles.length === 0" @bobaSatisfied="bobaSatisfied"/>
+      </div>
     </div>
   </div>
 
@@ -112,28 +80,12 @@ import FlowForm from "@/components/flow/FlowForm.vue";
 import ProfileSearch from "@/components/profile/ProfileSearch.vue";
 import NavBar from "@/components/NavBar.vue";
 import {required} from "@/components/tasks/menu/helper";
+import Schedule from "@/components/flow/Schedule.vue";
 
 export default defineComponent({
   name: "Flow",
-  components: {NavBar, ProfileSearch, FlowForm, ProfileCard},
-  watch: {
-    runAfter: {
-      handler() {
-        if (this.runAfter) {
-          this.addRunAfterTime()
-        }
-      }
-    },
-    runAfterSchedule: {
-      handler() {
-        this.runAfterList = []
-        this.runAfterSchedule.forEach(e => {
-          this.runAfterList.push(ts(e.date, e.time))
-        })
-      },
-      deep: true,
-    }
-  },
+  components: {Schedule, NavBar, ProfileSearch, FlowForm, ProfileCard},
+
   props: {
     propId: {
       type: String,
@@ -164,14 +116,6 @@ export default defineComponent({
   },
   methods: {
     formatTime,
-    removeRunAfterTime() {
-      this.runAfterSchedule.pop()
-    },
-    addRunAfterTime() {
-      const date = getDate()
-      const time = getTime()
-      this.runAfterSchedule.push({date: date, time: time})
-    },
     required,
     isMobile,
     async shareFlow() {
@@ -234,35 +178,31 @@ export default defineComponent({
     getCheckboxLabel(): string {
       return this.editMode ? "sw" : 'switch tp editing mode'
     },
-    async startProcess() {
 
-
-      if (!this.runAfter) {
-        const res = await processService.processServiceCreateProcess({
+    async bobaSatisfied(runAfterList: Date[]) {
+      runAfterList.forEach(runAfter => {
+        const res = processService.processServiceCreateProcess({
           body: {
+            runAfter: runAfter,
             flowId: this.flowId,
             profileIds: this.selectedProfiles.map((p) => p.id),
           }
         })
-        this.$router.push({name: "ViewProcess", params: {id: res.process.id}})
-      } else {
-        this.runAfterList.forEach(runAfter => {
-          const res = processService.processServiceCreateProcess({
-            body: {
-              runAfter: runAfter,
-              flowId: this.flowId,
-              profileIds: this.selectedProfiles.map((p) => p.id),
-            }
-          })
-        })
+      })
 
-        this.$router.push({
-          name: "Processes",
-          query: {ready: 'true', done: false, error: false, running: false, stop: false}
-        })
-      }
-
-
+      this.$router.push({
+        name: "Processes",
+        query: {ready: 'true', done: false, error: false, running: false, stop: false}
+      })
+    },
+    async startProcess() {
+      const res = await processService.processServiceCreateProcess({
+        body: {
+          flowId: this.flowId,
+          profileIds: this.selectedProfiles.map((p) => p.id),
+        }
+      })
+      this.$router.push({name: "ViewProcess", params: {id: res.process.id}})
     },
     async DeleteFlow() {
       try {
@@ -301,14 +241,5 @@ export default defineComponent({
 
 <style scoped>
 
-.header {
-  margin: auto;
-  height: auto;
-  z-index: 100;
-  right: 2px;
-  left: 56px;
-  background-color: #FFF3E0;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-}
 </style>
 

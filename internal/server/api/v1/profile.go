@@ -549,9 +549,9 @@ func (s *ProfileService) GetProfileRelations(ctx context.Context, req *v1.GetPro
 }
 func (s *ProfileService) DeleteProfileRelation(ctx context.Context, req *v1.DeleteProfileRelationReq) (*v1.DeleteProfileRelationRes, error) {
 
-	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
-		return nil, err
-	}
+	//if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+	//	return nil, err
+	//}
 	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err
@@ -573,9 +573,9 @@ func (s *ProfileService) DeleteProfileRelation(ctx context.Context, req *v1.Dele
 }
 func (s *ProfileService) AddProfileRelation(ctx context.Context, req *v1.AddProfileRelationReq) (*v1.AddProfileRelationRes, error) {
 
-	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
-		return nil, err
-	}
+	//if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+	//	return nil, err
+	//}
 	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, err

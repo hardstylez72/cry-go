@@ -52,6 +52,9 @@ enum TaskType {
   FibrousSwap = 38;
   ExchangeSwap = 39;
   ZkLendLP = 40;
+  WoofiSwap = 41;
+  AaveLP = 42;
+  MintFun = 43;
 }
 
 
@@ -424,6 +427,7 @@ message WithdrawExchangeTask {
   optional string withdraw_addr = 10;
   optional bool use_external_addr = 11;
   optional bool send_all_coins = 12;
+  bool send_to_related_profile = 13;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
