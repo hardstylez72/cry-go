@@ -121,7 +121,7 @@ var TokenAddress = map[v1.Token]common.Address{
 	v1.Token_BUSD:  common.HexToAddress("0x2039bb4116b4efc145ec4f0e2ea75012d6c0f181"),
 }
 
-func NewMainNetClient(c *ClientConfig) (*Client, error) {
+func NewClient(c *ClientConfig) (*Client, error) {
 
 	syncSwap := SyncSwap{
 		RouterSwap:         SpecMap["syncSwapRouter"].Addr,      // mainnet

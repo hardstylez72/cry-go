@@ -219,7 +219,7 @@ func CastUSD(wei *big.Int, network v1.Network, token v1.Token) string {
 		switch network {
 		case v1.Network_ZKSYNCERA, v1.Network_ZKSYNCLITE,
 			v1.Network_Etherium, v1.Network_ARBITRUM,
-			v1.Network_OPTIMISM, v1.Network_GOERLIETH:
+			v1.Network_OPTIMISM, v1.Network_GOERLIETH, v1.Network_Base:
 			gasTokenPrice = pub.Price().ETH
 		case v1.Network_POLIGON:
 			gasTokenPrice = pub.Price().MATIC

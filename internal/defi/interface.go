@@ -7,7 +7,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )
 
@@ -38,13 +37,6 @@ type Networker interface {
 type Balancer interface {
 	GetBalance(ctx context.Context, req *GetBalanceReq) (*GetBalanceRes, error)
 	GetNetworkToken() Token
-}
-
-type MintAndBridgeNFT interface {
-	Networker
-	MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, error)
-	MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error)
-	GetMerklyNFTId(ctx context.Context, txHash common.Hash, owner common.Address) (*big.Int, error)
 }
 
 type StargateSwapper interface {
@@ -168,11 +160,6 @@ type LiquidityBridgeReq struct {
 
 type DmailSender interface {
 	SendDmailMessage(ctx context.Context, req *SimpleReq) (*bozdo.DefaultRes, error)
-	Networker
-}
-
-type Minter interface {
-	Mint(ctx context.Context, req *SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)
 	Networker
 }
 

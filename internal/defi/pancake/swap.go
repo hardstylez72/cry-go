@@ -20,21 +20,6 @@ type Swapper struct {
 
 func (c *Swapper) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error) {
 
-	fromToken, ok := c.Cfg.TokenMap[req.FromToken]
-	if !ok {
-		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
-	}
-
-	toToken, ok := c.Cfg.TokenMap[req.ToToken]
-	if !ok {
-		return nil, defi.ErrTokenNotSupportedFn(req.ToToken)
-	}
-
-	_, err := c.Pool(ctx, fromToken, toToken)
-	if err != nil {
-		return nil, errors.Wrap(err, "pool failed")
-	}
-
 	if req.FromToken == v1.Token_ETH {
 		return c.SwapToToken(ctx, req)
 	}
@@ -91,6 +76,15 @@ func (c *Swapper) SwapToETH(ctx context.Context, req *defi.DefaultSwapReq) (*boz
 	toToken, ok := c.Cfg.TokenMap[req.ToToken]
 	if !ok {
 		return nil, defi.ErrTokenNotSupportedFn(req.ToToken)
+	}
+
+	if c.Cfg.Network == v1.Network_Base {
+		toToken = c.Cfg.TokenMap[v1.Token_WETH]
+	}
+
+	_, err := c.Pool(ctx, fromToken, toToken)
+	if err != nil {
+		return nil, errors.Wrap(err, "pool failed")
 	}
 
 	value := big.NewInt(0)
@@ -161,9 +155,18 @@ func (c *Swapper) SwapToToken(ctx context.Context, req *defi.DefaultSwapReq) (*b
 		return nil, defi.ErrTokenNotSupportedFn(req.FromToken)
 	}
 
+	if c.Cfg.Network == v1.Network_Base {
+		fromToken = c.Cfg.TokenMap[v1.Token_WETH]
+	}
+
 	toToken, ok := c.Cfg.TokenMap[req.ToToken]
 	if !ok {
 		return nil, defi.ErrTokenNotSupportedFn(req.ToToken)
+	}
+
+	_, err := c.Pool(ctx, fromToken, toToken)
+	if err != nil {
+		return nil, errors.Wrap(err, "pool failed")
 	}
 
 	value := req.Amount

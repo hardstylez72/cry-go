@@ -180,15 +180,17 @@ export default defineComponent({
     },
 
     async bobaSatisfied(runAfterList: Date[]) {
-      runAfterList.forEach(runAfter => {
-        const res = processService.processServiceCreateProcess({
+
+      for (let i = 0; i < runAfterList.length; i++) {
+        const runAfter = runAfterList[i]
+        await processService.processServiceCreateProcess({
           body: {
             runAfter: runAfter,
             flowId: this.flowId,
             profileIds: this.selectedProfiles.map((p) => p.id),
           }
         })
-      })
+      }
 
       this.$router.push({
         name: "Processes",

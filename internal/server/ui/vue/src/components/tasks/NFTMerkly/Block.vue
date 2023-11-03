@@ -70,6 +70,11 @@ export default defineComponent({
     }
   },
   watch: {
+    "item.fromNetwork": {
+      handler() {
+        this.item.toNetwork = null
+      },
+    },
     item: {
       handler() {
         this.$emit('taskChanged', this.getTask())
@@ -135,6 +140,21 @@ export default defineComponent({
           Network.Tenet,
         ])],
         [Network.POLIGON, new Set([
+          Network.BinanaceBNB,
+          Network.ZKSYNCERA,
+          Network.OPTIMISM,
+          Network.AVALANCHE,
+          Network.ARBITRUM,
+          Network.ArbitrumNova,
+          Network.Base,
+          Network.Canto,
+          Network.Fantom,
+          Network.Meter,
+          Network.opBNB,
+          Network.PolygonZKEVM,
+          Network.Tenet,
+        ])],
+        [Network.Base, new Set([
           Network.BinanaceBNB,
           Network.ZKSYNCERA,
           Network.OPTIMISM,

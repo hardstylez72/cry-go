@@ -127,7 +127,7 @@ func (t *DefaultBridge) Run(ctx context.Context, a *Input) (*v1.ProcessTask, err
 	}
 
 	if !p.GetReceived() {
-		if err := client.WaitForConfirm(ctx, p.GetTx().GetTxId(), t.taskType, profile.Addr); err != nil {
+		if err := client.WaitForConfirm(taskContext, p.GetTx().GetTxId(), t.taskType, profile.Addr); err != nil {
 			return nil, err
 		}
 		p.Received = true

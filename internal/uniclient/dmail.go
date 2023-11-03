@@ -19,7 +19,7 @@ func NewDmailClient(network v1.Network, c *BaseClientConfig) (defi.DmailSender, 
 	var cli defi.DmailSender
 	switch network {
 	case v1.Network_ZKSYNCERA:
-		cli, err = zksyncera.NewMainNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+		cli, err = zksyncera.NewClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_StarkNet:
 		cli, err = starknet.NewClient(&starknet.ClientConfig{
 			HttpCli:     proxy.Cli,

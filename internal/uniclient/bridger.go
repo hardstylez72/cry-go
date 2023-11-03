@@ -20,7 +20,7 @@ func NewBridger(network v1.Network, c *BaseClientConfig, taskType v1.TaskType) (
 
 	switch network {
 	case v1.Network_ZKSYNCERA:
-		c, err := zksyncera.NewMainNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+		c, err := zksyncera.NewClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 		if err != nil {
 			return nil, err
 		}

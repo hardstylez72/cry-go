@@ -102,6 +102,7 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_WoofiSwap,
 	v1.TaskType_AaveLP,
 	v1.TaskType_MintFun,
+	v1.TaskType_MintMerkly,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -155,6 +156,7 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_WoofiSwap:                        &Wrap{Tasker: NewWoofiSwapTask()},
 	v1.TaskType_AaveLP:                           &Wrap{Tasker: NewAaveLPTask()},
 	v1.TaskType_MintFun:                          &Wrap{Tasker: NewMintFunMintTask()},
+	v1.TaskType_MintMerkly:                       &Wrap{Tasker: NewMerklyMintTask()},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -418,6 +420,12 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_MintFunTask)")
 		}
 		return Marshal(t.MintFunTask)
+	case v1.TaskType_MintMerkly:
+		t, ok := m.Task.(*v1.Task_MintMerklyTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_MintMerklyTask)")
+		}
+		return Marshal(t.MintMerklyTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}

@@ -1012,6 +1012,9 @@ export interface Task {
 
   /**  */
   mintFunTask?: SimpleTask;
+
+  /**  */
+  mintMerklyTask?: SimpleTask;
 }
 
 export interface TaskTx {
@@ -1272,7 +1275,8 @@ export enum TaskType {
   'ZkLendLP' = 'ZkLendLP',
   'WoofiSwap' = 'WoofiSwap',
   'AaveLP' = 'AaveLP',
-  'MintFun' = 'MintFun'
+  'MintFun' = 'MintFun',
+  'MintMerkly' = 'MintMerkly'
 }
 
 export enum Token {

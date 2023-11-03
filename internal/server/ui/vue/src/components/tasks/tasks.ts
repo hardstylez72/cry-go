@@ -70,6 +70,7 @@ import {OrbiterBridgeSpec} from "@/components/tasks/BridgeOrbiter";
 import {SwapWoofiSpec} from "@/components/tasks/SwapWoofi";
 import {LPAaveSpec} from "@/components/tasks/LPAave";
 import {NFTMintFunSpec} from "@/components/tasks/NFTMintFun";
+import {NFTMerklyMintSpec, NFTMerklySpec} from "@/components/tasks/NFTMerkly";
 
 
 export interface TaskArg {
@@ -431,26 +432,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     profileType: new Set([ProfileType.EVM])
   },
   TraderJoeSwap: TraderJoeSpec,
-  MerklyMintAndBridgeNFT: {
-    deprecated: false,
-    canBeEstimated: true,
-    descFn(task) {
-      const p = task.merklyMintAndBridgeNFTTask
-      return ` (from ${p?.fromNetwork} to ${p?.toNetwork})`
-    },
-    component: TaskMerklyNFT,
-    menu: MenuTaskMerklyNFT,
-    service: {
-      name: 'Merkly',
-      link: 'https://minter.merkly.com/',
-      img: '/icons/merkly.webp',
-      op: 'mint/brdge NFT',
-    },
-    job: TaskJob.NFT,
-    networks: new Set<Network>([Network.ZKSYNCERA]),
-    airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync]),
-    profileType: new Set([ProfileType.EVM])
-  },
+  MerklyMintAndBridgeNFT: NFTMerklySpec,
   DeployStarkNetAccount: {
     deprecated: false,
     canBeEstimated: true,
@@ -641,6 +623,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   WoofiSwap: SwapWoofiSpec,
   AaveLP: LPAaveSpec,
   MintFun: NFTMintFunSpec,
+  MintMerkly: NFTMerklyMintSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

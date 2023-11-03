@@ -195,7 +195,8 @@
         "ZkLendLP",
         "WoofiSwap",
         "AaveLP",
-        "MintFun"
+        "MintFun",
+        "MintMerkly"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

@@ -18,7 +18,7 @@ func NewWETH(network v1.Network, c *BaseClientConfig) (defi.WETH, error) {
 	var cli defi.WETH
 	switch network {
 	case v1.Network_ZKSYNCERA:
-		cli, err = zksyncera.NewMainNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+		cli, err = zksyncera.NewClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	default:
 		return nil, errors.New("network is not supported for Transfer")
 	}

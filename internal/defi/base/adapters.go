@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/aave"
 	"github.com/hardstylez72/cry/internal/defi/across"
@@ -84,7 +85,24 @@ func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.Task
 	case v1.TaskType_MintFun:
 		cli := mintfun.NewClient(c.defi.Cfg.Dict.MintFun.Minter, c.defi)
 		return cli.Mint(ctx, req)
+	case v1.TaskType_MerklyMintAndBridgeNFT:
+		return c.defi.MintMerkly(ctx, req)
+	case v1.TaskType_MintMerkly:
+		return c.defi.MintMerkly(ctx, req)
 	default:
 		return nil, errors.New("unknown task type: " + taskType.String())
 	}
+}
+
+func (c *Client) BridgeNft(ctx context.Context, req *defi.BridgeNFTReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
+	switch taskType {
+	case v1.TaskType_MerklyMintAndBridgeNFT:
+		return c.defi.BridgeNftMerkly(ctx, req)
+	default:
+		return nil, errors.New("not supported")
+	}
+}
+
+func (c *Client) GetNFTId(ctx context.Context, txHash common.Hash, owner common.Address) (*big.Int, error) {
+	return c.defi.GetNFTId(ctx, txHash, owner)
 }

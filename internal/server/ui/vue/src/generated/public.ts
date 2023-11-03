@@ -211,5 +211,6 @@ export enum TaskType {
   'ZkLendLP' = 'ZkLendLP',
   'WoofiSwap' = 'WoofiSwap',
   'AaveLP' = 'AaveLP',
-  'MintFun' = 'MintFun'
+  'MintFun' = 'MintFun',
+  'MintMerkly' = 'MintMerkly'
 }

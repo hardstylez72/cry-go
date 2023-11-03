@@ -70,9 +70,9 @@ func (s *WithdrawerService) GetExchangeDepositOptions(ctx context.Context, req *
 }
 func (s *WithdrawerService) OkexDepositAddrAttach(ctx context.Context, req *v1.OkexDepositAddrAttachRequest) (*v1.OkexDepositAddrAttachResponse, error) {
 
-	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
-		return nil, err
-	}
+	//if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+	//	return nil, err
+	//}
 
 	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
@@ -93,9 +93,9 @@ func (s *WithdrawerService) OkexDepositAddrAttach(ctx context.Context, req *v1.O
 }
 func (s *WithdrawerService) OkexDepositAddrDetach(ctx context.Context, req *v1.OkexDepositAddrDetachRequest) (*v1.OkexDepositAddrDetachResponse, error) {
 
-	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
-		return nil, err
-	}
+	//if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+	//	return nil, err
+	//}
 
 	userId, err := user.ResolveUserId(ctx)
 	if err != nil {

@@ -15,7 +15,7 @@ func NewZkSyncOfficialBridge(network v1.Network, c *BaseClientConfig) (*zksyncer
 
 	switch network {
 	case v1.Network_ZKSYNCERA:
-		return zksyncera.NewMainNetClient(&zksyncera.ClientConfig{
+		return zksyncera.NewClient(&zksyncera.ClientConfig{
 			HttpCli:     proxy.Cli,
 			RPCEndpoint: c.RPCEndpoint,
 		})

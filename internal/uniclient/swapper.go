@@ -23,7 +23,7 @@ func NewSwapper(network v1.Network, c *BaseClientConfig, taskType v1.TaskType) (
 	case v1.Network_Base:
 		return base.NewClient(&base.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_ZKSYNCERA:
-		return zksyncera.NewMainNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+		return zksyncera.NewClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 
 	default:
 		return nil, errors.New("unsupported network: " + taskType.String())

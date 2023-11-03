@@ -55,6 +55,7 @@ enum TaskType {
   WoofiSwap = 41;
   AaveLP = 42;
   MintFun = 43;
+  MintMerkly = 44;
 }
 
 

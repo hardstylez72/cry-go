@@ -11,7 +11,7 @@ import (
 
 func Test(t *testing.T) {
 
-	r, err := NewMainNetClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
+	r, err := NewClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 

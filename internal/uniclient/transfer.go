@@ -37,7 +37,7 @@ func NewTransfer(network v1.Network, c *BaseClientConfig) (defi.Transfer, error)
 	case v1.Network_AVALANCHE:
 		cli, err = avalanche.NewClient(&avalanche.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_ZKSYNCERA:
-		cli, err = zksyncera.NewMainNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+		cli, err = zksyncera.NewClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_StarkNet:
 		cli, err = starknet.NewClient(&starknet.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint, Proxy: c.ProxyString})
 	default:

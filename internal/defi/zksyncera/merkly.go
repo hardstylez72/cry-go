@@ -9,10 +9,11 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
-func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, error) {
+func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
 		Cli:      c.ClientL2,
@@ -27,7 +28,7 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 
 	result := &bozdo.DefaultRes{}
 
-	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
+	transactor, err := NewWalletTransactor(req.PK, c.NetworkId)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +65,16 @@ func (c *Client) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bo
 
 	return result, nil
 }
-func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error) {
+
+func (c *Client) BridgeNft(ctx context.Context, req *defi.BridgeNFTReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
+	switch taskType {
+	case v1.TaskType_MerklyMintAndBridgeNFT:
+		return c.BridgeNftMerkly(ctx, req)
+	default:
+		return nil, errors.New("not supported")
+	}
+}
+func (c *Client) BridgeNftMerkly(ctx context.Context, req *defi.BridgeNFTReq) (*bozdo.DefaultRes, error) {
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,
 		Cli:      c.ClientL2,
@@ -122,7 +132,7 @@ func (c *Client) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) 
 	return result, nil
 }
 
-func (c *Client) GetMerklyNFTId(ctx context.Context, txHash common.Hash, targetOwner common.Address) (*big.Int, error) {
+func (c *Client) GetNFTId(ctx context.Context, txHash common.Hash, targetOwner common.Address) (*big.Int, error) {
 
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,

@@ -10,6 +10,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
+	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
@@ -27,13 +28,22 @@ func (c *EtheriumClient) newTxOpt(ctx context.Context, pk string) (*bind.Transac
 	return opt, nil
 }
 
-func (c *EtheriumClient) MerklyMintNft(ctx context.Context, req *merkly.MintNFTReq) (*bozdo.DefaultRes, error) {
+func (c *EtheriumClient) Mint(ctx context.Context, req *SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
+	switch taskType {
+	case v1.TaskType_MerklyMintAndBridgeNFT, v1.TaskType_MintMerkly:
+		return c.MintMerkly(ctx, req)
+	default:
+		return nil, errors.New("not supported")
+	}
+}
+
+func (c *EtheriumClient) MintMerkly(ctx context.Context, req *SimpleReq) (*bozdo.DefaultRes, error) {
 	t, err := merkly.NewMinterTransactor(c.Cfg.Dict.Merkly.NFT, c.Cli)
 	if err != nil {
 		return nil, err
 	}
 
-	opt, err := c.newTxOpt(ctx, req.WalletPK)
+	opt, err := c.newTxOpt(ctx, req.PK)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +79,8 @@ func (c *EtheriumClient) MerklyMintNft(ctx context.Context, req *merkly.MintNFTR
 
 	return res, nil
 }
-func (c *EtheriumClient) MerklyBridgeNft(ctx context.Context, req *merkly.BridgeNFTReq) (*bozdo.DefaultRes, error) {
+
+func (c *EtheriumClient) BridgeNftMerkly(ctx context.Context, req *BridgeNFTReq) (*bozdo.DefaultRes, error) {
 
 	var _from common.Address              //+
 	var _dstChainId uint16                //+
@@ -148,7 +159,7 @@ func (c *EtheriumClient) MerklyBridgeNft(ctx context.Context, req *merkly.Bridge
 	return res, nil
 }
 
-func (c *EtheriumClient) GetMerklyNFTId(ctx context.Context, txHash common.Hash, owner common.Address) (*big.Int, error) {
+func (c *EtheriumClient) GetNFTId(ctx context.Context, txHash common.Hash, owner common.Address) (*big.Int, error) {
 	minId := big.NewInt(1000000)
 
 	receipt, err := c.Cli.TransactionReceipt(ctx, txHash)

@@ -12,7 +12,7 @@ import (
 )
 
 func TestStargate(t *testing.T) {
-	c, err := NewMainNetClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
+	c, err := NewClient(&ClientConfig{RPCEndpoint: MainNetURL, HttpCli: tests.GetConfig().Cli})
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 	r := &stargateBridgeMaker{c}

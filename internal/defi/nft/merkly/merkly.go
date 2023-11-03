@@ -23,20 +23,6 @@ type Maker struct {
 	CA       common.Address
 }
 
-type MintNFTReq struct {
-	WalletPK string
-
-	bozdo.BaseReq
-}
-
-type BridgeNFTReq struct {
-	WalletPK    string
-	FromNetwork v1.Network
-	ToNetwork   v1.Network
-	NFTId       *big.Int
-	bozdo.BaseReq
-}
-
 // site https://explorer.zksync.io/tx/0xa762372ccb04ca4495a9d90915b27fa44b2c402c63455f5a81e6312506abddb8
 func (m *Maker) MakeMintTx(ctx context.Context) (_ *bozdo.TxData, nftId *big.Int, _ error) {
 	c, err := NewMinterCaller(m.CA, m.Cli)

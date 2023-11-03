@@ -7,7 +7,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -106,7 +105,7 @@ func (t *MerklyMintAndBridgeNFTTask) Run(ctx context.Context, a *Input) (*v1.Pro
 	// bridge
 	if p.GetBridgeTx().GetTxId() == "" {
 
-		nftId, err := client.GetMerklyNFTId(ctx, common.HexToHash(p.GetMintTx().GetTxId()), common.HexToAddress(profile.Addr))
+		nftId, err := client.GetNFTId(ctx, common.HexToHash(p.GetMintTx().GetTxId()), common.HexToAddress(profile.Addr))
 		if err != nil {
 			tx := p.MintTx
 			if tx.RetryCount > 20 {
@@ -198,14 +197,14 @@ func MerklyMintNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMintA
 		Gas = gas
 	}
 
-	res, err := client.MerklyMintNft(ctx, &merkly.MintNFTReq{
-		WalletPK: wallet.PK,
-		BaseReq: bozdo.BaseReq{
+	res, err := client.Mint(ctx, &defi.SimpleReq{
+		PK: wallet.PK,
+		BaseReq: &bozdo.BaseReq{
 			EstimateOnly: estimateOnly,
 			Gas:          Gas,
 			Debug:        false,
 		},
-	})
+	}, v1.TaskType_MerklyMintAndBridgeNFT)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -247,7 +246,7 @@ func MerklyBridgeNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMin
 		return nil, nil, errors.New("invalid nft id: " + p.GetNftId())
 	}
 
-	res, err := client.MerklyBridgeNft(ctx, &merkly.BridgeNFTReq{
+	res, err := client.BridgeNft(ctx, &defi.BridgeNFTReq{
 		WalletPK:    wallet.PK,
 		FromNetwork: p.FromNetwork,
 		ToNetwork:   p.ToNetwork,
@@ -257,7 +256,7 @@ func MerklyBridgeNFT(ctx context.Context, profile *halp.Profile, p *v1.MerklyMin
 			Gas:          Gas,
 			Debug:        false,
 		},
-	})
+	}, v1.TaskType_MerklyMintAndBridgeNFT)
 	if err != nil {
 		return nil, nil, err
 	}

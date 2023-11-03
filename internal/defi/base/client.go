@@ -26,7 +26,9 @@ var TokenAddress = map[defi.Token]common.Address{
 var Dict = defi.Dict{
 	Stargate:                 defi.Stargate{},
 	TestNetBridgeSwapAddress: common.HexToAddress(""),
-	Merkly:                   defi.Merkly{},
+	Merkly: defi.Merkly{
+		NFT: common.HexToAddress("0xF882c982a95F4D3e8187eFE12713835406d11840"),
+	},
 	Pancake: defi.Pancake{
 		Router:  SpecMap["PancakeRouter"].Addr,
 		Factory: SpecMap["PancakeFactory"].Addr,

@@ -17,13 +17,13 @@ func Test(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 
-	nft, err := r.GetMerklyNFTId(context.Background(), common.HexToHash("0xe43fa82a0121f893b74de3328f78e9a7eebf90f6ddcfb10bdf8a5434ab45bfb3"))
+	nft, err := r.GetNFTId(context.Background(), common.HexToHash("0xe43fa82a0121f893b74de3328f78e9a7eebf90f6ddcfb10bdf8a5434ab45bfb3"))
 	assert.NoError(t, err)
 	assert.NotNil(t, nft)
 
 	println(nft.String())
 
-	res, err := r.MerklyBridgeNft(context.Background(), &merkly.BridgeNFTReq{
+	res, err := r.BridgeNftMerkly(context.Background(), &merkly.BridgeNFTReq{
 		WalletPK:    tests.GetConfig().PK,
 		FromNetwork: v1.Network_BinanaceBNB,
 		ToNetwork:   v1.Network_ZKSYNCERA,

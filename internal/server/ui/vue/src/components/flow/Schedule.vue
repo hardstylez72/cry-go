@@ -15,7 +15,7 @@
       <v-card-title class="d-flex justify-space-between">
         <span>Расписание</span>
         <div>
-          <v-btn @click="callBoba" variant="outlined">Запланировать</v-btn>
+          <v-btn @click="callBoba" :loading="loading" variant="outlined">Запланировать</v-btn>
           <v-icon icon="mdi-close" @click="dialog = false"/>
         </div>
 
@@ -134,10 +134,13 @@ export default {
       runAfterSchedule: [] as Item[],
       runAfterList: [] as Date[],
       runAfter: true,
+
+      loading: false,
     }
   },
   methods: {
     callBoba() {
+      this.loading = true
       this.$emit('bobaSatisfied', this.runAfterList)
     },
     generate() {

@@ -246,6 +246,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_MintFun:
 		p := t.Task.Task.(*v1.Task_MintFunTask).MintFunTask
 		e, err = task.NewMintFunMintTask().EstimateCost(ctx, p, profile)
+	case v1.TaskType_MintMerkly:
+		p := t.Task.Task.(*v1.Task_MintMerklyTask).MintMerklyTask
+		e, err = task.NewMerklyMintTask().EstimateCost(ctx, p, profile)
 
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")

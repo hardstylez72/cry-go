@@ -297,6 +297,7 @@ message Task {
     task.DefaultSwap woofiSwapTask = 45;
     task.DefaultLP aaveLPTask = 46;
     task.SimpleTask mintFunTask = 47;
+    task.SimpleTask mintMerklyTask = 48;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

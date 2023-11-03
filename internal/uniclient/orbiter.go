@@ -37,7 +37,7 @@ func NewOrbiterSwapper(network v1.Network, c *BaseClientConfig) (defi.OrbiterSwa
 	case v1.Network_AVALANCHE:
 		cli, err = avalanche.NewClient(&avalanche.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_ZKSYNCERA:
-		cli, err = zksyncera.NewMainNetClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+		cli, err = zksyncera.NewClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_Base:
 		cli, err = base.NewClient(&base.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	default:

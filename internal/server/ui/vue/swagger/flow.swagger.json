@@ -1432,6 +1432,9 @@
         },
         "mintFunTask": {
           "$ref": "#/definitions/SimpleTask"
+        },
+        "mintMerklyTask": {
+          "$ref": "#/definitions/SimpleTask"
         }
       },
       "required": [
@@ -1550,7 +1553,8 @@
         "ZkLendLP",
         "WoofiSwap",
         "AaveLP",
-        "MintFun"
+        "MintFun",
+        "MintMerkly"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

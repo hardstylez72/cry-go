@@ -16,7 +16,7 @@ import (
 
 func TestOdos(t *testing.T) {
 
-	cli, err := NewMainNetClient(&ClientConfig{
+	cli, err := NewClient(&ClientConfig{
 		HttpCli:     tests.GetConfig().Cli,
 		RPCEndpoint: MainNetURL,
 	})
