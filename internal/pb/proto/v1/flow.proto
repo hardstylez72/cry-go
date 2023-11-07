@@ -228,10 +228,10 @@ message Flow {
   optional string next_id = 6;
   google.protobuf.Timestamp created_at = 7;
   optional google.protobuf.Timestamp deleted_at = 8;
-
+  repeated Task random_tasks = 9;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id", "label", "payload", "created_at", "tasks"]
+      required: ["id", "label", "payload", "created_at", "tasks", "random_tasks"]
     }
   };
 }
@@ -298,6 +298,7 @@ message Task {
     task.DefaultLP aaveLPTask = 46;
     task.SimpleTask mintFunTask = 47;
     task.SimpleTask mintMerklyTask = 48;
+    task.SimpleTask mintZeriusTask = 49;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -310,10 +311,11 @@ message Task {
 message CreateFlowRequest {
    string label = 1;
   repeated Task tasks = 2;
+  repeated Task random_tasks = 3;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["label", "tasks"]
+      required: ["label", "tasks", "random_tasks"]
     }
   };
 }

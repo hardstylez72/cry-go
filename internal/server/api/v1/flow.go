@@ -64,10 +64,11 @@ func (s *FlowService) CreateFlow(ctx context.Context, req *v1.CreateFlowRequest)
 		return nil, err
 	}
 	pb := &v1.Flow{
-		Id:        uuid.New().String(),
-		Label:     req.Label,
-		Tasks:     req.Tasks,
-		CreatedAt: timestamppb.Now(),
+		Id:          uuid.New().String(),
+		Label:       req.Label,
+		Tasks:       req.Tasks,
+		CreatedAt:   timestamppb.Now(),
+		RandomTasks: req.GetRandomTasks(),
 	}
 
 	a := &repository.Flow{}
@@ -91,6 +92,7 @@ func (s *FlowService) CreateFlow(ctx context.Context, req *v1.CreateFlowRequest)
 
 	return &v1.CreateFlowResponse{Flow: pb}, nil
 }
+
 func (s *FlowService) ListFlow(ctx context.Context, req *v1.ListFlowRequest) (*v1.ListFlowResponse, error) {
 
 	userId, err := user.ResolveUserId(ctx)

@@ -69,6 +69,7 @@ type TxData struct {
 	Rate         *float64
 	Gas          *big.Int
 	ExtraFee     *big.Int
+	Code         TxCode
 }
 
 type BaseReq struct {

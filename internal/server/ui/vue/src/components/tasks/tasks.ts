@@ -71,6 +71,7 @@ import {SwapWoofiSpec} from "@/components/tasks/SwapWoofi";
 import {LPAaveSpec} from "@/components/tasks/LPAave";
 import {NFTMintFunSpec} from "@/components/tasks/NFTMintFun";
 import {NFTMerklyMintSpec, NFTMerklySpec} from "@/components/tasks/NFTMerkly";
+import {NFTZeriusMintSpec} from "@/components/tasks/NFTZeruis";
 
 
 export interface TaskArg {
@@ -624,6 +625,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   AaveLP: LPAaveSpec,
   MintFun: NFTMintFunSpec,
   MintMerkly: NFTMerklyMintSpec,
+  MintZerius: NFTZeriusMintSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

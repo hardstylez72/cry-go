@@ -12,6 +12,23 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewZeriusMintTask() *DefaultMintTask {
+	return &DefaultMintTask{
+		taskType: v1.TaskType_MintZerius,
+		extractor: func(a *Input) (*v1.SimpleTask, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_MintZeriusTask)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_MintZeriusTask) call an ambulance!")
+			}
+			return l.MintZeriusTask, nil
+		},
+		cancel: nil,
+		DefaultMintTaskHalper: &DefaultMintTaskHalper{
+			v1.TaskType_MintZerius,
+		},
+	}
+}
+
 func NewMerklyMintTask() *DefaultMintTask {
 	return &DefaultMintTask{
 		taskType: v1.TaskType_MintMerkly,

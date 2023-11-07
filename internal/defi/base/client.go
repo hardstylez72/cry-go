@@ -50,6 +50,9 @@ var Dict = defi.Dict{
 	MintFun: defi.MintFun{
 		Minter: common.HexToAddress("0x69b69cc6e9f99c62a003fd9e143c126504d49dc2"),
 	},
+	Zerius: defi.Zerius{
+		Minter: common.HexToAddress("0x178608fFe2Cca5d36f3Fc6e69426c4D3A5A74A41"),
+	},
 }
 
 type Client struct {

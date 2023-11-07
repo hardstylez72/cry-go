@@ -10,7 +10,6 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
 	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
-	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
@@ -26,15 +25,6 @@ func (c *EtheriumClient) newTxOpt(ctx context.Context, pk string) (*bind.Transac
 	}
 	opt.Context = ctx
 	return opt, nil
-}
-
-func (c *EtheriumClient) Mint(ctx context.Context, req *SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
-	switch taskType {
-	case v1.TaskType_MerklyMintAndBridgeNFT, v1.TaskType_MintMerkly:
-		return c.MintMerkly(ctx, req)
-	default:
-		return nil, errors.New("not supported")
-	}
 }
 
 func (c *EtheriumClient) MintMerkly(ctx context.Context, req *SimpleReq) (*bozdo.DefaultRes, error) {

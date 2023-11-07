@@ -61,7 +61,7 @@
       <v-list v-else max-width="96vw" class="px-5">
         <v-list-item
           density="compact"
-          variant="plain"
+          variant="outlined"
           class="my-1 my-4"
           v-for="item in getList"
           :key="item.id"
@@ -71,7 +71,7 @@
           @click="viewProcess(item.id)"
           style="border: 0px solid "
         >
-          <div class="d-flex justify-start">
+          <div class="d-flex justify-start align-center">
             <StatusCard :status="item.status" class="mx-2"/>
             <div class="mr-2">
               <v-progress-linear
@@ -86,16 +86,19 @@
               </v-progress-linear>
             </div>
 
-            <div class="mr-2"><b>{{ `flow: ${item.flowLabel}` }}</b></div>
-            <div class="mr-2" v-if="item.runAfter"> Запуск запланирован {{ formatTime(item.runAfter) }}</div>
-          </div>
-          <div class="mr-2">Created: {{ dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
-          <div class="mr-2">Profiles: <b>[{{ getProfiles(item) }}]</b></div>
-          <div><b>Flow:</b>
-            <div class="mr-2" v-for="(d, i) in getFlow(item.flow)">
-              <b>{{ i + 1 }})</b> {{ d }}
+            <div class="mr-2 text-h6 text-blue-darken-1"><b>{{ `${item.flowLabel}` }}</b></div>
+            <div class="mr-2" v-if="item.runAfter && item.status === ProcessStatus.StatusReady"> Запуск запланирован
+              {{ formatTime(item.runAfter) }}
             </div>
+            <div class="mr-2">Created: {{ dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
           </div>
+
+          <div class="mr-2">Profiles: <b>{{ getProfiles(item) }}</b></div>
+          <!--          <div><b>Flow:</b>-->
+          <!--            <div class="mr-2" v-for="(d, i) in getFlow(item.flow)">-->
+          <!--              <b>{{ i + 1 }})</b> {{ d }}-->
+          <!--            </div>-->
+          <!--          </div>-->
         </v-list-item>
         <v-btn v-if="showNext" @click="next" :loading="nextLoading" width="100%">More</v-btn>
       </v-list>
@@ -322,15 +325,73 @@ export default defineComponent({
         labels.push(Number(pp.profileLabel))
       })
 
-      labels = labels.sort((a, b) => a - b)
+      const ranges = this.mergeIntervals(labels)
 
       let out = ""
-      labels.forEach((label) => {
-        out += label + ", "
+      ranges.forEach((range) => {
+        if (range.length === 1) {
+          out += ", " + range[0]
+        } else {
+          out += `, [${range[0]}-${range[1]}]`
+        }
       })
-      if (out.length) {
-        out = out.substring(0, out.length - 2)
+      out = out.substring(2)
+
+      return out
+    },
+    mergeIntervals(array: number[]): number[][] {
+
+      if (array.length === 1) {
+        return [array]
       }
+
+      array = array.sort((a, b) => a - b)
+
+      const out: number[][] = []
+
+      let start = 0
+      let end = 0
+      let prev = 0
+
+      for (let i = 0; i <= array.length; i++) {
+
+        if (i === 0) {
+          prev = i
+          start = prev
+          continue
+        }
+
+        while (true) {
+          if (array[i] - array[prev] === 1) {
+            end = i
+            prev = i
+            i++
+          } else {
+            break
+          }
+        }
+
+        if (start === end) {
+          out.push([array[start]])
+          if (end + 1 < array.length) {
+            end += 1
+            start = end
+            prev = end
+          }
+        } else {
+          out.push([array[start], array[end]])
+          if (end + 1 < array.length) {
+            start = end + 1
+            end = i
+            prev = start
+          }
+        }
+
+
+      }
+
+
+      console.log(out)
       return out
     },
     next() {

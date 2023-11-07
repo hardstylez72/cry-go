@@ -1340,6 +1340,9 @@ export interface Task {
 
   /**  */
   mintMerklyTask?: SimpleTask;
+
+  /**  */
+  mintZeriusTask?: SimpleTask;
 }
 
 export interface TaskTx {
@@ -1541,6 +1544,9 @@ export interface flow_Flow {
 
   /**  */
   deletedAt?: Date;
+
+  /**  */
+  randomTasks: Task[];
 }
 
 export enum Network {
@@ -1619,7 +1625,8 @@ export enum TaskType {
   'WoofiSwap' = 'WoofiSwap',
   'AaveLP' = 'AaveLP',
   'MintFun' = 'MintFun',
-  'MintMerkly' = 'MintMerkly'
+  'MintMerkly' = 'MintMerkly',
+  'MintZerius' = 'MintZerius'
 }
 
 export enum Token {

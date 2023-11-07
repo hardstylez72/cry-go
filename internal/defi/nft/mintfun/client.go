@@ -27,6 +27,7 @@ func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq) (*bozdo.DefaultR
 	data := &bozdo.TxData{
 		Data:         common.Hex2Bytes("6a6278420000000000000000000000004a6e7c137a6691d55693ca3bc7e5c698d9d438150021fb3f"),
 		ContractAddr: c.ca,
+		Code:         bozdo.CodeMint,
 	}
 
 	opt := &defi.TxOpt{

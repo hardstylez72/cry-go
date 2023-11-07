@@ -60,6 +60,12 @@
                      value="поддержка"
                      @click="$router.push({name: 'Issues'})"></v-list-item>
 
+        <v-list-item prepend-icon="mdi-school" title="Как пользоваться" color="green"
+                     value="guide"
+                     @click="openGuide"
+        >
+        </v-list-item>
+
         <div class="h-auto py-4 pl-3">
           <div class="flex-column  justify-start">
 
@@ -170,6 +176,9 @@ export default defineComponent({
     ...mapActions(useUserStore, ['syncUser', "syncDailyImpact"])
   },
   methods: {
+    openGuide() {
+      window.open('tg://resolve?domain=Instruction_DropHunter_bot&start=c1697659253166-ds', '_blank');
+    },
     toggleTheme() {
       const theme = this.getTheme() === 'dark' ? 'light' : 'dark'
       this.setTheme(theme)

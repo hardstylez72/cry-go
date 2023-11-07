@@ -177,6 +177,7 @@ func (a *Bridge) MakeBridgeTx2(ctx context.Context, req *defi.DefaultBridgeReq) 
 		Rate:         nil,
 		Gas:          nil,
 		ExtraFee:     extraFee,
+		Code:         bozdo.CodeBridge,
 	}, nil
 }
 
@@ -280,6 +281,7 @@ func (a *Bridge) MakeBridgeTx(ctx context.Context, req *defi.DefaultBridgeReq) (
 		Rate:         nil,
 		Gas:          nil,
 		ExtraFee:     extraFee,
+		Code:         bozdo.CodeBridge,
 	}, nil
 }
 

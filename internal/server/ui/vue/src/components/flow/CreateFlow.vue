@@ -36,6 +36,7 @@ export default defineComponent({
     return {
       demo: false,
       tasks: [] as Task[],
+      randomTasks: [] as Task[],
       stepTypes: taskTypes,
       show: this.showProp,
       item: {} as CreateFlowRequest,
@@ -43,13 +44,21 @@ export default defineComponent({
     }
   },
   methods: {
-    flowChanged(label: string, tasks: TaskArg[]) {
+    flowChanged(label: string, tasks: TaskArg[], randomTasks: TaskArg[]) {
       this.tasks = []
       tasks.forEach(t => {
         if (t.task) {
           this.tasks.push(t.task)
         }
       })
+
+      this.randomTasks = []
+      randomTasks.forEach(t => {
+        if (t.task) {
+          this.randomTasks.push(t.task)
+        }
+      })
+
       this.item.label = label
       this.validateForm()
     },
@@ -68,6 +77,7 @@ export default defineComponent({
       try {
         this.saveLoading = true
         this.item.tasks = this.tasks
+        this.item.randomTasks = this.randomTasks
 
         const res = await flowService.flowServiceCreateFlow({body: this.item})
         this.$router.push({name: "Flow", params: {id: res.flow.id}})

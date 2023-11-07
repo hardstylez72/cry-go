@@ -88,7 +88,7 @@ func (c *EtheriumClient) LondonReadyTx(ctx context.Context, opt *TxOpt, data *bo
 
 	r.ECost.Details = data.Details
 	if l1Fee != nil && l1Fee.Cmp(big.NewInt(0)) != 0 {
-		r.ECost.Details = append(r.ECost.Details, bozdo.NewProtocolFeeDetails(l1Fee, v1.Network_Base, c.Cfg.MainToken))
+		r.ECost.Details = append(r.ECost.Details, bozdo.NewProtocolFeeDetails(l1Fee, c.Network(), c.Cfg.MainToken))
 	}
 
 	if data.Rate != nil && opt.ExchangeRate != nil {
@@ -119,7 +119,7 @@ func (c *EtheriumClient) LondonReadyTx(ctx context.Context, opt *TxOpt, data *bo
 			return nil, err
 		}
 
-		r.Tx = c.NewTx(tx.Hash(), bozdo.CodeSwap, r.ECost.Details)
+		r.Tx = c.NewTx(tx.Hash(), data.Code, r.ECost.Details)
 	}
 
 	return r, nil

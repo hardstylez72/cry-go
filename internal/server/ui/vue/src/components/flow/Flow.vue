@@ -60,7 +60,7 @@
   <v-spacer class="my-6"/>
   <v-form validate-on="submit" ref="flow-form">
     <FlowForm v-if="!flowLoading" :disable="disabled" :label-value="flow.label" :tasks-value="tasks"
-              @flow-changed="flowChanged"/>
+              @flow-changed="flowChanged" :random-tasks-value="randomTasks"/>
   </v-form>
 
 </template>
@@ -94,15 +94,13 @@ export default defineComponent({
   },
   data() {
     return {
-      runAfterSchedule: [],
-      runAfterList: [],
-      runAfter: false,
       selectedProfiles: [] as Profile[],
       editMode: false,
       flowId: "" as string,
       flow: {} as Flow,
       disabled: true,
       tasks: [] as Task[],
+      randomTasks: [] as Task[],
       showUpdateBtn: false,
       updatingFlow: false,
       timer: new Timer(),
@@ -142,7 +140,7 @@ export default defineComponent({
 
       return valid
     },
-    flowChanged(label: string, tasks: TaskArg[]) {
+    flowChanged(label: string, tasks: TaskArg[], randomTasks: TaskArg[]) {
       this.flow.label = label
       this.tasks = []
       tasks.forEach(t => {
@@ -150,6 +148,14 @@ export default defineComponent({
           this.tasks.push(t.task)
         }
       })
+
+      this.randomTasks = []
+      randomTasks.forEach(t => {
+        if (t.task) {
+          this.randomTasks.push(t.task)
+        }
+      })
+
       this.validateForm()
     },
     async updateFlow() {
@@ -159,6 +165,7 @@ export default defineComponent({
       try {
         this.updatingFlow = true
         this.flow.tasks = this.tasks
+        this.flow.randomTasks = this.randomTasks
 
         const res = await flowService.flowServiceUpdateFlow({body: {flow: this.flow}})
         this.flow = res.flow
@@ -226,6 +233,7 @@ export default defineComponent({
         const res = await flowService.flowServiceGetFlow({body: {id: this.flowId}})
         this.flow = res.flow
         this.tasks = this.flow.tasks
+        this.randomTasks = this.flow.randomTasks
       } finally {
         this.flowLoading = false
       }

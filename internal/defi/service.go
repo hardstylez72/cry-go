@@ -26,8 +26,12 @@ type Dict struct {
 	Woofi                    Woofi
 	Aave                     Aave
 	MintFun                  MintFun
+	Zerius                   Zerius
 }
 
+type Zerius struct {
+	Minter common.Address
+}
 type MintFun struct {
 	Minter common.Address
 }

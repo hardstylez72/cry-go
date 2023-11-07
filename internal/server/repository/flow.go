@@ -47,10 +47,11 @@ func (a *Flow) ToPB() (*v1.Flow, error) {
 		return nil, err
 	}
 	p := &v1.Flow{
-		Id:        a.Id,
-		Label:     a.Label,
-		Tasks:     f.Tasks,
-		CreatedAt: timestamppb.New(a.CreatedAt),
+		Id:          a.Id,
+		Label:       a.Label,
+		Tasks:       f.Tasks,
+		RandomTasks: f.RandomTasks,
+		CreatedAt:   timestamppb.New(a.CreatedAt),
 	}
 
 	if a.NextId.Valid {
@@ -121,6 +122,15 @@ func (r *pgRepository) GetFlow(ctx context.Context, userId, flowId string) (*Flo
 	}
 
 	return res, nil
+}
+
+func (r *pgRepository) GetFlowLabel(ctx context.Context, userId, flowId string) (*string, error) {
+	q := `select label from flow where id = $1 and user_id = $2`
+	var a string
+	if err := r.conn.GetContext(ctx, &a, q, flowId, userId); err != nil {
+		return nil, err
+	}
+	return &a, nil
 }
 
 func getFlow(ctx context.Context, conn *sqlx.DB, id, userId string) (*Flow, error) {

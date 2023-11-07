@@ -103,6 +103,7 @@ var PayableTasks = []v1.TaskType{
 	v1.TaskType_AaveLP,
 	v1.TaskType_MintFun,
 	v1.TaskType_MintMerkly,
+	v1.TaskType_MintZerius,
 }
 
 var NonPayableTasks = []v1.TaskType{
@@ -127,7 +128,7 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_ZkSyncOfficialBridgeFromEthereum: &Wrap{Tasker: &ZksyncOfficialBridgeFromEthereumTask{}},
 	v1.TaskType_WETH:                             &Wrap{Tasker: &WethTask{}},
 	v1.TaskType_MuteioSwap:                       &Wrap{Tasker: NewMuteioSwapTask()},
-	v1.TaskType_SyncSwapLP:                       &Wrap{Tasker: &DefaultLPTask{}},
+	v1.TaskType_SyncSwapLP:                       &Wrap{Tasker: &SyncSwapLPTask{}},
 	v1.TaskType_MaverickSwap:                     &Wrap{Tasker: NewMaverickSwapTask()},
 	v1.TaskType_SpaceFISwap:                      &Wrap{Tasker: NewSpaceFiSwapTask()},
 	v1.TaskType_VelocoreSwap:                     &Wrap{Tasker: NewVelocoreSwapTask()},
@@ -157,6 +158,7 @@ var executors = map[v1.TaskType]Tasker{
 	v1.TaskType_AaveLP:                           &Wrap{Tasker: NewAaveLPTask()},
 	v1.TaskType_MintFun:                          &Wrap{Tasker: NewMintFunMintTask()},
 	v1.TaskType_MintMerkly:                       &Wrap{Tasker: NewMerklyMintTask()},
+	v1.TaskType_MintZerius:                       &Wrap{Tasker: NewZeriusMintTask()},
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
@@ -426,6 +428,12 @@ func GetTaskDesc(m *v1.Task) ([]byte, error) {
 			return nil, errors.New("m.Task.(*v1.Task_MintMerklyTask)")
 		}
 		return Marshal(t.MintMerklyTask)
+	case v1.TaskType_MintZerius:
+		t, ok := m.Task.(*v1.Task_MintZeriusTask)
+		if !ok {
+			return nil, errors.New("m.Task.(*v1.Task_MintZeriusTask)")
+		}
+		return Marshal(t.MintZeriusTask)
 	default:
 		return nil, errors.New("invalid task type: " + m.TaskType.String())
 	}

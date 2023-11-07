@@ -9,6 +9,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/aave"
 	"github.com/hardstylez72/cry/internal/defi/across"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/generic"
 	"github.com/hardstylez72/cry/internal/defi/nft/mintfun"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -85,12 +86,9 @@ func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.Task
 	case v1.TaskType_MintFun:
 		cli := mintfun.NewClient(c.defi.Cfg.Dict.MintFun.Minter, c.defi)
 		return cli.Mint(ctx, req)
-	case v1.TaskType_MerklyMintAndBridgeNFT:
-		return c.defi.MintMerkly(ctx, req)
-	case v1.TaskType_MintMerkly:
-		return c.defi.MintMerkly(ctx, req)
 	default:
-		return nil, errors.New("unknown task type: " + taskType.String())
+		m := generic.NewMinter(c.defi)
+		return m.Mint(ctx, req, taskType)
 	}
 }
 

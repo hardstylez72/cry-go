@@ -51,7 +51,7 @@ func (r *pgRepository) GetProcessArg(ctx context.Context, req *v1.GetProcessRequ
 	if err != nil {
 		return nil, err
 	}
-	pb, err := p.ToPB(fpb)
+	pb, err := p.ToPB(fpb.Label, fpb)
 	if err != nil {
 		return nil, err
 	}

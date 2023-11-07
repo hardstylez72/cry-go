@@ -2,9 +2,37 @@
   <v-row class="mx-5">
     <v-col cols="5" v-if="!isMobile"
            style="float: left; font-size: 18px; width: 30%; overflow: auto; box-sizing: border-box;">
-      <v-card class="px-1 py-1">
-        Сценарий
+      <v-card class="px-2 py-2">
+        <v-card-title class="font-weight-bold text-blue-darken-2 text-center">
+          Сценарий
+        </v-card-title>
+
+        <v-card-subtitle class="font-weight-bold text-blue-darken-2 text-center">
+          Случайные задачи
+        </v-card-subtitle>
+        <div v-if="randomTasks.length === 0" class="text-center">-</div>
+
+        <div v-else class="handle my-2 elevation-1 py-1 px-1" style="cursor: pointer; height: 50px;"
+             v-for="element in randomTasks">
+          <a style="text-decoration: none; color: black" :href="`#${element.weight}`">
+            <div class="d-inline-flex">
+              {{ element.weight }})
+              <a target="_blank" :href="taskSpec(element).service.link" class="mx-1">
+                <v-img style="background-color: lightgray" height="22px" :src="taskSpec(element).service.img"/>
+              </a>
+              <b>{{ element.taskType }}</b>
+            </div>
+            <span>{{ taskDescription(element) }}</span>
+            <v-icon v-if="!disable" icon="mdi-close" @click="randomTaskDeleted(element.weight)"></v-icon>
+          </a>
+        </div>
+
+        <v-card-subtitle class="font-weight-bold text-blue-darken-2 text-center">
+          Основные задачи
+        </v-card-subtitle>
+        <div v-if="tasks.length === 0" class="text-center">-</div>
         <draggable
+          v-else
           v-model="tasks"
           @start="drag=true"
           @end="orderChanged"
@@ -30,27 +58,6 @@
             </div>
           </template>
         </draggable>
-        <v-menu
-          location-strategy="connected"
-          max-width="700px"
-          location="left"
-          v-model="menu"
-          persistent="true"
-          no-click-animation
-          transition="false"
-          :close-on-content-click="false"
-          :close-on-back="false">
-          <template v-slot:activator="{ props }">
-            <v-btn rounded="false" width="100%" v-bind="props" :disabled="disable">Добавить задачу</v-btn>
-          </template>
-          <v-card>
-            <div class="d-flex justify-end">
-              <v-icon icon="mdi-close" @click="menu = false"></v-icon>
-            </div>
-            <TaskSelector v-if="!disable" @task-selected="addStep"/>
-          </v-card>
-        </v-menu>
-
 
       </v-card>
     </v-col>
@@ -66,16 +73,23 @@
         @input="labelChanged"
         :disabled="disable"
       ></v-text-field>
-      <draggable
-        v-model="tasks"
-        @start="drag=true"
-        @end="orderChanged"
-        item-key="weight"
-        :animation="100"
-        handle=".handle"
-      >
-        <template #item="{element}">
-          <v-row class="d-flex justify-space-between">
+
+      <div class="my-2">
+        <TaskSelectorMenu label="Добавить случайную задачу" :disable="disable" @addStep="addRandomStep"/>
+      </div>
+      <div class="my-2">
+        <TaskSelectorMenu label="Добавить основную задачу" :disable="disable" @addStep="addStep"/>
+      </div>
+
+
+      <v-card v-if="randomTasks.length !== 0">
+        <v-card-title class="font-weight-bold text-blue-darken-2 text-center">
+          Случайные задачи
+        </v-card-title>
+        <v-card-text>
+
+
+          <v-row class="d-flex justify-space-between" v-for="element in randomTasks">
             <v-col>
               <v-card>
                 <div class="d-inline-flex my-1 mx-1">
@@ -89,16 +103,16 @@
                     <h4 v-if="!disable">
                       <v-icon icon="mdi-dots-vertical" class="handle" @click="() => {}"/>
                     </h4>
-                    <a><h4 :id="element.weight" class="mx-2">{{ `${element.weight}) ${element.taskType}` }}</h4></a>
+                    <a><h4 class="mx-2">{{ `${element.weight}) ${element.taskType}` }}</h4></a>
                     <a target="_blank" :href="taskSpec(element).service.link" class="mx-1">
                       <v-img height="22px" :src="taskSpec(element).service.img"/>
                     </a>
                   </div>
 
-                  <v-icon v-if="!disable" icon="mdi-close" @click="taskDeleted(element.weight)"></v-icon>
+                  <v-icon v-if="!disable" icon="mdi-close" @click="randomTaskDeleted(element.weight)"></v-icon>
                 </v-card-title>
                 <component
-                  @taskChanged="taskChanged"
+                  @taskChanged="randomTaskChanged"
                   style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;"
                   :is="element.component"
                   :weight="element.weight"
@@ -109,10 +123,64 @@
               </v-card>
             </v-col>
           </v-row>
-        </template>
-      </draggable>
-      <TaskSelector v-if="!disable && isMobile" @task-selected="addStep"/>
 
+        </v-card-text>
+      </v-card>
+
+
+      <v-card v-if="tasks.length !== 0">
+        <v-card-title class="font-weight-bold text-blue-darken-2 text-center">
+          Основные задачи
+        </v-card-title>
+        <v-card-text>
+          <draggable
+            v-model="tasks"
+            @start="drag=true"
+            @end="orderChanged"
+            item-key="weight"
+            :animation="100"
+            handle=".handle"
+          >
+            <template #item="{element}">
+              <v-row class="d-flex justify-space-between">
+                <v-col>
+                  <v-card>
+                    <div class="d-inline-flex my-1 mx-1">
+                      Доступна для типов профилей: [
+                      <div v-for="t of taskSpec(element).profileType.values()"><b>{{ t + " " }}</b></div>
+                      ]
+                    </div>
+
+                    <v-card-title class="d-flex justify-space-between px-0 align-center">
+                      <div class="d-inline-flex align-center">
+                        <h4 v-if="!disable">
+                          <v-icon icon="mdi-dots-vertical" class="handle" @click="() => {}"/>
+                        </h4>
+                        <a><h4 :id="element.weight" class="mx-2">{{ `${element.weight}) ${element.taskType}` }}</h4></a>
+                        <a target="_blank" :href="taskSpec(element).service.link" class="mx-1">
+                          <v-img height="22px" :src="taskSpec(element).service.img"/>
+                        </a>
+                      </div>
+
+                      <v-icon v-if="!disable" icon="mdi-close" @click="taskDeleted(element.weight)"></v-icon>
+                    </v-card-title>
+                    <component
+                      @taskChanged="taskChanged"
+                      style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;"
+                      :is="element.component"
+                      :weight="element.weight"
+                      :task="element.task"
+                      :disabled="disable"
+                      :spec="taskSpec(element)"
+                    />
+                  </v-card>
+                </v-col>
+              </v-row>
+            </template>
+          </draggable>
+          <TaskSelector v-if="!disable && isMobile" @task-selected="addStep"/>
+        </v-card-text>
+      </v-card>
     </v-col>
   </v-row>
 
@@ -128,6 +196,7 @@ import TaskChip from "@/components/tasks/TaskChip.vue";
 import {networkProps} from "@/components/helper";
 import TaskSelector from "@/components/flow/TaskSelector.vue";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
+import TaskSelectorMenu from "@/components/flow/TaskSelectorMenu.vue";
 
 
 export default defineComponent({
@@ -136,50 +205,35 @@ export default defineComponent({
     isMobile() {
       return window.innerWidth < 1280
     },
-    networkProps() {
-      return networkProps
-    },
     taskProps() {
       return taskProps
     },
     taskTypes() {
       return taskTypes
     },
-    Filters(): string[] {
-      return ['Сеть', 'Airdrop']
-    },
   },
   components: {
+    TaskSelectorMenu,
     TaskSelector,
     TaskChip,
     draggable,
   },
   watch: {
-    filterNetwork: {
-      handler() {
-        this.getTaskList()
-      },
-    },
-    filterAirdrop: {
-      handler() {
-        this.getTaskList()
-      },
-    },
     label: {
       handler() {
-        this.$emit('flowChanged', this.label, this.tasks)
+        this.sync()
       }
     },
     tasks: {
       handler() {
-        this.$emit('flowChanged', this.label, this.tasks)
+        this.sync()
       }
     },
-    filter: {
+    randomTasks: {
       handler() {
-        this.getTaskList()
-      },
-    }
+        this.sync()
+      }
+    },
   },
   props: {
     demo: {
@@ -197,6 +251,10 @@ export default defineComponent({
     tasksValue: {
       type: Array as PropType<Task[]>,
       required: false
+    },
+    randomTasksValue: {
+      type: Array as PropType<Task[]>,
+      required: false
     }
   },
   emits: ['flowChanged'],
@@ -208,81 +266,21 @@ export default defineComponent({
       label: "",
       selectedTask: TaskType.Delay,
       tasks: [] as TaskArg[],
-
-      filterType: 'Сеть' as 'Сеть' | 'Airdrop',
-
-
-      taskJobs: [] as TaskJob[],
-      jobSet: new Set<TaskJob>(),
-
-      filterNetwork: 'Все сети' as 'Все сети' | Network,
-      networks: [] as Network[],
-      networkSet: new Set<Network>(),
-
-      filterAirdrop: 'Все Airdrop' as 'Все Airdrop' | Airdrop,
-      airdrops: [] as Airdrop[],
-      airdropSet: new Set<Airdrop>()
+      randomTasks: [] as TaskArg[],
     }
   },
   methods: {
-    filterTasksByJob(job: TaskJob): TaskType[] {
-      const out: TaskType[] = []
-
-      this.taskTypes.forEach((taskType) => {
-        if (this.taskProps[taskType].job !== job) {
-          return
-        }
-
-        switch (true) {
-          case this.filterType === 'Сеть' :
-            if (this.filterNetwork !== 'Все сети' && !this.taskProps[taskType].networks.has(this.filterNetwork)) {
-              return;
-            }
-            break
-          case this.filterType === 'Airdrop' :
-            if (this.filterAirdrop !== 'Все Airdrop' && !this.taskProps[taskType].airdrops.has(this.filterAirdrop)) {
-              return;
-            }
-            break
-        }
-
-        out.push(taskType)
-      })
-      return out
+    sync() {
+      console.log('taskChanged')
+      this.$emit('flowChanged', this.label, this.tasks, this.randomTasks)
     },
-    getTaskList() {
-
-      this.networks = []
-      this.airdrops = []
-      this.taskJobs = []
-
-      this.jobSet = new Set<TaskJob>()
-      this.airdropSet = new Set<Airdrop>()
-      this.networkSet = new Set<Network>()
-
-      this.taskTypes.forEach((taskType) => {
-
-        this.jobSet.add(this.taskProps[taskType].job)
-        this.taskProps[taskType].airdrops.forEach((airdrop) => {
-          this.airdropSet.add(airdrop)
-        })
-
-        taskProps[taskType].networks.forEach((network) => {
-          this.networkSet.add(network)
-        })
-      })
-
-      for (const airdrop of this.airdropSet.values()) {
-        this.airdrops.push(airdrop)
-      }
-
-      for (const network of this.networkSet.values()) {
-        this.networks.push(network)
-      }
-
-      for (const job of this.jobSet.values()) {
-        this.taskJobs.push(job)
-      }
+    addRandomStep(task: TaskType) {
+      this.randomTasks.push({
+        component: taskComponentMap.get(task),
+        weight: this.randomTasks.length + 1,
+        taskType: task
+      });
+      this.resolveRandomOrder()
     },
     taskSpec(item: TaskArg): TaskSpec {
       return taskProps[item.taskType]
@@ -303,14 +301,25 @@ export default defineComponent({
       });
       this.resolveOrder()
     },
+    randomTaskDeleted(i: number) {
+      this.randomTasks = this.randomTasks.filter(t => t.weight !== i)
+      this.resolveRandomOrder()
+      this.sync()
+    },
     taskDeleted(i: number) {
       this.tasks = this.tasks.filter(t => t.weight !== i)
       this.resolveOrder()
-      this.$emit('flowChanged', this.label, this.tasks)
+      this.sync()
     },
     orderChanged() {
       this.drag = false
       this.resolveOrder()
+    },
+    resolveRandomOrder() {
+      this.randomTasks = this.randomTasks.map((t, i) => {
+        t.weight = ++i
+        return t
+      })
     },
     resolveOrder() {
       this.tasks = this.tasks.map((t, i) => {
@@ -321,12 +330,24 @@ export default defineComponent({
     taskChanged(task: Task) {
       console.log('taskChanged')
       this.updateTask(task)
-      this.$emit('flowChanged', this.label, this.tasks)
+      this.sync()
+    },
+    randomTaskChanged(task: Task) {
+      console.log('randomTaskChanged')
+      this.updateRandomTask(task)
+      this.sync()
     },
     updateTask(task: Task) {
       for (let i = 0; i < this.tasks.length; i++) {
         if (this.tasks[i].weight.toString() === task.weight) {
           this.tasks[i].task = task
+        }
+      }
+    },
+    updateRandomTask(task: Task) {
+      for (let i = 0; i < this.randomTasks.length; i++) {
+        if (this.randomTasks[i].weight.toString() === task.weight) {
+          this.randomTasks[i].task = task
         }
       }
     },
@@ -352,7 +373,6 @@ export default defineComponent({
     },
   },
   created() {
-    this.getTaskList()
 
     if (this.labelValue) {
       this.label = this.labelValue
@@ -360,6 +380,17 @@ export default defineComponent({
     if (this.tasksValue) {
       this.tasksValue.forEach((v) => {
         this.tasks.push({
+          component: taskComponentMap.get(v.taskType),
+          weight: Number(v.weight),
+          task: v,
+          taskType: v.taskType,
+        })
+      })
+    }
+
+    if (this.randomTasksValue) {
+      this.randomTasksValue.forEach((v) => {
+        this.randomTasks.push({
           component: taskComponentMap.get(v.taskType),
           weight: Number(v.weight),
           task: v,

@@ -1969,6 +1969,9 @@
         },
         "mintMerklyTask": {
           "$ref": "#/definitions/SimpleTask"
+        },
+        "mintZeriusTask": {
+          "$ref": "#/definitions/SimpleTask"
         }
       },
       "required": [
@@ -2088,7 +2091,8 @@
         "WoofiSwap",
         "AaveLP",
         "MintFun",
-        "MintMerkly"
+        "MintMerkly",
+        "MintZerius"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -2351,6 +2355,13 @@
         "deletedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "randomTasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Task"
+          }
         }
       },
       "required": [
@@ -2358,7 +2369,8 @@
         "label",
         "payload",
         "createdAt",
-        "tasks"
+        "tasks",
+        "randomTasks"
       ]
     }
   }

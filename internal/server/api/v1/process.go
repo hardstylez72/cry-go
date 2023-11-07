@@ -2,7 +2,9 @@ package v1
 
 import (
 	"context"
+	"math/rand"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 
@@ -80,27 +82,23 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 
 	for profileWeight, profileId := range req.ProfileIds {
 
-		processTasks := make([]*v1.ProcessTask, 0)
-
+		tasks := []v1.Task{}
 		for i := range flow.Tasks {
-			t := flow.Tasks[i]
+			tasks = append(tasks, *flow.Tasks[i])
+		}
 
-			marshal, err := task.GetTaskDesc(t)
-			if err != nil {
-				return nil, errors.Wrap(err, "lib.Marshal")
-			}
-			description := string(marshal)
-			t.Description = description
+		randomTasks := []v1.Task{}
+		for i := range flow.RandomTasks {
+			randomTasks = append(randomTasks, *flow.RandomTasks[i])
+		}
 
-			processTasks = append(processTasks, &v1.ProcessTask{
-				Id:           uuid.New().String(),
-				Task:         t,
-				Status:       v1.ProcessStatus_StatusReady,
-				Transactions: []string{},
-				FinishedAt:   nil,
-				Error:        nil,
-				StartedAt:    nil,
-			})
+		processTasks, err := addRandomTasks(tasks, randomTasks)
+		if err != nil {
+			return nil, errors.Wrap(err, "lib.Marshal")
+		}
+
+		for i := range processTasks {
+			println(processTasks[i].Task.TaskType.String() + strconv.Itoa(int(processTasks[i].Task.Weight)))
 		}
 
 		profiles = append(profiles, &v1.ProcessProfile{
@@ -150,6 +148,102 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 		Process: res.Process,
 	}, nil
 }
+
+func addRandomTasks(tasks, randomTasks []v1.Task) ([]*v1.ProcessTask, error) {
+
+	// preparation
+	randomProcessTasks := make([]*v1.ProcessTask, 0, len(randomTasks))
+
+	for i := range randomTasks {
+		t := randomTasks[i]
+
+		marshal, err := task.GetTaskDesc(&t)
+		if err != nil {
+			return nil, errors.Wrap(err, "lib.Marshal")
+		}
+		description := string(marshal)
+		t.Description = description
+
+		randomProcessTasks = append(randomProcessTasks, &v1.ProcessTask{
+			Id:           uuid.New().String(),
+			Task:         &t,
+			Status:       v1.ProcessStatus_StatusReady,
+			Transactions: []string{},
+			FinishedAt:   nil,
+			Error:        nil,
+			StartedAt:    nil,
+		})
+	}
+
+	processTasks := make([]*v1.ProcessTask, 0, len(randomTasks)+len(tasks))
+	for i := range tasks {
+		t := tasks[i]
+
+		marshal, err := task.GetTaskDesc(&t)
+		if err != nil {
+			return nil, errors.Wrap(err, "lib.Marshal")
+		}
+		description := string(marshal)
+		t.Description = description
+
+		processTasks = append(processTasks, &v1.ProcessTask{
+			Id:         uuid.New().String(),
+			Task:       &t,
+			Status:     v1.ProcessStatus_StatusReady,
+			FinishedAt: nil,
+			Error:      nil,
+			StartedAt:  nil,
+		})
+	}
+
+	// random
+
+	capacity := len(randomTasks) + len(tasks)
+	out := make([]*v1.ProcessTask, 0, capacity)
+
+	m := map[int]*v1.ProcessTask{}
+	for _, randomTask := range randomProcessTasks {
+
+		for {
+			r := rand.New(rand.NewSource(time.Now().UnixNano()))
+			position := r.Intn(capacity)
+			_, exist := m[position]
+			if !exist {
+				m[position] = randomTask
+				break
+			}
+		}
+	}
+
+	j := 0
+	for i := 0; i < capacity; i++ {
+
+		if j >= len(processTasks) {
+			for i2, randomTask := range m {
+				if i2 >= i {
+					out = append(out, randomTask)
+				}
+			}
+			break
+		}
+		t := processTasks[j]
+
+		randomTask, needInsert := m[i]
+		if needInsert {
+			out = append(out, randomTask)
+		} else {
+			out = append(out, t)
+			j++
+		}
+	}
+
+	for i := range out {
+		out[i].Task.Weight = int64(i)
+	}
+
+	return out, nil
+}
+
 func (s *ProcessService) GetProcess(ctx context.Context, req *v1.GetProcessRequest) (*v1.GetProcessResponse, error) {
 	userId, err := user.ResolveUserId(ctx)
 	if err != nil {

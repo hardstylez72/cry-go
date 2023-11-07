@@ -98,6 +98,7 @@ func (c *Client) Supply(ctx context.Context, req *defi.LPReq) (*defi.LPRes, erro
 		Rate:         nil,
 		Gas:          nil,
 		ExtraFee:     nil,
+		Code:         bozdo.CodeLP,
 	}
 
 	opt := &defi.TxOpt{
@@ -156,12 +157,8 @@ func (c *Client) Withdraw(ctx context.Context, req *defi.LPReq) (*defi.LPRes, er
 
 	data := &bozdo.TxData{
 		Data:         pack,
-		Value:        nil,
 		ContractAddr: c.ca,
-		Details:      nil,
-		Rate:         nil,
-		Gas:          nil,
-		ExtraFee:     nil,
+		Code:         bozdo.CodeLP,
 	}
 
 	opt := &defi.TxOpt{

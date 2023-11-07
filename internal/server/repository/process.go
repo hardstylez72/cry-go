@@ -84,7 +84,7 @@ func (a *ProcessArg) FromPB(pb *v1.Process, userId string) error {
 	return nil
 }
 
-func (a *ProcessArg) ToPB(flow *v1.Flow) (*v1.Process, error) {
+func (a *ProcessArg) ToPB(flowLabel string, flow *v1.Flow) (*v1.Process, error) {
 
 	var payload v1.Process
 	if err := protojson.Unmarshal([]byte(a.Payload), &payload); err != nil {
@@ -99,7 +99,7 @@ func (a *ProcessArg) ToPB(flow *v1.Flow) (*v1.Process, error) {
 		UpdatedAt:  timestamppb.New(a.UpdatedAt),
 		FinishedAt: nil,
 		StartedAt:  nil,
-		FlowLabel:  flow.Label,
+		FlowLabel:  flowLabel,
 		Progress:   int64(a.Progress),
 		DeletedAt:  nil,
 		AutoRetry:  a.AutoRetry,
@@ -263,11 +263,10 @@ func (r *pgRepository) ListProcessByUser(ctx context.Context, userId string, sta
 	for i := range tmp {
 		p := &tmp[i]
 
-		flow, err := r.GetFlow(ctx, userId, p.FlowId)
+		flowLabel, err := r.GetFlowLabel(ctx, userId, p.FlowId)
 		if err != nil {
 			return nil, err
 		}
-
 		progress, err := r.GetProcessProgress(ctx, p.Id)
 		if err != nil {
 			return nil, err
@@ -290,11 +289,7 @@ func (r *pgRepository) ListProcessByUser(ctx context.Context, userId string, sta
 
 		p.Profiles = profiles
 
-		fpb, err := flow.ToPB()
-		if err != nil {
-			return nil, err
-		}
-		pb, err := p.ToPB(fpb)
+		pb, err := p.ToPB(*flowLabel, nil)
 		if err != nil {
 			return nil, err
 		}

@@ -8,6 +8,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/across"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/generic"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
@@ -66,7 +67,8 @@ func (c *Client) GetNFTId(ctx context.Context, txHash common.Hash, owner common.
 }
 
 func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
-	return c.defi.Mint(ctx, req, taskType)
+	g := generic.NewMinter(c.defi)
+	return g.Mint(ctx, req, taskType)
 }
 
 func (c *Client) BridgeNft(ctx context.Context, req *defi.BridgeNFTReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
