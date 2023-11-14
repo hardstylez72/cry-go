@@ -22,7 +22,26 @@ func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1
 	case v1.TaskType_PancakeSwap:
 		return c.PancakeSwap(ctx, req)
 	case v1.TaskType_SpaceFISwap:
-		return c.SpaceFiSwap(ctx, req)
+
+		tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
+			Token:       req.FromToken,
+			WalletPK:    req.WalletPK,
+			Amount:      req.Amount,
+			SpenderAddr: c.Cfg.SpaceFI.Router,
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "TokenLimitChecker")
+		}
+
+		res, err := c.SpaceFiSwap(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		if tokenLimitChecker.ApproveTx != nil {
+			res.ApproveTx = tokenLimitChecker.ApproveTx
+		}
+		return res, nil
+
 	case v1.TaskType_MuteioSwap:
 		return c.MuteIOSwap(ctx, req)
 	case v1.TaskType_SyncSwap:
@@ -33,6 +52,8 @@ func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1
 		return c.EzkaliburSwap(ctx, req)
 	case v1.TaskType_OdosSwap:
 		return c.OdosSwap(ctx, req)
+	case v1.TaskType_KyberSwap:
+		return c.KeyberSwap(ctx, req)
 	default:
 		return nil, errors.New("unsupported task type: " + taskType.String())
 	}

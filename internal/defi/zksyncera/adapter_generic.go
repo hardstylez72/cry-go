@@ -20,11 +20,10 @@ type TxBridgeMaker interface {
 func (c *Client) GenericSwap(ctx context.Context, maker TxSwapMaker, req *defi.DefaultSwapReq) (*bozdo.DefaultRes, error) {
 	result := &bozdo.DefaultRes{}
 
-	transactor, err := NewWalletTransactor(req.WalletPK, c.NetworkId)
+	_, transactor, err := c.Wallet(req.WalletPK)
 	if err != nil {
 		return nil, err
 	}
-
 	txData, err := maker.MakeSwapTx(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "makeSpaceFiSwapData")

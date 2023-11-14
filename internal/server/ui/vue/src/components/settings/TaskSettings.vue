@@ -43,7 +43,7 @@ import {Network, TaskType} from "@/generated/flow";
 import {TaskSettings, Timer} from "@/components/helper";
 import deepEqual from "deep-equal";
 import {taskProps} from "@/components/tasks/tasks";
-import {required} from "@/components/tasks/menu/helper";
+import {required} from "@/components/tasks/helper";
 
 export default defineComponent({
   name: "TaskSettings",

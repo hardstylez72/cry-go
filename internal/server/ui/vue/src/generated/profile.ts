@@ -856,5 +856,6 @@ export enum Token {
   'VC' = 'VC',
   'IZI' = 'IZI',
   'USDCBridged' = 'USDCBridged',
-  'BUSD' = 'BUSD'
+  'BUSD' = 'BUSD',
+  'USDp' = 'USDp'
 }

@@ -11,12 +11,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-const ETHPrice = 2000
-
 func TokenAmountFloatToWEI(a float64, token Token) *big.Int {
 
 	switch token {
-	case v1.Token_USDT, v1.Token_USDC:
+	case v1.Token_USDT, v1.Token_USDC, v1.Token_USDp:
 		am := big.NewFloat(a)
 		am = big.NewFloat(0).Mul(am, big.NewFloat(params.Ether*1e-12))
 
@@ -82,7 +80,7 @@ func CastFloatToEtherWEI(wei float64) *big.Int {
 
 func WeiToToken(wei *big.Int, token Token) *big.Float {
 	switch token {
-	case v1.Token_USDT, v1.Token_USDC, v1.Token_USDCBridged:
+	case v1.Token_USDT, v1.Token_USDC, v1.Token_USDCBridged, v1.Token_USDp:
 		return new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(params.Ether*1e-12))
 	default:
 		return new(big.Float).Quo(new(big.Float).SetInt(wei), big.NewFloat(params.Ether))

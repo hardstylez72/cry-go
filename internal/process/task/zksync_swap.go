@@ -294,7 +294,7 @@ func (h *ZkSyncSwapHalper) Execute(ctx context.Context, profile *halp.Profile, p
 		WalletPK:     profile.WalletPK,
 		EstimateOnly: estimateOnly,
 		Gas:          Gas,
-		Debug:        false,
+		Debug:        true,
 		Slippage:     getSlippage(s.Source, h.TaskType),
 		SubType:      profile.SubType,
 		ExchangeRate: pub.GetExchangeRate(p.FromToken, p.ToToken),

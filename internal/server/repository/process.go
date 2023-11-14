@@ -18,19 +18,20 @@ type ProcessArg struct {
 }
 
 type Process struct {
-	Id         string       `db:"id"`
-	Status     string       `db:"status"`
-	UserId     string       `db:"user_id"`
-	FlowId     string       `db:"flow_id"`
-	Payload    string       `db:"payload"`
-	UpdatedAt  time.Time    `db:"updated_at"`
-	CreatedAt  time.Time    `db:"created_at"`
-	StartedAt  sql.NullTime `db:"started_at"`
-	FinishedAt sql.NullTime `db:"finished_at"`
-	Progress   int          `db:"progress"`
-	DeletedAt  sql.NullTime `db:"deleted_at"`
-	AutoRetry  bool         `db:"auto_retry"`
-	RunAfter   sql.NullTime `db:"run_after"`
+	Id         string         `db:"id"`
+	Status     string         `db:"status"`
+	UserId     string         `db:"user_id"`
+	FlowId     string         `db:"flow_id"`
+	Payload    string         `db:"payload"`
+	UpdatedAt  time.Time      `db:"updated_at"`
+	CreatedAt  time.Time      `db:"created_at"`
+	StartedAt  sql.NullTime   `db:"started_at"`
+	FinishedAt sql.NullTime   `db:"finished_at"`
+	Progress   int            `db:"progress"`
+	DeletedAt  sql.NullTime   `db:"deleted_at"`
+	AutoRetry  bool           `db:"auto_retry"`
+	RunAfter   sql.NullTime   `db:"run_after"`
+	StopReason sql.NullString `db:"stop_reason"`
 }
 
 func (a *ProcessArg) FromPB(pb *v1.Process, userId string) error {
@@ -81,6 +82,11 @@ func (a *ProcessArg) FromPB(pb *v1.Process, userId string) error {
 
 	a.AutoRetry = pb.AutoRetry
 
+	if pb.StopReason != nil {
+		a.StopReason.Valid = true
+		a.StopReason.String = pb.StopReason.String()
+	}
+
 	return nil
 }
 
@@ -120,6 +126,11 @@ func (a *ProcessArg) ToPB(flowLabel string, flow *v1.Flow) (*v1.Process, error) 
 
 	if a.RunAfter.Valid {
 		out.RunAfter = timestamppb.New(a.RunAfter.Time)
+	}
+
+	if a.StopReason.Valid {
+		tmp := v1.ProcessStopReason(v1.ProcessStopReason_value[a.StopReason.String])
+		out.StopReason = &tmp
 	}
 
 	pr := make([]*v1.ProcessProfile, 0)

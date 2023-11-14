@@ -27,6 +27,7 @@
                   density="compact"
                   variant="outlined"
                   :disabled="true"
+                  hide-details
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -39,12 +40,8 @@
                   variant="outlined"
                   :loading="loading"
                   :disabled="true"
+                  hide-details
                 ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <NetworkGasMultiplier v-model="settings.gasMultiplier"/>
               </v-col>
             </v-row>
             <v-row>
@@ -52,25 +49,38 @@
                 <NetworkMaxGas v-model="settings.maxGas" :network="network.value"/>
               </v-col>
             </v-row>
+
+            <v-row class="my-1">
+              <v-expansion-panels :multiple="false" variant="popout">
+                <v-expansion-panel rounded title="Продвинутые">
+                  <v-expansion-panel-text>
+                    <h3 class="my-3 text-center bg-red-accent-1">При изменении продвинутых настроек возможно появление
+                      ошибок. Действуйте осознанно!</h3>
+                    <NetworkGasMultiplier v-model="settings.gasMultiplier"/>
+                    <v-list>
+                      <div v-for="(task) in taskMap">
+                        <v-list-item
+                          v-if="slippageAvailable(task[0])"
+                          density="compact"
+                          variant="plain"
+                          class="my-1 my-4"
+                          rounded
+                          height="auto"
+                          elevation="1"
+                        >
+                          <TaskSettingsC :network="network.value" :task-type="task[0]"
+                                         :settings-prop="task[1]"
+                                         @updated="taskUpdated"/>
+                        </v-list-item>
+                      </div>
+                    </v-list>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
+            </v-row>
           </v-card-text>
 
-          <v-list>
-            <div v-for="(task) in taskMap">
-              <v-list-item
-                v-if="slippageAvailable(task[0])"
-                density="compact"
-                variant="plain"
-                class="my-1 my-4"
-                rounded
-                height="auto"
-                elevation="1"
-              >
-                <TaskSettingsC :network="network.value" :task-type="task[0]"
-                               :settings-prop="task[1]"
-                               @updated="taskUpdated"/>
-              </v-list-item>
-            </div>
-          </v-list>
+
         </v-form>
       </v-card>
 
@@ -170,8 +180,7 @@ export default defineComponent({
             network: this.network.value
           }
         })
-        this.settings = res.settings
-        this.sync()
+        await this.loadSettings()
       } finally {
         this.reseting = false
       }

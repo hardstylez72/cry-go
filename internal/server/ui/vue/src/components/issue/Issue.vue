@@ -59,7 +59,7 @@ import {issueService} from "@/generated/services";
 import Support from "@/components/issue/Support.vue";
 import {formatTime} from "../helper";
 import Loader from "@/components/Loader.vue";
-import {required} from "@/components/tasks/menu/helper";
+import {required} from "@/components/tasks/helper";
 import StatusChip from "@/components/issue/StatusChip.vue";
 
 export default defineComponent({

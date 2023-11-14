@@ -101,7 +101,23 @@ func (c velocoreMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 			ContractAddr: c.Cfg.Velocore.Router,
 			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
-	}
+	} else {
+		amOut := amsOut[1]
+		amSlip, err := defi.Slippage(amOut, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
 
-	return nil, errors.New("unsupported input params")
+		data, err := abiSource.Pack("swapExactTokensForTokens", req.Amount, amSlip, path, w.WalletAddr, DefaultDeadLine())
+		if err != nil {
+			return nil, err
+		}
+
+		return &bozdo.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.Velocore.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
+		}, nil
+	}
 }

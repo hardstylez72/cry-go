@@ -3,7 +3,7 @@
     <NavBar title="Настройки">
     </NavBar>
     <div>
-      <v-expansion-panels class="mt-4" multiple="multiple">
+      <v-expansion-panels class="mt-4" multiple="multiple" variant="popout">
         <SettingsNetwork v-for="n in networks" :network="networkProps[n]"/>
       </v-expansion-panels>
     </div>

@@ -30,7 +30,7 @@ import {
 import ProxyInput from "@/components/ProxyInput.vue";
 import OkexWithdrawOptionSubAcc from "@/components/exchange.acc/OkexWithdrawOptionSubAcc.vue";
 import CreateWithdrawerSubAcc from "@/components/exchange.acc/CreateWithdrawerSubAcc.vue";
-import {required} from "@/components/tasks/menu/helper";
+import {required} from "@/components/tasks/helper";
 import ProfileSearch from "@/components/profile/ProfileSearch.vue";
 import {Profile} from "@/generated/profile";
 import {Delay, Timer} from "@/components/helper";

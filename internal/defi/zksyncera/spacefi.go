@@ -104,7 +104,28 @@ func (c *spaceFiMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq)
 			ContractAddr: c.Cfg.SpaceFI.Router,
 			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
 		}, nil
-	}
+	} else {
+		amOut := amsOut[1]
 
-	return nil, errors.New("unsupported input params")
+		amSlip, err := defi.Slippage(amOut, req.Slippage)
+		if err != nil {
+			return nil, err
+		}
+
+		data, err := abispacefirouter.Pack("swapExactTokensForTokens", req.Amount, amSlip, path, w.WalletAddr, DefaultDeadLine())
+		if err != nil {
+			return nil, err
+		}
+
+		if req.Debug {
+			println("0x" + common.Bytes2Hex(data))
+		}
+
+		return &bozdo.TxData{
+			Data:         data,
+			Value:        value,
+			ContractAddr: c.Cfg.SpaceFI.Router,
+			Rate:         CalcRate(req.FromToken, req.ToToken, req.Amount, amOut),
+		}, nil
+	}
 }

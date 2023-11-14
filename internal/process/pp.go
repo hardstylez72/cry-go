@@ -187,26 +187,34 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 		}
 
 		if execErr != nil {
-			if errors.Is(execErr, task.ErrUserHasNoBalance) {
+			switch true {
+			case errors.Is(execErr, task.ErrUserHasNoBalance):
 				d.SendAlert(ctx, userId, pId, execErr, l)
 				return execErr
-			}
-
-			retryCount++
-			if retryCount < getMaxRetry() {
-				err := d.r.UpdateProcessTaskStatus(ctx, v1.ProcessStatus_StatusRetry.String(), t.Id, pId)
+			case errors.Is(execErr, task.ErrHighGas):
+				err := d.r.UpdateProcessTaskStatus(ctx, v1.ProcessStatus_StatusRunning.String(), t.Id, pId)
 				if err != nil {
 					return errors.Wrap(err, "UpdateProcessTaskStatus")
 				}
-				pp, err = d.LoadPP(ctx, ppId)
-				if err != nil {
-					return errors.Wrap(err, "LoadPP")
+				return nil
+			default:
+				retryCount++
+				if retryCount < getMaxRetry() {
+					err := d.r.UpdateProcessTaskStatus(ctx, v1.ProcessStatus_StatusRetry.String(), t.Id, pId)
+					if err != nil {
+						return errors.Wrap(err, "UpdateProcessTaskStatus")
+					}
+					pp, err = d.LoadPP(ctx, ppId)
+					if err != nil {
+						return errors.Wrap(err, "LoadPP")
+					}
+					_ = <-d.sleep(ctx, pId, getDelayBeforePPTask())
+					continue
 				}
-				_ = <-d.sleep(ctx, pId, getDelayBeforePPTask())
-				continue
+
+				d.SendAlert(ctx, userId, pId, execErr, l)
 			}
 
-			d.SendAlert(ctx, userId, pId, execErr, l)
 		} else {
 			retryCount = 0
 			t = executed

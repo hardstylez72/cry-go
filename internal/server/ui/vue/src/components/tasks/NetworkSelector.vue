@@ -34,7 +34,7 @@ import {EstimationTx} from "@/generated/process";
 import {networkProps, percent} from "@/components/helper";
 import {ca} from "vuetify/locale";
 import {taskProps} from "@/components/tasks/tasks";
-import {required} from "@/components/tasks/menu/helper";
+import {required} from "@/components/tasks/helper";
 
 export default defineComponent({
   name: "NetworkSelector",

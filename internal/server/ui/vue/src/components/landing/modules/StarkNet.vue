@@ -31,7 +31,6 @@
 <script lang="ts">
 
 import {defineComponent} from 'vue';
-import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
 
 enum Status {

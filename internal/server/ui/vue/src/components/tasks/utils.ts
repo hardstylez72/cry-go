@@ -1,5 +1,6 @@
 import {Network, Task} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
+import {BridgePair, SwapPair} from "@/components/helper";
 
 
 export const allNetworks: Network[] = [
@@ -44,6 +45,9 @@ export interface TaskSpec {
   job: TaskJob
 
   profileType: Set<ProfileType>
+
+  swapParis?: SwapPair[]
+  bridgePairs?: BridgePair[]
 }
 
 export enum TaskJob {

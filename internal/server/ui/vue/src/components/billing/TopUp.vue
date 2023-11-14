@@ -63,7 +63,7 @@
 
 import {defineComponent} from 'vue';
 import {helperService} from "@/generated/services";
-import {onlyInteger, required} from "@/components/tasks/menu/helper";
+import {onlyInteger, required} from "@/components/tasks/helper";
 import {mapStores} from "pinia";
 import {useUserStore} from "@/plugins/pinia";
 

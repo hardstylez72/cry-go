@@ -344,7 +344,8 @@
         "VC",
         "IZI",
         "USDCBridged",
-        "BUSD"
+        "BUSD",
+        "USDp"
       ],
       "default": "USDT"
     }

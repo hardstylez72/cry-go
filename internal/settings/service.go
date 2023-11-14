@@ -22,7 +22,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const LastSettingsUpdateTime = "2023-10-11 7:40:05"
+const LastSettingsUpdateTime = "2023-12-01 7:40:05"
 
 type GetSettingsNetworkRequest struct {
 	Network v1.Network
@@ -201,11 +201,13 @@ func resolveNetworkSettings(in *v1.NetworkSettings, s ResolveNet, force bool) (*
 		if !exist {
 			tmp := slippage
 			out.TaskSettings[taskType.String()] = &v1.TaskSettings{
-				Slippage: &tmp,
+				Slippage:      &tmp,
+				SwapRateRatio: &tmp,
 			}
+
 		} else {
 			if v.SwapRateRatio == nil {
-				tmp := "1"
+				tmp := "2"
 				out.TaskSettings[taskType.String()].SwapRateRatio = &tmp
 			}
 

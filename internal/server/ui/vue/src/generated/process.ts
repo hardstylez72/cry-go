@@ -985,6 +985,9 @@ export interface Process {
 
   /**  */
   runAfter?: Date;
+
+  /**  */
+  stopReason?: ProcessStopReason;
 }
 
 export interface ProcessProfile {
@@ -1343,6 +1346,9 @@ export interface Task {
 
   /**  */
   mintZeriusTask?: SimpleTask;
+
+  /**  */
+  kyberSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1580,6 +1586,11 @@ export enum ProcessStatus {
   'StatusRetry' = 'StatusRetry'
 }
 
+export enum ProcessStopReason {
+  'PSR_Default' = 'PSR_Default',
+  'PSR_HighGas' = 'PSR_HighGas'
+}
+
 export enum TaskType {
   'StargateBridge' = 'StargateBridge',
   'Mock' = 'Mock',
@@ -1626,7 +1637,8 @@ export enum TaskType {
   'AaveLP' = 'AaveLP',
   'MintFun' = 'MintFun',
   'MintMerkly' = 'MintMerkly',
-  'MintZerius' = 'MintZerius'
+  'MintZerius' = 'MintZerius',
+  'KyberSwap' = 'KyberSwap'
 }
 
 export enum Token {
@@ -1647,5 +1659,6 @@ export enum Token {
   'VC' = 'VC',
   'IZI' = 'IZI',
   'USDCBridged' = 'USDCBridged',
-  'BUSD' = 'BUSD'
+  'BUSD' = 'BUSD',
+  'USDp' = 'USDp'
 }

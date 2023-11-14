@@ -29,7 +29,6 @@
 <script lang="ts">
 
 import {defineComponent} from 'vue';
-import {link} from "@/components/tasks/links";
 
 enum Status {
   'integrated' = 'integrated',
@@ -47,7 +46,7 @@ export default defineComponent({
       integrated: [
         {
           name: 'Okex',
-          link: link.okx,
+          link: 'https://www.okx.com/',
           status: Status.integrated,
           action: 'Full support of all withdrawals available on pff site + multi-sub-account deposit support',
           quest: '',
@@ -55,7 +54,7 @@ export default defineComponent({
         },
         {
           name: 'Binance',
-          link: link.binance,
+          link: 'https://www.binance.com/',
           status: Status.integrated,
           action: 'Full support of all withdrawals available on pff site',
           quest: '',

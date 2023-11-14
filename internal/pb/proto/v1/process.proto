@@ -29,6 +29,11 @@ message Transaction {
   };
 }
 
+enum ProcessStopReason {
+  PSR_Default = 0;
+  PSR_HighGas = 1;
+}
+
 message Process {
   string id = 1;
 
@@ -48,6 +53,7 @@ message Process {
   bool auto_retry = 13;
   flow.Flow flow = 14;
   optional google.protobuf.Timestamp run_after = 15;
+  optional ProcessStopReason stop_reason = 16;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {

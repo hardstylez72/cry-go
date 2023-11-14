@@ -48,7 +48,7 @@ import {defineComponent, PropType} from 'vue';
 import {profileService} from "@/generated/services"
 import {Profile, ProfileType} from "@/generated/profile";
 import {profileTitle, shuffleArray, Timer} from "@/components/helper";
-import {required} from "@/components/tasks/menu/helper";
+import {required} from "@/components/tasks/helper";
 
 export default defineComponent({
   name: "ProfileSearch",

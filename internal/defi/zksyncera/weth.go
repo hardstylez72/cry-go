@@ -151,8 +151,6 @@ func (c *Client) Make712Tx(ctx context.Context, tx *types.CallMsg, gasOpt *bozdo
 			return nil, nil, errors.Wrap(err, "ClientL2.HeaderByNumber")
 		}
 
-		tip := big.NewInt(100_000_000)
-
 		gasPrice = bozdo.BigIntSum(header.BaseFee, tip)
 		tx.GasFeeCap = gasPrice
 		//tx.GasTipCap = tip
@@ -169,6 +167,7 @@ func (c *Client) Make712Tx(ctx context.Context, tx *types.CallMsg, gasOpt *bozdo
 		if err != nil {
 			return nil, nil, fmt.Errorf("failed to EstimateGas: %w", err)
 		}
+
 	}
 
 	prepared := &types.Transaction712{

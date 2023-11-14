@@ -74,7 +74,7 @@
 
 <script lang="ts">
 import {formatTime, getDate, getTime, isMobile, ts} from "@/components/helper";
-import {required} from "@/components/tasks/menu/helper";
+import {required} from "@/components/tasks/helper";
 
 
 interface Item {

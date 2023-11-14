@@ -83,6 +83,9 @@ func NewDispatcher(
 		starknetcClient: starknetcClient,
 	}
 
+	if config.CFG.Env == config.Local {
+		return d
+	}
 	go func() {
 		for {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
@@ -252,7 +255,9 @@ func (d *Dispatcher) EstimateTaskCost(ctx context.Context, profileId, taskId str
 	case v1.TaskType_MintZerius:
 		p := t.Task.Task.(*v1.Task_MintZeriusTask).MintZeriusTask
 		e, err = task.NewZeriusMintTask().EstimateCost(ctx, p, profile)
-
+	case v1.TaskType_KyberSwap:
+		p := t.Task.Task.(*v1.Task_KyberSwapTask).KyberSwapTask
+		e, err = task.NewKyberSwapTask().EstimateCost(ctx, profile, p, nil)
 	default:
 		return nil, errors.New("task: " + t.Task.TaskType.String() + " can not be estimated")
 	}
@@ -320,7 +325,7 @@ func (d *Dispatcher) RunDispatcher(ctx context.Context) {
 			d.queue <- pId
 		}
 
-		ticker := time.NewTicker(time.Second * 10)
+		ticker := time.NewTicker(time.Minute * 1)
 		resolver := time.NewTicker(time.Minute * 15)
 
 		for {

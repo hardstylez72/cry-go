@@ -48,6 +48,7 @@ enum Token {
   IZI = 15;
   USDCBridged = 16;
   BUSD = 17;
+  USDp = 18;
 }
 
 enum ProcessStatus {

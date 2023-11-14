@@ -28,6 +28,26 @@ message FlowShared {
   };
 }
 
+message Flow {
+  string id = 1;
+  string label = 2;
+  repeated Task tasks = 5;
+  optional string next_id = 6;
+  google.protobuf.Timestamp created_at = 7;
+  optional google.protobuf.Timestamp deleted_at = 8;
+  repeated Task random_tasks = 9;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "label", "payload", "created_at", "tasks", "random_tasks"]
+    }
+  };
+  FlowBase base = 10;
+}
+
+message FlowBase {
+  shared.Token token = 1;
+}
+
 service FlowService {
   rpc UpdateFlow(UpdateFlowRequest) returns (UpdateFlowResponse) {
     option (google.api.http) = {
@@ -221,23 +241,6 @@ message GetFlowResponse {
   };
 }
 
-message Flow {
-  string id = 1;
-  string label = 2;
-  repeated Task tasks = 5;
-  optional string next_id = 6;
-  google.protobuf.Timestamp created_at = 7;
-  optional google.protobuf.Timestamp deleted_at = 8;
-  repeated Task random_tasks = 9;
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      required: ["id", "label", "payload", "created_at", "tasks", "random_tasks"]
-    }
-  };
-}
-
-
-
 message WalletByWalletMode {
   int64 delayBetweenWallets = 1;
   int64 delayBetweenTransactions = 2;
@@ -299,6 +302,7 @@ message Task {
     task.SimpleTask mintFunTask = 47;
     task.SimpleTask mintMerklyTask = 48;
     task.SimpleTask mintZeriusTask = 49;
+    task.DefaultSwap kyberSwapTask = 50;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

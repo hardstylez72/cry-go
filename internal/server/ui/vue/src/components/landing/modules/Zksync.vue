@@ -28,7 +28,6 @@
 <script lang="ts">
 
 import {defineComponent} from 'vue';
-import {link} from "@/components/tasks/links";
 import {taskProps} from "@/components/tasks/tasks";
 
 enum Status {
@@ -54,7 +53,7 @@ export default defineComponent({
           quest: 'https://layer3.xyz/quests/welcome-to-a-new-era'
         },
         {
-          name: 'SyncSwap',
+          name: 'Block.vue',
           link: taskProps.SyncSwap.service.link,
           img: taskProps.SyncSwap.service.img,
           status: Status.integrated,

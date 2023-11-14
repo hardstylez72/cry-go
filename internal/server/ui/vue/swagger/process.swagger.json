@@ -1413,6 +1413,9 @@
         "runAfter": {
           "type": "string",
           "format": "date-time"
+        },
+        "stopReason": {
+          "$ref": "#/definitions/ProcessStopReason"
         }
       },
       "required": [
@@ -1476,6 +1479,14 @@
       ],
       "default": "StatusReady",
       "title": "- StatusStop: delete"
+    },
+    "ProcessStopReason": {
+      "type": "string",
+      "enum": [
+        "PSR_Default",
+        "PSR_HighGas"
+      ],
+      "default": "PSR_Default"
     },
     "ProcessTask": {
       "type": "object",
@@ -1972,6 +1983,9 @@
         },
         "mintZeriusTask": {
           "$ref": "#/definitions/SimpleTask"
+        },
+        "kyberSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -2092,7 +2106,8 @@
         "AaveLP",
         "MintFun",
         "MintMerkly",
-        "MintZerius"
+        "MintZerius",
+        "KyberSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -2142,7 +2157,8 @@
         "VC",
         "IZI",
         "USDCBridged",
-        "BUSD"
+        "BUSD",
+        "USDp"
       ],
       "default": "USDT"
     },

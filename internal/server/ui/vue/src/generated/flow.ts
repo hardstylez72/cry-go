@@ -1021,6 +1021,9 @@ export interface Task {
 
   /**  */
   mintZeriusTask?: SimpleTask;
+
+  /**  */
+  kyberSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1286,7 +1289,8 @@ export enum TaskType {
   'AaveLP' = 'AaveLP',
   'MintFun' = 'MintFun',
   'MintMerkly' = 'MintMerkly',
-  'MintZerius' = 'MintZerius'
+  'MintZerius' = 'MintZerius',
+  'KyberSwap' = 'KyberSwap'
 }
 
 export enum Token {
@@ -1307,5 +1311,6 @@ export enum Token {
   'VC' = 'VC',
   'IZI' = 'IZI',
   'USDCBridged' = 'USDCBridged',
-  'BUSD' = 'BUSD'
+  'BUSD' = 'BUSD',
+  'USDp' = 'USDp'
 }

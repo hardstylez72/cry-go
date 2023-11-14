@@ -24,6 +24,7 @@ var DeadLine = func() *big.Int {
 }
 
 var ZeroAddress = common.HexToAddress("0x0000000000000000000000000000000000000000")
+var NativeTokenAddress = common.HexToAddress("0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
 
 type Networker interface {
 	TxViewFn(id string) string

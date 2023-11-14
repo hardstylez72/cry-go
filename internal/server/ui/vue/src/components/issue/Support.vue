@@ -41,7 +41,7 @@ import {defineComponent} from 'vue';
 import {helperService, issueService} from "@/generated/services"
 import {mapStores} from "pinia";
 import {useSysStore} from "@/plugins/pinia";
-import {required} from "@/components/tasks/menu/helper";
+import {required} from "@/components/tasks/helper";
 
 export default defineComponent({
   name: "Support",

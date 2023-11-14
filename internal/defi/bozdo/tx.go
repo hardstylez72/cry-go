@@ -3,6 +3,7 @@ package bozdo
 import (
 	"math"
 	"math/big"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/params"
@@ -108,6 +109,23 @@ type Gas struct {
 	GasLimit            big.Int
 	GasPrice            big.Int
 	TotalGas            big.Int
+}
+
+func NewKyperSwap(in, out string, priceImpact int) []TxDetail {
+	return []TxDetail{
+		{
+			Key:   "KyperSwapIn",
+			Value: in + " USD",
+		},
+		{
+			Key:   "KyperSwapOut",
+			Value: out + " USD",
+		},
+		{
+			Key:   "KyperSwapPriceImpact",
+			Value: strconv.Itoa(priceImpact) + " %",
+		},
+	}
 }
 
 func NewOdos(in, out string, network v1.Network, tokenIn, tokenOut v1.Token, priceImpact float64) []TxDetail {

@@ -1,0 +1,46 @@
+{
+  "routeSummary": {
+    "tokenIn": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+    "amountIn": "12206441",
+    "amountInUsd": "12.206441",
+    "tokenInMarketPriceAvailable": false,
+    "tokenOut": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "amountOut": "6497342149917728",
+    "amountOutUsd": "12.217667152126795",
+    "tokenOutMarketPriceAvailable": false,
+    "gas": "125000",
+    "gasPrice": "250000000",
+    "gasUsd": "0.058762812500000004",
+    "extraFee": {
+      "feeAmount": "0",
+      "chargeFeeBy": "",
+      "isInBps": false,
+      "feeReceiver": ""
+    },
+    "route": [
+      [
+        {
+          "pool": "0x2158ec5366effca1216af93ee0d77762e2ebd466",
+          "tokenIn": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+          "tokenOut": "0x5aea5775959fbc2557cc8789bc1bf90a239d9a91",
+          "limitReturnAmount": "0",
+          "swapAmount": "12206441",
+          "amountOut": "6497342149917728",
+          "exchange": "iziswap",
+          "poolLength": 2,
+          "poolType": "iziswap",
+          "poolExtra": {
+            "limitPoint": 198941
+          },
+          "extra": {}
+        }
+      ]
+    ]
+  },
+  "deadline": 1699427155,
+  "slippageTolerance": 5,
+  "sender": "0x4A6e7c137a6691D55693CA3Bc7E5C698d9d43815",
+  "recipient": "0x4A6e7c137a6691D55693CA3Bc7E5C698d9d43815",
+  "source": "kyberswap",
+  "skipSimulateTx": false
+}
