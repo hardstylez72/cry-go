@@ -90,7 +90,7 @@ func (a *ProcessArg) FromPB(pb *v1.Process, userId string) error {
 	return nil
 }
 
-func (a *ProcessArg) ToPB(flowLabel string, flow *v1.Flow) (*v1.Process, error) {
+func (a *ProcessArg) ToPB(meta FlowMeta) (*v1.Process, error) {
 
 	var payload v1.Process
 	if err := protojson.Unmarshal([]byte(a.Payload), &payload); err != nil {
@@ -98,18 +98,18 @@ func (a *ProcessArg) ToPB(flowLabel string, flow *v1.Flow) (*v1.Process, error) 
 	}
 
 	out := v1.Process{
-		Id:         a.Id,
-		Status:     v1.ProcessStatus(v1.ProcessStatus_value[a.Status]),
-		FlowId:     a.FlowId,
-		CreatedAt:  timestamppb.New(a.CreatedAt),
-		UpdatedAt:  timestamppb.New(a.UpdatedAt),
-		FinishedAt: nil,
-		StartedAt:  nil,
-		FlowLabel:  flowLabel,
-		Progress:   int64(a.Progress),
-		DeletedAt:  nil,
-		AutoRetry:  a.AutoRetry,
-		Flow:       flow,
+		Id:          a.Id,
+		Status:      v1.ProcessStatus(v1.ProcessStatus_value[a.Status]),
+		FlowId:      a.FlowId,
+		CreatedAt:   timestamppb.New(a.CreatedAt),
+		UpdatedAt:   timestamppb.New(a.UpdatedAt),
+		FinishedAt:  nil,
+		StartedAt:   nil,
+		FlowLabel:   meta.Label,
+		Progress:    int64(a.Progress),
+		DeletedAt:   nil,
+		AutoRetry:   a.AutoRetry,
+		FlowVersion: int64(meta.Version),
 	}
 
 	if a.StartedAt.Valid {
@@ -274,7 +274,7 @@ func (r *pgRepository) ListProcessByUser(ctx context.Context, userId string, sta
 	for i := range tmp {
 		p := &tmp[i]
 
-		flowLabel, err := r.GetFlowLabel(ctx, userId, p.FlowId)
+		flowMeta, err := r.FlowMeta(ctx, userId, p.FlowId)
 		if err != nil {
 			return nil, err
 		}
@@ -300,7 +300,7 @@ func (r *pgRepository) ListProcessByUser(ctx context.Context, userId string, sta
 
 		p.Profiles = profiles
 
-		pb, err := p.ToPB(*flowLabel, nil)
+		pb, err := p.ToPB(*flowMeta)
 		if err != nil {
 			return nil, err
 		}

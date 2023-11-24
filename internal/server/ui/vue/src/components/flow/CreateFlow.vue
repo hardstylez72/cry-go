@@ -2,7 +2,6 @@
   <NavBar title="Создание сценария">
     <template v-slot:default>
       <v-btn
-        :class="demo ? 'onboarding' : ''"
         :disabled="saveLoading"
         :loading="saveLoading"
         variant="flat"
@@ -11,11 +10,41 @@
       </v-btn>
     </template>
   </NavBar>
+
   <v-card>
     <v-card-text>
-      <v-form validate-on="submit" ref="flow-form">
-        <FlowForm @flow-changed="flowChanged" :demo="demo"/>
-      </v-form>
+
+      <!--      <v-form ref="form">-->
+
+      <v-text-field
+        v-model="label"
+        label="Название сценария"
+        density="comfortable"
+        variant="outlined"
+        :rules="[required]"
+        :disabled="disable"
+      ></v-text-field>
+
+      <div v-for="block in blocks">
+        <component
+          class="my-2"
+          v-if="block.man"
+          is="ManBlock"
+          :disable="disable"
+          :block="block"
+          @flow-changed="flowChanged"
+        />
+        <component
+          class="my-2"
+          v-if="block.rand"
+          is="RandomBlock"
+          :disable="disable"
+          :block="block"
+          @block-changed="flowChanged"
+        />
+      </div>
+      <!--      </v-form>-->
+      <Preview :data="preview"/>
     </v-card-text>
   </v-card>
 </template>
@@ -24,48 +53,67 @@
 
 import {defineComponent} from 'vue';
 import {flowService} from "@/generated/services"
-import {CreateFlowRequest, Task} from "@/generated/flow";
-import {TaskArg, taskTypes} from '@/components/tasks/tasks'
-import FlowForm from "@/components/flow/FlowForm.vue";
+import {
+  FlowBlock, RandomFlowPreviewRes,
+} from "@/generated/flow";
 import NavBar from "@/components/NavBar.vue";
+import RandomBlock from "@/components/flow/RandomBlock.vue";
+import ManBlock from "@/components/flow/ManBlock.vue";
+import Preview from "@/components/flow/Preview.vue";
+import {Timer} from "@/components/helper";
+import {required} from "@/components/tasks/helper";
 
 export default defineComponent({
-  name: "CreateFlow",
-  components: {NavBar, FlowForm},
+  name: "CreateFlowV2",
+  components: {Preview, RandomBlock, ManBlock, NavBar},
   data() {
     return {
-      demo: false,
-      tasks: [] as Task[],
-      randomTasks: [] as Task[],
-      stepTypes: taskTypes,
-      show: this.showProp,
-      item: {} as CreateFlowRequest,
+      blockMap: new Map<number, FlowBlock>(),
+      disable: false,
       saveLoading: false,
+      preview: null as null | RandomFlowPreviewRes,
+      previewError: '',
+      timer: new Timer(),
+      label: '',
+    }
+  },
+  computed: {
+    blocks(): FlowBlock[] {
+      const blocks = [] as FlowBlock[]
+      this.blockMap.forEach((v, k) => {
+        blocks.push(v)
+      })
+      return blocks
     }
   },
   methods: {
-    flowChanged(label: string, tasks: TaskArg[], randomTasks: TaskArg[]) {
-      this.tasks = []
-      tasks.forEach(t => {
-        if (t.task) {
-          this.tasks.push(t.task)
-        }
-      })
+    required,
+    async flowChanged(block: FlowBlock) {
+      this.blockMap.set(Number(block.weight), block)
 
-      this.randomTasks = []
-      randomTasks.forEach(t => {
-        if (t.task) {
-          this.randomTasks.push(t.task)
-        }
-      })
+      await this.validateForm()
 
-      this.item.label = label
-      this.validateForm()
+      this.loadPreview()
+    },
+    async loadTokenCombo() {
+
+      this.timer.add(100)
+      this.timer.cb(() => {
+
+        this.previewError = ''
+        flowService.flowServiceRandomFlowPreview({body: {blocks: this.blocks, label: ''}})
+          .then((data) => {
+            this.preview = data
+          }).catch(() => {
+          this.previewError = 'Ошибка'
+        })
+
+      })
     },
     async validateForm(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
       // спасибо китайцам скажи лучше
-      const {valid} = await this["$refs"]['flow-form'].validate()
+      const {valid} = await this["$refs"]['form'].validate()
 
       return valid
     },
@@ -76,21 +124,23 @@ export default defineComponent({
 
       try {
         this.saveLoading = true
-        this.item.tasks = this.tasks
-        this.item.randomTasks = this.randomTasks
 
-        const res = await flowService.flowServiceCreateFlow({body: this.item})
-        this.$router.push({name: "Flow", params: {id: res.flow.id}})
+        const res = await flowService.flowServiceCreateFlowV2({
+          body: {
+            blocks: this.blocks,
+            label: this.label,
+          }
+        })
+        this.$router.push({name: "FlowViewV2", params: {id: res.id}})
       } finally {
         this.saveLoading = false
       }
     },
   },
   created() {
-    const s = this.$route.query.demo
-    if (s !== null && !Array.isArray(s)) {
-      this.demo = Boolean(s)
-    }
+    this.blockMap.set(1, {man: {tasks: [], randomTasks: []}, weight: 1})
+    this.blockMap.set(2, {rand: {tasks: []}, weight: 2})
+    this.blockMap.set(3, {man: {tasks: [], randomTasks: []}, weight: 3})
   }
 })
 

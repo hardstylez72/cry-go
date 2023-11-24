@@ -24,11 +24,7 @@ import {defineComponent, PropType} from "vue";
 
 export default defineComponent({
   name: "TaskSnapshotVote",
-  computed: {
-    link() {
-      return link
-    }
-  },
+
   emits: ['taskChanged'],
   props: {
     weight: {

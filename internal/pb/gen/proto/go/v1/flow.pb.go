@@ -126,16 +126,18 @@ func (x *FlowShared) GetCreatorId() string {
 	return ""
 }
 
-type UseSharedFlowReq struct {
+type RandomFlow struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id    string        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Label string        `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	Tasks []*RandomTask `protobuf:"bytes,3,rep,name=tasks,proto3" json:"tasks,omitempty"`
 }
 
-func (x *UseSharedFlowReq) Reset() {
-	*x = UseSharedFlowReq{}
+func (x *RandomFlow) Reset() {
+	*x = RandomFlow{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_v1_flow_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -143,13 +145,13 @@ func (x *UseSharedFlowReq) Reset() {
 	}
 }
 
-func (x *UseSharedFlowReq) String() string {
+func (x *RandomFlow) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UseSharedFlowReq) ProtoMessage() {}
+func (*RandomFlow) ProtoMessage() {}
 
-func (x *UseSharedFlowReq) ProtoReflect() protoreflect.Message {
+func (x *RandomFlow) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_flow_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -161,28 +163,48 @@ func (x *UseSharedFlowReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UseSharedFlowReq.ProtoReflect.Descriptor instead.
-func (*UseSharedFlowReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use RandomFlow.ProtoReflect.Descriptor instead.
+func (*RandomFlow) Descriptor() ([]byte, []int) {
 	return file_v1_flow_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *UseSharedFlowReq) GetId() string {
+func (x *RandomFlow) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-type UseSharedFlowRes struct {
+func (x *RandomFlow) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *RandomFlow) GetTasks() []*RandomTask {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
+type RandomTask struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Optional bool     `protobuf:"varint,1,opt,name=optional,proto3" json:"optional,omitempty"`
+	TaskType TaskType `protobuf:"varint,2,opt,name=taskType,proto3,enum=task.TaskType" json:"taskType,omitempty"`
+	// Types that are assignable to P:
+	//
+	//	*RandomTask_Swap
+	//	*RandomTask_Simple
+	P isRandomTask_P `protobuf_oneof:"p"`
 }
 
-func (x *UseSharedFlowRes) Reset() {
-	*x = UseSharedFlowRes{}
+func (x *RandomTask) Reset() {
+	*x = RandomTask{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_v1_flow_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -190,13 +212,13 @@ func (x *UseSharedFlowRes) Reset() {
 	}
 }
 
-func (x *UseSharedFlowRes) String() string {
+func (x *RandomTask) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UseSharedFlowRes) ProtoMessage() {}
+func (*RandomTask) ProtoMessage() {}
 
-func (x *UseSharedFlowRes) ProtoReflect() protoreflect.Message {
+func (x *RandomTask) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_flow_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -208,28 +230,72 @@ func (x *UseSharedFlowRes) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UseSharedFlowRes.ProtoReflect.Descriptor instead.
-func (*UseSharedFlowRes) Descriptor() ([]byte, []int) {
+// Deprecated: Use RandomTask.ProtoReflect.Descriptor instead.
+func (*RandomTask) Descriptor() ([]byte, []int) {
 	return file_v1_flow_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UseSharedFlowRes) GetId() string {
+func (x *RandomTask) GetOptional() bool {
 	if x != nil {
-		return x.Id
+		return x.Optional
 	}
-	return ""
+	return false
 }
 
-type SharedFlowRes struct {
+func (x *RandomTask) GetTaskType() TaskType {
+	if x != nil {
+		return x.TaskType
+	}
+	return TaskType_StargateBridge
+}
+
+func (m *RandomTask) GetP() isRandomTask_P {
+	if m != nil {
+		return m.P
+	}
+	return nil
+}
+
+func (x *RandomTask) GetSwap() *RPswap {
+	if x, ok := x.GetP().(*RandomTask_Swap); ok {
+		return x.Swap
+	}
+	return nil
+}
+
+func (x *RandomTask) GetSimple() *RPsimple {
+	if x, ok := x.GetP().(*RandomTask_Simple); ok {
+		return x.Simple
+	}
+	return nil
+}
+
+type isRandomTask_P interface {
+	isRandomTask_P()
+}
+
+type RandomTask_Swap struct {
+	Swap *RPswap `protobuf:"bytes,3,opt,name=swap,proto3,oneof"`
+}
+
+type RandomTask_Simple struct {
+	Simple *RPsimple `protobuf:"bytes,4,opt,name=simple,proto3,oneof"`
+}
+
+func (*RandomTask_Swap) isRandomTask_P() {}
+
+func (*RandomTask_Simple) isRandomTask_P() {}
+
+type RPsimple struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Flow *FlowShared `protobuf:"bytes,1,opt,name=flow,proto3" json:"flow,omitempty"`
+	Network Network `protobuf:"varint,1,opt,name=network,proto3,enum=shared.Network" json:"network,omitempty"`
 }
 
-func (x *SharedFlowRes) Reset() {
-	*x = SharedFlowRes{}
+func (x *RPsimple) Reset() {
+	*x = RPsimple{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_v1_flow_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -237,13 +303,13 @@ func (x *SharedFlowRes) Reset() {
 	}
 }
 
-func (x *SharedFlowRes) String() string {
+func (x *RPsimple) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SharedFlowRes) ProtoMessage() {}
+func (*RPsimple) ProtoMessage() {}
 
-func (x *SharedFlowRes) ProtoReflect() protoreflect.Message {
+func (x *RPsimple) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_flow_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -255,28 +321,28 @@ func (x *SharedFlowRes) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SharedFlowRes.ProtoReflect.Descriptor instead.
-func (*SharedFlowRes) Descriptor() ([]byte, []int) {
+// Deprecated: Use RPsimple.ProtoReflect.Descriptor instead.
+func (*RPsimple) Descriptor() ([]byte, []int) {
 	return file_v1_flow_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *SharedFlowRes) GetFlow() *FlowShared {
+func (x *RPsimple) GetNetwork() Network {
 	if x != nil {
-		return x.Flow
+		return x.Network
 	}
-	return nil
+	return Network_ARBITRUM
 }
 
-type SharedFlowReq struct {
+type RPswap struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Items []*RPswapItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
 }
 
-func (x *SharedFlowReq) Reset() {
-	*x = SharedFlowReq{}
+func (x *RPswap) Reset() {
+	*x = RPswap{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_v1_flow_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -284,13 +350,13 @@ func (x *SharedFlowReq) Reset() {
 	}
 }
 
-func (x *SharedFlowReq) String() string {
+func (x *RPswap) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SharedFlowReq) ProtoMessage() {}
+func (*RPswap) ProtoMessage() {}
 
-func (x *SharedFlowReq) ProtoReflect() protoreflect.Message {
+func (x *RPswap) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_flow_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -302,26 +368,30 @@ func (x *SharedFlowReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SharedFlowReq.ProtoReflect.Descriptor instead.
-func (*SharedFlowReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use RPswap.ProtoReflect.Descriptor instead.
+func (*RPswap) Descriptor() ([]byte, []int) {
 	return file_v1_flow_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *SharedFlowReq) GetId() string {
+func (x *RPswap) GetItems() []*RPswapItem {
 	if x != nil {
-		return x.Id
+		return x.Items
 	}
-	return ""
+	return nil
 }
 
-type SharedFlowsReq struct {
+type RPswapItem struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Network Network `protobuf:"varint,1,opt,name=network,proto3,enum=shared.Network" json:"network,omitempty"`
+	From    Token   `protobuf:"varint,2,opt,name=from,proto3,enum=shared.Token" json:"from,omitempty"`
+	To      Token   `protobuf:"varint,3,opt,name=to,proto3,enum=shared.Token" json:"to,omitempty"`
 }
 
-func (x *SharedFlowsReq) Reset() {
-	*x = SharedFlowsReq{}
+func (x *RPswapItem) Reset() {
+	*x = RPswapItem{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_v1_flow_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -329,13 +399,13 @@ func (x *SharedFlowsReq) Reset() {
 	}
 }
 
-func (x *SharedFlowsReq) String() string {
+func (x *RPswapItem) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SharedFlowsReq) ProtoMessage() {}
+func (*RPswapItem) ProtoMessage() {}
 
-func (x *SharedFlowsReq) ProtoReflect() protoreflect.Message {
+func (x *RPswapItem) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_flow_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -347,431 +417,30 @@ func (x *SharedFlowsReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SharedFlowsReq.ProtoReflect.Descriptor instead.
-func (*SharedFlowsReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use RPswapItem.ProtoReflect.Descriptor instead.
+func (*RPswapItem) Descriptor() ([]byte, []int) {
 	return file_v1_flow_proto_rawDescGZIP(), []int{5}
 }
 
-type SharedFlowsRes struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Items []*FlowShared `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
-}
-
-func (x *SharedFlowsRes) Reset() {
-	*x = SharedFlowsRes{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[6]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SharedFlowsRes) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SharedFlowsRes) ProtoMessage() {}
-
-func (x *SharedFlowsRes) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[6]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SharedFlowsRes.ProtoReflect.Descriptor instead.
-func (*SharedFlowsRes) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *SharedFlowsRes) GetItems() []*FlowShared {
+func (x *RPswapItem) GetNetwork() Network {
 	if x != nil {
-		return x.Items
+		return x.Network
 	}
-	return nil
+	return Network_ARBITRUM
 }
 
-type ShareFlowReq struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id          string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-}
-
-func (x *ShareFlowReq) Reset() {
-	*x = ShareFlowReq{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[7]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ShareFlowReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ShareFlowReq) ProtoMessage() {}
-
-func (x *ShareFlowReq) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[7]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ShareFlowReq.ProtoReflect.Descriptor instead.
-func (*ShareFlowReq) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *ShareFlowReq) GetId() string {
+func (x *RPswapItem) GetFrom() Token {
 	if x != nil {
-		return x.Id
+		return x.From
 	}
-	return ""
+	return Token_USDT
 }
 
-func (x *ShareFlowReq) GetDescription() string {
+func (x *RPswapItem) GetTo() Token {
 	if x != nil {
-		return x.Description
+		return x.To
 	}
-	return ""
-}
-
-type ShareFlowRes struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *ShareFlowRes) Reset() {
-	*x = ShareFlowRes{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[8]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ShareFlowRes) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ShareFlowRes) ProtoMessage() {}
-
-func (x *ShareFlowRes) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[8]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ShareFlowRes.ProtoReflect.Descriptor instead.
-func (*ShareFlowRes) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *ShareFlowRes) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type HideFlowReq struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *HideFlowReq) Reset() {
-	*x = HideFlowReq{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[9]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *HideFlowReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HideFlowReq) ProtoMessage() {}
-
-func (x *HideFlowReq) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[9]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HideFlowReq.ProtoReflect.Descriptor instead.
-func (*HideFlowReq) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *HideFlowReq) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type HideFlowRes struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *HideFlowRes) Reset() {
-	*x = HideFlowRes{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[10]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *HideFlowRes) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HideFlowRes) ProtoMessage() {}
-
-func (x *HideFlowRes) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[10]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HideFlowRes.ProtoReflect.Descriptor instead.
-func (*HideFlowRes) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{10}
-}
-
-type CopyFlowReq struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *CopyFlowReq) Reset() {
-	*x = CopyFlowReq{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[11]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CopyFlowReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CopyFlowReq) ProtoMessage() {}
-
-func (x *CopyFlowReq) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[11]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CopyFlowReq.ProtoReflect.Descriptor instead.
-func (*CopyFlowReq) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *CopyFlowReq) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type CopyFlowRes struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *CopyFlowRes) Reset() {
-	*x = CopyFlowRes{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[12]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CopyFlowRes) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CopyFlowRes) ProtoMessage() {}
-
-func (x *CopyFlowRes) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[12]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CopyFlowRes.ProtoReflect.Descriptor instead.
-func (*CopyFlowRes) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *CopyFlowRes) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type GetFlowRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-}
-
-func (x *GetFlowRequest) Reset() {
-	*x = GetFlowRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[13]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetFlowRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetFlowRequest) ProtoMessage() {}
-
-func (x *GetFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[13]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetFlowRequest.ProtoReflect.Descriptor instead.
-func (*GetFlowRequest) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *GetFlowRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-type GetFlowResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Flow *Flow `protobuf:"bytes,1,opt,name=flow,proto3" json:"flow,omitempty"`
-}
-
-func (x *GetFlowResponse) Reset() {
-	*x = GetFlowResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[14]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetFlowResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetFlowResponse) ProtoMessage() {}
-
-func (x *GetFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[14]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetFlowResponse.ProtoReflect.Descriptor instead.
-func (*GetFlowResponse) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *GetFlowResponse) GetFlow() *Flow {
-	if x != nil {
-		return x.Flow
-	}
-	return nil
+	return Token_USDT
 }
 
 type Flow struct {
@@ -786,12 +455,13 @@ type Flow struct {
 	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	DeletedAt   *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=deleted_at,json=deletedAt,proto3,oneof" json:"deleted_at,omitempty"`
 	RandomTasks []*Task                `protobuf:"bytes,9,rep,name=random_tasks,json=randomTasks,proto3" json:"random_tasks,omitempty"`
+	Base        *FlowBase              `protobuf:"bytes,10,opt,name=base,proto3" json:"base,omitempty"`
 }
 
 func (x *Flow) Reset() {
 	*x = Flow{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[15]
+		mi := &file_v1_flow_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -804,7 +474,7 @@ func (x *Flow) String() string {
 func (*Flow) ProtoMessage() {}
 
 func (x *Flow) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[15]
+	mi := &file_v1_flow_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -817,7 +487,7 @@ func (x *Flow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Flow.ProtoReflect.Descriptor instead.
 func (*Flow) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{15}
+	return file_v1_flow_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Flow) GetId() string {
@@ -869,6 +539,1718 @@ func (x *Flow) GetRandomTasks() []*Task {
 	return nil
 }
 
+func (x *Flow) GetBase() *FlowBase {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+type FlowBase struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Token Token `protobuf:"varint,1,opt,name=token,proto3,enum=shared.Token" json:"token,omitempty"`
+}
+
+func (x *FlowBase) Reset() {
+	*x = FlowBase{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowBase) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowBase) ProtoMessage() {}
+
+func (x *FlowBase) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowBase.ProtoReflect.Descriptor instead.
+func (*FlowBase) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *FlowBase) GetToken() Token {
+	if x != nil {
+		return x.Token
+	}
+	return Token_USDT
+}
+
+type UpdateFlowV2Request struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id     string       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Label  string       `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	Blocks []*FlowBlock `protobuf:"bytes,3,rep,name=blocks,proto3" json:"blocks,omitempty"`
+}
+
+func (x *UpdateFlowV2Request) Reset() {
+	*x = UpdateFlowV2Request{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateFlowV2Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFlowV2Request) ProtoMessage() {}
+
+func (x *UpdateFlowV2Request) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFlowV2Request.ProtoReflect.Descriptor instead.
+func (*UpdateFlowV2Request) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdateFlowV2Request) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateFlowV2Request) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *UpdateFlowV2Request) GetBlocks() []*FlowBlock {
+	if x != nil {
+		return x.Blocks
+	}
+	return nil
+}
+
+type UpdateFlowV2Response struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id     string       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Label  string       `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	Blocks []*FlowBlock `protobuf:"bytes,3,rep,name=blocks,proto3" json:"blocks,omitempty"`
+}
+
+func (x *UpdateFlowV2Response) Reset() {
+	*x = UpdateFlowV2Response{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateFlowV2Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFlowV2Response) ProtoMessage() {}
+
+func (x *UpdateFlowV2Response) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFlowV2Response.ProtoReflect.Descriptor instead.
+func (*UpdateFlowV2Response) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UpdateFlowV2Response) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateFlowV2Response) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *UpdateFlowV2Response) GetBlocks() []*FlowBlock {
+	if x != nil {
+		return x.Blocks
+	}
+	return nil
+}
+
+type GetFlowV2Req struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *GetFlowV2Req) Reset() {
+	*x = GetFlowV2Req{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetFlowV2Req) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFlowV2Req) ProtoMessage() {}
+
+func (x *GetFlowV2Req) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFlowV2Req.ProtoReflect.Descriptor instead.
+func (*GetFlowV2Req) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetFlowV2Req) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetFlowV2Res struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id     string       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Label  string       `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	Blocks []*FlowBlock `protobuf:"bytes,3,rep,name=blocks,proto3" json:"blocks,omitempty"`
+}
+
+func (x *GetFlowV2Res) Reset() {
+	*x = GetFlowV2Res{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetFlowV2Res) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFlowV2Res) ProtoMessage() {}
+
+func (x *GetFlowV2Res) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFlowV2Res.ProtoReflect.Descriptor instead.
+func (*GetFlowV2Res) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetFlowV2Res) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GetFlowV2Res) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *GetFlowV2Res) GetBlocks() []*FlowBlock {
+	if x != nil {
+		return x.Blocks
+	}
+	return nil
+}
+
+type OnlyRandomFlowPreviewReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	StartToken        Token         `protobuf:"varint,1,opt,name=start_token,json=startToken,proto3,enum=shared.Token" json:"start_token,omitempty"`
+	FinishToken       Token         `protobuf:"varint,2,opt,name=finish_token,json=finishToken,proto3,enum=shared.Token" json:"finish_token,omitempty"`
+	StartNetwork      Network       `protobuf:"varint,3,opt,name=start_network,json=startNetwork,proto3,enum=shared.Network" json:"start_network,omitempty"`
+	Tasks             []*RandomTask `protobuf:"bytes,4,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	TaskCount         int64         `protobuf:"varint,6,opt,name=task_count,json=taskCount,proto3" json:"task_count,omitempty"`
+	IgnoreStartToken  bool          `protobuf:"varint,7,opt,name=ignore_start_token,json=ignoreStartToken,proto3" json:"ignore_start_token,omitempty"`
+	IgnoreFinishToken bool          `protobuf:"varint,8,opt,name=ignore_finish_token,json=ignoreFinishToken,proto3" json:"ignore_finish_token,omitempty"`
+	MinDelay          int64         `protobuf:"varint,9,opt,name=min_delay,json=minDelay,proto3" json:"min_delay,omitempty"`
+	MaxDelay          int64         `protobuf:"varint,10,opt,name=max_delay,json=maxDelay,proto3" json:"max_delay,omitempty"`
+}
+
+func (x *OnlyRandomFlowPreviewReq) Reset() {
+	*x = OnlyRandomFlowPreviewReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *OnlyRandomFlowPreviewReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OnlyRandomFlowPreviewReq) ProtoMessage() {}
+
+func (x *OnlyRandomFlowPreviewReq) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OnlyRandomFlowPreviewReq.ProtoReflect.Descriptor instead.
+func (*OnlyRandomFlowPreviewReq) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetStartToken() Token {
+	if x != nil {
+		return x.StartToken
+	}
+	return Token_USDT
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetFinishToken() Token {
+	if x != nil {
+		return x.FinishToken
+	}
+	return Token_USDT
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetStartNetwork() Network {
+	if x != nil {
+		return x.StartNetwork
+	}
+	return Network_ARBITRUM
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetTasks() []*RandomTask {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetTaskCount() int64 {
+	if x != nil {
+		return x.TaskCount
+	}
+	return 0
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetIgnoreStartToken() bool {
+	if x != nil {
+		return x.IgnoreStartToken
+	}
+	return false
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetIgnoreFinishToken() bool {
+	if x != nil {
+		return x.IgnoreFinishToken
+	}
+	return false
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetMinDelay() int64 {
+	if x != nil {
+		return x.MinDelay
+	}
+	return 0
+}
+
+func (x *OnlyRandomFlowPreviewReq) GetMaxDelay() int64 {
+	if x != nil {
+		return x.MaxDelay
+	}
+	return 0
+}
+
+type OnlyRandomFlowFromTokensRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tokens []Token `protobuf:"varint,1,rep,packed,name=tokens,proto3,enum=shared.Token" json:"tokens,omitempty"`
+}
+
+func (x *OnlyRandomFlowFromTokensRes) Reset() {
+	*x = OnlyRandomFlowFromTokensRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *OnlyRandomFlowFromTokensRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OnlyRandomFlowFromTokensRes) ProtoMessage() {}
+
+func (x *OnlyRandomFlowFromTokensRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OnlyRandomFlowFromTokensRes.ProtoReflect.Descriptor instead.
+func (*OnlyRandomFlowFromTokensRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *OnlyRandomFlowFromTokensRes) GetTokens() []Token {
+	if x != nil {
+		return x.Tokens
+	}
+	return nil
+}
+
+type OnlyRandomFlowPreviewRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Flow          []*UniqueFlow `protobuf:"bytes,1,rep,name=flow,proto3" json:"flow,omitempty"`
+	UniquePercent float64       `protobuf:"fixed64,2,opt,name=unique_percent,json=uniquePercent,proto3" json:"unique_percent,omitempty"`
+	Tokens        []*TokenArr   `protobuf:"bytes,3,rep,name=tokens,proto3" json:"tokens,omitempty"`
+}
+
+func (x *OnlyRandomFlowPreviewRes) Reset() {
+	*x = OnlyRandomFlowPreviewRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *OnlyRandomFlowPreviewRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OnlyRandomFlowPreviewRes) ProtoMessage() {}
+
+func (x *OnlyRandomFlowPreviewRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OnlyRandomFlowPreviewRes.ProtoReflect.Descriptor instead.
+func (*OnlyRandomFlowPreviewRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *OnlyRandomFlowPreviewRes) GetFlow() []*UniqueFlow {
+	if x != nil {
+		return x.Flow
+	}
+	return nil
+}
+
+func (x *OnlyRandomFlowPreviewRes) GetUniquePercent() float64 {
+	if x != nil {
+		return x.UniquePercent
+	}
+	return 0
+}
+
+func (x *OnlyRandomFlowPreviewRes) GetTokens() []*TokenArr {
+	if x != nil {
+		return x.Tokens
+	}
+	return nil
+}
+
+type FlowPreviewReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Label  string       `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
+	Blocks []*FlowBlock `protobuf:"bytes,2,rep,name=blocks,proto3" json:"blocks,omitempty"`
+}
+
+func (x *FlowPreviewReq) Reset() {
+	*x = FlowPreviewReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowPreviewReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowPreviewReq) ProtoMessage() {}
+
+func (x *FlowPreviewReq) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowPreviewReq.ProtoReflect.Descriptor instead.
+func (*FlowPreviewReq) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *FlowPreviewReq) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *FlowPreviewReq) GetBlocks() []*FlowBlock {
+	if x != nil {
+		return x.Blocks
+	}
+	return nil
+}
+
+type RandomFlowPreviewRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Flow          []*UniqueFlow `protobuf:"bytes,1,rep,name=flow,proto3" json:"flow,omitempty"`
+	UniquePercent float64       `protobuf:"fixed64,2,opt,name=unique_percent,json=uniquePercent,proto3" json:"unique_percent,omitempty"`
+}
+
+func (x *RandomFlowPreviewRes) Reset() {
+	*x = RandomFlowPreviewRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RandomFlowPreviewRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RandomFlowPreviewRes) ProtoMessage() {}
+
+func (x *RandomFlowPreviewRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RandomFlowPreviewRes.ProtoReflect.Descriptor instead.
+func (*RandomFlowPreviewRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *RandomFlowPreviewRes) GetFlow() []*UniqueFlow {
+	if x != nil {
+		return x.Flow
+	}
+	return nil
+}
+
+func (x *RandomFlowPreviewRes) GetUniquePercent() float64 {
+	if x != nil {
+		return x.UniquePercent
+	}
+	return 0
+}
+
+type TokenArr struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	From Token   `protobuf:"varint,1,opt,name=from,proto3,enum=shared.Token" json:"from,omitempty"`
+	To   []Token `protobuf:"varint,2,rep,packed,name=to,proto3,enum=shared.Token" json:"to,omitempty"`
+}
+
+func (x *TokenArr) Reset() {
+	*x = TokenArr{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TokenArr) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TokenArr) ProtoMessage() {}
+
+func (x *TokenArr) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TokenArr.ProtoReflect.Descriptor instead.
+func (*TokenArr) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *TokenArr) GetFrom() Token {
+	if x != nil {
+		return x.From
+	}
+	return Token_USDT
+}
+
+func (x *TokenArr) GetTo() []Token {
+	if x != nil {
+		return x.To
+	}
+	return nil
+}
+
+type UniqueFlow struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tasks []*Task `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+}
+
+func (x *UniqueFlow) Reset() {
+	*x = UniqueFlow{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UniqueFlow) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UniqueFlow) ProtoMessage() {}
+
+func (x *UniqueFlow) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UniqueFlow.ProtoReflect.Descriptor instead.
+func (*UniqueFlow) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *UniqueFlow) GetTasks() []*Task {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
+type CreateFlowV2Req struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Label  string       `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
+	Blocks []*FlowBlock `protobuf:"bytes,2,rep,name=blocks,proto3" json:"blocks,omitempty"`
+}
+
+func (x *CreateFlowV2Req) Reset() {
+	*x = CreateFlowV2Req{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateFlowV2Req) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateFlowV2Req) ProtoMessage() {}
+
+func (x *CreateFlowV2Req) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateFlowV2Req.ProtoReflect.Descriptor instead.
+func (*CreateFlowV2Req) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *CreateFlowV2Req) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *CreateFlowV2Req) GetBlocks() []*FlowBlock {
+	if x != nil {
+		return x.Blocks
+	}
+	return nil
+}
+
+type FlowBlock struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Weight int64 `protobuf:"varint,1,opt,name=weight,proto3" json:"weight,omitempty"`
+	// Types that are assignable to Block:
+	//
+	//	*FlowBlock_Man
+	//	*FlowBlock_Rand
+	Block isFlowBlock_Block `protobuf_oneof:"block"`
+}
+
+func (x *FlowBlock) Reset() {
+	*x = FlowBlock{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowBlock) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowBlock) ProtoMessage() {}
+
+func (x *FlowBlock) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowBlock.ProtoReflect.Descriptor instead.
+func (*FlowBlock) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *FlowBlock) GetWeight() int64 {
+	if x != nil {
+		return x.Weight
+	}
+	return 0
+}
+
+func (m *FlowBlock) GetBlock() isFlowBlock_Block {
+	if m != nil {
+		return m.Block
+	}
+	return nil
+}
+
+func (x *FlowBlock) GetMan() *FlowBlockMan {
+	if x, ok := x.GetBlock().(*FlowBlock_Man); ok {
+		return x.Man
+	}
+	return nil
+}
+
+func (x *FlowBlock) GetRand() *FlowBlockRand {
+	if x, ok := x.GetBlock().(*FlowBlock_Rand); ok {
+		return x.Rand
+	}
+	return nil
+}
+
+type isFlowBlock_Block interface {
+	isFlowBlock_Block()
+}
+
+type FlowBlock_Man struct {
+	Man *FlowBlockMan `protobuf:"bytes,2,opt,name=man,proto3,oneof"`
+}
+
+type FlowBlock_Rand struct {
+	Rand *FlowBlockRand `protobuf:"bytes,3,opt,name=rand,proto3,oneof"`
+}
+
+func (*FlowBlock_Man) isFlowBlock_Block() {}
+
+func (*FlowBlock_Rand) isFlowBlock_Block() {}
+
+type FlowBlockMan struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tasks       []*Task `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	RandomTasks []*Task `protobuf:"bytes,2,rep,name=random_tasks,json=randomTasks,proto3" json:"random_tasks,omitempty"`
+}
+
+func (x *FlowBlockMan) Reset() {
+	*x = FlowBlockMan{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowBlockMan) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowBlockMan) ProtoMessage() {}
+
+func (x *FlowBlockMan) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowBlockMan.ProtoReflect.Descriptor instead.
+func (*FlowBlockMan) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *FlowBlockMan) GetTasks() []*Task {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
+func (x *FlowBlockMan) GetRandomTasks() []*Task {
+	if x != nil {
+		return x.RandomTasks
+	}
+	return nil
+}
+
+type FlowBlockRand struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	StartToken   Token         `protobuf:"varint,1,opt,name=start_token,json=startToken,proto3,enum=shared.Token" json:"start_token,omitempty"`
+	FinishToken  Token         `protobuf:"varint,2,opt,name=finish_token,json=finishToken,proto3,enum=shared.Token" json:"finish_token,omitempty"`
+	StartNetwork Network       `protobuf:"varint,3,opt,name=start_network,json=startNetwork,proto3,enum=shared.Network" json:"start_network,omitempty"`
+	Tasks        []*RandomTask `protobuf:"bytes,4,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	TaskCount    int64         `protobuf:"varint,6,opt,name=task_count,json=taskCount,proto3" json:"task_count,omitempty"`
+	MinDelay     int64         `protobuf:"varint,7,opt,name=min_delay,json=minDelay,proto3" json:"min_delay,omitempty"`
+	MaxDelay     int64         `protobuf:"varint,8,opt,name=max_delay,json=maxDelay,proto3" json:"max_delay,omitempty"`
+}
+
+func (x *FlowBlockRand) Reset() {
+	*x = FlowBlockRand{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowBlockRand) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowBlockRand) ProtoMessage() {}
+
+func (x *FlowBlockRand) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowBlockRand.ProtoReflect.Descriptor instead.
+func (*FlowBlockRand) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *FlowBlockRand) GetStartToken() Token {
+	if x != nil {
+		return x.StartToken
+	}
+	return Token_USDT
+}
+
+func (x *FlowBlockRand) GetFinishToken() Token {
+	if x != nil {
+		return x.FinishToken
+	}
+	return Token_USDT
+}
+
+func (x *FlowBlockRand) GetStartNetwork() Network {
+	if x != nil {
+		return x.StartNetwork
+	}
+	return Network_ARBITRUM
+}
+
+func (x *FlowBlockRand) GetTasks() []*RandomTask {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
+func (x *FlowBlockRand) GetTaskCount() int64 {
+	if x != nil {
+		return x.TaskCount
+	}
+	return 0
+}
+
+func (x *FlowBlockRand) GetMinDelay() int64 {
+	if x != nil {
+		return x.MinDelay
+	}
+	return 0
+}
+
+func (x *FlowBlockRand) GetMaxDelay() int64 {
+	if x != nil {
+		return x.MaxDelay
+	}
+	return 0
+}
+
+type CreateFlowV2Res struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *CreateFlowV2Res) Reset() {
+	*x = CreateFlowV2Res{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateFlowV2Res) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateFlowV2Res) ProtoMessage() {}
+
+func (x *CreateFlowV2Res) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateFlowV2Res.ProtoReflect.Descriptor instead.
+func (*CreateFlowV2Res) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *CreateFlowV2Res) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type UseSharedFlowReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *UseSharedFlowReq) Reset() {
+	*x = UseSharedFlowReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UseSharedFlowReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UseSharedFlowReq) ProtoMessage() {}
+
+func (x *UseSharedFlowReq) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UseSharedFlowReq.ProtoReflect.Descriptor instead.
+func (*UseSharedFlowReq) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *UseSharedFlowReq) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type UseSharedFlowRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *UseSharedFlowRes) Reset() {
+	*x = UseSharedFlowRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UseSharedFlowRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UseSharedFlowRes) ProtoMessage() {}
+
+func (x *UseSharedFlowRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UseSharedFlowRes.ProtoReflect.Descriptor instead.
+func (*UseSharedFlowRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *UseSharedFlowRes) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type SharedFlowRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Flow *FlowShared `protobuf:"bytes,1,opt,name=flow,proto3" json:"flow,omitempty"`
+}
+
+func (x *SharedFlowRes) Reset() {
+	*x = SharedFlowRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SharedFlowRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SharedFlowRes) ProtoMessage() {}
+
+func (x *SharedFlowRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SharedFlowRes.ProtoReflect.Descriptor instead.
+func (*SharedFlowRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *SharedFlowRes) GetFlow() *FlowShared {
+	if x != nil {
+		return x.Flow
+	}
+	return nil
+}
+
+type SharedFlowReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *SharedFlowReq) Reset() {
+	*x = SharedFlowReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SharedFlowReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SharedFlowReq) ProtoMessage() {}
+
+func (x *SharedFlowReq) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SharedFlowReq.ProtoReflect.Descriptor instead.
+func (*SharedFlowReq) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *SharedFlowReq) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type SharedFlowsReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *SharedFlowsReq) Reset() {
+	*x = SharedFlowsReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[28]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SharedFlowsReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SharedFlowsReq) ProtoMessage() {}
+
+func (x *SharedFlowsReq) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[28]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SharedFlowsReq.ProtoReflect.Descriptor instead.
+func (*SharedFlowsReq) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{28}
+}
+
+type SharedFlowsRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Items []*FlowShared `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+}
+
+func (x *SharedFlowsRes) Reset() {
+	*x = SharedFlowsRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[29]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SharedFlowsRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SharedFlowsRes) ProtoMessage() {}
+
+func (x *SharedFlowsRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[29]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SharedFlowsRes.ProtoReflect.Descriptor instead.
+func (*SharedFlowsRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *SharedFlowsRes) GetItems() []*FlowShared {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type ShareFlowReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id          string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+}
+
+func (x *ShareFlowReq) Reset() {
+	*x = ShareFlowReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ShareFlowReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShareFlowReq) ProtoMessage() {}
+
+func (x *ShareFlowReq) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShareFlowReq.ProtoReflect.Descriptor instead.
+func (*ShareFlowReq) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *ShareFlowReq) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ShareFlowReq) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+type ShareFlowRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *ShareFlowRes) Reset() {
+	*x = ShareFlowRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[31]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ShareFlowRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ShareFlowRes) ProtoMessage() {}
+
+func (x *ShareFlowRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[31]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ShareFlowRes.ProtoReflect.Descriptor instead.
+func (*ShareFlowRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *ShareFlowRes) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type HideFlowReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *HideFlowReq) Reset() {
+	*x = HideFlowReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[32]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HideFlowReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HideFlowReq) ProtoMessage() {}
+
+func (x *HideFlowReq) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[32]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HideFlowReq.ProtoReflect.Descriptor instead.
+func (*HideFlowReq) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *HideFlowReq) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type HideFlowRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *HideFlowRes) Reset() {
+	*x = HideFlowRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[33]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HideFlowRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HideFlowRes) ProtoMessage() {}
+
+func (x *HideFlowRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[33]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HideFlowRes.ProtoReflect.Descriptor instead.
+func (*HideFlowRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{33}
+}
+
+type CopyFlowReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *CopyFlowReq) Reset() {
+	*x = CopyFlowReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[34]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CopyFlowReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CopyFlowReq) ProtoMessage() {}
+
+func (x *CopyFlowReq) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[34]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CopyFlowReq.ProtoReflect.Descriptor instead.
+func (*CopyFlowReq) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *CopyFlowReq) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type CopyFlowRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *CopyFlowRes) Reset() {
+	*x = CopyFlowRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[35]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CopyFlowRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CopyFlowRes) ProtoMessage() {}
+
+func (x *CopyFlowRes) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[35]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CopyFlowRes.ProtoReflect.Descriptor instead.
+func (*CopyFlowRes) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *CopyFlowRes) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetFlowRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *GetFlowRequest) Reset() {
+	*x = GetFlowRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[36]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetFlowRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFlowRequest) ProtoMessage() {}
+
+func (x *GetFlowRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[36]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFlowRequest.ProtoReflect.Descriptor instead.
+func (*GetFlowRequest) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *GetFlowRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type GetFlowResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Flow *Flow `protobuf:"bytes,1,opt,name=flow,proto3" json:"flow,omitempty"`
+}
+
+func (x *GetFlowResponse) Reset() {
+	*x = GetFlowResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[37]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetFlowResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFlowResponse) ProtoMessage() {}
+
+func (x *GetFlowResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[37]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFlowResponse.ProtoReflect.Descriptor instead.
+func (*GetFlowResponse) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *GetFlowResponse) GetFlow() *Flow {
+	if x != nil {
+		return x.Flow
+	}
+	return nil
+}
+
 type WalletByWalletMode struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -881,7 +2263,7 @@ type WalletByWalletMode struct {
 func (x *WalletByWalletMode) Reset() {
 	*x = WalletByWalletMode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[16]
+		mi := &file_v1_flow_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -894,7 +2276,7 @@ func (x *WalletByWalletMode) String() string {
 func (*WalletByWalletMode) ProtoMessage() {}
 
 func (x *WalletByWalletMode) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[16]
+	mi := &file_v1_flow_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -907,7 +2289,7 @@ func (x *WalletByWalletMode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WalletByWalletMode.ProtoReflect.Descriptor instead.
 func (*WalletByWalletMode) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{16}
+	return file_v1_flow_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *WalletByWalletMode) GetDelayBetweenWallets() int64 {
@@ -987,7 +2369,7 @@ type Task struct {
 func (x *Task) Reset() {
 	*x = Task{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[17]
+		mi := &file_v1_flow_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1000,7 +2382,7 @@ func (x *Task) String() string {
 func (*Task) ProtoMessage() {}
 
 func (x *Task) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[17]
+	mi := &file_v1_flow_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1013,7 +2395,7 @@ func (x *Task) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Task.ProtoReflect.Descriptor instead.
 func (*Task) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{17}
+	return file_v1_flow_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *Task) GetWeight() int64 {
@@ -1672,7 +3054,7 @@ type CreateFlowRequest struct {
 func (x *CreateFlowRequest) Reset() {
 	*x = CreateFlowRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[18]
+		mi := &file_v1_flow_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1685,7 +3067,7 @@ func (x *CreateFlowRequest) String() string {
 func (*CreateFlowRequest) ProtoMessage() {}
 
 func (x *CreateFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[18]
+	mi := &file_v1_flow_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1698,7 +3080,7 @@ func (x *CreateFlowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFlowRequest.ProtoReflect.Descriptor instead.
 func (*CreateFlowRequest) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{18}
+	return file_v1_flow_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *CreateFlowRequest) GetLabel() string {
@@ -1733,7 +3115,7 @@ type UpdateFlowRequest struct {
 func (x *UpdateFlowRequest) Reset() {
 	*x = UpdateFlowRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[19]
+		mi := &file_v1_flow_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1746,7 +3128,7 @@ func (x *UpdateFlowRequest) String() string {
 func (*UpdateFlowRequest) ProtoMessage() {}
 
 func (x *UpdateFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[19]
+	mi := &file_v1_flow_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1759,7 +3141,7 @@ func (x *UpdateFlowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFlowRequest.ProtoReflect.Descriptor instead.
 func (*UpdateFlowRequest) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{19}
+	return file_v1_flow_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *UpdateFlowRequest) GetFlow() *Flow {
@@ -1780,7 +3162,7 @@ type UpdateFlowResponse struct {
 func (x *UpdateFlowResponse) Reset() {
 	*x = UpdateFlowResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[20]
+		mi := &file_v1_flow_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1793,7 +3175,7 @@ func (x *UpdateFlowResponse) String() string {
 func (*UpdateFlowResponse) ProtoMessage() {}
 
 func (x *UpdateFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[20]
+	mi := &file_v1_flow_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1806,7 +3188,7 @@ func (x *UpdateFlowResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFlowResponse.ProtoReflect.Descriptor instead.
 func (*UpdateFlowResponse) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{20}
+	return file_v1_flow_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *UpdateFlowResponse) GetFlow() *Flow {
@@ -1827,7 +3209,7 @@ type CreateFlowResponse struct {
 func (x *CreateFlowResponse) Reset() {
 	*x = CreateFlowResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[21]
+		mi := &file_v1_flow_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1840,7 +3222,7 @@ func (x *CreateFlowResponse) String() string {
 func (*CreateFlowResponse) ProtoMessage() {}
 
 func (x *CreateFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[21]
+	mi := &file_v1_flow_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1853,7 +3235,7 @@ func (x *CreateFlowResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFlowResponse.ProtoReflect.Descriptor instead.
 func (*CreateFlowResponse) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{21}
+	return file_v1_flow_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *CreateFlowResponse) GetFlow() *Flow {
@@ -1872,7 +3254,7 @@ type ListFlowRequest struct {
 func (x *ListFlowRequest) Reset() {
 	*x = ListFlowRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[22]
+		mi := &file_v1_flow_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1885,7 +3267,7 @@ func (x *ListFlowRequest) String() string {
 func (*ListFlowRequest) ProtoMessage() {}
 
 func (x *ListFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[22]
+	mi := &file_v1_flow_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1898,7 +3280,7 @@ func (x *ListFlowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFlowRequest.ProtoReflect.Descriptor instead.
 func (*ListFlowRequest) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{22}
+	return file_v1_flow_proto_rawDescGZIP(), []int{44}
 }
 
 type ListFlowResponse struct {
@@ -1906,13 +3288,13 @@ type ListFlowResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Flows []*Flow `protobuf:"bytes,1,rep,name=flows,proto3" json:"flows,omitempty"`
+	Flows []*FlowListItem `protobuf:"bytes,1,rep,name=flows,proto3" json:"flows,omitempty"`
 }
 
 func (x *ListFlowResponse) Reset() {
 	*x = ListFlowResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[23]
+		mi := &file_v1_flow_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1925,7 +3307,7 @@ func (x *ListFlowResponse) String() string {
 func (*ListFlowResponse) ProtoMessage() {}
 
 func (x *ListFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[23]
+	mi := &file_v1_flow_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1938,14 +3320,101 @@ func (x *ListFlowResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFlowResponse.ProtoReflect.Descriptor instead.
 func (*ListFlowResponse) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{23}
+	return file_v1_flow_proto_rawDescGZIP(), []int{45}
 }
 
-func (x *ListFlowResponse) GetFlows() []*Flow {
+func (x *ListFlowResponse) GetFlows() []*FlowListItem {
 	if x != nil {
 		return x.Flows
 	}
 	return nil
+}
+
+type FlowListItem struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Label     string                 `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	NextId    *string                `protobuf:"bytes,6,opt,name=next_id,json=nextId,proto3,oneof" json:"next_id,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	DeletedAt *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=deleted_at,json=deletedAt,proto3,oneof" json:"deleted_at,omitempty"`
+	Version   int64                  `protobuf:"varint,9,opt,name=version,proto3" json:"version,omitempty"`
+}
+
+func (x *FlowListItem) Reset() {
+	*x = FlowListItem{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_v1_flow_proto_msgTypes[46]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FlowListItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FlowListItem) ProtoMessage() {}
+
+func (x *FlowListItem) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_flow_proto_msgTypes[46]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FlowListItem.ProtoReflect.Descriptor instead.
+func (*FlowListItem) Descriptor() ([]byte, []int) {
+	return file_v1_flow_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *FlowListItem) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *FlowListItem) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *FlowListItem) GetNextId() string {
+	if x != nil && x.NextId != nil {
+		return *x.NextId
+	}
+	return ""
+}
+
+func (x *FlowListItem) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *FlowListItem) GetDeletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeletedAt
+	}
+	return nil
+}
+
+func (x *FlowListItem) GetVersion() int64 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
 }
 
 type DeleteFlowRequest struct {
@@ -1959,7 +3428,7 @@ type DeleteFlowRequest struct {
 func (x *DeleteFlowRequest) Reset() {
 	*x = DeleteFlowRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[24]
+		mi := &file_v1_flow_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1972,7 +3441,7 @@ func (x *DeleteFlowRequest) String() string {
 func (*DeleteFlowRequest) ProtoMessage() {}
 
 func (x *DeleteFlowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[24]
+	mi := &file_v1_flow_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1985,7 +3454,7 @@ func (x *DeleteFlowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFlowRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFlowRequest) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{24}
+	return file_v1_flow_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *DeleteFlowRequest) GetId() string {
@@ -2004,7 +3473,7 @@ type DeleteFlowResponse struct {
 func (x *DeleteFlowResponse) Reset() {
 	*x = DeleteFlowResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_v1_flow_proto_msgTypes[25]
+		mi := &file_v1_flow_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2017,7 +3486,7 @@ func (x *DeleteFlowResponse) String() string {
 func (*DeleteFlowResponse) ProtoMessage() {}
 
 func (x *DeleteFlowResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_flow_proto_msgTypes[25]
+	mi := &file_v1_flow_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2030,7 +3499,7 @@ func (x *DeleteFlowResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFlowResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFlowResponse) Descriptor() ([]byte, []int) {
-	return file_v1_flow_proto_rawDescGZIP(), []int{25}
+	return file_v1_flow_proto_rawDescGZIP(), []int{48}
 }
 
 var File_v1_flow_proto protoreflect.FileDescriptor
@@ -2071,73 +3540,263 @@ var file_v1_flow_proto_rawDesc = []byte{
 	0x69, 0x64, 0xd2, 0x01, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0xd2,
 	0x01, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0xd2, 0x01, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f,
 	0x72, 0x5f, 0x69, 0x64, 0x42, 0x0d, 0x0a, 0x0b, 0x5f, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64,
-	0x5f, 0x61, 0x74, 0x22, 0x2e, 0x0a, 0x10, 0x55, 0x73, 0x65, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64,
-	0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01,
-	0x02, 0x69, 0x64, 0x22, 0x2e, 0x0a, 0x10, 0x55, 0x73, 0x65, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64,
-	0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01,
-	0x02, 0x69, 0x64, 0x22, 0x43, 0x0a, 0x0d, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f,
-	0x77, 0x52, 0x65, 0x73, 0x12, 0x24, 0x0a, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x53, 0x68,
-	0x61, 0x72, 0x65, 0x64, 0x52, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x3a, 0x0c, 0x92, 0x41, 0x09, 0x0a,
-	0x07, 0xd2, 0x01, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x22, 0x2b, 0x0a, 0x0d, 0x53, 0x68, 0x61, 0x72,
-	0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05,
-	0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x10, 0x0a, 0x0e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46,
-	0x6c, 0x6f, 0x77, 0x73, 0x52, 0x65, 0x71, 0x22, 0x47, 0x0a, 0x0e, 0x53, 0x68, 0x61, 0x72, 0x65,
-	0x64, 0x46, 0x6c, 0x6f, 0x77, 0x73, 0x52, 0x65, 0x73, 0x12, 0x26, 0x0a, 0x05, 0x69, 0x74, 0x65,
-	0x6d, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
-	0x46, 0x6c, 0x6f, 0x77, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x52, 0x05, 0x69, 0x74, 0x65, 0x6d,
-	0x73, 0x3a, 0x0d, 0x92, 0x41, 0x0a, 0x0a, 0x08, 0xd2, 0x01, 0x05, 0x69, 0x74, 0x65, 0x6d, 0x73,
-	0x22, 0x5a, 0x0a, 0x0c, 0x53, 0x68, 0x61, 0x72, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71,
-	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
-	0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69,
-	0x6f, 0x6e, 0x3a, 0x18, 0x92, 0x41, 0x15, 0x0a, 0x13, 0xd2, 0x01, 0x02, 0x69, 0x64, 0xd2, 0x01,
-	0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x2a, 0x0a, 0x0c,
-	0x53, 0x68, 0x61, 0x72, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x12, 0x0e, 0x0a, 0x02,
-	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41,
-	0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x29, 0x0a, 0x0b, 0x48, 0x69, 0x64, 0x65,
-	0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01,
-	0x02, 0x69, 0x64, 0x22, 0x0d, 0x0a, 0x0b, 0x48, 0x69, 0x64, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52,
-	0x65, 0x73, 0x22, 0x29, 0x0a, 0x0b, 0x43, 0x6f, 0x70, 0x79, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65,
-	0x71, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
-	0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x29, 0x0a,
-	0x0b, 0x43, 0x6f, 0x70, 0x79, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x12, 0x0e, 0x0a, 0x02,
-	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41,
-	0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x2c, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x46,
-	0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a,
-	0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x3f, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f,
-	0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x04, 0x66, 0x6c, 0x6f,
-	0x77, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46,
-	0x6c, 0x6f, 0x77, 0x52, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x3a, 0x0c, 0x92, 0x41, 0x09, 0x0a, 0x07,
-	0xd2, 0x01, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x22, 0xf3, 0x02, 0x0a, 0x04, 0x46, 0x6c, 0x6f, 0x77,
+	0x5f, 0x61, 0x74, 0x22, 0x76, 0x0a, 0x0a, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f,
+	0x77, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x12, 0x26, 0x0a, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73,
+	0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x61,
+	0x6e, 0x64, 0x6f, 0x6d, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x3a,
+	0x1a, 0x92, 0x41, 0x17, 0x0a, 0x15, 0xd2, 0x01, 0x02, 0x69, 0x64, 0xd2, 0x01, 0x05, 0x6c, 0x61,
+	0x62, 0x65, 0x6c, 0xd2, 0x01, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x22, 0xc8, 0x01, 0x0a, 0x0a,
+	0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x54, 0x61, 0x73, 0x6b, 0x12, 0x1a, 0x0a, 0x08, 0x6f, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x61, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x6f, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x61, 0x6c, 0x12, 0x2a, 0x0a, 0x08, 0x74, 0x61, 0x73, 0x6b, 0x54, 0x79,
+	0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0e, 0x2e, 0x74, 0x61, 0x73, 0x6b, 0x2e,
+	0x54, 0x61, 0x73, 0x6b, 0x54, 0x79, 0x70, 0x65, 0x52, 0x08, 0x74, 0x61, 0x73, 0x6b, 0x54, 0x79,
+	0x70, 0x65, 0x12, 0x22, 0x0a, 0x04, 0x73, 0x77, 0x61, 0x70, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x0c, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x50, 0x73, 0x77, 0x61, 0x70, 0x48, 0x00,
+	0x52, 0x04, 0x73, 0x77, 0x61, 0x70, 0x12, 0x28, 0x0a, 0x06, 0x73, 0x69, 0x6d, 0x70, 0x6c, 0x65,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x50,
+	0x73, 0x69, 0x6d, 0x70, 0x6c, 0x65, 0x48, 0x00, 0x52, 0x06, 0x73, 0x69, 0x6d, 0x70, 0x6c, 0x65,
+	0x3a, 0x1f, 0x92, 0x41, 0x1c, 0x0a, 0x1a, 0xd2, 0x01, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e,
+	0x61, 0x6c, 0xd2, 0x01, 0x08, 0x74, 0x61, 0x73, 0x6b, 0x54, 0x79, 0x70, 0x65, 0xd2, 0x01, 0x01,
+	0x70, 0x42, 0x03, 0x0a, 0x01, 0x70, 0x22, 0x46, 0x0a, 0x08, 0x52, 0x50, 0x73, 0x69, 0x6d, 0x70,
+	0x6c, 0x65, 0x12, 0x29, 0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0e, 0x32, 0x0f, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x4e, 0x65, 0x74,
+	0x77, 0x6f, 0x72, 0x6b, 0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x3a, 0x0f, 0x92,
+	0x41, 0x0c, 0x0a, 0x0a, 0xd2, 0x01, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x22, 0x3f,
+	0x0a, 0x06, 0x52, 0x50, 0x73, 0x77, 0x61, 0x70, 0x12, 0x26, 0x0a, 0x05, 0x69, 0x74, 0x65, 0x6d,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52,
+	0x50, 0x73, 0x77, 0x61, 0x70, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x05, 0x69, 0x74, 0x65, 0x6d, 0x73,
+	0x3a, 0x0d, 0x92, 0x41, 0x0a, 0x0a, 0x08, 0xd2, 0x01, 0x05, 0x69, 0x74, 0x65, 0x6d, 0x73, 0x22,
+	0x96, 0x01, 0x0a, 0x0a, 0x52, 0x50, 0x73, 0x77, 0x61, 0x70, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x29,
+	0x0a, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x0f, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b,
+	0x52, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x21, 0x0a, 0x04, 0x66, 0x72, 0x6f,
+	0x6d, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64,
+	0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x1d, 0x0a, 0x02,
+	0x74, 0x6f, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65,
+	0x64, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x02, 0x74, 0x6f, 0x3a, 0x1b, 0x92, 0x41, 0x18,
+	0x0a, 0x16, 0xd2, 0x01, 0x07, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0xd2, 0x01, 0x04, 0x66,
+	0x72, 0x6f, 0x6d, 0xd2, 0x01, 0x02, 0x74, 0x6f, 0x22, 0x97, 0x03, 0x0a, 0x04, 0x46, 0x6c, 0x6f,
+	0x77, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x12, 0x20, 0x0a, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73,
+	0x18, 0x05, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x54, 0x61,
+	0x73, 0x6b, 0x52, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x12, 0x1c, 0x0a, 0x07, 0x6e, 0x65, 0x78,
+	0x74, 0x5f, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x06, 0x6e, 0x65,
+	0x78, 0x74, 0x49, 0x64, 0x88, 0x01, 0x01, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64,
+	0x41, 0x74, 0x12, 0x3e, 0x0a, 0x0a, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74,
+	0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
+	0x6d, 0x70, 0x48, 0x01, 0x52, 0x09, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x41, 0x74, 0x88,
+	0x01, 0x01, 0x12, 0x2d, 0x0a, 0x0c, 0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x5f, 0x74, 0x61, 0x73,
+	0x6b, 0x73, 0x18, 0x09, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x54, 0x61, 0x73, 0x6b, 0x52, 0x0b, 0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x54, 0x61, 0x73, 0x6b,
+	0x73, 0x12, 0x22, 0x0a, 0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x0e, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x42, 0x61, 0x73, 0x65, 0x52,
+	0x04, 0x62, 0x61, 0x73, 0x65, 0x3a, 0x40, 0x92, 0x41, 0x3d, 0x0a, 0x3b, 0xd2, 0x01, 0x02, 0x69,
+	0x64, 0xd2, 0x01, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0xd2, 0x01, 0x07, 0x70, 0x61, 0x79, 0x6c,
+	0x6f, 0x61, 0x64, 0xd2, 0x01, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74,
+	0xd2, 0x01, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0xd2, 0x01, 0x0c, 0x72, 0x61, 0x6e, 0x64, 0x6f,
+	0x6d, 0x5f, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x42, 0x0a, 0x0a, 0x08, 0x5f, 0x6e, 0x65, 0x78, 0x74,
+	0x5f, 0x69, 0x64, 0x42, 0x0d, 0x0a, 0x0b, 0x5f, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x5f,
+	0x61, 0x74, 0x22, 0x2f, 0x0a, 0x08, 0x46, 0x6c, 0x6f, 0x77, 0x42, 0x61, 0x73, 0x65, 0x12, 0x23,
+	0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0d, 0x2e,
+	0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x05, 0x74, 0x6f,
+	0x6b, 0x65, 0x6e, 0x22, 0x81, 0x01, 0x0a, 0x13, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x6c,
+	0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c,
+	0x61, 0x62, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65,
+	0x6c, 0x12, 0x27, 0x0a, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x0f, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x42, 0x6c, 0x6f,
+	0x63, 0x6b, 0x52, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x3a, 0x1b, 0x92, 0x41, 0x18, 0x0a,
+	0x16, 0xd2, 0x01, 0x02, 0x69, 0x64, 0xd2, 0x01, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0xd2, 0x01,
+	0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x22, 0x82, 0x01, 0x0a, 0x14, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
 	0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x12, 0x20, 0x0a, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x18,
-	0x05, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x54, 0x61, 0x73,
-	0x6b, 0x52, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x12, 0x1c, 0x0a, 0x07, 0x6e, 0x65, 0x78, 0x74,
-	0x5f, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x06, 0x6e, 0x65, 0x78,
-	0x74, 0x49, 0x64, 0x88, 0x01, 0x01, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65,
-	0x64, 0x5f, 0x61, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
-	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41,
-	0x74, 0x12, 0x3e, 0x0a, 0x0a, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18,
-	0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
-	0x70, 0x48, 0x01, 0x52, 0x09, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x41, 0x74, 0x88, 0x01,
-	0x01, 0x12, 0x2d, 0x0a, 0x0c, 0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x5f, 0x74, 0x61, 0x73, 0x6b,
-	0x73, 0x18, 0x09, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x54,
-	0x61, 0x73, 0x6b, 0x52, 0x0b, 0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x54, 0x61, 0x73, 0x6b, 0x73,
-	0x3a, 0x40, 0x92, 0x41, 0x3d, 0x0a, 0x3b, 0xd2, 0x01, 0x02, 0x69, 0x64, 0xd2, 0x01, 0x05, 0x6c,
-	0x61, 0x62, 0x65, 0x6c, 0xd2, 0x01, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0xd2, 0x01,
-	0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0xd2, 0x01, 0x05, 0x74, 0x61,
+	0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x12, 0x27, 0x0a, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73,
+	0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c,
+	0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x3a,
+	0x1b, 0x92, 0x41, 0x18, 0x0a, 0x16, 0xd2, 0x01, 0x02, 0x69, 0x64, 0xd2, 0x01, 0x05, 0x6c, 0x61,
+	0x62, 0x65, 0x6c, 0xd2, 0x01, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x22, 0x2a, 0x0a, 0x0c,
+	0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x71, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41,
+	0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x7a, 0x0a, 0x0c, 0x47, 0x65, 0x74, 0x46,
+	0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65,
+	0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x12, 0x27,
+	0x0a, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f,
+	0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52,
+	0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x3a, 0x1b, 0x92, 0x41, 0x18, 0x0a, 0x16, 0xd2, 0x01,
+	0x02, 0x69, 0x64, 0xd2, 0x01, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0xd2, 0x01, 0x06, 0x62, 0x6c,
+	0x6f, 0x63, 0x6b, 0x73, 0x22, 0xc1, 0x03, 0x0a, 0x18, 0x4f, 0x6e, 0x6c, 0x79, 0x52, 0x61, 0x6e,
+	0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x50, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x52, 0x65,
+	0x71, 0x12, 0x2e, 0x0a, 0x0b, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e,
+	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x0a, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x6f, 0x6b, 0x65,
+	0x6e, 0x12, 0x30, 0x0a, 0x0c, 0x66, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x5f, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64,
+	0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x0b, 0x66, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x54, 0x6f,
+	0x6b, 0x65, 0x6e, 0x12, 0x34, 0x0a, 0x0d, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x6e, 0x65, 0x74,
+	0x77, 0x6f, 0x72, 0x6b, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0f, 0x2e, 0x73, 0x68, 0x61,
+	0x72, 0x65, 0x64, 0x2e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x52, 0x0c, 0x73, 0x74, 0x61,
+	0x72, 0x74, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x12, 0x26, 0x0a, 0x05, 0x74, 0x61, 0x73,
+	0x6b, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x05, 0x74, 0x61, 0x73, 0x6b,
+	0x73, 0x12, 0x1d, 0x0a, 0x0a, 0x74, 0x61, 0x73, 0x6b, 0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18,
+	0x06, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x74, 0x61, 0x73, 0x6b, 0x43, 0x6f, 0x75, 0x6e, 0x74,
+	0x12, 0x2c, 0x0a, 0x12, 0x69, 0x67, 0x6e, 0x6f, 0x72, 0x65, 0x5f, 0x73, 0x74, 0x61, 0x72, 0x74,
+	0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x10, 0x69, 0x67,
+	0x6e, 0x6f, 0x72, 0x65, 0x53, 0x74, 0x61, 0x72, 0x74, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x2e,
+	0x0a, 0x13, 0x69, 0x67, 0x6e, 0x6f, 0x72, 0x65, 0x5f, 0x66, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x5f,
+	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x08, 0x20, 0x01, 0x28, 0x08, 0x52, 0x11, 0x69, 0x67, 0x6e,
+	0x6f, 0x72, 0x65, 0x46, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x1b,
+	0x0a, 0x09, 0x6d, 0x69, 0x6e, 0x5f, 0x64, 0x65, 0x6c, 0x61, 0x79, 0x18, 0x09, 0x20, 0x01, 0x28,
+	0x03, 0x52, 0x08, 0x6d, 0x69, 0x6e, 0x44, 0x65, 0x6c, 0x61, 0x79, 0x12, 0x1b, 0x0a, 0x09, 0x6d,
+	0x61, 0x78, 0x5f, 0x64, 0x65, 0x6c, 0x61, 0x79, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08,
+	0x6d, 0x61, 0x78, 0x44, 0x65, 0x6c, 0x61, 0x79, 0x3a, 0x2e, 0x92, 0x41, 0x2b, 0x0a, 0x29, 0xd2,
+	0x01, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0xd2, 0x01, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73,
+	0xd2, 0x01, 0x09, 0x6d, 0x69, 0x6e, 0x5f, 0x64, 0x65, 0x6c, 0x61, 0x79, 0xd2, 0x01, 0x09, 0x6d,
+	0x61, 0x78, 0x5f, 0x64, 0x65, 0x6c, 0x61, 0x79, 0x22, 0x54, 0x0a, 0x1b, 0x4f, 0x6e, 0x6c, 0x79,
+	0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x46, 0x72, 0x6f, 0x6d, 0x54, 0x6f,
+	0x6b, 0x65, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x12, 0x25, 0x0a, 0x06, 0x74, 0x6f, 0x6b, 0x65, 0x6e,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0e, 0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64,
+	0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x06, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x3a, 0x0e,
+	0x92, 0x41, 0x0b, 0x0a, 0x09, 0xd2, 0x01, 0x06, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x22, 0xb7,
+	0x01, 0x0a, 0x18, 0x4f, 0x6e, 0x6c, 0x79, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f,
+	0x77, 0x50, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x52, 0x65, 0x73, 0x12, 0x24, 0x0a, 0x04, 0x66,
+	0x6c, 0x6f, 0x77, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x55, 0x6e, 0x69, 0x71, 0x75, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x04, 0x66, 0x6c, 0x6f,
+	0x77, 0x12, 0x25, 0x0a, 0x0e, 0x75, 0x6e, 0x69, 0x71, 0x75, 0x65, 0x5f, 0x70, 0x65, 0x72, 0x63,
+	0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x0d, 0x75, 0x6e, 0x69, 0x71, 0x75,
+	0x65, 0x50, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x12, 0x26, 0x0a, 0x06, 0x74, 0x6f, 0x6b, 0x65,
+	0x6e, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x41, 0x72, 0x72, 0x52, 0x06, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x73,
+	0x3a, 0x26, 0x92, 0x41, 0x23, 0x0a, 0x21, 0xd2, 0x01, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0xd2, 0x01,
+	0x0e, 0x75, 0x6e, 0x69, 0x71, 0x75, 0x65, 0x5f, 0x70, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0xd2,
+	0x01, 0x06, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x22, 0x67, 0x0a, 0x0e, 0x46, 0x6c, 0x6f, 0x77,
+	0x50, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x52, 0x65, 0x71, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61,
+	0x62, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c,
+	0x12, 0x27, 0x0a, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x0f, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63,
+	0x6b, 0x52, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x3a, 0x16, 0x92, 0x41, 0x13, 0x0a, 0x11,
+	0xd2, 0x01, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0xd2, 0x01, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b,
+	0x73, 0x22, 0x82, 0x01, 0x0a, 0x14, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77,
+	0x50, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x52, 0x65, 0x73, 0x12, 0x24, 0x0a, 0x04, 0x66, 0x6c,
+	0x6f, 0x77, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x55, 0x6e, 0x69, 0x71, 0x75, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x04, 0x66, 0x6c, 0x6f, 0x77,
+	0x12, 0x25, 0x0a, 0x0e, 0x75, 0x6e, 0x69, 0x71, 0x75, 0x65, 0x5f, 0x70, 0x65, 0x72, 0x63, 0x65,
+	0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x0d, 0x75, 0x6e, 0x69, 0x71, 0x75, 0x65,
+	0x50, 0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x3a, 0x1d, 0x92, 0x41, 0x1a, 0x0a, 0x18, 0xd2, 0x01,
+	0x04, 0x66, 0x6c, 0x6f, 0x77, 0xd2, 0x01, 0x0e, 0x75, 0x6e, 0x69, 0x71, 0x75, 0x65, 0x5f, 0x70,
+	0x65, 0x72, 0x63, 0x65, 0x6e, 0x74, 0x22, 0x5f, 0x0a, 0x08, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x41,
+	0x72, 0x72, 0x12, 0x21, 0x0a, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e,
+	0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52,
+	0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x1d, 0x0a, 0x02, 0x74, 0x6f, 0x18, 0x02, 0x20, 0x03, 0x28,
+	0x0e, 0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e,
+	0x52, 0x02, 0x74, 0x6f, 0x3a, 0x11, 0x92, 0x41, 0x0e, 0x0a, 0x0c, 0xd2, 0x01, 0x04, 0x66, 0x72,
+	0x6f, 0x6d, 0xd2, 0x01, 0x02, 0x74, 0x6f, 0x22, 0x3d, 0x0a, 0x0a, 0x55, 0x6e, 0x69, 0x71, 0x75,
+	0x65, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x20, 0x0a, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x18, 0x01,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x54, 0x61, 0x73, 0x6b,
+	0x52, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x3a, 0x0d, 0x92, 0x41, 0x0a, 0x0a, 0x08, 0xd2, 0x01,
+	0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x22, 0x68, 0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x71, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61, 0x62,
+	0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x12,
+	0x27, 0x0a, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x0f, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63, 0x6b,
+	0x52, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x3a, 0x16, 0x92, 0x41, 0x13, 0x0a, 0x11, 0xd2,
+	0x01, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0xd2, 0x01, 0x06, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x73,
+	0x22, 0x97, 0x01, 0x0a, 0x09, 0x46, 0x6c, 0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x12, 0x16,
+	0x0a, 0x06, 0x77, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06,
+	0x77, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x26, 0x0a, 0x03, 0x6d, 0x61, 0x6e, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x42,
+	0x6c, 0x6f, 0x63, 0x6b, 0x4d, 0x61, 0x6e, 0x48, 0x00, 0x52, 0x03, 0x6d, 0x61, 0x6e, 0x12, 0x29,
+	0x0a, 0x04, 0x72, 0x61, 0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x66,
+	0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x61, 0x6e,
+	0x64, 0x48, 0x00, 0x52, 0x04, 0x72, 0x61, 0x6e, 0x64, 0x3a, 0x16, 0x92, 0x41, 0x13, 0x0a, 0x11,
+	0xd2, 0x01, 0x06, 0x77, 0x65, 0x69, 0x67, 0x68, 0x74, 0xd2, 0x01, 0x05, 0x62, 0x6c, 0x6f, 0x63,
+	0x6b, 0x42, 0x07, 0x0a, 0x05, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x22, 0x7d, 0x0a, 0x0c, 0x46, 0x6c,
+	0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x4d, 0x61, 0x6e, 0x12, 0x20, 0x0a, 0x05, 0x74, 0x61,
+	0x73, 0x6b, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x12, 0x2d, 0x0a, 0x0c,
+	0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x5f, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x18, 0x02, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x0b,
+	0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x54, 0x61, 0x73, 0x6b, 0x73, 0x3a, 0x1c, 0x92, 0x41, 0x19,
+	0x0a, 0x17, 0xd2, 0x01, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0xd2, 0x01, 0x0c, 0x72, 0x61, 0x6e,
+	0x64, 0x6f, 0x6d, 0x5f, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x22, 0xde, 0x02, 0x0a, 0x0d, 0x46, 0x6c,
+	0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x61, 0x6e, 0x64, 0x12, 0x2e, 0x0a, 0x0b, 0x73,
+	0x74, 0x61, 0x72, 0x74, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e,
+	0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52,
+	0x0a, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x30, 0x0a, 0x0c, 0x66,
+	0x69, 0x6e, 0x69, 0x73, 0x68, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0e, 0x32, 0x0d, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x54, 0x6f, 0x6b, 0x65, 0x6e,
+	0x52, 0x0b, 0x66, 0x69, 0x6e, 0x69, 0x73, 0x68, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x34, 0x0a,
+	0x0d, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0e, 0x32, 0x0f, 0x2e, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2e, 0x4e, 0x65,
+	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x52, 0x0c, 0x73, 0x74, 0x61, 0x72, 0x74, 0x4e, 0x65, 0x74, 0x77,
+	0x6f, 0x72, 0x6b, 0x12, 0x26, 0x0a, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x18, 0x04, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d,
+	0x54, 0x61, 0x73, 0x6b, 0x52, 0x05, 0x74, 0x61, 0x73, 0x6b, 0x73, 0x12, 0x1d, 0x0a, 0x0a, 0x74,
+	0x61, 0x73, 0x6b, 0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x09, 0x74, 0x61, 0x73, 0x6b, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x6d, 0x69,
+	0x6e, 0x5f, 0x64, 0x65, 0x6c, 0x61, 0x79, 0x18, 0x07, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x6d,
+	0x69, 0x6e, 0x44, 0x65, 0x6c, 0x61, 0x79, 0x12, 0x1b, 0x0a, 0x09, 0x6d, 0x61, 0x78, 0x5f, 0x64,
+	0x65, 0x6c, 0x61, 0x79, 0x18, 0x08, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x6d, 0x61, 0x78, 0x44,
+	0x65, 0x6c, 0x61, 0x79, 0x3a, 0x34, 0x92, 0x41, 0x31, 0x0a, 0x2f, 0xd2, 0x01, 0x05, 0x74, 0x61,
 	0x73, 0x6b, 0x73, 0xd2, 0x01, 0x0c, 0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x5f, 0x74, 0x61, 0x73,
-	0x6b, 0x73, 0x42, 0x0a, 0x0a, 0x08, 0x5f, 0x6e, 0x65, 0x78, 0x74, 0x5f, 0x69, 0x64, 0x42, 0x0d,
-	0x0a, 0x0b, 0x5f, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x22, 0xba, 0x01,
+	0x6b, 0x73, 0xd2, 0x01, 0x09, 0x6d, 0x61, 0x78, 0x5f, 0x64, 0x65, 0x6c, 0x61, 0x79, 0xd2, 0x01,
+	0x09, 0x6d, 0x69, 0x6e, 0x5f, 0x64, 0x65, 0x6c, 0x61, 0x79, 0x22, 0x2d, 0x0a, 0x0f, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x73, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92,
+	0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x2e, 0x0a, 0x10, 0x55, 0x73, 0x65,
+	0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92,
+	0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x2e, 0x0a, 0x10, 0x55, 0x73, 0x65,
+	0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92,
+	0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x43, 0x0a, 0x0d, 0x53, 0x68, 0x61,
+	0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x12, 0x24, 0x0a, 0x04, 0x66, 0x6c,
+	0x6f, 0x77, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x46, 0x6c, 0x6f, 0x77, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x52, 0x04, 0x66, 0x6c, 0x6f, 0x77,
+	0x3a, 0x0c, 0x92, 0x41, 0x09, 0x0a, 0x07, 0xd2, 0x01, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x22, 0x2b,
+	0x0a, 0x0d, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x12,
+	0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a,
+	0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x10, 0x0a, 0x0e, 0x53,
+	0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x73, 0x52, 0x65, 0x71, 0x22, 0x47, 0x0a,
+	0x0e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x73, 0x52, 0x65, 0x73, 0x12,
+	0x26, 0x0a, 0x05, 0x69, 0x74, 0x65, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10,
+	0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64,
+	0x52, 0x05, 0x69, 0x74, 0x65, 0x6d, 0x73, 0x3a, 0x0d, 0x92, 0x41, 0x0a, 0x0a, 0x08, 0xd2, 0x01,
+	0x05, 0x69, 0x74, 0x65, 0x6d, 0x73, 0x22, 0x5a, 0x0a, 0x0c, 0x53, 0x68, 0x61, 0x72, 0x65, 0x46,
+	0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69,
+	0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73,
+	0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x3a, 0x18, 0x92, 0x41, 0x15, 0x0a, 0x13, 0xd2,
+	0x01, 0x02, 0x69, 0x64, 0xd2, 0x01, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69,
+	0x6f, 0x6e, 0x22, 0x2a, 0x0a, 0x0c, 0x53, 0x68, 0x61, 0x72, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52,
+	0x65, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x29,
+	0x0a, 0x0b, 0x48, 0x69, 0x64, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92,
+	0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x0d, 0x0a, 0x0b, 0x48, 0x69, 0x64,
+	0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x22, 0x29, 0x0a, 0x0b, 0x43, 0x6f, 0x70, 0x79,
+	0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01,
+	0x02, 0x69, 0x64, 0x22, 0x29, 0x0a, 0x0b, 0x43, 0x6f, 0x70, 0x79, 0x46, 0x6c, 0x6f, 0x77, 0x52,
+	0x65, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x2c,
+	0x0a, 0x0e, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
+	0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x3f, 0x0a, 0x0f,
+	0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x1e, 0x0a, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e,
+	0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x3a,
+	0x0c, 0x92, 0x41, 0x09, 0x0a, 0x07, 0xd2, 0x01, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x22, 0xba, 0x01,
 	0x0a, 0x12, 0x57, 0x61, 0x6c, 0x6c, 0x65, 0x74, 0x42, 0x79, 0x57, 0x61, 0x6c, 0x6c, 0x65, 0x74,
 	0x4d, 0x6f, 0x64, 0x65, 0x12, 0x30, 0x0a, 0x13, 0x64, 0x65, 0x6c, 0x61, 0x79, 0x42, 0x65, 0x74,
 	0x77, 0x65, 0x65, 0x6e, 0x57, 0x61, 0x6c, 0x6c, 0x65, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28,
@@ -2377,82 +4036,145 @@ var file_v1_flow_proto_rawDesc = []byte{
 	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f,
 	0x77, 0x52, 0x04, 0x66, 0x6c, 0x6f, 0x77, 0x3a, 0x0c, 0x92, 0x41, 0x09, 0x0a, 0x07, 0xd2, 0x01,
 	0x04, 0x66, 0x6c, 0x6f, 0x77, 0x22, 0x11, 0x0a, 0x0f, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x6c, 0x6f,
-	0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x43, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74,
-	0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x20, 0x0a, 0x05,
-	0x66, 0x6c, 0x6f, 0x77, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x66, 0x6c,
-	0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x05, 0x66, 0x6c, 0x6f, 0x77, 0x73, 0x3a, 0x0d,
-	0x92, 0x41, 0x0a, 0x0a, 0x08, 0xd2, 0x01, 0x05, 0x66, 0x6c, 0x6f, 0x77, 0x73, 0x22, 0x2f, 0x0a,
-	0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
-	0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a, 0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x14,
-	0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x32, 0x92, 0x08, 0x0a, 0x0b, 0x46, 0x6c, 0x6f, 0x77, 0x53, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x12, 0x62, 0x0a, 0x0a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x6c,
-	0x6f, 0x77, 0x12, 0x17, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
-	0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x66, 0x6c,
-	0x6f, 0x77, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x3a, 0x01, 0x2a,
-	0x22, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f,
-	0x77, 0x2f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x12, 0x62, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61,
-	0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x17, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x18, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f,
-	0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02,
-	0x1b, 0x3a, 0x01, 0x2a, 0x22, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31,
-	0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x12, 0x56, 0x0a, 0x07,
-	0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x14, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x47,
-	0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e,
-	0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x1e, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x18, 0x3a, 0x01, 0x2a, 0x22,
-	0x13, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77,
-	0x2f, 0x67, 0x65, 0x74, 0x12, 0x5a, 0x0a, 0x08, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x6c, 0x6f, 0x77,
-	0x12, 0x15, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x6c, 0x6f, 0x77,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c,
-	0x69, 0x73, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x1f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x19, 0x3a, 0x01, 0x2a, 0x22, 0x14, 0x2f, 0x61, 0x70, 0x69,
-	0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x6c, 0x69, 0x73, 0x74,
-	0x12, 0x62, 0x0a, 0x0a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x17,
-	0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x44,
-	0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x3a, 0x01, 0x2a, 0x22, 0x16, 0x2f, 0x61,
-	0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x64, 0x65,
-	0x6c, 0x65, 0x74, 0x65, 0x12, 0x51, 0x0a, 0x08, 0x43, 0x6f, 0x70, 0x79, 0x46, 0x6c, 0x6f, 0x77,
-	0x12, 0x11, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6f, 0x70, 0x79, 0x46, 0x6c, 0x6f, 0x77,
-	0x52, 0x65, 0x71, 0x1a, 0x11, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6f, 0x70, 0x79, 0x46,
-	0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x22, 0x1f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x19, 0x3a, 0x01,
-	0x2a, 0x22, 0x14, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c,
-	0x6f, 0x77, 0x2f, 0x63, 0x6f, 0x70, 0x79, 0x12, 0x57, 0x0a, 0x09, 0x53, 0x68, 0x61, 0x72, 0x65,
-	0x46, 0x6c, 0x6f, 0x77, 0x12, 0x12, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x68, 0x61, 0x72,
-	0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x12, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
-	0x53, 0x68, 0x61, 0x72, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x22, 0x22, 0x82, 0xd3,
-	0xe4, 0x93, 0x02, 0x1c, 0x3a, 0x01, 0x2a, 0x22, 0x17, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77,
-	0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x73, 0x68,
-	0x12, 0x51, 0x0a, 0x08, 0x48, 0x69, 0x64, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x11, 0x2e, 0x66,
-	0x6c, 0x6f, 0x77, 0x2e, 0x48, 0x69, 0x64, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x1a,
-	0x11, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x48, 0x69, 0x64, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52,
-	0x65, 0x73, 0x22, 0x1f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x19, 0x3a, 0x01, 0x2a, 0x22, 0x14, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x68,
-	0x69, 0x64, 0x65, 0x12, 0x61, 0x0a, 0x0b, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f,
-	0x77, 0x73, 0x12, 0x14, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64,
-	0x46, 0x6c, 0x6f, 0x77, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x14, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
-	0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x73, 0x52, 0x65, 0x73, 0x22, 0x26,
-	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x20, 0x3a, 0x01, 0x2a, 0x22, 0x1b, 0x2f, 0x61, 0x70, 0x69, 0x2f,
-	0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x73, 0x68, 0x61, 0x72, 0x65,
-	0x64, 0x2f, 0x6c, 0x69, 0x73, 0x74, 0x12, 0x59, 0x0a, 0x0a, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64,
-	0x46, 0x6c, 0x6f, 0x77, 0x12, 0x13, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x68, 0x61, 0x72,
-	0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x13, 0x2e, 0x66, 0x6c, 0x6f, 0x77,
-	0x2e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x22, 0x21,
-	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x3a, 0x01, 0x2a, 0x22, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f,
-	0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2d, 0x73, 0x68, 0x61, 0x72, 0x65,
-	0x64, 0x12, 0x66, 0x0a, 0x0d, 0x55, 0x73, 0x65, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c,
-	0x6f, 0x77, 0x12, 0x16, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x55, 0x73, 0x65, 0x53, 0x68, 0x61,
-	0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x16, 0x2e, 0x66, 0x6c, 0x6f,
-	0x77, 0x2e, 0x55, 0x73, 0x65, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52,
-	0x65, 0x73, 0x22, 0x25, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1f, 0x3a, 0x01, 0x2a, 0x22, 0x1a, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2d, 0x73,
-	0x68, 0x61, 0x72, 0x65, 0x64, 0x2f, 0x75, 0x73, 0x65, 0x42, 0x09, 0x5a, 0x07, 0x67, 0x72, 0x70,
-	0x63, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x4b, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74,
+	0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x28, 0x0a, 0x05,
+	0x66, 0x6c, 0x6f, 0x77, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x66, 0x6c,
+	0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x52,
+	0x05, 0x66, 0x6c, 0x6f, 0x77, 0x73, 0x3a, 0x0d, 0x92, 0x41, 0x0a, 0x0a, 0x08, 0xd2, 0x01, 0x05,
+	0x66, 0x6c, 0x6f, 0x77, 0x73, 0x22, 0xad, 0x02, 0x0a, 0x0c, 0x46, 0x6c, 0x6f, 0x77, 0x4c, 0x69,
+	0x73, 0x74, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x12, 0x1c, 0x0a, 0x07,
+	0x6e, 0x65, 0x78, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52,
+	0x06, 0x6e, 0x65, 0x78, 0x74, 0x49, 0x64, 0x88, 0x01, 0x01, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x3e, 0x0a, 0x0a, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64,
+	0x5f, 0x61, 0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67,
+	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x48, 0x01, 0x52, 0x09, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64,
+	0x41, 0x74, 0x88, 0x01, 0x01, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
+	0x18, 0x09, 0x20, 0x01, 0x28, 0x03, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x3a,
+	0x29, 0x92, 0x41, 0x26, 0x0a, 0x24, 0xd2, 0x01, 0x02, 0x69, 0x64, 0xd2, 0x01, 0x05, 0x6c, 0x61,
+	0x62, 0x65, 0x6c, 0xd2, 0x01, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74,
+	0xd2, 0x01, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x0a, 0x0a, 0x08, 0x5f, 0x6e,
+	0x65, 0x78, 0x74, 0x5f, 0x69, 0x64, 0x42, 0x0d, 0x0a, 0x0b, 0x5f, 0x64, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x64, 0x5f, 0x61, 0x74, 0x22, 0x2f, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46,
+	0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x3a, 0x0a, 0x92, 0x41, 0x07, 0x0a,
+	0x05, 0xd2, 0x01, 0x02, 0x69, 0x64, 0x22, 0x14, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
+	0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xc5, 0x0d, 0x0a,
+	0x0b, 0x46, 0x6c, 0x6f, 0x77, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x62, 0x0a, 0x0a,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x17, 0x2e, 0x66, 0x6c, 0x6f,
+	0x77, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x21, 0x82,
+	0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x3a, 0x01, 0x2a, 0x22, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67,
+	0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x12, 0x68, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32,
+	0x12, 0x19, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x6c,
+	0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x66, 0x6c,
+	0x6f, 0x77, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x3a,
+	0x01, 0x2a, 0x22, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x32, 0x2f, 0x66,
+	0x6c, 0x6f, 0x77, 0x2f, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x12, 0x62, 0x0a, 0x0a, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x17, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x18, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x46,
+	0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4,
+	0x93, 0x02, 0x1b, 0x3a, 0x01, 0x2a, 0x22, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f,
+	0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x12, 0x56,
+	0x0a, 0x07, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x14, 0x2e, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x15, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x1e, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x18, 0x3a, 0x01,
+	0x2a, 0x22, 0x13, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c,
+	0x6f, 0x77, 0x2f, 0x67, 0x65, 0x74, 0x12, 0x5a, 0x0a, 0x08, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x6c,
+	0x6f, 0x77, 0x12, 0x15, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x6c,
+	0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x1f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x19, 0x3a, 0x01, 0x2a, 0x22, 0x14, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x6c, 0x69,
+	0x73, 0x74, 0x12, 0x62, 0x0a, 0x0a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77,
+	0x12, 0x17, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6c,
+	0x6f, 0x77, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x3a, 0x01, 0x2a, 0x22, 0x16,
+	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f,
+	0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x12, 0x51, 0x0a, 0x08, 0x43, 0x6f, 0x70, 0x79, 0x46, 0x6c,
+	0x6f, 0x77, 0x12, 0x11, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6f, 0x70, 0x79, 0x46, 0x6c,
+	0x6f, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x11, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6f, 0x70,
+	0x79, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x22, 0x1f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x19,
+	0x3a, 0x01, 0x2a, 0x22, 0x14, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f,
+	0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x63, 0x6f, 0x70, 0x79, 0x12, 0x57, 0x0a, 0x09, 0x53, 0x68, 0x61,
+	0x72, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x12, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x68,
+	0x61, 0x72, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x12, 0x2e, 0x66, 0x6c, 0x6f,
+	0x77, 0x2e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73, 0x22, 0x22,
+	0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1c, 0x3a, 0x01, 0x2a, 0x22, 0x17, 0x2f, 0x61, 0x70, 0x69, 0x2f,
+	0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x70, 0x75, 0x62, 0x6c, 0x69,
+	0x73, 0x68, 0x12, 0x51, 0x0a, 0x08, 0x48, 0x69, 0x64, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x11,
+	0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x48, 0x69, 0x64, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65,
+	0x71, 0x1a, 0x11, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x48, 0x69, 0x64, 0x65, 0x46, 0x6c, 0x6f,
+	0x77, 0x52, 0x65, 0x73, 0x22, 0x1f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x19, 0x3a, 0x01, 0x2a, 0x22,
+	0x14, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77,
+	0x2f, 0x68, 0x69, 0x64, 0x65, 0x12, 0x61, 0x0a, 0x0b, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46,
+	0x6c, 0x6f, 0x77, 0x73, 0x12, 0x14, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x68, 0x61, 0x72,
+	0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x73, 0x52, 0x65, 0x71, 0x1a, 0x14, 0x2e, 0x66, 0x6c, 0x6f,
+	0x77, 0x2e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x73, 0x52, 0x65, 0x73,
+	0x22, 0x26, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x20, 0x3a, 0x01, 0x2a, 0x22, 0x1b, 0x2f, 0x61, 0x70,
+	0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x73, 0x68, 0x61,
+	0x72, 0x65, 0x64, 0x2f, 0x6c, 0x69, 0x73, 0x74, 0x12, 0x59, 0x0a, 0x0a, 0x53, 0x68, 0x61, 0x72,
+	0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x12, 0x13, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x68,
+	0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x13, 0x2e, 0x66, 0x6c,
+	0x6f, 0x77, 0x2e, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x73,
+	0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x3a, 0x01, 0x2a, 0x22, 0x16, 0x2f, 0x61, 0x70,
+	0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2d, 0x73, 0x68, 0x61,
+	0x72, 0x65, 0x64, 0x12, 0x66, 0x0a, 0x0d, 0x55, 0x73, 0x65, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64,
+	0x46, 0x6c, 0x6f, 0x77, 0x12, 0x16, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x55, 0x73, 0x65, 0x53,
+	0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x16, 0x2e, 0x66,
+	0x6c, 0x6f, 0x77, 0x2e, 0x55, 0x73, 0x65, 0x53, 0x68, 0x61, 0x72, 0x65, 0x64, 0x46, 0x6c, 0x6f,
+	0x77, 0x52, 0x65, 0x73, 0x22, 0x25, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1f, 0x3a, 0x01, 0x2a, 0x22,
+	0x1a, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77,
+	0x2d, 0x73, 0x68, 0x61, 0x72, 0x65, 0x64, 0x2f, 0x75, 0x73, 0x65, 0x12, 0x5f, 0x0a, 0x0c, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x12, 0x15, 0x2e, 0x66, 0x6c,
+	0x6f, 0x77, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52,
+	0x65, 0x71, 0x1a, 0x15, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x73, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02,
+	0x1b, 0x3a, 0x01, 0x2a, 0x22, 0x16, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x32,
+	0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x12, 0x70, 0x0a, 0x11,
+	0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x50, 0x72, 0x65, 0x76, 0x69, 0x65,
+	0x77, 0x12, 0x14, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x46, 0x6c, 0x6f, 0x77, 0x50, 0x72, 0x65,
+	0x76, 0x69, 0x65, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x1a, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52,
+	0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x50, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77,
+	0x52, 0x65, 0x73, 0x22, 0x29, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x23, 0x3a, 0x01, 0x2a, 0x22, 0x1e,
+	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f, 0x66, 0x6c, 0x6f, 0x77, 0x2d,
+	0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x2f, 0x70, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x12, 0x87,
+	0x01, 0x0a, 0x15, 0x4f, 0x6e, 0x6c, 0x79, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f,
+	0x77, 0x50, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x12, 0x1e, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x4f, 0x6e, 0x6c, 0x79, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x50, 0x72,
+	0x65, 0x76, 0x69, 0x65, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x1e, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x4f, 0x6e, 0x6c, 0x79, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x50, 0x72,
+	0x65, 0x76, 0x69, 0x65, 0x77, 0x52, 0x65, 0x73, 0x22, 0x2e, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x28,
+	0x3a, 0x01, 0x2a, 0x22, 0x23, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f,
+	0x66, 0x6c, 0x6f, 0x77, 0x2d, 0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x2f, 0x6f, 0x6e, 0x6c, 0x79,
+	0x2d, 0x70, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x12, 0x94, 0x01, 0x0a, 0x18, 0x4f, 0x6e, 0x6c,
+	0x79, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x46, 0x72, 0x6f, 0x6d, 0x54,
+	0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x12, 0x1e, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4f, 0x6e, 0x6c,
+	0x79, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x50, 0x72, 0x65, 0x76, 0x69,
+	0x65, 0x77, 0x52, 0x65, 0x71, 0x1a, 0x21, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4f, 0x6e, 0x6c,
+	0x79, 0x52, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x46, 0x6c, 0x6f, 0x77, 0x46, 0x72, 0x6f, 0x6d, 0x54,
+	0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x22, 0x35, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2f,
+	0x3a, 0x01, 0x2a, 0x22, 0x2a, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x31, 0x2f,
+	0x66, 0x6c, 0x6f, 0x77, 0x2d, 0x72, 0x61, 0x6e, 0x64, 0x6f, 0x6d, 0x2f, 0x6f, 0x6e, 0x6c, 0x79,
+	0x2d, 0x70, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x2d, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x73, 0x12,
+	0x53, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x12, 0x12, 0x2e, 0x66,
+	0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x56, 0x32, 0x52, 0x65, 0x71,
+	0x1a, 0x12, 0x2e, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x65, 0x74, 0x46, 0x6c, 0x6f, 0x77, 0x56,
+	0x32, 0x52, 0x65, 0x73, 0x22, 0x1e, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x18, 0x3a, 0x01, 0x2a, 0x22,
+	0x13, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x67, 0x77, 0x2f, 0x76, 0x32, 0x2f, 0x66, 0x6c, 0x6f, 0x77,
+	0x2f, 0x67, 0x65, 0x74, 0x42, 0x09, 0x5a, 0x07, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x76, 0x31, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2467,150 +4189,224 @@ func file_v1_flow_proto_rawDescGZIP() []byte {
 	return file_v1_flow_proto_rawDescData
 }
 
-var file_v1_flow_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_v1_flow_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
 var file_v1_flow_proto_goTypes = []interface{}{
 	(*FlowShared)(nil),                           // 0: flow.FlowShared
-	(*UseSharedFlowReq)(nil),                     // 1: flow.UseSharedFlowReq
-	(*UseSharedFlowRes)(nil),                     // 2: flow.UseSharedFlowRes
-	(*SharedFlowRes)(nil),                        // 3: flow.SharedFlowRes
-	(*SharedFlowReq)(nil),                        // 4: flow.SharedFlowReq
-	(*SharedFlowsReq)(nil),                       // 5: flow.SharedFlowsReq
-	(*SharedFlowsRes)(nil),                       // 6: flow.SharedFlowsRes
-	(*ShareFlowReq)(nil),                         // 7: flow.ShareFlowReq
-	(*ShareFlowRes)(nil),                         // 8: flow.ShareFlowRes
-	(*HideFlowReq)(nil),                          // 9: flow.HideFlowReq
-	(*HideFlowRes)(nil),                          // 10: flow.HideFlowRes
-	(*CopyFlowReq)(nil),                          // 11: flow.CopyFlowReq
-	(*CopyFlowRes)(nil),                          // 12: flow.CopyFlowRes
-	(*GetFlowRequest)(nil),                       // 13: flow.GetFlowRequest
-	(*GetFlowResponse)(nil),                      // 14: flow.GetFlowResponse
-	(*Flow)(nil),                                 // 15: flow.Flow
-	(*WalletByWalletMode)(nil),                   // 16: flow.WalletByWalletMode
-	(*Task)(nil),                                 // 17: flow.Task
-	(*CreateFlowRequest)(nil),                    // 18: flow.CreateFlowRequest
-	(*UpdateFlowRequest)(nil),                    // 19: flow.UpdateFlowRequest
-	(*UpdateFlowResponse)(nil),                   // 20: flow.UpdateFlowResponse
-	(*CreateFlowResponse)(nil),                   // 21: flow.CreateFlowResponse
-	(*ListFlowRequest)(nil),                      // 22: flow.ListFlowRequest
-	(*ListFlowResponse)(nil),                     // 23: flow.ListFlowResponse
-	(*DeleteFlowRequest)(nil),                    // 24: flow.DeleteFlowRequest
-	(*DeleteFlowResponse)(nil),                   // 25: flow.DeleteFlowResponse
-	(*timestamppb.Timestamp)(nil),                // 26: google.protobuf.Timestamp
-	(TaskType)(0),                                // 27: task.TaskType
-	(*StargateBridgeTask)(nil),                   // 28: task.StargateBridgeTask
-	(*MockTask)(nil),                             // 29: task.MockTask
-	(*DelayTask)(nil),                            // 30: task.DelayTask
-	(*WithdrawExchangeTask)(nil),                 // 31: task.WithdrawExchangeTask
-	(*OkexDepositTask)(nil),                      // 32: task.OkexDepositTask
-	(*TestNetBridgeSwapTask)(nil),                // 33: task.TestNetBridgeSwapTask
-	(*SnapshotVoteTask)(nil),                     // 34: task.SnapshotVoteTask
-	(*OkexBinanaceTask)(nil),                     // 35: task.OkexBinanaceTask
-	(*Swap1InchTask)(nil),                        // 36: task.Swap1inchTask
-	(*DefaultSwap)(nil),                          // 37: task.DefaultSwap
-	(*ZkSyncOfficialBridgeToEthereumTask)(nil),   // 38: task.ZkSyncOfficialBridgeToEthereumTask
-	(*OrbiterBridgeTask)(nil),                    // 39: task.OrbiterBridgeTask
-	(*ZkSyncOfficialBridgeFromEthereumTask)(nil), // 40: task.ZkSyncOfficialBridgeFromEthereumTask
-	(*WETHTask)(nil),                             // 41: task.WETHTask
-	(*DefaultLP)(nil),                            // 42: task.DefaultLP
-	(*MerklyMintAndBridgeNFTTask)(nil),           // 43: task.MerklyMintAndBridgeNFTTask
-	(*DeployStarkNetAccountTask)(nil),            // 44: task.DeployStarkNetAccountTask
-	(*LiquidityBridgeTask)(nil),                  // 45: task.LiquidityBridgeTask
-	(*SimpleTask)(nil),                           // 46: task.SimpleTask
-	(*DefaultBridge)(nil),                        // 47: task.DefaultBridge
-	(*ExchangeSwapTask)(nil),                     // 48: task.ExchangeSwapTask
+	(*RandomFlow)(nil),                           // 1: flow.RandomFlow
+	(*RandomTask)(nil),                           // 2: flow.RandomTask
+	(*RPsimple)(nil),                             // 3: flow.RPsimple
+	(*RPswap)(nil),                               // 4: flow.RPswap
+	(*RPswapItem)(nil),                           // 5: flow.RPswapItem
+	(*Flow)(nil),                                 // 6: flow.Flow
+	(*FlowBase)(nil),                             // 7: flow.FlowBase
+	(*UpdateFlowV2Request)(nil),                  // 8: flow.UpdateFlowV2Request
+	(*UpdateFlowV2Response)(nil),                 // 9: flow.UpdateFlowV2Response
+	(*GetFlowV2Req)(nil),                         // 10: flow.GetFlowV2Req
+	(*GetFlowV2Res)(nil),                         // 11: flow.GetFlowV2Res
+	(*OnlyRandomFlowPreviewReq)(nil),             // 12: flow.OnlyRandomFlowPreviewReq
+	(*OnlyRandomFlowFromTokensRes)(nil),          // 13: flow.OnlyRandomFlowFromTokensRes
+	(*OnlyRandomFlowPreviewRes)(nil),             // 14: flow.OnlyRandomFlowPreviewRes
+	(*FlowPreviewReq)(nil),                       // 15: flow.FlowPreviewReq
+	(*RandomFlowPreviewRes)(nil),                 // 16: flow.RandomFlowPreviewRes
+	(*TokenArr)(nil),                             // 17: flow.TokenArr
+	(*UniqueFlow)(nil),                           // 18: flow.UniqueFlow
+	(*CreateFlowV2Req)(nil),                      // 19: flow.CreateFlowV2Req
+	(*FlowBlock)(nil),                            // 20: flow.FlowBlock
+	(*FlowBlockMan)(nil),                         // 21: flow.FlowBlockMan
+	(*FlowBlockRand)(nil),                        // 22: flow.FlowBlockRand
+	(*CreateFlowV2Res)(nil),                      // 23: flow.CreateFlowV2Res
+	(*UseSharedFlowReq)(nil),                     // 24: flow.UseSharedFlowReq
+	(*UseSharedFlowRes)(nil),                     // 25: flow.UseSharedFlowRes
+	(*SharedFlowRes)(nil),                        // 26: flow.SharedFlowRes
+	(*SharedFlowReq)(nil),                        // 27: flow.SharedFlowReq
+	(*SharedFlowsReq)(nil),                       // 28: flow.SharedFlowsReq
+	(*SharedFlowsRes)(nil),                       // 29: flow.SharedFlowsRes
+	(*ShareFlowReq)(nil),                         // 30: flow.ShareFlowReq
+	(*ShareFlowRes)(nil),                         // 31: flow.ShareFlowRes
+	(*HideFlowReq)(nil),                          // 32: flow.HideFlowReq
+	(*HideFlowRes)(nil),                          // 33: flow.HideFlowRes
+	(*CopyFlowReq)(nil),                          // 34: flow.CopyFlowReq
+	(*CopyFlowRes)(nil),                          // 35: flow.CopyFlowRes
+	(*GetFlowRequest)(nil),                       // 36: flow.GetFlowRequest
+	(*GetFlowResponse)(nil),                      // 37: flow.GetFlowResponse
+	(*WalletByWalletMode)(nil),                   // 38: flow.WalletByWalletMode
+	(*Task)(nil),                                 // 39: flow.Task
+	(*CreateFlowRequest)(nil),                    // 40: flow.CreateFlowRequest
+	(*UpdateFlowRequest)(nil),                    // 41: flow.UpdateFlowRequest
+	(*UpdateFlowResponse)(nil),                   // 42: flow.UpdateFlowResponse
+	(*CreateFlowResponse)(nil),                   // 43: flow.CreateFlowResponse
+	(*ListFlowRequest)(nil),                      // 44: flow.ListFlowRequest
+	(*ListFlowResponse)(nil),                     // 45: flow.ListFlowResponse
+	(*FlowListItem)(nil),                         // 46: flow.FlowListItem
+	(*DeleteFlowRequest)(nil),                    // 47: flow.DeleteFlowRequest
+	(*DeleteFlowResponse)(nil),                   // 48: flow.DeleteFlowResponse
+	(*timestamppb.Timestamp)(nil),                // 49: google.protobuf.Timestamp
+	(TaskType)(0),                                // 50: task.TaskType
+	(Network)(0),                                 // 51: shared.Network
+	(Token)(0),                                   // 52: shared.Token
+	(*StargateBridgeTask)(nil),                   // 53: task.StargateBridgeTask
+	(*MockTask)(nil),                             // 54: task.MockTask
+	(*DelayTask)(nil),                            // 55: task.DelayTask
+	(*WithdrawExchangeTask)(nil),                 // 56: task.WithdrawExchangeTask
+	(*OkexDepositTask)(nil),                      // 57: task.OkexDepositTask
+	(*TestNetBridgeSwapTask)(nil),                // 58: task.TestNetBridgeSwapTask
+	(*SnapshotVoteTask)(nil),                     // 59: task.SnapshotVoteTask
+	(*OkexBinanaceTask)(nil),                     // 60: task.OkexBinanaceTask
+	(*Swap1InchTask)(nil),                        // 61: task.Swap1inchTask
+	(*DefaultSwap)(nil),                          // 62: task.DefaultSwap
+	(*ZkSyncOfficialBridgeToEthereumTask)(nil),   // 63: task.ZkSyncOfficialBridgeToEthereumTask
+	(*OrbiterBridgeTask)(nil),                    // 64: task.OrbiterBridgeTask
+	(*ZkSyncOfficialBridgeFromEthereumTask)(nil), // 65: task.ZkSyncOfficialBridgeFromEthereumTask
+	(*WETHTask)(nil),                             // 66: task.WETHTask
+	(*DefaultLP)(nil),                            // 67: task.DefaultLP
+	(*MerklyMintAndBridgeNFTTask)(nil),           // 68: task.MerklyMintAndBridgeNFTTask
+	(*DeployStarkNetAccountTask)(nil),            // 69: task.DeployStarkNetAccountTask
+	(*LiquidityBridgeTask)(nil),                  // 70: task.LiquidityBridgeTask
+	(*SimpleTask)(nil),                           // 71: task.SimpleTask
+	(*DefaultBridge)(nil),                        // 72: task.DefaultBridge
+	(*ExchangeSwapTask)(nil),                     // 73: task.ExchangeSwapTask
 }
 var file_v1_flow_proto_depIdxs = []int32{
-	26, // 0: flow.FlowShared.created_at:type_name -> google.protobuf.Timestamp
-	26, // 1: flow.FlowShared.deleted_at:type_name -> google.protobuf.Timestamp
-	17, // 2: flow.FlowShared.tasks:type_name -> flow.Task
-	0,  // 3: flow.SharedFlowRes.flow:type_name -> flow.FlowShared
-	0,  // 4: flow.SharedFlowsRes.items:type_name -> flow.FlowShared
-	15, // 5: flow.GetFlowResponse.flow:type_name -> flow.Flow
-	17, // 6: flow.Flow.tasks:type_name -> flow.Task
-	26, // 7: flow.Flow.created_at:type_name -> google.protobuf.Timestamp
-	26, // 8: flow.Flow.deleted_at:type_name -> google.protobuf.Timestamp
-	17, // 9: flow.Flow.random_tasks:type_name -> flow.Task
-	27, // 10: flow.Task.taskType:type_name -> task.TaskType
-	28, // 11: flow.Task.stargateBridgeTask:type_name -> task.StargateBridgeTask
-	29, // 12: flow.Task.mock_task:type_name -> task.MockTask
-	30, // 13: flow.Task.delay_task:type_name -> task.DelayTask
-	31, // 14: flow.Task.withdrawExchangeTask:type_name -> task.WithdrawExchangeTask
-	32, // 15: flow.Task.okexDepositTask:type_name -> task.OkexDepositTask
-	33, // 16: flow.Task.testNetBridgeSwapTask:type_name -> task.TestNetBridgeSwapTask
-	34, // 17: flow.Task.snapshotVoteTask:type_name -> task.SnapshotVoteTask
-	35, // 18: flow.Task.okexBinanaceTask:type_name -> task.OkexBinanaceTask
-	36, // 19: flow.Task.swap1inchTask:type_name -> task.Swap1inchTask
-	37, // 20: flow.Task.syncSwapTask:type_name -> task.DefaultSwap
-	38, // 21: flow.Task.zkSyncOfficialBridgeToEthereumTask:type_name -> task.ZkSyncOfficialBridgeToEthereumTask
-	39, // 22: flow.Task.orbiterBridgeTask:type_name -> task.OrbiterBridgeTask
-	40, // 23: flow.Task.zkSyncOfficialBridgeFromEthereumTask:type_name -> task.ZkSyncOfficialBridgeFromEthereumTask
-	41, // 24: flow.Task.wETHTask:type_name -> task.WETHTask
-	37, // 25: flow.Task.muteioSwapTask:type_name -> task.DefaultSwap
-	42, // 26: flow.Task.syncSwapLPTask:type_name -> task.DefaultLP
-	37, // 27: flow.Task.maverickSwapTask:type_name -> task.DefaultSwap
-	37, // 28: flow.Task.spaceFiSwapTask:type_name -> task.DefaultSwap
-	37, // 29: flow.Task.velocoreSwapTask:type_name -> task.DefaultSwap
-	37, // 30: flow.Task.izumiSwapTask:type_name -> task.DefaultSwap
-	37, // 31: flow.Task.veSyncSwapTask:type_name -> task.DefaultSwap
-	37, // 32: flow.Task.ezkaliburSwapTask:type_name -> task.DefaultSwap
-	37, // 33: flow.Task.zkSwapTask:type_name -> task.DefaultSwap
-	37, // 34: flow.Task.traderJoeSwapTask:type_name -> task.DefaultSwap
-	43, // 35: flow.Task.merklyMintAndBridgeNFTTask:type_name -> task.MerklyMintAndBridgeNFTTask
-	44, // 36: flow.Task.deployStarkNetAccountTask:type_name -> task.DeployStarkNetAccountTask
-	37, // 37: flow.Task.swap10k:type_name -> task.DefaultSwap
-	37, // 38: flow.Task.pancakeSwapTask:type_name -> task.DefaultSwap
-	37, // 39: flow.Task.sithSwapTask:type_name -> task.DefaultSwap
-	37, // 40: flow.Task.jediSwapTask:type_name -> task.DefaultSwap
-	37, // 41: flow.Task.mySwapTask:type_name -> task.DefaultSwap
-	37, // 42: flow.Task.protosSwapTask:type_name -> task.DefaultSwap
-	45, // 43: flow.Task.starkNetBridgeTask:type_name -> task.LiquidityBridgeTask
-	46, // 44: flow.Task.dmailTask:type_name -> task.SimpleTask
-	46, // 45: flow.Task.starkNetIdMintTask:type_name -> task.SimpleTask
-	37, // 46: flow.Task.odosSwapTask:type_name -> task.DefaultSwap
-	47, // 47: flow.Task.acrossBridgeTask:type_name -> task.DefaultBridge
-	37, // 48: flow.Task.avnuSwapTask:type_name -> task.DefaultSwap
-	37, // 49: flow.Task.fibrousSwapTask:type_name -> task.DefaultSwap
-	48, // 50: flow.Task.exchangeSwapTask:type_name -> task.ExchangeSwapTask
-	42, // 51: flow.Task.zkLendLPTask:type_name -> task.DefaultLP
-	37, // 52: flow.Task.woofiSwapTask:type_name -> task.DefaultSwap
-	42, // 53: flow.Task.aaveLPTask:type_name -> task.DefaultLP
-	46, // 54: flow.Task.mintFunTask:type_name -> task.SimpleTask
-	46, // 55: flow.Task.mintMerklyTask:type_name -> task.SimpleTask
-	46, // 56: flow.Task.mintZeriusTask:type_name -> task.SimpleTask
-	37, // 57: flow.Task.kyberSwapTask:type_name -> task.DefaultSwap
-	17, // 58: flow.CreateFlowRequest.tasks:type_name -> flow.Task
-	17, // 59: flow.CreateFlowRequest.random_tasks:type_name -> flow.Task
-	15, // 60: flow.UpdateFlowRequest.flow:type_name -> flow.Flow
-	15, // 61: flow.UpdateFlowResponse.flow:type_name -> flow.Flow
-	15, // 62: flow.CreateFlowResponse.flow:type_name -> flow.Flow
-	15, // 63: flow.ListFlowResponse.flows:type_name -> flow.Flow
-	19, // 64: flow.FlowService.UpdateFlow:input_type -> flow.UpdateFlowRequest
-	18, // 65: flow.FlowService.CreateFlow:input_type -> flow.CreateFlowRequest
-	13, // 66: flow.FlowService.GetFlow:input_type -> flow.GetFlowRequest
-	22, // 67: flow.FlowService.ListFlow:input_type -> flow.ListFlowRequest
-	24, // 68: flow.FlowService.DeleteFlow:input_type -> flow.DeleteFlowRequest
-	11, // 69: flow.FlowService.CopyFlow:input_type -> flow.CopyFlowReq
-	7,  // 70: flow.FlowService.ShareFlow:input_type -> flow.ShareFlowReq
-	9,  // 71: flow.FlowService.HideFlow:input_type -> flow.HideFlowReq
-	5,  // 72: flow.FlowService.SharedFlows:input_type -> flow.SharedFlowsReq
-	4,  // 73: flow.FlowService.SharedFlow:input_type -> flow.SharedFlowReq
-	1,  // 74: flow.FlowService.UseSharedFlow:input_type -> flow.UseSharedFlowReq
-	20, // 75: flow.FlowService.UpdateFlow:output_type -> flow.UpdateFlowResponse
-	21, // 76: flow.FlowService.CreateFlow:output_type -> flow.CreateFlowResponse
-	14, // 77: flow.FlowService.GetFlow:output_type -> flow.GetFlowResponse
-	23, // 78: flow.FlowService.ListFlow:output_type -> flow.ListFlowResponse
-	25, // 79: flow.FlowService.DeleteFlow:output_type -> flow.DeleteFlowResponse
-	12, // 80: flow.FlowService.CopyFlow:output_type -> flow.CopyFlowRes
-	8,  // 81: flow.FlowService.ShareFlow:output_type -> flow.ShareFlowRes
-	10, // 82: flow.FlowService.HideFlow:output_type -> flow.HideFlowRes
-	6,  // 83: flow.FlowService.SharedFlows:output_type -> flow.SharedFlowsRes
-	3,  // 84: flow.FlowService.SharedFlow:output_type -> flow.SharedFlowRes
-	2,  // 85: flow.FlowService.UseSharedFlow:output_type -> flow.UseSharedFlowRes
-	75, // [75:86] is the sub-list for method output_type
-	64, // [64:75] is the sub-list for method input_type
-	64, // [64:64] is the sub-list for extension type_name
-	64, // [64:64] is the sub-list for extension extendee
-	0,  // [0:64] is the sub-list for field type_name
+	49,  // 0: flow.FlowShared.created_at:type_name -> google.protobuf.Timestamp
+	49,  // 1: flow.FlowShared.deleted_at:type_name -> google.protobuf.Timestamp
+	39,  // 2: flow.FlowShared.tasks:type_name -> flow.Task
+	2,   // 3: flow.RandomFlow.tasks:type_name -> flow.RandomTask
+	50,  // 4: flow.RandomTask.taskType:type_name -> task.TaskType
+	4,   // 5: flow.RandomTask.swap:type_name -> flow.RPswap
+	3,   // 6: flow.RandomTask.simple:type_name -> flow.RPsimple
+	51,  // 7: flow.RPsimple.network:type_name -> shared.Network
+	5,   // 8: flow.RPswap.items:type_name -> flow.RPswapItem
+	51,  // 9: flow.RPswapItem.network:type_name -> shared.Network
+	52,  // 10: flow.RPswapItem.from:type_name -> shared.Token
+	52,  // 11: flow.RPswapItem.to:type_name -> shared.Token
+	39,  // 12: flow.Flow.tasks:type_name -> flow.Task
+	49,  // 13: flow.Flow.created_at:type_name -> google.protobuf.Timestamp
+	49,  // 14: flow.Flow.deleted_at:type_name -> google.protobuf.Timestamp
+	39,  // 15: flow.Flow.random_tasks:type_name -> flow.Task
+	7,   // 16: flow.Flow.base:type_name -> flow.FlowBase
+	52,  // 17: flow.FlowBase.token:type_name -> shared.Token
+	20,  // 18: flow.UpdateFlowV2Request.blocks:type_name -> flow.FlowBlock
+	20,  // 19: flow.UpdateFlowV2Response.blocks:type_name -> flow.FlowBlock
+	20,  // 20: flow.GetFlowV2Res.blocks:type_name -> flow.FlowBlock
+	52,  // 21: flow.OnlyRandomFlowPreviewReq.start_token:type_name -> shared.Token
+	52,  // 22: flow.OnlyRandomFlowPreviewReq.finish_token:type_name -> shared.Token
+	51,  // 23: flow.OnlyRandomFlowPreviewReq.start_network:type_name -> shared.Network
+	2,   // 24: flow.OnlyRandomFlowPreviewReq.tasks:type_name -> flow.RandomTask
+	52,  // 25: flow.OnlyRandomFlowFromTokensRes.tokens:type_name -> shared.Token
+	18,  // 26: flow.OnlyRandomFlowPreviewRes.flow:type_name -> flow.UniqueFlow
+	17,  // 27: flow.OnlyRandomFlowPreviewRes.tokens:type_name -> flow.TokenArr
+	20,  // 28: flow.FlowPreviewReq.blocks:type_name -> flow.FlowBlock
+	18,  // 29: flow.RandomFlowPreviewRes.flow:type_name -> flow.UniqueFlow
+	52,  // 30: flow.TokenArr.from:type_name -> shared.Token
+	52,  // 31: flow.TokenArr.to:type_name -> shared.Token
+	39,  // 32: flow.UniqueFlow.tasks:type_name -> flow.Task
+	20,  // 33: flow.CreateFlowV2Req.blocks:type_name -> flow.FlowBlock
+	21,  // 34: flow.FlowBlock.man:type_name -> flow.FlowBlockMan
+	22,  // 35: flow.FlowBlock.rand:type_name -> flow.FlowBlockRand
+	39,  // 36: flow.FlowBlockMan.tasks:type_name -> flow.Task
+	39,  // 37: flow.FlowBlockMan.random_tasks:type_name -> flow.Task
+	52,  // 38: flow.FlowBlockRand.start_token:type_name -> shared.Token
+	52,  // 39: flow.FlowBlockRand.finish_token:type_name -> shared.Token
+	51,  // 40: flow.FlowBlockRand.start_network:type_name -> shared.Network
+	2,   // 41: flow.FlowBlockRand.tasks:type_name -> flow.RandomTask
+	0,   // 42: flow.SharedFlowRes.flow:type_name -> flow.FlowShared
+	0,   // 43: flow.SharedFlowsRes.items:type_name -> flow.FlowShared
+	6,   // 44: flow.GetFlowResponse.flow:type_name -> flow.Flow
+	50,  // 45: flow.Task.taskType:type_name -> task.TaskType
+	53,  // 46: flow.Task.stargateBridgeTask:type_name -> task.StargateBridgeTask
+	54,  // 47: flow.Task.mock_task:type_name -> task.MockTask
+	55,  // 48: flow.Task.delay_task:type_name -> task.DelayTask
+	56,  // 49: flow.Task.withdrawExchangeTask:type_name -> task.WithdrawExchangeTask
+	57,  // 50: flow.Task.okexDepositTask:type_name -> task.OkexDepositTask
+	58,  // 51: flow.Task.testNetBridgeSwapTask:type_name -> task.TestNetBridgeSwapTask
+	59,  // 52: flow.Task.snapshotVoteTask:type_name -> task.SnapshotVoteTask
+	60,  // 53: flow.Task.okexBinanaceTask:type_name -> task.OkexBinanaceTask
+	61,  // 54: flow.Task.swap1inchTask:type_name -> task.Swap1inchTask
+	62,  // 55: flow.Task.syncSwapTask:type_name -> task.DefaultSwap
+	63,  // 56: flow.Task.zkSyncOfficialBridgeToEthereumTask:type_name -> task.ZkSyncOfficialBridgeToEthereumTask
+	64,  // 57: flow.Task.orbiterBridgeTask:type_name -> task.OrbiterBridgeTask
+	65,  // 58: flow.Task.zkSyncOfficialBridgeFromEthereumTask:type_name -> task.ZkSyncOfficialBridgeFromEthereumTask
+	66,  // 59: flow.Task.wETHTask:type_name -> task.WETHTask
+	62,  // 60: flow.Task.muteioSwapTask:type_name -> task.DefaultSwap
+	67,  // 61: flow.Task.syncSwapLPTask:type_name -> task.DefaultLP
+	62,  // 62: flow.Task.maverickSwapTask:type_name -> task.DefaultSwap
+	62,  // 63: flow.Task.spaceFiSwapTask:type_name -> task.DefaultSwap
+	62,  // 64: flow.Task.velocoreSwapTask:type_name -> task.DefaultSwap
+	62,  // 65: flow.Task.izumiSwapTask:type_name -> task.DefaultSwap
+	62,  // 66: flow.Task.veSyncSwapTask:type_name -> task.DefaultSwap
+	62,  // 67: flow.Task.ezkaliburSwapTask:type_name -> task.DefaultSwap
+	62,  // 68: flow.Task.zkSwapTask:type_name -> task.DefaultSwap
+	62,  // 69: flow.Task.traderJoeSwapTask:type_name -> task.DefaultSwap
+	68,  // 70: flow.Task.merklyMintAndBridgeNFTTask:type_name -> task.MerklyMintAndBridgeNFTTask
+	69,  // 71: flow.Task.deployStarkNetAccountTask:type_name -> task.DeployStarkNetAccountTask
+	62,  // 72: flow.Task.swap10k:type_name -> task.DefaultSwap
+	62,  // 73: flow.Task.pancakeSwapTask:type_name -> task.DefaultSwap
+	62,  // 74: flow.Task.sithSwapTask:type_name -> task.DefaultSwap
+	62,  // 75: flow.Task.jediSwapTask:type_name -> task.DefaultSwap
+	62,  // 76: flow.Task.mySwapTask:type_name -> task.DefaultSwap
+	62,  // 77: flow.Task.protosSwapTask:type_name -> task.DefaultSwap
+	70,  // 78: flow.Task.starkNetBridgeTask:type_name -> task.LiquidityBridgeTask
+	71,  // 79: flow.Task.dmailTask:type_name -> task.SimpleTask
+	71,  // 80: flow.Task.starkNetIdMintTask:type_name -> task.SimpleTask
+	62,  // 81: flow.Task.odosSwapTask:type_name -> task.DefaultSwap
+	72,  // 82: flow.Task.acrossBridgeTask:type_name -> task.DefaultBridge
+	62,  // 83: flow.Task.avnuSwapTask:type_name -> task.DefaultSwap
+	62,  // 84: flow.Task.fibrousSwapTask:type_name -> task.DefaultSwap
+	73,  // 85: flow.Task.exchangeSwapTask:type_name -> task.ExchangeSwapTask
+	67,  // 86: flow.Task.zkLendLPTask:type_name -> task.DefaultLP
+	62,  // 87: flow.Task.woofiSwapTask:type_name -> task.DefaultSwap
+	67,  // 88: flow.Task.aaveLPTask:type_name -> task.DefaultLP
+	71,  // 89: flow.Task.mintFunTask:type_name -> task.SimpleTask
+	71,  // 90: flow.Task.mintMerklyTask:type_name -> task.SimpleTask
+	71,  // 91: flow.Task.mintZeriusTask:type_name -> task.SimpleTask
+	62,  // 92: flow.Task.kyberSwapTask:type_name -> task.DefaultSwap
+	39,  // 93: flow.CreateFlowRequest.tasks:type_name -> flow.Task
+	39,  // 94: flow.CreateFlowRequest.random_tasks:type_name -> flow.Task
+	6,   // 95: flow.UpdateFlowRequest.flow:type_name -> flow.Flow
+	6,   // 96: flow.UpdateFlowResponse.flow:type_name -> flow.Flow
+	6,   // 97: flow.CreateFlowResponse.flow:type_name -> flow.Flow
+	46,  // 98: flow.ListFlowResponse.flows:type_name -> flow.FlowListItem
+	49,  // 99: flow.FlowListItem.created_at:type_name -> google.protobuf.Timestamp
+	49,  // 100: flow.FlowListItem.deleted_at:type_name -> google.protobuf.Timestamp
+	41,  // 101: flow.FlowService.UpdateFlow:input_type -> flow.UpdateFlowRequest
+	8,   // 102: flow.FlowService.UpdateFlowV2:input_type -> flow.UpdateFlowV2Request
+	40,  // 103: flow.FlowService.CreateFlow:input_type -> flow.CreateFlowRequest
+	36,  // 104: flow.FlowService.GetFlow:input_type -> flow.GetFlowRequest
+	44,  // 105: flow.FlowService.ListFlow:input_type -> flow.ListFlowRequest
+	47,  // 106: flow.FlowService.DeleteFlow:input_type -> flow.DeleteFlowRequest
+	34,  // 107: flow.FlowService.CopyFlow:input_type -> flow.CopyFlowReq
+	30,  // 108: flow.FlowService.ShareFlow:input_type -> flow.ShareFlowReq
+	32,  // 109: flow.FlowService.HideFlow:input_type -> flow.HideFlowReq
+	28,  // 110: flow.FlowService.SharedFlows:input_type -> flow.SharedFlowsReq
+	27,  // 111: flow.FlowService.SharedFlow:input_type -> flow.SharedFlowReq
+	24,  // 112: flow.FlowService.UseSharedFlow:input_type -> flow.UseSharedFlowReq
+	19,  // 113: flow.FlowService.CreateFlowV2:input_type -> flow.CreateFlowV2Req
+	15,  // 114: flow.FlowService.RandomFlowPreview:input_type -> flow.FlowPreviewReq
+	12,  // 115: flow.FlowService.OnlyRandomFlowPreview:input_type -> flow.OnlyRandomFlowPreviewReq
+	12,  // 116: flow.FlowService.OnlyRandomFlowFromTokens:input_type -> flow.OnlyRandomFlowPreviewReq
+	10,  // 117: flow.FlowService.GetFlowV2:input_type -> flow.GetFlowV2Req
+	42,  // 118: flow.FlowService.UpdateFlow:output_type -> flow.UpdateFlowResponse
+	9,   // 119: flow.FlowService.UpdateFlowV2:output_type -> flow.UpdateFlowV2Response
+	43,  // 120: flow.FlowService.CreateFlow:output_type -> flow.CreateFlowResponse
+	37,  // 121: flow.FlowService.GetFlow:output_type -> flow.GetFlowResponse
+	45,  // 122: flow.FlowService.ListFlow:output_type -> flow.ListFlowResponse
+	48,  // 123: flow.FlowService.DeleteFlow:output_type -> flow.DeleteFlowResponse
+	35,  // 124: flow.FlowService.CopyFlow:output_type -> flow.CopyFlowRes
+	31,  // 125: flow.FlowService.ShareFlow:output_type -> flow.ShareFlowRes
+	33,  // 126: flow.FlowService.HideFlow:output_type -> flow.HideFlowRes
+	29,  // 127: flow.FlowService.SharedFlows:output_type -> flow.SharedFlowsRes
+	26,  // 128: flow.FlowService.SharedFlow:output_type -> flow.SharedFlowRes
+	25,  // 129: flow.FlowService.UseSharedFlow:output_type -> flow.UseSharedFlowRes
+	23,  // 130: flow.FlowService.CreateFlowV2:output_type -> flow.CreateFlowV2Res
+	16,  // 131: flow.FlowService.RandomFlowPreview:output_type -> flow.RandomFlowPreviewRes
+	14,  // 132: flow.FlowService.OnlyRandomFlowPreview:output_type -> flow.OnlyRandomFlowPreviewRes
+	13,  // 133: flow.FlowService.OnlyRandomFlowFromTokens:output_type -> flow.OnlyRandomFlowFromTokensRes
+	11,  // 134: flow.FlowService.GetFlowV2:output_type -> flow.GetFlowV2Res
+	118, // [118:135] is the sub-list for method output_type
+	101, // [101:118] is the sub-list for method input_type
+	101, // [101:101] is the sub-list for extension type_name
+	101, // [101:101] is the sub-list for extension extendee
+	0,   // [0:101] is the sub-list for field type_name
 }
 
 func init() { file_v1_flow_proto_init() }
@@ -2634,7 +4430,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UseSharedFlowReq); i {
+			switch v := v.(*RandomFlow); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2646,7 +4442,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UseSharedFlowRes); i {
+			switch v := v.(*RandomTask); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2658,7 +4454,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SharedFlowRes); i {
+			switch v := v.(*RPsimple); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2670,7 +4466,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SharedFlowReq); i {
+			switch v := v.(*RPswap); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2682,7 +4478,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SharedFlowsReq); i {
+			switch v := v.(*RPswapItem); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2694,114 +4490,6 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SharedFlowsRes); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ShareFlowReq); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ShareFlowRes); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HideFlowReq); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HideFlowRes); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CopyFlowReq); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CopyFlowRes); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetFlowRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetFlowResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_v1_flow_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Flow); i {
 			case 0:
 				return &v.state
@@ -2813,8 +4501,116 @@ func file_v1_flow_proto_init() {
 				return nil
 			}
 		}
+		file_v1_flow_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FlowBase); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateFlowV2Request); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateFlowV2Response); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetFlowV2Req); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetFlowV2Res); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*OnlyRandomFlowPreviewReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*OnlyRandomFlowFromTokensRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*OnlyRandomFlowPreviewRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FlowPreviewReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 		file_v1_flow_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*WalletByWalletMode); i {
+			switch v := v.(*RandomFlowPreviewRes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2826,7 +4622,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Task); i {
+			switch v := v.(*TokenArr); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2838,7 +4634,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateFlowRequest); i {
+			switch v := v.(*UniqueFlow); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2850,7 +4646,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateFlowRequest); i {
+			switch v := v.(*CreateFlowV2Req); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2862,7 +4658,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateFlowResponse); i {
+			switch v := v.(*FlowBlock); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2874,7 +4670,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateFlowResponse); i {
+			switch v := v.(*FlowBlockMan); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2886,7 +4682,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListFlowRequest); i {
+			switch v := v.(*FlowBlockRand); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2898,7 +4694,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListFlowResponse); i {
+			switch v := v.(*CreateFlowV2Res); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2910,7 +4706,7 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteFlowRequest); i {
+			switch v := v.(*UseSharedFlowReq); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2922,6 +4718,282 @@ func file_v1_flow_proto_init() {
 			}
 		}
 		file_v1_flow_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UseSharedFlowRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SharedFlowRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SharedFlowReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SharedFlowsReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SharedFlowsRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ShareFlowReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ShareFlowRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HideFlowReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HideFlowRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CopyFlowReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CopyFlowRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetFlowRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetFlowResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*WalletByWalletMode); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Task); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateFlowRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateFlowRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateFlowResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateFlowResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListFlowRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListFlowResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FlowListItem); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteFlowRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_v1_flow_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteFlowResponse); i {
 			case 0:
 				return &v.state
@@ -2935,8 +5007,16 @@ func file_v1_flow_proto_init() {
 		}
 	}
 	file_v1_flow_proto_msgTypes[0].OneofWrappers = []interface{}{}
-	file_v1_flow_proto_msgTypes[15].OneofWrappers = []interface{}{}
-	file_v1_flow_proto_msgTypes[17].OneofWrappers = []interface{}{
+	file_v1_flow_proto_msgTypes[2].OneofWrappers = []interface{}{
+		(*RandomTask_Swap)(nil),
+		(*RandomTask_Simple)(nil),
+	}
+	file_v1_flow_proto_msgTypes[6].OneofWrappers = []interface{}{}
+	file_v1_flow_proto_msgTypes[20].OneofWrappers = []interface{}{
+		(*FlowBlock_Man)(nil),
+		(*FlowBlock_Rand)(nil),
+	}
+	file_v1_flow_proto_msgTypes[39].OneofWrappers = []interface{}{
 		(*Task_StargateBridgeTask)(nil),
 		(*Task_MockTask)(nil),
 		(*Task_DelayTask)(nil),
@@ -2985,13 +5065,14 @@ func file_v1_flow_proto_init() {
 		(*Task_MintZeriusTask)(nil),
 		(*Task_KyberSwapTask)(nil),
 	}
+	file_v1_flow_proto_msgTypes[46].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_v1_flow_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   49,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -1,11 +1,11 @@
-import {Network} from "@/generated/flow";
+import {Network, Task} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
-import TaskMerklyNFT from "@/components/tasks/NFT/NFTMerkly/Block.vue";
-import MenuTaskMerklyNFT from "@/components/tasks/NFT/NFTMerkly/Menu.vue";
+import TaskMerklyNFT from "@/components/tasks/NFT/Merkly/Block.vue";
+import MenuTaskMerklyNFT from "@/components/tasks/NFT/Merkly/Menu.vue";
 
-import MintBlock from "@/components/tasks/NFT/NFTMerkly/mintBlock.vue";
-import MintMenu from "@/components/tasks/NFT/NFTMerkly/mintMenu.vue";
+import MintBlock from "@/components/tasks/NFT/Merkly/mintBlock.vue";
+import MintMenu from "@/components/tasks/NFT/Merkly/mintMenu.vue";
 
 export const NFTMerklySpec: TaskSpec = {
   deprecated: false,
@@ -14,10 +14,17 @@ export const NFTMerklySpec: TaskSpec = {
     const p = task.merklyMintAndBridgeNFTTask
     return ` (from ${p?.fromNetwork} to ${p?.toNetwork})`
   },
+  nft(task: Task) {
+    const p = task.merklyMintAndBridgeNFTTask
+    return {
+      network: p.fromNetwork,
+      toNetwork: p.toNetwork
+    }
+  },
   component: TaskMerklyNFT,
   menu: MenuTaskMerklyNFT,
   service: {
-    name: 'Merkly mint/bridge',
+    name: 'Merkly',
     link: 'https://minter.merkly.com/',
     img: '/icons/merkly.webp',
     op: 'mint/brdge NFT',
@@ -41,10 +48,16 @@ export const NFTMerklyMintSpec: TaskSpec = {
     const p = task.mintMerklyTask
     return ` (${p?.network})`
   },
+  nft(task: Task) {
+    const p = task.mintMerklyTask
+    return {
+      network: p.network,
+    }
+  },
   component: MintBlock,
   menu: MintMenu,
   service: {
-    name: 'Merkly mint',
+    name: 'Merkly',
     link: 'https://minter.merkly.com/',
     img: '/icons/merkly.webp',
     op: 'mint NFT',

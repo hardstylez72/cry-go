@@ -125,6 +125,9 @@ func (c *OdosMaker) Quote(ctx context.Context, in *defi.DefaultSwapReq) (*QuoteR
 	if !supported {
 		return nil, defi.ErrTokenNotSupportedFn(in.FromToken)
 	}
+	if in.ToToken == v1.Token_ETH {
+		toToken = defi.ZeroAddress
+	}
 
 	b := QuoteReq{
 		ChainId: int(c.ChainId.Int64()),

@@ -51,9 +51,7 @@ export default defineComponent({
     taskProps() {
       return taskProps
     },
-    link() {
-      return link
-    },
+
     getTxStatusColor(): string {
       const s = this.getTxStatus
       switch (s) {

@@ -46,9 +46,6 @@ export default defineComponent({
     }
   },
   computed: {
-    link() {
-      return link
-    },
     getStatus(): string {
       if (this.status == ProcessStatus.StatusDone) {
         return 'completed'

@@ -1,4 +1,4 @@
-import {Network, Task} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {BridgePair, SwapPair} from "@/components/helper";
 
@@ -37,6 +37,9 @@ export interface TaskSpec {
 
   descFn: DescFn
 
+  swap?: (task: Task) => { from: Token, to: Token, network: Network }
+  nft?: (task: Task) => { network: Network, toNetwork?: Network }
+  simple?: (task: Task) => { network: Network }
   service: Service
 
   networks: Set<Network>
@@ -58,7 +61,9 @@ export enum TaskJob {
 
   NFT = "NFT",
 
-  LP = 'LP'
+  LP = 'LP',
+
+  Simple = "Simple"
 }
 
 export enum Airdrop {

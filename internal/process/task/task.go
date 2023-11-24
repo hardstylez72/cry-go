@@ -6,6 +6,7 @@ import (
 	"time"
 
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/orbiter"
 	"github.com/hardstylez72/cry/internal/pay"
 	"github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -64,395 +65,1487 @@ const (
 	taskStarkNetTimeout = time.Minute * 10
 )
 
-var PayableTasks = []v1.TaskType{
-	v1.TaskType_SyncSwap,
-	v1.TaskType_StargateBridge,
-	v1.TaskType_ZkSyncOfficialBridgeToEthereum,
-	v1.TaskType_TestNetBridgeSwap,
-	v1.TaskType_SnapshotVote,
-	v1.TaskType_OrbiterBridge,
-	v1.TaskType_ZkSyncOfficialBridgeFromEthereum,
-	v1.TaskType_WETH,
-	v1.TaskType_MuteioSwap,
-	v1.TaskType_SyncSwapLP,
-	v1.TaskType_MaverickSwap,
-	v1.TaskType_SpaceFISwap,
-	v1.TaskType_VelocoreSwap,
-	v1.TaskType_IzumiSwap,
-	v1.TaskType_VeSyncSwap,
-	v1.TaskType_EzkaliburSwap,
-	v1.TaskType_ZkSwap,
-	v1.TaskType_TraderJoeSwap,
-	v1.TaskType_MerklyMintAndBridgeNFT,
-	v1.TaskType_DeployStarkNetAccount,
-	v1.TaskType_Swap10k,
-	v1.TaskType_PancakeSwap,
-	v1.TaskType_SithSwap,
-	v1.TaskType_JediSwap,
-	v1.TaskType_MySwap,
-	v1.TaskType_ProtossSwap,
-	v1.TaskType_StarkNetBridge,
-	v1.TaskType_Dmail,
-	v1.TaskType_StarkNetIdMint,
-	v1.TaskType_OdosSwap,
-	v1.TaskType_AcrossBridge,
-	v1.TaskType_AvnuSwap,
-	v1.TaskType_FibrousSwap,
-	v1.TaskType_ZkLendLP,
-	v1.TaskType_WoofiSwap,
-	v1.TaskType_AaveLP,
-	v1.TaskType_MintFun,
-	v1.TaskType_MintMerkly,
-	v1.TaskType_MintZerius,
-	v1.TaskType_KyberSwap,
+type Spec struct {
+	Payable  bool
+	Tasker   Tasker
+	Estimate func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error)
+	Desc     func(m *v1.Task) ([]byte, error)
+	CastR    func(in RandomTask) (*v1.Task, error)
+	Input    func(m *v1.Task) (*TaskInput, error)
+	Output   func(m *v1.Task) (*TaskOutput, error)
 }
 
-var NonPayableTasks = []v1.TaskType{
-	v1.TaskType_Delay,
-	v1.TaskType_OkexDeposit,
-	v1.TaskType_WithdrawExchange,
-	v1.TaskType_ExchangeSwap,
+type TaskInput struct {
+	NoInput bool
+	Native  bool
+	Token   v1.Token
+	Network v1.Network
 }
 
-var executors = map[v1.TaskType]Tasker{
-	v1.TaskType_StargateBridge:                   &Wrap{Tasker: &StargateTask{}},
-	v1.TaskType_Mock:                             &Wrap{Tasker: &mockTask{}},
-	v1.TaskType_Delay:                            &Wrap{Tasker: &taskDelay{}},
-	v1.TaskType_WithdrawExchange:                 &Wrap{Tasker: &WithdrawExchange{}},
-	v1.TaskType_OkexDeposit:                      &Wrap{Tasker: &OkexDepositTask{}},
-	v1.TaskType_TestNetBridgeSwap:                &Wrap{Tasker: &TestNetBridgeSwapTask{}},
-	v1.TaskType_SnapshotVote:                     &Wrap{Tasker: &SnapshotVoteTask{}},
-	v1.TaskType_OkexBinance:                      &Wrap{Tasker: &mockTask{}},
-	v1.TaskType_SyncSwap:                         &Wrap{Tasker: NewSyncSwapTask()},
-	v1.TaskType_ZkSyncOfficialBridgeToEthereum:   &Wrap{Tasker: &ZksyncOfficialBridgeToEthereumTask{}},
-	v1.TaskType_OrbiterBridge:                    &Wrap{Tasker: &OrbiterBridgeTask{}},
-	v1.TaskType_ZkSyncOfficialBridgeFromEthereum: &Wrap{Tasker: &ZksyncOfficialBridgeFromEthereumTask{}},
-	v1.TaskType_WETH:                             &Wrap{Tasker: &WethTask{}},
-	v1.TaskType_MuteioSwap:                       &Wrap{Tasker: NewMuteioSwapTask()},
-	v1.TaskType_SyncSwapLP:                       &Wrap{Tasker: &SyncSwapLPTask{}},
-	v1.TaskType_MaverickSwap:                     &Wrap{Tasker: NewMaverickSwapTask()},
-	v1.TaskType_SpaceFISwap:                      &Wrap{Tasker: NewSpaceFiSwapTask()},
-	v1.TaskType_VelocoreSwap:                     &Wrap{Tasker: NewVelocoreSwapTask()},
-	v1.TaskType_IzumiSwap:                        &Wrap{Tasker: NewIzumiSwapTask()},
-	v1.TaskType_VeSyncSwap:                       &Wrap{Tasker: NewVeSyncSwapTask()},
-	v1.TaskType_EzkaliburSwap:                    &Wrap{Tasker: NewEzkaliburSwapTask()},
-	v1.TaskType_ZkSwap:                           &Wrap{Tasker: NewZkSwapTask()},
-	v1.TaskType_TraderJoeSwap:                    &Wrap{Tasker: NewTraderJoeSwapTask()},
-	v1.TaskType_MerklyMintAndBridgeNFT:           &Wrap{Tasker: &MerklyMintAndBridgeNFTTask{}},
-	v1.TaskType_DeployStarkNetAccount:            &Wrap{Tasker: &DeployStarkNetAccountTask{}},
-	v1.TaskType_Swap10k:                          &Wrap{Tasker: NewSwap10kSwapTask()},
-	v1.TaskType_PancakeSwap:                      &Wrap{Tasker: NewPancakeSwapTask()},
-	v1.TaskType_SithSwap:                         &Wrap{Tasker: NewSithSwapTask()},
-	v1.TaskType_JediSwap:                         &Wrap{Tasker: NewJediSwapTask()},
-	v1.TaskType_MySwap:                           &Wrap{Tasker: NewMySwapSwapTask()},
-	v1.TaskType_ProtossSwap:                      &Wrap{Tasker: NewProtossSwapTask()},
-	v1.TaskType_StarkNetBridge:                   &Wrap{Tasker: NewStarkNetBridgeTask()},
-	v1.TaskType_Dmail:                            &Wrap{Tasker: &DmailTask{}},
-	v1.TaskType_StarkNetIdMint:                   &Wrap{Tasker: NewStarkNetIdMintTask()},
-	v1.TaskType_OdosSwap:                         &Wrap{Tasker: NewOdosSwapTask()},
-	v1.TaskType_AcrossBridge:                     &Wrap{Tasker: NewAcrossBridgeTask()},
-	v1.TaskType_AvnuSwap:                         &Wrap{Tasker: NewAvnuSwapTask()},
-	v1.TaskType_FibrousSwap:                      &Wrap{Tasker: NewFibrousSwapTask()},
-	v1.TaskType_ExchangeSwap:                     &Wrap{Tasker: &ExchangeSwapTask{}},
-	v1.TaskType_ZkLendLP:                         &Wrap{Tasker: NewZkLendLPTask()},
-	v1.TaskType_WoofiSwap:                        &Wrap{Tasker: NewWoofiSwapTask()},
-	v1.TaskType_AaveLP:                           &Wrap{Tasker: NewAaveLPTask()},
-	v1.TaskType_MintFun:                          &Wrap{Tasker: NewMintFunMintTask()},
-	v1.TaskType_MintMerkly:                       &Wrap{Tasker: NewMerklyMintTask()},
-	v1.TaskType_MintZerius:                       &Wrap{Tasker: NewZeriusMintTask()},
-	v1.TaskType_KyberSwap:                        &Wrap{Tasker: NewKyberSwapTask()},
+type TaskOutput struct {
+	NoOutput bool
+	Token    v1.Token
+	Network  v1.Network
+}
+
+type EstimateArg struct {
+	Task                 *v1.Task
+	Profile              *halp.Profile
+	ProfileService       *halp.Halp
+	WithdrawerRepository repository.WithdrawerRepository
+	ProfileRepository    repository.ProfileRepository
+	OrbiterService       *orbiter.Service
+}
+
+var SpecMap = map[v1.TaskType]Spec{
+	//OTHER
+	v1.TaskType_DeployStarkNetAccount: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &DeployStarkNetAccountTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_DeployStarkNetAccountTask).DeployStarkNetAccountTask
+			return EstimateDeployStarkNetAccountCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_DeployStarkNetAccountTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_DeployStarkNetAccountTask)")
+			}
+			return Marshal(t.DeployStarkNetAccountTask)
+		},
+	},
+	v1.TaskType_Dmail: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &DmailTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_DmailTask).DmailTask
+			return EstimateDmailSwapCost(ctx, p, a.Profile)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_DmailTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_DmailTask)")
+			}
+			return Marshal(t.DmailTask)
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			t, ok := m.Task.(*v1.Task_DmailTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_DmailTask)")
+			}
+			return &TaskInput{
+				Native:  true,
+				Network: t.DmailTask.Network,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			t, ok := m.Task.(*v1.Task_DmailTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_DmailTask)")
+			}
+			return &TaskOutput{
+				NoOutput: true,
+				Network:  t.DmailTask.Network,
+			}, nil
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_DmailTask{DmailTask: CastDefaultSimple(in.P)},
+			}, nil
+		},
+	},
+	v1.TaskType_Delay: {
+		Payable:  false,
+		Tasker:   &Wrap{Tasker: &taskDelay{}},
+		Estimate: nil,
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_DelayTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_DelayTask)")
+			}
+			return Marshal(t.DelayTask)
+		},
+		CastR: nil,
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			_, ok := m.Task.(*v1.Task_DelayTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_DelayTask)")
+			}
+			return &TaskInput{
+				NoInput: true,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			_, ok := m.Task.(*v1.Task_DelayTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_DelayTask)")
+			}
+			return &TaskOutput{
+				NoOutput: true,
+			}, nil
+		},
+	},
+	v1.TaskType_OkexDeposit: {
+		Payable: false,
+		Tasker:  &Wrap{Tasker: &OkexDepositTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_OkexDepositTask).OkexDepositTask
+			return EstimateOkexDepositCost(ctx, a.Profile, p, a.WithdrawerRepository)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_OkexDepositTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_OkexDepositTask)")
+			}
+			return Marshal(t.OkexDepositTask)
+		},
+		CastR: nil,
+	},
+	v1.TaskType_WithdrawExchange: {
+		Payable:  false,
+		Tasker:   &Wrap{Tasker: &WithdrawExchange{}},
+		Estimate: nil,
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_WithdrawExchangeTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_WithdrawExchangeTask)")
+			}
+			return Marshal(t.WithdrawExchangeTask)
+		},
+		CastR: nil,
+	},
+	v1.TaskType_ExchangeSwap: {
+		Payable:  false,
+		Tasker:   &Wrap{Tasker: &ExchangeSwapTask{}},
+		Estimate: nil,
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_ExchangeSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ExchangeSwapTask)")
+			}
+			return Marshal(t.ExchangeSwapTask)
+		},
+		CastR: nil,
+	},
+	v1.TaskType_Mock: {
+		Payable:  false,
+		Tasker:   &Wrap{Tasker: &mockTask{}},
+		Estimate: nil,
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MockTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MockTask)")
+			}
+			return Marshal(t.MockTask)
+		},
+	},
+	v1.TaskType_SnapshotVote: {
+		Payable:  true,
+		Tasker:   &Wrap{Tasker: &SnapshotVoteTask{}},
+		Estimate: nil,
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_SnapshotVoteTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SnapshotVoteTask)")
+			}
+			return Marshal(t.SnapshotVoteTask)
+		},
+	},
+	v1.TaskType_OkexBinance: {
+		Payable:  true,
+		Tasker:   &Wrap{Tasker: &mockTask{}},
+		Estimate: nil,
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_OkexBinanaceTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_OkexDepositTask)")
+			}
+			return Marshal(t.OkexBinanaceTask)
+		},
+	},
+	v1.TaskType_WETH: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &WethTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_WETHTask).WETHTask
+			return EstimateWethTaskCost(ctx, p, a.Profile)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_WETHTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_WETHTask)")
+			}
+			return Marshal(t.WETHTask)
+		},
+	},
+	// LP
+	v1.TaskType_SyncSwapLP: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &SyncSwapLPTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_SyncSwapLPTask).SyncSwapLPTask
+			return EstimateSyncSwapLPCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_SyncSwapLPTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SyncSwapLPTask)")
+			}
+			return Marshal(t.SyncSwapLPTask)
+		},
+	},
+	v1.TaskType_ZkLendLP: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewZkLendLPTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_ZkLendLPTask).ZkLendLPTask
+			return NewZkLendLPTask().EstimateLPCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_ZkLendLPTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ZkLandLPTask)")
+			}
+			return Marshal(t.ZkLendLPTask)
+		},
+	},
+	v1.TaskType_AaveLP: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewAaveLPTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_AaveLPTask).AaveLPTask
+			return NewAaveLPTask().EstimateLPCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_AaveLPTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_AaveLPTask)")
+			}
+			return Marshal(t.AaveLPTask)
+		},
+	},
+	// NFT
+	v1.TaskType_MintFun: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewMintFunMintTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_MintFunTask).MintFunTask
+			return NewMintFunMintTask().EstimateCost(ctx, p, a.Profile)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MintFunTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintFunTask)")
+			}
+			return Marshal(t.MintFunTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_MintFunTask{MintFunTask: CastDefaultSimple(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			_, ok := m.Task.(*v1.Task_MintFunTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintFunTask)")
+			}
+			return &TaskInput{
+				NoInput: true,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			_, ok := m.Task.(*v1.Task_MintFunTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintFunTask)")
+			}
+			return &TaskOutput{
+				NoOutput: true,
+			}, nil
+		},
+	},
+	v1.TaskType_MintMerkly: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewMerklyMintTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_MintMerklyTask).MintMerklyTask
+			return NewMerklyMintTask().EstimateCost(ctx, p, a.Profile)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MintMerklyTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintMerklyTask)")
+			}
+			return Marshal(t.MintMerklyTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_MintMerklyTask{MintMerklyTask: CastDefaultSimple(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			_, ok := m.Task.(*v1.Task_MintMerklyTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintMerklyTask)")
+			}
+			return &TaskInput{
+				NoInput: true,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			_, ok := m.Task.(*v1.Task_MintMerklyTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintMerklyTask)")
+			}
+			return &TaskOutput{
+				NoOutput: true,
+			}, nil
+		},
+	},
+	v1.TaskType_MintZerius: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewZeriusMintTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_MintZeriusTask).MintZeriusTask
+			return NewZeriusMintTask().EstimateCost(ctx, p, a.Profile)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MintZeriusTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintZeriusTask)")
+			}
+			return Marshal(t.MintZeriusTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_MintZeriusTask{MintZeriusTask: CastDefaultSimple(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			_, ok := m.Task.(*v1.Task_MintZeriusTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintZeriusTask)")
+			}
+			return &TaskInput{
+				NoInput: true,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			_, ok := m.Task.(*v1.Task_MintZeriusTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintZeriusTask)")
+			}
+			return &TaskOutput{
+				NoOutput: true,
+			}, nil
+		},
+	},
+	v1.TaskType_StarkNetIdMint: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewStarkNetIdMintTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_StarkNetIdMintTask).StarkNetIdMintTask
+			return NewStarkNetIdMintTask().EstimateCost(ctx, p, a.Profile)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_StarkNetIdMintTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.StarkNetIdMintTask)")
+			}
+			return Marshal(t.StarkNetIdMintTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_StarkNetIdMintTask{StarkNetIdMintTask: CastDefaultSimple(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			_, ok := m.Task.(*v1.Task_StarkNetIdMintTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_StarkNetIdMintTask)")
+			}
+			return &TaskInput{
+				NoInput: true,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			_, ok := m.Task.(*v1.Task_StarkNetIdMintTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_StarkNetIdMintTask)")
+			}
+			return &TaskOutput{
+				NoOutput: true,
+			}, nil
+		},
+	},
+	v1.TaskType_MerklyMintAndBridgeNFT: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &MerklyMintAndBridgeNFTTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_MerklyMintAndBridgeNFTTask).MerklyMintAndBridgeNFTTask
+			return EstimateMerklyMintCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)")
+			}
+			return Marshal(t.MerklyMintAndBridgeNFTTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			from := CastDefaultSimple(in.P).Network
+			return &v1.Task{
+				TaskType: in.Type,
+				Task: &v1.Task_MerklyMintAndBridgeNFTTask{MerklyMintAndBridgeNFTTask: &v1.MerklyMintAndBridgeNFTTask{
+					FromNetwork: from,
+					ToNetwork:   v1.Network_POLIGON, //todo: fix
+				}},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			_, ok := m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)")
+			}
+			return &TaskInput{
+				NoInput: true,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			_, ok := m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)")
+			}
+			return &TaskOutput{
+				NoOutput: true,
+			}, nil
+		},
+	},
+	//BRIDGES
+	v1.TaskType_ZkSyncOfficialBridgeToEthereum: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &ZksyncOfficialBridgeToEthereumTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask).ZkSyncOfficialBridgeToEthereumTask
+			return EstimateZkSyncOfficialBridgeToEthSwapCost(ctx, a.Profile, p)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask)")
+			}
+			return Marshal(t.ZkSyncOfficialBridgeToEthereumTask)
+		},
+	},
+	v1.TaskType_ZkSyncOfficialBridgeFromEthereum: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &ZksyncOfficialBridgeFromEthereumTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask).ZkSyncOfficialBridgeFromEthereumTask
+			return EstimateZkSyncOfficialBridgeFromEthSwapCost(ctx, a.Profile, p)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask)")
+			}
+			return Marshal(t.ZkSyncOfficialBridgeFromEthereumTask)
+		},
+	},
+	v1.TaskType_OrbiterBridge: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &OrbiterBridgeTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_OrbiterBridgeTask).OrbiterBridgeTask
+			return EstimateOrbiterBridgeCost(ctx, a.OrbiterService, a.Profile, p)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_OrbiterBridgeTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_OrbiterBridgeTask)")
+			}
+			return Marshal(t.OrbiterBridgeTask)
+		},
+	},
+	v1.TaskType_StargateBridge: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &StargateTask{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_StargateBridgeTask).StargateBridgeTask
+			return EstimateStargateBridgeSwapCost(ctx, p, a.Profile)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_StargateBridgeTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_StargateBridgeTask)")
+			}
+			return Marshal(t.StargateBridgeTask)
+		},
+	},
+	v1.TaskType_AcrossBridge: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewAcrossBridgeTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_AcrossBridgeTask).AcrossBridgeTask
+			return NewAcrossBridgeTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_AcrossBridgeTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_AcrossBridgeTask)")
+			}
+			return Marshal(t.AcrossBridgeTask)
+		},
+	},
+	v1.TaskType_StarkNetBridge: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewStarkNetBridgeTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_StarkNetBridgeTask).StarkNetBridgeTask
+			from, to, errr := LiquidityBridgeProfiles(ctx, a.ProfileService, a.ProfileRepository, p, a.Profile)
+			if errr != nil {
+				return nil, errr
+			}
+			return (&DefaultLiquidityBridgeTaskHalper{v1.TaskType_StarkNetBridge}).EstimateCost(ctx, from, to, p, nil, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_StarkNetBridgeTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_StarkNetBridgeTask)")
+			}
+			return Marshal(t.StarkNetBridgeTask)
+		},
+	},
+	// SWAPS
+	v1.TaskType_TestNetBridgeSwap: {
+		Payable:  true,
+		Tasker:   &Wrap{Tasker: &TestNetBridgeSwapTask{}},
+		Estimate: nil,
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_TestNetBridgeSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_TestNetBridgeSwapTask)")
+			}
+			return Marshal(t.TestNetBridgeSwapTask)
+		},
+	},
+	v1.TaskType_SyncSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewSyncSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_SyncSwapTask).SyncSwapTask
+			return NewSyncSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_SyncSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SyncSwapTask)")
+			}
+			return Marshal(t.SyncSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_SyncSwapTask{SyncSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_SyncSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SyncSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.SyncSwapTask.Network,
+				Token:   p.SyncSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_SyncSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SyncSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.SyncSwapTask.Network,
+				Token:   p.SyncSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_VelocoreSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewVelocoreSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_VelocoreSwapTask).VelocoreSwapTask
+			return NewVelocoreSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_VelocoreSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_VelocoreSwapTask)")
+			}
+			return Marshal(t.VelocoreSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_VelocoreSwapTask{VelocoreSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_VelocoreSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_VelocoreSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.VelocoreSwapTask.Network,
+				Token:   p.VelocoreSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_VelocoreSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_VelocoreSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.VelocoreSwapTask.Network,
+				Token:   p.VelocoreSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_SpaceFISwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewSpaceFiSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_SpaceFiSwapTask).SpaceFiSwapTask
+			return NewSpaceFiSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_SpaceFiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SpaceFiSwapTask)")
+			}
+			return Marshal(t.SpaceFiSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_SpaceFiSwapTask{SpaceFiSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_SpaceFiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SpaceFiSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.SpaceFiSwapTask.Network,
+				Token:   p.SpaceFiSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_SpaceFiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SpaceFiSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.SpaceFiSwapTask.Network,
+				Token:   p.SpaceFiSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_MaverickSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewMaverickSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_MaverickSwapTask).MaverickSwapTask
+			return NewMaverickSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MaverickSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MaverickSwapTask)")
+			}
+			return Marshal(t.MaverickSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_MaverickSwapTask{MaverickSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_MaverickSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MaverickSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.MaverickSwapTask.Network,
+				Token:   p.MaverickSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_MaverickSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MaverickSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.MaverickSwapTask.Network,
+				Token:   p.MaverickSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_MuteioSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewMuteioSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_MuteioSwapTask).MuteioSwapTask
+			return NewMuteioSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MuteioSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MuteioSwapTask)")
+			}
+			return Marshal(t.MuteioSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_MuteioSwapTask{MuteioSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_MuteioSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MuteioSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.MuteioSwapTask.Network,
+				Token:   p.MuteioSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_MuteioSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MuteioSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.MuteioSwapTask.Network,
+				Token:   p.MuteioSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_IzumiSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewIzumiSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_IzumiSwapTask).IzumiSwapTask
+			return NewIzumiSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_IzumiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_IzumiSwapTask)")
+			}
+			return Marshal(t.IzumiSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_IzumiSwapTask{IzumiSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_IzumiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_IzumiSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.IzumiSwapTask.Network,
+				Token:   p.IzumiSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_IzumiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_IzumiSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.IzumiSwapTask.Network,
+				Token:   p.IzumiSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_VeSyncSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewVeSyncSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_VeSyncSwapTask).VeSyncSwapTask
+			return NewVeSyncSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_VeSyncSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_VeSyncSwapTask)")
+			}
+			return Marshal(t.VeSyncSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_VeSyncSwapTask{VeSyncSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_VeSyncSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_VeSyncSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.VeSyncSwapTask.Network,
+				Token:   p.VeSyncSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_VeSyncSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_VeSyncSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.VeSyncSwapTask.Network,
+				Token:   p.VeSyncSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_EzkaliburSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewEzkaliburSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_EzkaliburSwapTask).EzkaliburSwapTask
+			return NewEzkaliburSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_EzkaliburSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_EzkaliburSwapTask)")
+			}
+			return Marshal(t.EzkaliburSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_EzkaliburSwapTask{EzkaliburSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_EzkaliburSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_EzkaliburSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.EzkaliburSwapTask.Network,
+				Token:   p.EzkaliburSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_EzkaliburSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_EzkaliburSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.EzkaliburSwapTask.Network,
+				Token:   p.EzkaliburSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_ZkSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewZkSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_ZkSwapTask).ZkSwapTask
+			return NewZkSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_ZkSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ZkSwapTask)")
+			}
+			return Marshal(t.ZkSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_ZkSwapTask{ZkSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_ZkSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ZkSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.ZkSwapTask.Network,
+				Token:   p.ZkSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_ZkSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ZkSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.ZkSwapTask.Network,
+				Token:   p.ZkSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_TraderJoeSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewTraderJoeSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_TraderJoeSwapTask).TraderJoeSwapTask
+			return NewTraderJoeSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_TraderJoeSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_TraderJoeSwapTask)")
+			}
+			return Marshal(t.TraderJoeSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_TraderJoeSwapTask{TraderJoeSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_TraderJoeSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_TraderJoeSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.TraderJoeSwapTask.Network,
+				Token:   p.TraderJoeSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_TraderJoeSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_TraderJoeSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.TraderJoeSwapTask.Network,
+				Token:   p.TraderJoeSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_Swap10k: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewSwap10kSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_Swap10K).Swap10K
+			return (&StarketSwapHalper{v1.TaskType_Swap10k}).EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_Swap10K)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_Swap10K)")
+			}
+			return Marshal(t.Swap10K)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_Swap10K{Swap10K: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_Swap10K)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_Swap10K)")
+			}
+			return &TaskInput{
+				Network: p.Swap10K.Network,
+				Token:   p.Swap10K.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_Swap10K)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_Swap10K)")
+			}
+			return &TaskOutput{
+				Network: p.Swap10K.Network,
+				Token:   p.Swap10K.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_PancakeSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewPancakeSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_PancakeSwapTask).PancakeSwapTask
+			return NewPancakeSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_PancakeSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_PancakeSwapTask)")
+			}
+			return Marshal(t.PancakeSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_PancakeSwapTask{PancakeSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_PancakeSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_PancakeSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.PancakeSwapTask.Network,
+				Token:   p.PancakeSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_PancakeSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_PancakeSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.PancakeSwapTask.Network,
+				Token:   p.PancakeSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_SithSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewSithSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_SithSwapTask).SithSwapTask
+			return (&StarketSwapHalper{v1.TaskType_SithSwap}).EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_SithSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SithSwapTask)")
+			}
+			return Marshal(t.SithSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_SithSwapTask{SithSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_SithSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SithSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.SithSwapTask.Network,
+				Token:   p.SithSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_SithSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_SithSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.SithSwapTask.Network,
+				Token:   p.SithSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_JediSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewJediSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_JediSwapTask).JediSwapTask
+			return (&StarketSwapHalper{v1.TaskType_JediSwap}).EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_JediSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_JediSwapTask)")
+			}
+			return Marshal(t.JediSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_JediSwapTask{JediSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_JediSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_JediSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.JediSwapTask.Network,
+				Token:   p.JediSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_JediSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_JediSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.JediSwapTask.Network,
+				Token:   p.JediSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_MySwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewMySwapSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_MySwapTask).MySwapTask
+			return (&StarketSwapHalper{v1.TaskType_MySwap}).EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MySwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MySwapTask)")
+			}
+			return Marshal(t.MySwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_MySwapTask{MySwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_MySwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MySwapTask)")
+			}
+			return &TaskInput{
+				Network: p.MySwapTask.Network,
+				Token:   p.MySwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_MySwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MySwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.MySwapTask.Network,
+				Token:   p.MySwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_ProtossSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewProtossSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_ProtosSwapTask).ProtosSwapTask
+			return (&StarketSwapHalper{v1.TaskType_ProtossSwap}).EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_ProtosSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ProtosSwapTask)")
+			}
+			return Marshal(t.ProtosSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_ProtosSwapTask{ProtosSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_ProtosSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ProtosSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.ProtosSwapTask.Network,
+				Token:   p.ProtosSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_ProtosSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_ProtosSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.ProtosSwapTask.Network,
+				Token:   p.ProtosSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_OdosSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewOdosSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_OdosSwapTask).OdosSwapTask
+			return NewOdosSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_OdosSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_OdosSwapTask)")
+			}
+			return Marshal(t.OdosSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_OdosSwapTask{OdosSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_OdosSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_OdosSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.OdosSwapTask.Network,
+				Token:   p.OdosSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_OdosSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_OdosSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.OdosSwapTask.Network,
+				Token:   p.OdosSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_AvnuSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewAvnuSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_AvnuSwapTask).AvnuSwapTask
+			return NewAvnuSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_AvnuSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_AvnuSwapTask)")
+			}
+			return Marshal(t.AvnuSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_AvnuSwapTask{AvnuSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_AvnuSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_AvnuSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.AvnuSwapTask.Network,
+				Token:   p.AvnuSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_AvnuSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_AvnuSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.AvnuSwapTask.Network,
+				Token:   p.AvnuSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_FibrousSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewFibrousSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_FibrousSwapTask).FibrousSwapTask
+			return NewFibrousSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_FibrousSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_FibrousSwapTask)")
+			}
+			return Marshal(t.FibrousSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_FibrousSwapTask{FibrousSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_FibrousSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_FibrousSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.FibrousSwapTask.Network,
+				Token:   p.FibrousSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_FibrousSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_FibrousSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.FibrousSwapTask.Network,
+				Token:   p.FibrousSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_WoofiSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewWoofiSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_WoofiSwapTask).WoofiSwapTask
+			return NewWoofiSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_WoofiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_WoofiSwapTask)")
+			}
+			return Marshal(t.WoofiSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_WoofiSwapTask{WoofiSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_WoofiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_WoofiSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.WoofiSwapTask.Network,
+				Token:   p.WoofiSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_WoofiSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_WoofiSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.WoofiSwapTask.Network,
+				Token:   p.WoofiSwapTask.ToToken,
+			}, nil
+		},
+	},
+	v1.TaskType_KyberSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewKyberSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_KyberSwapTask).KyberSwapTask
+			return NewKyberSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_KyberSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MintZeriusTask)")
+			}
+			return Marshal(t.KyberSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_KyberSwapTask{KyberSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_KyberSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_KyberSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.KyberSwapTask.Network,
+				Token:   p.KyberSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_KyberSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_KyberSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.KyberSwapTask.Network,
+				Token:   p.KyberSwapTask.ToToken,
+			}, nil
+		},
+	},
+}
+
+func CastDefaultSwap(p any) *v1.DefaultSwap {
+
+	pa := p.(*v1.RPswapItem)
+
+	am := &v1.Amount{
+		Kind: &v1.Amount_SendAll{
+			SendAll: true,
+		},
+	}
+
+	if pa.From.String() == bozdo.NativeTokenMap[pa.Network].String() {
+		am = &v1.Amount{
+			Kind: &v1.Amount_SendPercent{
+				SendPercent: 80,
+			},
+		}
+	}
+
+	return &v1.DefaultSwap{
+		Amount:    am,
+		Network:   pa.Network,
+		FromToken: pa.From,
+		ToToken:   pa.To,
+	}
+}
+
+func CastDefaultSimple(p any) *v1.SimpleTask {
+
+	pa := p.(*v1.RPsimple)
+
+	return &v1.SimpleTask{
+		Network: pa.Network,
+	}
 }
 
 func GetTaskDesc(m *v1.Task) ([]byte, error) {
-	switch m.TaskType {
-	case v1.TaskType_Delay:
-		t, ok := m.Task.(*v1.Task_DelayTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_DelayTask)")
-		}
-		return Marshal(t.DelayTask)
-	case v1.TaskType_SnapshotVote:
-		t, ok := m.Task.(*v1.Task_SnapshotVoteTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_SnapshotVoteTask)")
-		}
-		return Marshal(t.SnapshotVoteTask)
-	case v1.TaskType_StargateBridge:
-		t, ok := m.Task.(*v1.Task_StargateBridgeTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_StargateBridgeTask)")
-		}
-		return Marshal(t.StargateBridgeTask)
-	case v1.TaskType_Mock:
-		t, ok := m.Task.(*v1.Task_MockTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MockTask)")
-		}
-		return Marshal(t.MockTask)
-	case v1.TaskType_TestNetBridgeSwap:
-		t, ok := m.Task.(*v1.Task_TestNetBridgeSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_TestNetBridgeSwapTask)")
-		}
-		return Marshal(t.TestNetBridgeSwapTask)
-	case v1.TaskType_WithdrawExchange:
-		t, ok := m.Task.(*v1.Task_WithdrawExchangeTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_WithdrawExchangeTask)")
-		}
-		return Marshal(t.WithdrawExchangeTask)
-	case v1.TaskType_OkexDeposit:
-		t, ok := m.Task.(*v1.Task_OkexDepositTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_OkexDepositTask)")
-		}
-		return Marshal(t.OkexDepositTask)
-	case v1.TaskType_OkexBinance:
-		t, ok := m.Task.(*v1.Task_OkexBinanaceTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_OkexDepositTask)")
-		}
-		return Marshal(t.OkexBinanaceTask)
-	case v1.TaskType_SyncSwap:
-		t, ok := m.Task.(*v1.Task_SyncSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_SyncSwapTask)")
-		}
-		return Marshal(t.SyncSwapTask)
-	case v1.TaskType_ZkSyncOfficialBridgeToEthereum:
-		t, ok := m.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_ZkSyncOfficialBridgeToEthereumTask)")
-		}
-		return Marshal(t.ZkSyncOfficialBridgeToEthereumTask)
-	case v1.TaskType_OrbiterBridge:
-		t, ok := m.Task.(*v1.Task_OrbiterBridgeTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_OrbiterBridgeTask)")
-		}
-		return Marshal(t.OrbiterBridgeTask)
-	case v1.TaskType_ZkSyncOfficialBridgeFromEthereum:
-		t, ok := m.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_ZkSyncOfficialBridgeFromEthereumTask)")
-		}
-		return Marshal(t.ZkSyncOfficialBridgeFromEthereumTask)
-
-	case v1.TaskType_WETH:
-		t, ok := m.Task.(*v1.Task_WETHTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_WETHTask)")
-		}
-		return Marshal(t.WETHTask)
-	case v1.TaskType_MuteioSwap:
-		t, ok := m.Task.(*v1.Task_MuteioSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MuteioSwapTask)")
-		}
-		return Marshal(t.MuteioSwapTask)
-	case v1.TaskType_SyncSwapLP:
-		t, ok := m.Task.(*v1.Task_SyncSwapLPTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_SyncSwapLPTask)")
-		}
-		return Marshal(t.SyncSwapLPTask)
-	case v1.TaskType_MaverickSwap:
-		t, ok := m.Task.(*v1.Task_MaverickSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MaverickSwapTask)")
-		}
-		return Marshal(t.MaverickSwapTask)
-	case v1.TaskType_SpaceFISwap:
-		t, ok := m.Task.(*v1.Task_SpaceFiSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_SpaceFiSwapTask)")
-		}
-		return Marshal(t.SpaceFiSwapTask)
-	case v1.TaskType_VelocoreSwap:
-		t, ok := m.Task.(*v1.Task_VelocoreSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_VelocoreSwapTask)")
-		}
-		return Marshal(t.VelocoreSwapTask)
-	case v1.TaskType_IzumiSwap:
-		t, ok := m.Task.(*v1.Task_IzumiSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_IzumiSwapTask)")
-		}
-		return Marshal(t.IzumiSwapTask)
-	case v1.TaskType_VeSyncSwap:
-		t, ok := m.Task.(*v1.Task_VeSyncSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_VeSyncSwapTask)")
-		}
-		return Marshal(t.VeSyncSwapTask)
-	case v1.TaskType_EzkaliburSwap:
-		t, ok := m.Task.(*v1.Task_EzkaliburSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_EzkaliburSwapTask)")
-		}
-		return Marshal(t.EzkaliburSwapTask)
-	case v1.TaskType_ZkSwap:
-		t, ok := m.Task.(*v1.Task_ZkSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_ZkSwapTask)")
-		}
-		return Marshal(t.ZkSwapTask)
-	case v1.TaskType_TraderJoeSwap:
-		t, ok := m.Task.(*v1.Task_TraderJoeSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_TraderJoeSwapTask)")
-		}
-		return Marshal(t.TraderJoeSwapTask)
-	case v1.TaskType_MerklyMintAndBridgeNFT:
-		t, ok := m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MerklyMintAndBridgeNFTTask)")
-		}
-		return Marshal(t.MerklyMintAndBridgeNFTTask)
-	case v1.TaskType_DeployStarkNetAccount:
-		t, ok := m.Task.(*v1.Task_DeployStarkNetAccountTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_DeployStarkNetAccountTask)")
-		}
-		return Marshal(t.DeployStarkNetAccountTask)
-	case v1.TaskType_Swap10k:
-		t, ok := m.Task.(*v1.Task_Swap10K)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_Swap10K)")
-		}
-		return Marshal(t.Swap10K)
-	case v1.TaskType_PancakeSwap:
-		t, ok := m.Task.(*v1.Task_PancakeSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_PancakeSwapTask)")
-		}
-		return Marshal(t.PancakeSwapTask)
-	case v1.TaskType_SithSwap:
-		t, ok := m.Task.(*v1.Task_SithSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_SithSwapTask)")
-		}
-		return Marshal(t.SithSwapTask)
-	case v1.TaskType_JediSwap:
-		t, ok := m.Task.(*v1.Task_JediSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_JediSwapTask)")
-		}
-		return Marshal(t.JediSwapTask)
-	case v1.TaskType_MySwap:
-		t, ok := m.Task.(*v1.Task_MySwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MySwapTask)")
-		}
-		return Marshal(t.MySwapTask)
-	case v1.TaskType_ProtossSwap:
-		t, ok := m.Task.(*v1.Task_ProtosSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_ProtosSwapTask)")
-		}
-		return Marshal(t.ProtosSwapTask)
-	case v1.TaskType_StarkNetBridge:
-		t, ok := m.Task.(*v1.Task_StarkNetBridgeTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_StarkNetBridgeTask)")
-		}
-		return Marshal(t.StarkNetBridgeTask)
-	case v1.TaskType_Dmail:
-		t, ok := m.Task.(*v1.Task_DmailTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_DmailTask)")
-		}
-		return Marshal(t.DmailTask)
-	case v1.TaskType_StarkNetIdMint:
-		t, ok := m.Task.(*v1.Task_StarkNetIdMintTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.StarkNetIdMintTask)")
-		}
-		return Marshal(t.StarkNetIdMintTask)
-	case v1.TaskType_OdosSwap:
-		t, ok := m.Task.(*v1.Task_OdosSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_OdosSwapTask)")
-		}
-		return Marshal(t.OdosSwapTask)
-	case v1.TaskType_AcrossBridge:
-		t, ok := m.Task.(*v1.Task_AcrossBridgeTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_AcrossBridgeTask)")
-		}
-		return Marshal(t.AcrossBridgeTask)
-	case v1.TaskType_AvnuSwap:
-		t, ok := m.Task.(*v1.Task_AvnuSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_AvnuSwapTask)")
-		}
-		return Marshal(t.AvnuSwapTask)
-	case v1.TaskType_FibrousSwap:
-		t, ok := m.Task.(*v1.Task_FibrousSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_FibrousSwapTask)")
-		}
-		return Marshal(t.FibrousSwapTask)
-	case v1.TaskType_ExchangeSwap:
-		t, ok := m.Task.(*v1.Task_ExchangeSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_ExchangeSwapTask)")
-		}
-		return Marshal(t.ExchangeSwapTask)
-	case v1.TaskType_ZkLendLP:
-		t, ok := m.Task.(*v1.Task_ZkLendLPTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_ZkLandLPTask)")
-		}
-		return Marshal(t.ZkLendLPTask)
-	case v1.TaskType_WoofiSwap:
-		t, ok := m.Task.(*v1.Task_WoofiSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_WoofiSwapTask)")
-		}
-		return Marshal(t.WoofiSwapTask)
-	case v1.TaskType_AaveLP:
-		t, ok := m.Task.(*v1.Task_AaveLPTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_AaveLPTask)")
-		}
-		return Marshal(t.AaveLPTask)
-	case v1.TaskType_MintFun:
-		t, ok := m.Task.(*v1.Task_MintFunTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MintFunTask)")
-		}
-		return Marshal(t.MintFunTask)
-	case v1.TaskType_MintMerkly:
-		t, ok := m.Task.(*v1.Task_MintMerklyTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MintMerklyTask)")
-		}
-		return Marshal(t.MintMerklyTask)
-	case v1.TaskType_MintZerius:
-		t, ok := m.Task.(*v1.Task_MintZeriusTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MintZeriusTask)")
-		}
-		return Marshal(t.MintZeriusTask)
-	case v1.TaskType_KyberSwap:
-		t, ok := m.Task.(*v1.Task_KyberSwapTask)
-		if !ok {
-			return nil, errors.New("m.Task.(*v1.Task_MintZeriusTask)")
-		}
-		return Marshal(t.KyberSwapTask)
-	default:
-		return nil, errors.New("invalid task type: " + m.TaskType.String())
+	v, ok := SpecMap[m.TaskType]
+	if !ok {
+		return nil, errors.New("unknown task type")
 	}
+	return v.Desc(m)
 }
 
 func GetTask(t v1.TaskType) (Tasker, error) {
-	tasker, exist := executors[t]
+	tasker, exist := SpecMap[t]
 	if !exist {
 		return nil, errors.New("unknown task: " + t.String())
 	}
-	return tasker, nil
+	return tasker.Tasker, nil
 }
 
 type Wrap struct {
@@ -607,12 +1700,7 @@ func IsPayableTask(t v1.TaskType) bool {
 		return true
 	}
 
-	for _, tt := range PayableTasks {
-		if t == tt {
-			return true
-		}
-	}
-	return false
+	return SpecMap[t].Payable
 }
 
 func NeedPay(before, after *v1.ProcessTask) bool {

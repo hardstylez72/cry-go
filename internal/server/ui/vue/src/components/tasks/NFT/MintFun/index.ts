@@ -1,8 +1,8 @@
-import {Network} from "@/generated/flow";
+import {Network, Task} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
-import Block from "@/components/tasks/NFT/NFTMintFun/Block.vue";
-import Menu from "@/components/tasks/NFT/NFTMintFun/Menu.vue";
+import Block from "@/components/tasks/NFT/MintFun/Block.vue";
+import Menu from "@/components/tasks/NFT/MintFun/Menu.vue";
 
 export const NFTMintFunSpec: TaskSpec = {
   deprecated: false,
@@ -10,6 +10,12 @@ export const NFTMintFunSpec: TaskSpec = {
   descFn(task) {
     const p = task.mintFunTask
     return ` (${p?.network})`
+  },
+  nft(task: Task) {
+    const p = task.mintFunTask
+    return {
+      network: p.network,
+    }
   },
   component: Block,
   menu: Menu,

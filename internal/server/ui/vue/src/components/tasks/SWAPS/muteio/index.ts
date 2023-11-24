@@ -1,4 +1,4 @@
-import {Network, Token} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import TaskZkSwap from "@/components/tasks/SWAPS/ZkSwap/Block.vue";
@@ -15,6 +15,10 @@ export const MuteIOSwapSpec: TaskSpec = {
   descFn(task) {
     const p = task.muteioSwapTask
     return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+  },
+  swap: (task: Task) => {
+    const p = task.muteioSwapTask
+    return {from: p.fromToken, to: p.toToken, network: p.network}
   },
   service: {
     name: 'Mute.io',

@@ -92,7 +92,7 @@ export default defineComponent({
         [Network.OPTIMISM, [Token.ETH, Token.USDC, Token.USDT]],
       ]),
       item: {
-        network: Network.AVALANCHE,
+        network: Network.ARBITRUM,
         token: Token.USDT
       } as OkexDepositTask,
     }

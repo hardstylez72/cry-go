@@ -13,13 +13,14 @@
         density="compact"
         v-bind="props"
       >
-        Estimate
+        <v-icon icon="mdi-gas-station"></v-icon>
+        <v-tooltip activator="parent" location="top">Че по чем?</v-tooltip>
       </v-btn>
     </template>
 
     <v-card>
       <v-card-title class="d-flex justify-space-between">
-        <div>Market Estimation</div>
+        <div>Едем за бензином</div>
         <v-icon icon="mdi-close" @click="showTooltip = false"/>
       </v-card-title>
       <Loader v-if="loading"/>

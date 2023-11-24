@@ -6,7 +6,7 @@
   >
 
     <template v-slot:activator="{ props }">
-      <v-btn variant="outlined" @click="load" density="comfortable" v-bind="props">{{ label }}
+      <v-btn variant="outlined" @click="load" density="compact" v-bind="props">{{ label }}
       </v-btn>
     </template>
 

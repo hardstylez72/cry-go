@@ -196,11 +196,11 @@ import TaskChip from "@/components/tasks/TaskChip.vue";
 import {networkProps} from "@/components/helper";
 import TaskSelector from "@/components/flow/TaskSelector.vue";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
-import TaskSelectorMenu from "@/components/flow/TaskSelectorMenu.vue";
+import TaskSelectorMenu from "@/components/flow/TaskSelectorBtnMenu.vue";
 
 
 export default defineComponent({
-  name: "FlowForm",
+  name: "OldForm",
   computed: {
     isMobile() {
       return window.innerWidth < 1280

@@ -48,9 +48,6 @@ export default defineComponent({
     }
   },
   computed: {
-    link() {
-      return link
-    },
     getTxStatusColor(): string {
       const s = this.getTxStatus
       switch (s) {

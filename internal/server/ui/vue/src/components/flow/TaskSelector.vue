@@ -2,12 +2,15 @@
   <div cols="12" class="my-3"
        style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;">
     <v-col cols="12">
-      <div class="d-inline-flex align-center">{{ `Тип фильтра: ` }}
+
+
+      <div v-if="!baseNetworkFilter" class="d-inline-flex align-center">{{ `Тип фильтра: ` }}
         <v-radio-group inline="true" v-model="filterType" hide-details>
           <v-radio v-for="item in Filters" :value="item" :label="item"/>
         </v-radio-group>
       </div>
-      <div>Значения фильтра:
+
+      <div v-if="!baseNetworkFilter">Значения фильтра:
         <v-radio-group v-if="filterType === 'Сеть'" v-model="filterNetwork" inline="true">
           <v-chip density="compact" size="5px" value="Все сети" @click="filterNetwork = 'Все сети'">{{
               "Все сети"
@@ -25,12 +28,15 @@
         </v-radio-group>
 
       </div>
-      <div v-for="job in taskJobs" class="d-flex flex-wrap">
-        <v-divider class="my-1"/>
-        <b>{{ job }}</b>
-        <div v-for="tt in filterTasksByJob(job)">
-          <TaskChip class="mx-1 my-1" @click="addStep(tt)" :task-type="tt"/>
+      <div v-for="job in taskJobs">
+        <div v-if="!ignoreJob(job)" class="d-flex flex-wrap">
+          <v-divider class="my-1"/>
+          <b>{{ job }}</b>
+          <div v-for="tt in groupTasksByJob(job)">
+            <TaskChip class="mx-1 my-1" @click="addStep(tt)" :task-type="tt"/>
+          </div>
         </div>
+
       </div>
     </v-col>
   </div>
@@ -69,6 +75,14 @@ export default defineComponent({
     draggable,
   },
   watch: {
+    baseNetworkFilter: {
+      immediate: true,
+      handler() {
+        if (this.baseNetworkFilter) {
+          this.filterNetwork = this.baseNetworkFilter
+        }
+      },
+    },
     filterNetwork: {
       handler() {
         this.getTaskList()
@@ -86,6 +100,14 @@ export default defineComponent({
     }
   },
   props: {
+    excludeJobs: {
+      type: Array as PropType<TaskJob[]>,
+      required: false,
+    },
+    baseNetworkFilter: {
+      type: String as PropType<Network>,
+      required: false,
+    },
     disable: {
       type: Boolean as PropType<boolean>,
       required: false,
@@ -113,7 +135,10 @@ export default defineComponent({
     }
   },
   methods: {
-    filterTasksByJob(job: TaskJob): TaskType[] {
+    ignoreJob(job: TaskJob): boolean {
+      return this.excludeJobs && this.excludeJobs.some(j => job == j)
+    },
+    groupTasksByJob(job: TaskJob): TaskType[] {
       const out: TaskType[] = []
 
       this.taskTypes.forEach((taskType) => {

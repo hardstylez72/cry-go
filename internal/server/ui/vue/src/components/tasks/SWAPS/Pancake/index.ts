@@ -1,4 +1,4 @@
-import {Network, Token} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import TaskPancakeSwap from "@/components/tasks/SWAPS/Pancake/Block.vue";
@@ -12,10 +12,14 @@ export const PancakeSwapSpec: TaskSpec = {
     const p = task.pancakeSwapTask
     return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
   },
+  swap: (task: Task) => {
+    const p = task.pancakeSwapTask
+    return {from: p.fromToken, to: p.toToken, network: p.network}
+  },
   component: TaskPancakeSwap,
   menu: PancakeSwap,
   service: {
-    name: 'PancakeSwap',
+    name: 'Pancake',
     link: 'https://pancakeswap.finance/',
     img: '/icons/pancake.ico',
     op: 'swap',

@@ -1,5 +1,5 @@
 <template>
-  <v-chip :density="size" variant="tonal" :color="GetStatusColor(status)">
+  <v-chip :density="size" variant="tonal" elevation="1" :style="`background-color: ${GetStatusColor(status)}`">
     {{ GetStatusText(status) }}
     <v-menu v-if="msg" v-model="showMsg"
             width="400px" persistent :close-on-content-click="false" :close-on-back="false">

@@ -5,7 +5,7 @@ import MenuTaskWethSwap from "@/components/tasks/SWAPS/WETH/Menu.vue";
 import TaskWethSwap from "@/components/tasks/SWAPS/WETH/Block.vue";
 
 export const WETHSwapSpec: TaskSpec = {
-  deprecated: false,
+  deprecated: true,
   menu: MenuTaskWethSwap,
   component: TaskWethSwap,
   canBeEstimated: true,

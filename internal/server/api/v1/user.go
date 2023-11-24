@@ -7,7 +7,6 @@ import (
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
 	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
-	"github.com/hardstylez72/cry/internal/process/task"
 	"github.com/hardstylez72/cry/internal/server/repository/pg"
 	"github.com/hardstylez72/cry/internal/server/user"
 	"github.com/hardstylez72/cry/internal/settings"
@@ -56,13 +55,13 @@ func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.
 	}
 
 	return &v1.GetUserResponse{
-		Id:              u.Id,
-		Email:           u.Email,
-		Funds:           lib.FloatToString(res.GetAccount().GetFunds()),
-		TaskPrice:       lib.FloatToString(res.GetAccount().GetTaskPrice()),
-		PayableTasks:    task.PayableTasks,
-		NonpayableTasks: task.NonPayableTasks,
-		Groups:          groups.Keys(),
-		Promo:           res.Account.Promo,
+		Id:        u.Id,
+		Email:     u.Email,
+		Funds:     lib.FloatToString(res.GetAccount().GetFunds()),
+		TaskPrice: lib.FloatToString(res.GetAccount().GetTaskPrice()),
+		//PayableTasks:    task.PayableTasks,
+		//NonpayableTasks: task.NonPayableTasks,
+		Groups: groups.Keys(),
+		Promo:  res.Account.Promo,
 	}, nil
 }

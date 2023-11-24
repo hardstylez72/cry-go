@@ -16,6 +16,7 @@ import (
 	"github.com/hardstylez72/cry/internal/server/user"
 	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -73,80 +74,167 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 		return nil, err
 	}
 
-	flow, err := f.ToPB()
-	if err != nil {
-		return nil, err
-	}
-
-	profiles := make([]*v1.ProcessProfile, 0)
-
-	for profileWeight, profileId := range req.ProfileIds {
-
-		tasks := []v1.Task{}
-		for i := range flow.Tasks {
-			tasks = append(tasks, *flow.Tasks[i])
-		}
-
-		randomTasks := []v1.Task{}
-		for i := range flow.RandomTasks {
-			randomTasks = append(randomTasks, *flow.RandomTasks[i])
-		}
-
-		processTasks, err := addRandomTasks(tasks, randomTasks)
+	if f.Version == 1 {
+		flow, err := f.ToPB()
 		if err != nil {
-			return nil, errors.Wrap(err, "lib.Marshal")
+			return nil, err
 		}
 
-		for i := range processTasks {
-			println(processTasks[i].Task.TaskType.String() + strconv.Itoa(int(processTasks[i].Task.Weight)))
+		profiles := make([]*v1.ProcessProfile, 0)
+
+		for profileWeight, profileId := range req.ProfileIds {
+
+			tasks := []v1.Task{}
+			for i := range flow.Tasks {
+				tasks = append(tasks, *flow.Tasks[i])
+			}
+
+			randomTasks := []v1.Task{}
+			for i := range flow.RandomTasks {
+				randomTasks = append(randomTasks, *flow.RandomTasks[i])
+			}
+
+			processTasks, err := addRandomTasks(tasks, randomTasks)
+			if err != nil {
+				return nil, errors.Wrap(err, "lib.Marshal")
+			}
+
+			for i := range processTasks {
+				println(processTasks[i].Task.TaskType.String() + strconv.Itoa(int(processTasks[i].Task.Weight)))
+			}
+
+			profiles = append(profiles, &v1.ProcessProfile{
+				ProfileId: profileId,
+				Id:        uuid.New().String(),
+				Weight:    int64(profileWeight),
+				Tasks:     processTasks,
+				Status:    v1.ProcessStatus_StatusReady,
+			})
 		}
 
-		profiles = append(profiles, &v1.ProcessProfile{
-			ProfileId: profileId,
-			Id:        uuid.New().String(),
-			Weight:    int64(profileWeight),
-			Tasks:     processTasks,
-			Status:    v1.ProcessStatus_StatusReady,
-		})
+		status := v1.ProcessStatus_StatusStop
+		if req.RunAfter != nil {
+			status = v1.ProcessStatus_StatusReady
+		}
+
+		var pb = &v1.Process{
+			Id:         uuid.New().String(),
+			Status:     status,
+			Profiles:   profiles,
+			FlowId:     req.FlowId,
+			CreatedAt:  timestamppb.Now(),
+			UpdatedAt:  timestamppb.Now(),
+			FinishedAt: nil,
+			StartedAt:  nil,
+			RunAfter:   req.RunAfter,
+		}
+
+		a := &repository.ProcessArg{}
+		if err := a.FromPB(pb, userId); err != nil {
+			return nil, err
+		}
+
+		a.CreatedAt = time.Now()
+		a.UpdatedAt = time.Now()
+
+		if err := s.processRepository.CreateProcess(ctx, a); err != nil {
+			return nil, err
+		}
+
+		res, err := s.processRepository.GetProcessArg(ctx, &v1.GetProcessRequest{Id: a.Id}, userId)
+		if err != nil {
+			return nil, err
+		}
+
+		return &v1.CreateProcessResponse{
+			Process: res.Process,
+		}, nil
+	} else {
+
+		userId, err := user.ResolveUserId(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		flow, err := s.flowRepository.GetFlow(ctx, userId, req.FlowId)
+		if err != nil {
+			return nil, err
+		}
+
+		var tmp v1.CreateFlowV2Req
+
+		if err := protojson.Unmarshal([]byte(flow.Payload), &tmp); err != nil {
+			return nil, err
+		}
+
+		profiles := make([]*v1.ProcessProfile, 0)
+
+		tasks, err := LetTheDreamsComeTrue(tmp.GetBlocks())
+		if err != nil {
+			return nil, err
+		}
+		tasks = task.RandomN(tasks, len(req.ProfileIds))
+
+		for profileWeight, profileId := range req.ProfileIds {
+
+			tmp := []v1.Task{}
+			for i := range tasks[profileWeight] {
+				tmp = append(tmp, *tasks[profileWeight][i])
+			}
+
+			processTasks, err := addRandomTasks(tmp, []v1.Task{})
+			if err != nil {
+				return nil, errors.Wrap(err, "lib.Marshal")
+			}
+
+			profiles = append(profiles, &v1.ProcessProfile{
+				ProfileId: profileId,
+				Id:        uuid.New().String(),
+				Weight:    int64(profileWeight),
+				Tasks:     processTasks,
+				Status:    v1.ProcessStatus_StatusReady,
+			})
+		}
+
+		status := v1.ProcessStatus_StatusStop
+		if req.RunAfter != nil {
+			status = v1.ProcessStatus_StatusReady
+		}
+
+		var pb = &v1.Process{
+			Id:         uuid.New().String(),
+			Status:     status,
+			Profiles:   profiles,
+			FlowId:     req.FlowId,
+			CreatedAt:  timestamppb.Now(),
+			UpdatedAt:  timestamppb.Now(),
+			FinishedAt: nil,
+			StartedAt:  nil,
+			RunAfter:   req.RunAfter,
+		}
+
+		a := &repository.ProcessArg{}
+		if err := a.FromPB(pb, userId); err != nil {
+			return nil, err
+		}
+
+		a.CreatedAt = time.Now()
+		a.UpdatedAt = time.Now()
+
+		if err := s.processRepository.CreateProcess(ctx, a); err != nil {
+			return nil, err
+		}
+
+		res, err := s.processRepository.GetProcessArg(ctx, &v1.GetProcessRequest{Id: a.Id}, userId)
+		if err != nil {
+			return nil, err
+		}
+
+		return &v1.CreateProcessResponse{
+			Process: res.Process,
+		}, nil
 	}
 
-	status := v1.ProcessStatus_StatusStop
-	if req.RunAfter != nil {
-		status = v1.ProcessStatus_StatusReady
-	}
-
-	var pb = &v1.Process{
-		Id:         uuid.New().String(),
-		Status:     status,
-		Profiles:   profiles,
-		FlowId:     req.FlowId,
-		CreatedAt:  timestamppb.Now(),
-		UpdatedAt:  timestamppb.Now(),
-		FinishedAt: nil,
-		StartedAt:  nil,
-		RunAfter:   req.RunAfter,
-	}
-
-	a := &repository.ProcessArg{}
-	if err := a.FromPB(pb, userId); err != nil {
-		return nil, err
-	}
-
-	a.CreatedAt = time.Now()
-	a.UpdatedAt = time.Now()
-
-	if err := s.processRepository.CreateProcess(ctx, a); err != nil {
-		return nil, err
-	}
-
-	res, err := s.processRepository.GetProcessArg(ctx, &v1.GetProcessRequest{Id: a.Id}, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.CreateProcessResponse{
-		Process: res.Process,
-	}, nil
 }
 
 func addRandomTasks(tasks, randomTasks []v1.Task) ([]*v1.ProcessTask, error) {

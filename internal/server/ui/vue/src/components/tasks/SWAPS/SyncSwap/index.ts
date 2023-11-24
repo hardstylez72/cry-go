@@ -1,4 +1,4 @@
-import {Network, Token} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import MenuTaskSyncSwap from "@/components/tasks/SWAPS/SyncSwap/Menu.vue";
@@ -13,6 +13,10 @@ export const SyncSwapSpec: TaskSpec = {
   descFn(task) {
     let p = task.syncSwapTask
     return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+  },
+  swap: (task: Task) => {
+    const p = task.syncSwapTask
+    return {from: p.fromToken, to: p.toToken, network: p.network}
   },
   service: {
     name: 'SyncSwap',

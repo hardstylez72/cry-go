@@ -11,6 +11,10 @@ export const DmailSpec: TaskSpec = {
     const p = task.dmailTask
     return ''
   },
+  simple(task) {
+    const p = task.dmailTask
+    return {network: p.network}
+  },
   component: Dmail,
   menu: MenuDmail,
   service: {
@@ -19,7 +23,7 @@ export const DmailSpec: TaskSpec = {
     img: '/icons/dmail.ico',
     op: 'email send',
   },
-  job: TaskJob.Other,
+  job: TaskJob.Simple,
   networks: new Set<Network>([Network.ZKSYNCERA, Network.StarkNet]),
   airdrops: new Set<Airdrop>([Airdrop.ZkSync, Airdrop.StarkNet]),
   profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])

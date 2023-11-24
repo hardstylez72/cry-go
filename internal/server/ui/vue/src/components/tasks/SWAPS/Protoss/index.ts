@@ -1,4 +1,4 @@
-import {Network, Token} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import ProtossSwap from "@/components/tasks/SWAPS/Protoss/Block.vue";
@@ -11,6 +11,10 @@ export const ProtossSwapSpec: TaskSpec = {
   descFn(task) {
     const p = task.protosSwapTask
     return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+  },
+  swap: (task: Task) => {
+    const p = task.protosSwapTask
+    return {from: p.fromToken, to: p.toToken, network: p.network}
   },
   component: ProtossSwap,
   menu: MenuProtossSwap,

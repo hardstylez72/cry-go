@@ -18,7 +18,7 @@ export const ZkSyncBridgeToETHSpec: TaskSpec = {
     return ` (from ${Network.ZKSYNCERA} to ${Network.Etherium} ETH)`
   },
   service: {
-    name: 'zksync to ETH',
+    name: 'zksync',
     img: '/icons/era.svg',
     link: 'https://portal.zksync.io/bridge/',
     op: 'bridge',

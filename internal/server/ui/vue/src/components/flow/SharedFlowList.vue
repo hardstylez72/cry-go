@@ -38,7 +38,7 @@
 import {defineComponent} from 'vue';
 import {flowService} from "@/generated/services"
 import {flow_Flow as Flow, FlowShared, TaskType} from "@/generated/flow";
-import CreateFlow from "@/components/flow/CreateFlow.vue";
+import CreateFlow from "@/components/flow/OldCreateFlow.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import {getFlow} from "@/components/tasks/tasks";
 import Loader from "@/components/Loader.vue";

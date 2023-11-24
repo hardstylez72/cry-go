@@ -16,6 +16,102 @@
     "application/json"
   ],
   "paths": {
+    "/api/gw/v1/flow-random/only-preview": {
+      "post": {
+        "operationId": "FlowService_OnlyRandomFlowPreview",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/OnlyRandomFlowPreviewRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OnlyRandomFlowPreviewReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
+    "/api/gw/v1/flow-random/only-preview-tokens": {
+      "post": {
+        "operationId": "FlowService_OnlyRandomFlowFromTokens",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/OnlyRandomFlowFromTokensRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/OnlyRandomFlowPreviewReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
+    "/api/gw/v1/flow-random/preview": {
+      "post": {
+        "operationId": "FlowService_RandomFlowPreview",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/RandomFlowPreviewRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FlowPreviewReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
     "/api/gw/v1/flow-shared": {
       "post": {
         "operationId": "FlowService_SharedFlow",
@@ -367,6 +463,102 @@
           "FlowService"
         ]
       }
+    },
+    "/api/gw/v2/flow/create": {
+      "post": {
+        "operationId": "FlowService_CreateFlowV2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/CreateFlowV2Res"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateFlowV2Req"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
+    "/api/gw/v2/flow/get": {
+      "post": {
+        "operationId": "FlowService_GetFlowV2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/GetFlowV2Res"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GetFlowV2Req"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
+    "/api/gw/v2/flow/update": {
+      "post": {
+        "operationId": "FlowService_UpdateFlowV2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/UpdateFlowV2Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateFlowV2Request"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -489,6 +681,36 @@
       },
       "required": [
         "flow"
+      ]
+    },
+    "CreateFlowV2Req": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/FlowBlock"
+          }
+        }
+      },
+      "required": [
+        "label",
+        "blocks"
+      ]
+    },
+    "CreateFlowV2Res": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
       ]
     },
     "DefaultBridge": {
@@ -703,6 +925,146 @@
         "toToken"
       ]
     },
+    "FlowBase": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "$ref": "#/definitions/Token"
+        }
+      }
+    },
+    "FlowBlock": {
+      "type": "object",
+      "properties": {
+        "weight": {
+          "type": "string",
+          "format": "int64"
+        },
+        "man": {
+          "$ref": "#/definitions/FlowBlockMan"
+        },
+        "rand": {
+          "$ref": "#/definitions/FlowBlockRand"
+        }
+      },
+      "required": [
+        "weight",
+        "block"
+      ]
+    },
+    "FlowBlockMan": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Task"
+          }
+        },
+        "randomTasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Task"
+          }
+        }
+      },
+      "required": [
+        "tasks",
+        "randomTasks"
+      ]
+    },
+    "FlowBlockRand": {
+      "type": "object",
+      "properties": {
+        "startToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "finishToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "startNetwork": {
+          "$ref": "#/definitions/Network"
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/RandomTask"
+          }
+        },
+        "taskCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "minDelay": {
+          "type": "string",
+          "format": "int64"
+        },
+        "maxDelay": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "tasks",
+        "random_tasks",
+        "maxDelay",
+        "minDelay"
+      ]
+    },
+    "FlowListItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "nextId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deletedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "createdAt",
+        "version"
+      ]
+    },
+    "FlowPreviewReq": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/FlowBlock"
+          }
+        }
+      },
+      "required": [
+        "label",
+        "blocks"
+      ]
+    },
     "FlowShared": {
       "type": "object",
       "properties": {
@@ -767,6 +1129,40 @@
       },
       "required": [
         "flow"
+      ]
+    },
+    "GetFlowV2Req": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "GetFlowV2Res": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/FlowBlock"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "blocks"
       ]
     },
     "HideFlowReq": {
@@ -836,7 +1232,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/flow.Flow"
+            "$ref": "#/definitions/FlowListItem"
           }
         }
       },
@@ -981,6 +1377,93 @@
         "token"
       ]
     },
+    "OnlyRandomFlowFromTokensRes": {
+      "type": "object",
+      "properties": {
+        "tokens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Token"
+          }
+        }
+      },
+      "required": [
+        "tokens"
+      ]
+    },
+    "OnlyRandomFlowPreviewReq": {
+      "type": "object",
+      "properties": {
+        "startToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "finishToken": {
+          "$ref": "#/definitions/Token"
+        },
+        "startNetwork": {
+          "$ref": "#/definitions/Network"
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/RandomTask"
+          }
+        },
+        "taskCount": {
+          "type": "string",
+          "format": "int64"
+        },
+        "ignoreStartToken": {
+          "type": "boolean"
+        },
+        "ignoreFinishToken": {
+          "type": "boolean"
+        },
+        "minDelay": {
+          "type": "string",
+          "format": "int64"
+        },
+        "maxDelay": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "required": [
+        "label",
+        "blocks",
+        "minDelay",
+        "maxDelay"
+      ]
+    },
+    "OnlyRandomFlowPreviewRes": {
+      "type": "object",
+      "properties": {
+        "flow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/UniqueFlow"
+          }
+        },
+        "uniquePercent": {
+          "type": "number",
+          "format": "double"
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/TokenArr"
+          }
+        }
+      },
+      "required": [
+        "flow",
+        "uniquePercent",
+        "tokens"
+      ]
+    },
     "OrbiterBridgeTask": {
       "type": "object",
       "properties": {
@@ -1041,6 +1524,93 @@
       ],
       "default": "StatusReady",
       "title": "- StatusStop: delete"
+    },
+    "RPsimple": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "$ref": "#/definitions/Network"
+        }
+      },
+      "required": [
+        "network"
+      ]
+    },
+    "RPswap": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/RPswapItem"
+          }
+        }
+      },
+      "required": [
+        "items"
+      ]
+    },
+    "RPswapItem": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "$ref": "#/definitions/Network"
+        },
+        "from": {
+          "$ref": "#/definitions/Token"
+        },
+        "to": {
+          "$ref": "#/definitions/Token"
+        }
+      },
+      "required": [
+        "network",
+        "from",
+        "to"
+      ]
+    },
+    "RandomFlowPreviewRes": {
+      "type": "object",
+      "properties": {
+        "flow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/UniqueFlow"
+          }
+        },
+        "uniquePercent": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "flow",
+        "uniquePercent"
+      ]
+    },
+    "RandomTask": {
+      "type": "object",
+      "properties": {
+        "optional": {
+          "type": "boolean"
+        },
+        "taskType": {
+          "$ref": "#/definitions/TaskType"
+        },
+        "swap": {
+          "$ref": "#/definitions/RPswap"
+        },
+        "simple": {
+          "$ref": "#/definitions/RPsimple"
+        }
+      },
+      "required": [
+        "optional",
+        "taskType",
+        "p"
+      ]
     },
     "ShareFlowReq": {
       "type": "object",
@@ -1625,6 +2195,24 @@
       ],
       "default": "USDT"
     },
+    "TokenArr": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "$ref": "#/definitions/Token"
+        },
+        "to": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Token"
+          }
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ]
+    },
     "TxDetail": {
       "type": "object",
       "properties": {
@@ -1638,6 +2226,21 @@
       "required": [
         "key",
         "value"
+      ]
+    },
+    "UniqueFlow": {
+      "type": "object",
+      "properties": {
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Task"
+          }
+        }
+      },
+      "required": [
+        "tasks"
       ]
     },
     "UpdateFlowRequest": {
@@ -1660,6 +2263,52 @@
       },
       "required": [
         "flow"
+      ]
+    },
+    "UpdateFlowV2Request": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/FlowBlock"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "blocks"
+      ]
+    },
+    "UpdateFlowV2Response": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/FlowBlock"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "blocks"
       ]
     },
     "UseSharedFlowReq": {
@@ -1841,6 +2490,9 @@
             "type": "object",
             "$ref": "#/definitions/Task"
           }
+        },
+        "base": {
+          "$ref": "#/definitions/FlowBase"
         }
       },
       "required": [

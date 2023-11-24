@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavBar :title="`Сценарий: ${flow.label}`">
+    <NavBar :title="`Сценарий: ${label}`">
       <template v-slot:default>
 
         <v-btn @click="shareFlow" variant="flat" class="mx-1">
@@ -13,7 +13,7 @@
           <span v-else>Копия</span>
         </v-btn>
 
-        <span v-if="!flow.deletedAt && !flow.nextId">
+        <span v-if="!deletedAt && !nextId">
         <v-btn :disabled="selectedProfiles.length > 0" v-if="!editMode" variant="flat" class="mx-1" focused
                @click="editModeChanged">
           <v-icon v-if="isMobile()" icon="mdi-note-edit-outline"/>
@@ -26,7 +26,7 @@
         </v-btn>
         </span>
 
-        <v-btn variant="flat" :disabled="selectedProfiles.length > 0" v-if="!flow.deletedAt && !flow.nextId"
+        <v-btn variant="flat" :disabled="selectedProfiles.length > 0" v-if="!deletedAt && !nextId"
                color="red" @click="DeleteFlow">
           <v-icon v-if="isMobile()" icon="mdi-delete"/>
           <span v-else>Удалить</span>
@@ -56,12 +56,44 @@
     </div>
   </div>
 
-
   <v-spacer class="my-6"/>
-  <v-form validate-on="submit" ref="flow-form">
-    <FlowForm v-if="!flowLoading" :disable="disabled" :label-value="flow.label" :tasks-value="tasks"
-              @flow-changed="flowChanged" :random-tasks-value="randomTasks"/>
+  <v-form ref="form">
+
+    <v-text-field
+      v-model="label"
+      label="Название сценария"
+      density="comfortable"
+      variant="outlined"
+      :rules="[required]"
+      :disabled="disabled"
+    ></v-text-field>
+
+    <div v-for="block in blocks">
+      <component
+        class="my-2"
+        v-if="block.man"
+        is="ManBlock"
+        :disable="disabled"
+        :block="block"
+        @flow-changed="flowChanged"
+      />
+      <component
+        class="my-2"
+        v-if="block.rand"
+        is="RandomBlock"
+        :disable="disabled"
+        :block="block"
+        @block-changed="flowChanged"
+      />
+    </div>
+
   </v-form>
+
+  <Preview :data="preview">
+    <template v-slot:default>
+      <h3 class="my-1">Возможные финальные комбинации</h3>
+    </template>
+  </Preview>
 
 </template>
 
@@ -69,22 +101,23 @@
 
 import {defineComponent} from 'vue';
 import {flowService, processService, profileService} from "@/generated/services"
-import {flow_Flow as Flow, Task, TaskType} from "@/generated/flow";
-import TaskStargateBridge from "@/components/tasks/BRIDGE/Stargate/Block.vue";
+import {flow_Flow as Flow, FlowBlock, RandomFlowPreviewRes, Task, TaskType} from "@/generated/flow";
 import {Profile} from "@/generated/profile";
-import TaskDelay from "@/components/tasks/OTHER/Delay/Block.vue";
 import ProfileCard from "@/components/profile/ProfileCard.vue";
-import {taskComponentMap, TaskArg, taskTypes} from "@/components/tasks/tasks";
 import {Delay, formatTime, getDate, getTime, isMobile, Timer, ts} from "@/components/helper";
-import FlowForm from "@/components/flow/FlowForm.vue";
+import FlowForm from "@/components/flow/OldForm.vue";
 import ProfileSearch from "@/components/profile/ProfileSearch.vue";
 import NavBar from "@/components/NavBar.vue";
 import {required} from "@/components/tasks/helper";
 import Schedule from "@/components/flow/Schedule.vue";
+import Preview from "@/components/flow/Preview.vue";
+
+import RandomBlock from "@/components/flow/RandomBlock.vue";
+import ManBlock from "@/components/flow/ManBlock.vue";
 
 export default defineComponent({
-  name: "Flow",
-  components: {Schedule, NavBar, ProfileSearch, FlowForm, ProfileCard},
+  name: "FlowViewV2",
+  components: {Preview, Schedule, NavBar, ProfileSearch, ProfileCard, RandomBlock, ManBlock},
 
   props: {
     propId: {
@@ -97,19 +130,30 @@ export default defineComponent({
       selectedProfiles: [] as Profile[],
       editMode: false,
       flowId: "" as string,
-      flow: {} as Flow,
       disabled: true,
-      tasks: [] as Task[],
-      randomTasks: [] as Task[],
+      deletedAt: null as null | Date,
+      nextId: null as null | string,
       showUpdateBtn: false,
       updatingFlow: false,
       timer: new Timer(),
-      flowLoading: true
+      flowLoading: true,
+
+      blockMap: new Map<number, FlowBlock>(),
+      preview: null as null | RandomFlowPreviewRes,
+      previewError: '',
+      label: '',
     }
   },
   computed: {
     getProfileList() {
       return this.selectedProfiles.map(e => e)
+    },
+    blocks(): FlowBlock[] {
+      const blocks = [] as FlowBlock[]
+      this.blockMap.forEach((v, k) => {
+        blocks.push(v)
+      })
+      return blocks
     }
   },
   methods: {
@@ -136,27 +180,33 @@ export default defineComponent({
     async validateForm(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
       // спасибо китайцам скажи лучше
-      const {valid} = await this["$refs"]['flow-form'].validate()
+      const {valid} = await this["$refs"]['form'].validate()
 
       return valid
     },
-    flowChanged(label: string, tasks: TaskArg[], randomTasks: TaskArg[]) {
-      this.flow.label = label
-      this.tasks = []
-      tasks.forEach(t => {
-        if (t.task) {
-          this.tasks.push(t.task)
-        }
-      })
+    async loadPreview() {
 
-      this.randomTasks = []
-      randomTasks.forEach(t => {
-        if (t.task) {
-          this.randomTasks.push(t.task)
-        }
-      })
+      this.timer.add(100)
+      this.timer.cb(() => {
 
-      this.validateForm()
+        this.previewError = ''
+        flowService.flowServiceRandomFlowPreview({
+          body: {
+            label: '',
+            blocks: this.blocks,
+          }
+        }).then((data) => {
+          this.preview = data
+        }).catch((err) => {
+          this.previewError = 'Ошибка'
+        })
+
+      })
+    },
+    async flowChanged(block: FlowBlock) {
+      await this.validateForm()
+      this.blockMap.set(block.weight, block)
+      await this.loadPreview()
     },
     async updateFlow() {
       if (!(await this.validateForm())) {
@@ -164,14 +214,17 @@ export default defineComponent({
       }
       try {
         this.updatingFlow = true
-        this.flow.tasks = this.tasks
-        this.flow.randomTasks = this.randomTasks
 
-        const res = await flowService.flowServiceUpdateFlow({body: {flow: this.flow}})
-        this.flow = res.flow
-        this.flowId = this.flow.id
+        const res = await flowService.flowServiceUpdateFlowV2({
+          body: {
+            blocks: this.blocks,
+            label: this.label,
+            id: this.flowId,
+          }
+        })
+        this.flowId = res.id
         this.editModeChanged()
-        this.$router.push({name: 'Flow', params: {id: this.flow.id}})
+        this.$router.push({name: 'FlowViewV2', params: {id: this.flowId}})
 
       } finally {
         this.updatingFlow = false
@@ -185,7 +238,6 @@ export default defineComponent({
     getCheckboxLabel(): string {
       return this.editMode ? "sw" : 'switch tp editing mode'
     },
-
     async bobaSatisfied(runAfterList: Date[]) {
 
       for (let i = 0; i < runAfterList.length; i++) {
@@ -230,10 +282,14 @@ export default defineComponent({
 
       try {
         this.flowLoading = true
-        const res = await flowService.flowServiceGetFlow({body: {id: this.flowId}})
-        this.flow = res.flow
-        this.tasks = this.flow.tasks
-        this.randomTasks = this.flow.randomTasks
+        const res = await flowService.flowServiceGetFlowV2({body: {id: this.flowId}})
+
+        this.blockMap.clear()
+        res.blocks.forEach((block) => {
+          this.blockMap.set(block.weight, block)
+        })
+        this.label = res.label
+
       } finally {
         this.flowLoading = false
       }
@@ -241,6 +297,7 @@ export default defineComponent({
   },
   async mounted() {
     await this.loadFlow()
+    await this.loadPreview()
 
   }
 })

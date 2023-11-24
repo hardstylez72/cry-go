@@ -1,9 +1,9 @@
-import {Network} from "@/generated/flow";
+import {Network, Task} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 
-import MintBlock from "@/components/tasks/NFT/NFTZeruis/mintBlock.vue";
-import MintMenu from "@/components/tasks/NFT/NFTZeruis/mintMenu.vue";
+import MintBlock from "@/components/tasks/NFT/Zeruis/mintBlock.vue";
+import MintMenu from "@/components/tasks/NFT/Zeruis/mintMenu.vue";
 
 
 export const NFTZeriusMintSpec: TaskSpec = {
@@ -13,10 +13,16 @@ export const NFTZeriusMintSpec: TaskSpec = {
     const p = task.mintZeriusTask
     return ` (${p?.network})`
   },
+  nft(task: Task) {
+    const p = task.mintZeriusTask
+    return {
+      network: p.network,
+    }
+  },
   component: MintBlock,
   menu: MintMenu,
   service: {
-    name: 'Zerius mint',
+    name: 'Zerius',
     link: 'https://zerius.io/',
     img: '/icons/zerius.svg',
     op: 'mint NFT',

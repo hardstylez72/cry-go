@@ -49,7 +49,7 @@ func (s *FlowService) ShareFlow(ctx context.Context, req *v1.ShareFlowReq) (*v1.
 	}
 
 	var t repository.Flow
-	if err := t.FromPB(pb, userId); err != nil {
+	if err := t.FromPB(pb, userId, int64(flow.Version)); err != nil {
 		return nil, err
 	}
 

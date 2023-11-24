@@ -1,10 +1,6 @@
 <template>
   <v-card-actions>
     <v-container>
-      <div class="mb-3">use <a :href="link.officialZkSyncBridge" target="_blank">Official zksync bridge</a> to see
-        available options
-        options
-      </div>
       <v-row>
         <v-col cols="6">
           <v-select
@@ -47,9 +43,7 @@ import {required} from "@/components/tasks/helper";
 export default defineComponent({
   name: "TaskZkSyncOfficialBridgeToEth",
   computed: {
-    link() {
-      return link
-    },
+
     Network() {
       return Network
     },

@@ -51,13 +51,13 @@ message Process {
   int64 progress = 11;
   optional google.protobuf.Timestamp deleted_at = 12;
   bool auto_retry = 13;
-  flow.Flow flow = 14;
   optional google.protobuf.Timestamp run_after = 15;
   optional ProcessStopReason stop_reason = 16;
+  int64 flow_version = 17;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id", "status", "profiles", "flow_id","created_at", "updated_at", "flow_label", "progress", "auto_retry", "flow"]
+      required: ["id", "status", "profiles", "flow_id","created_at", "updated_at", "flow_label", "progress", "auto_retry", "flow", "flow_version"]
     }
   };
 }

@@ -276,9 +276,7 @@ export default defineComponent({
     taskProps() {
       return taskProps
     },
-    link() {
-      return link
-    },
+
     GetFromNetworks(): Network[] {
       const m = new Set<Network>()
       this.pairs.forEach((p) => {

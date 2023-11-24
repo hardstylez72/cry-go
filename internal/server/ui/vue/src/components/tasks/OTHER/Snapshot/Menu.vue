@@ -1,5 +1,4 @@
 <template>
-  <a target="_blank" :href="link.snapshot">Snapshot</a>
   <div><b>Space:</b> {{ item.space }}</div>
   <div><b>Status: </b> <span :style="'color: ' + getStatusColor(getStatus)">{{ getStatus }}</span></div>
   <div v-for="(proposal, key) in getProposals">
@@ -49,9 +48,6 @@ export default defineComponent({
     }
   },
   computed: {
-    link() {
-      return link
-    },
     getProposals(): Proposal[] {
       const res: Proposal[] = []
       this.proposals.forEach(v => res.push(v))

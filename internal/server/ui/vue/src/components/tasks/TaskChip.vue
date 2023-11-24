@@ -1,5 +1,5 @@
 <template>
-  <v-chip size="auto" density="compact">
+  <v-chip size="auto" density="compact" variant="outlined" rounded>
     <template v-slot:prepend>
       <div class="d-inline-flex mx-1">
         <v-img height="22px" v-if="service.img" :src="service.img"/>

@@ -20,9 +20,10 @@ type Flow struct {
 	UserId    string         `db:"user_id"`
 	CreatedAt time.Time      `db:"created_at"`
 	DeletedAt sql.NullTime   `db:"deleted_at"`
+	Version   int            `db:"version"`
 }
 
-func (a *Flow) FromPB(pb *v1.Flow, userId string) error {
+func (a *Flow) FromPB(pb *v1.Flow, userId string, version int64) error {
 	a.Id = pb.Id
 	a.Label = pb.Label
 	b, err := protojson.Marshal(pb)
@@ -36,6 +37,7 @@ func (a *Flow) FromPB(pb *v1.Flow, userId string) error {
 		a.DeletedAt.Valid = true
 		a.DeletedAt.Time = pb.DeletedAt.AsTime()
 	}
+	a.Version = int(version)
 
 	return nil
 }
@@ -107,8 +109,8 @@ func updateFlowParent(ctx context.Context, driver pg.SqlDriver, flowId, nextFlow
 }
 
 func createFlow(ctx context.Context, driver pg.SqlDriver, req *Flow) error {
-	q := `insert into flow (id, label, payload, created_at, user_id, next_id) values 
-      (:id, :label, :payload, :created_at, :user_id, null)                                                                 `
+	q := `insert into flow (id, label, payload, created_at, user_id, next_id, version) values 
+      (:id, :label, :payload, :created_at, :user_id, null, :version)                                                                 `
 	if _, err := driver.NamedExecContext(ctx, q, req); err != nil {
 		return err
 	}
@@ -166,4 +168,20 @@ func (r *pgRepository) DeleteFlow(ctx context.Context, userId, flowId string) er
 		return err
 	}
 	return nil
+}
+
+type FlowMeta struct {
+	Id      string `db:"id"`
+	Label   string `db:"label"`
+	Version int    `db:"version"`
+}
+
+func (r *pgRepository) FlowMeta(ctx context.Context, userId, flowId string) (*FlowMeta, error) {
+
+	var meta FlowMeta
+
+	if err := r.conn.GetContext(ctx, &meta, "select id, label, version from flow where id = $1 and user_id = $2", flowId, userId); err != nil {
+		return nil, err
+	}
+	return &meta, nil
 }

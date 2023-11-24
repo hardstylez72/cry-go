@@ -97,9 +97,7 @@ export default defineComponent({
     }
   },
   computed: {
-    link() {
-      return link
-    },
+
     Token() {
       return Token
     },

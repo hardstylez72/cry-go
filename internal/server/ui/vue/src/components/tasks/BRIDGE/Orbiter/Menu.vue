@@ -57,9 +57,6 @@ export default defineComponent({
     taskProps() {
       return taskProps
     },
-    link() {
-      return link
-    },
     getStatus(): string {
       if (this.status == ProcessStatus.StatusDone) {
         return 'completed'

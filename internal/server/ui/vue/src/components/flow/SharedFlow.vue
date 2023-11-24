@@ -33,7 +33,7 @@ import TaskDelay from "@/components/tasks/OTHER/Delay/Block.vue";
 import ProfileCard from "@/components/profile/ProfileCard.vue";
 import {taskComponentMap, TaskArg, taskTypes} from "@/components/tasks/tasks";
 import {Delay, isMobile, Timer} from "@/components/helper";
-import FlowForm from "@/components/flow/FlowForm.vue";
+import FlowForm from "@/components/flow/OldForm.vue";
 import ProfileSearch from "@/components/profile/ProfileSearch.vue";
 import NavBar from "@/components/NavBar.vue";
 import {mapStores} from "pinia";

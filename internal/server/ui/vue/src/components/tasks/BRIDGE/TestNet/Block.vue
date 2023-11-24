@@ -52,11 +52,7 @@ import {defineComponent, PropType} from "vue";
 
 export default defineComponent({
   name: "TaskTestNetBridgeSwap",
-  computed: {
-    link() {
-      return link
-    }
-  },
+  computed: {},
   emits: ['taskChanged'],
   props: {
     weight: {

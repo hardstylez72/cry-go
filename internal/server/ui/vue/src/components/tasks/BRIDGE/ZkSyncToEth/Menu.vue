@@ -60,9 +60,7 @@ export default defineComponent({
     taskProps() {
       return taskProps
     },
-    link() {
-      return link
-    },
+
     Network() {
       return Network
     },

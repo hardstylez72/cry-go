@@ -6,7 +6,10 @@
     max-width="400px"
   >
     <template v-slot:activator="{ props }">
-      <v-btn :loading="loading" variant="text" @click="menu=true">{{ btnText }}</v-btn>
+      <v-btn :loading="loading" variant="text" @click="menu=true">
+        <v-icon icon="mdi-lightbulb-alert-outline" color="red"></v-icon>
+        <v-tooltip activator="parent" location="top">Сообщить о проблеме</v-tooltip>
+      </v-btn>
     </template>
 
     <template v-slot:default="{ props }">

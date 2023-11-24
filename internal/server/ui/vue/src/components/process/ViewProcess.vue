@@ -4,7 +4,7 @@
       <template v-slot:default>
         <BtnProcessStopResume class="mx-1" size="comfortable" :item="process" @updated="processUpdated"/>
         <v-btn variant="flat" class="mx-1"
-               @click="$router.push({name: 'Flow', params: {id: process.flowId}})">Сценарий
+               @click="goFlow">Сценарий
         </v-btn>
         <DeleteProcess class="mx-1" :process-id="processId"/>
       </template>
@@ -32,15 +32,6 @@
         </div>
         <div class="mr-8">
           <div>
-            <v-checkbox
-              style="height: 30px"
-              color="blue"
-              v-model="showLess"
-              :label="getCheckboxLabel"
-              @input="showLessChanged">
-            </v-checkbox>
-          </div>
-          <div>
             <v-tooltip text="В случае возникновения ошибки попытается попробовать снова через в 10 минут">
               <template v-slot:activator="{ props }">
                 <v-checkbox
@@ -64,27 +55,25 @@
     </div>
 
     <div>
-      <v-row class="mt-4 ml-5 mr-5 align-center" v-for="profile in process.profiles">
-        <ProfileCard class="ml-5" :label="profile.profileLabel" :profile-id="profile.profileId"/>
-        <StatusCard class="ml-5" :status="profile.status"/>
+      <div class="mt-4 ml-5 mr-5 my-5 align-center d-flex flex-wrap" v-for="profile in process.profiles">
+        <div class="ml-5 d-flex flex-column mx-1">
+          <StatusCard :status="profile.status" class="my-1"/>
+          <ProfileCard :label="profile.profileLabel" :profile-id="profile.profileId"/>
 
-        <v-timeline
-          class="mt-4"
-          direction="horizontal"
-          style="overflow-x: scroll; overflow-y: scroll; white-space:nowrap; width: 90vw"
-          :density="density"
-        >
-          <v-timeline-item v-for="task in profile.tasks">
-            <template v-slot:icon>
-              <ProcessTaskMenu :task="task" :profile-id="profile.profileId" :process-id="processId"
-                               :pp-id="profile.id"/>
-            </template>
-            <template v-slot:opposite>
-              {{ task.task.taskType }}
-            </template>
-          </v-timeline-item>
-        </v-timeline>
-      </v-row>
+        </div>
+
+
+        <div class="mx-1 my-1" v-for="task in profile.tasks">
+          <ProcessTaskMenu
+            :task="task"
+            :profile-id="profile.profileId"
+            :process-id="processId"
+            :pp-id="profile.id"/>
+
+        </div>
+
+
+      </div>
     </div>
   </div>
 </template>
@@ -94,7 +83,7 @@
 import {defineComponent} from 'vue';
 import {processService} from "@/generated/services"
 import {Process, ProcessProfile, ProcessStatus, ProcessTask} from "@/generated/process";
-import ViewFlow from "@/components/flow/Flow.vue";
+import ViewFlow from "@/components/flow/OldView.vue";
 import StatusCard from "@/components/StatusCard.vue";
 import {formatTime, GetStatusColor, Timer} from "@/components/helper";
 import ProcessTaskMenu from "@/components/process/ProcessTaskMenu.vue";
@@ -103,10 +92,14 @@ import BtnProcessStopResume from "@/components/BtnProcessStopResume.vue";
 import dayjs from "dayjs";
 import DeleteProcess from "@/components/process/DeleteProcess.vue";
 import NavBar from "@/components/NavBar.vue";
+import TaskBlock from "@/components/flow/TaskBlock.vue";
 
 export default defineComponent({
   name: "ViewProcess",
-  components: {NavBar, DeleteProcess, BtnProcessStopResume, ProfileCard, StatusCard, ViewFlow, ProcessTaskMenu},
+  components: {
+    TaskBlock,
+    NavBar, DeleteProcess, BtnProcessStopResume, ProfileCard, StatusCard, ViewFlow, ProcessTaskMenu
+  },
   props: {},
   watch: {
     loadingMap: {
@@ -119,8 +112,6 @@ export default defineComponent({
   data() {
     return {
       checkboxLabel: 'detailed',
-      density: "compact" as 'compact' | 'comfortable',
-      showLess: false,
       menu: false,
       processId: this.$route.params.id.toString(),
       process: {autoRetry: false, profiles: []} as Process,
@@ -156,9 +147,6 @@ export default defineComponent({
       }
       return 'grey'
     },
-    getCheckboxLabel(): string {
-      return !this.showLess ? 'Подробно' : 'Кратко'
-    },
     getAutoRetryLabel(): string {
       return this.process.autoRetry ? 'Помошник' : 'Помошник'
     },
@@ -171,6 +159,14 @@ export default defineComponent({
 
   },
   methods: {
+    goFlow() {
+      if (this.process.flowVersion === "1") {
+        this.$router.push({name: 'Flow', params: {id: this.process.flowId}})
+      } else {
+        this.$router.push({name: 'FlowViewV2', params: {id: this.process.flowId}})
+      }
+
+    },
     formatTime,
     dayjs,
     processProgress(p: Process): number {
@@ -197,13 +193,6 @@ export default defineComponent({
       }
       return 0
     },
-    showLessChanged() {
-      if (this.showLess) {
-        this.density = "compact"
-      } else {
-        this.density = "comfortable"
-      }
-    },
     async autoRetryChanged() {
       try {
         this.autoRetryLoading = true
@@ -228,7 +217,6 @@ export default defineComponent({
     clearTimeout(this.poller)
   },
   created: async function () {
-    this.showLessChanged()
     const init = async () => {
       if (this.$route.params.id) {
 

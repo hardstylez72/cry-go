@@ -981,13 +981,13 @@ export interface Process {
   autoRetry: boolean;
 
   /**  */
-  flow: flow_Flow;
-
-  /**  */
   runAfter?: Date;
 
   /**  */
   stopReason?: ProcessStopReason;
+
+  /**  */
+  flowVersion: string;
 }
 
 export interface ProcessProfile {
@@ -1530,29 +1530,6 @@ export interface ZkSyncOfficialBridgeToEthereumTask {
 
   /**  */
   tx?: TaskTx;
-}
-
-export interface flow_Flow {
-  /**  */
-  id: string;
-
-  /**  */
-  label: string;
-
-  /**  */
-  tasks: Task[];
-
-  /**  */
-  nextId?: string;
-
-  /**  */
-  createdAt: Date;
-
-  /**  */
-  deletedAt?: Date;
-
-  /**  */
-  randomTasks: Task[];
 }
 
 export enum Network {

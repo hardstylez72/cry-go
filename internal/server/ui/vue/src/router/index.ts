@@ -7,7 +7,6 @@ const routes = [
     path: '/stats/zksync',
     component: () => import('@/components/stats/checker/ZkSync.vue'),
   },
-
   {
     name: 'Issue',
     path: '/issue/:id',
@@ -69,7 +68,7 @@ const routes = [
   {
     name: 'Constructor',
     path: '/constructor',
-    component: () => import('@/components/flow/FlowList.vue'),
+    component: () => import('@/components/flow/PageList.vue'),
   },
   {
     name: 'SharedFlowList',
@@ -92,11 +91,20 @@ const routes = [
   {
     name: 'Flow',
     path: '/flow/:id',
-    component: () => import('@/components/flow/Flow.vue'),
+    component: () => import('@/components/flow/OldView.vue'),
     props: {
       id: String,
     }
   },
+  {
+    name: 'FlowViewV2',
+    path: '/flow/random/:id',
+    component: () => import('@/components/flow/View.vue'),
+    props: {
+      id: String,
+    }
+  },
+
   {
     name: 'ViewProcess',
     path: '/process/:id',
@@ -113,6 +121,11 @@ const routes = [
   {
     name: 'CreateFlow',
     path: '/flow/create',
+    component: () => import('@/components/flow/OldCreateFlow.vue'),
+  },
+  {
+    name: 'CreateFlowV2',
+    path: '/flow/random/create',
     component: () => import('@/components/flow/CreateFlow.vue'),
   },
   {

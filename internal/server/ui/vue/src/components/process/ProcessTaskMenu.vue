@@ -2,23 +2,20 @@
   <v-menu
     v-model="menu"
     persistent
-    width="385px"
+    width="auto"
     :close-on-back="false"
     :close-on-content-click="false"
   >
     <template v-slot:activator="{ props }">
-      <v-btn
-        v-bind="props"
-        :color="GetStatusColor(task.status)"
-        @click="menu = true"
-        size="30"
-      >
-        <v-tooltip activator="parent" location="top">{{ task.task.taskType }}</v-tooltip>
-      </v-btn>
+
+
+      <TaskBlock v-bind="props" :task="task.task"
+                 :color="GetStatusColor(task.status)" style="cursor: pointer"/>
+
     </template>
 
     <template v-slot:default="{ props }">
-      <v-card>
+      <v-card width="auto">
         <v-card-text>
 
           <span class="d-flex justify-space-between">
@@ -80,10 +77,20 @@
           </div>
 
         </v-card-text>
-        <v-card-actions class="d-flex justify-end">
+        <v-card-actions class="d-flex">
           <Support :process-id="processId" :task-id="task.id" btn-text="Проблема" :skip-title="true"/>
-          <v-btn v-if="errorHappen(task)" @click="retry(task, ppId)" :loading="retryLoading">Retry</v-btn>
-          <v-btn v-if="skipable()" @click="skip(task, ppId)" :loading="skippingTask">Skip</v-btn>
+
+
+          <v-btn v-if="errorHappen(task)" @click="retry(task, ppId)" :loading="retryLoading">
+            <v-icon icon="mdi-repeat-once"/>
+            <v-tooltip activator="parent" location="top">Попробовать снова</v-tooltip>
+          </v-btn>
+
+
+          <v-btn v-if="skipable()" @click="skip(task, ppId)" :loading="skippingTask">
+            <v-icon icon="mdi-debug-step-over"></v-icon>
+            <v-tooltip activator="parent" location="top">Нажать - если телега не едет</v-tooltip>
+          </v-btn>
           <EstimateTask v-if="estimatedTaskMap.get(task.task.taskType)" :task-id="task.id" :profile-id="profileId"
                         :process-id="processId"/>
         </v-card-actions>
@@ -97,7 +104,7 @@
 import {defineComponent, PropType} from 'vue';
 import {processService} from "@/generated/services"
 import {ProcessStatus, ProcessTask, ProcessTaskHistoryRecord, TaskType, Transaction} from "@/generated/process";
-import ViewFlow from "@/components/flow/Flow.vue";
+import ViewFlow from "@/components/flow/OldView.vue";
 import StatusCard from "@/components/StatusCard.vue";
 import {Delay, formatTime, GetStatusColor, GetStatusText} from "@/components/helper";
 import dayjs from "dayjs";
@@ -105,10 +112,11 @@ import {estimatedTaskMap, menuTaskComponentMap, taskProps} from '@/components/ta
 import EstimateTask from "@/components/tasks/Estimate.vue";
 import Support from "@/components/issue/Support.vue";
 import {TaskSpec} from "@/components/tasks/utils";
+import TaskBlock from "@/components/flow/TaskBlock.vue";
 
 export default defineComponent({
   name: "ProcessTaskMenu",
-  components: {Support, EstimateTask, StatusCard, ViewFlow},
+  components: {TaskBlock, Support, EstimateTask, StatusCard, ViewFlow},
   watch: {
     menu: {
       handler(a, b) {

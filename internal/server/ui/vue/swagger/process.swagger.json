@@ -1407,15 +1407,16 @@
         "autoRetry": {
           "type": "boolean"
         },
-        "flow": {
-          "$ref": "#/definitions/flow.Flow"
-        },
         "runAfter": {
           "type": "string",
           "format": "date-time"
         },
         "stopReason": {
           "$ref": "#/definitions/ProcessStopReason"
+        },
+        "flowVersion": {
+          "type": "string",
+          "format": "int64"
         }
       },
       "required": [
@@ -1428,7 +1429,8 @@
         "flowLabel",
         "progress",
         "autoRetry",
-        "flow"
+        "flow",
+        "flowVersion"
       ]
     },
     "ProcessProfile": {
@@ -2343,50 +2345,6 @@
         "amount",
         "network",
         "amountKind"
-      ]
-    },
-    "flow.Flow": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "label": {
-          "type": "string"
-        },
-        "tasks": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/Task"
-          }
-        },
-        "nextId": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "deletedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "randomTasks": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/Task"
-          }
-        }
-      },
-      "required": [
-        "id",
-        "label",
-        "payload",
-        "createdAt",
-        "tasks",
-        "randomTasks"
       ]
     }
   }

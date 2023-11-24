@@ -47,9 +47,7 @@ import {required} from "@/components/tasks/helper";
 export default defineComponent({
   name: "TaskZkSyncOfficialBridgeFromEth",
   computed: {
-    link() {
-      return link
-    },
+
     Network() {
       return Network
     },

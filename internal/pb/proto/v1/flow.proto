@@ -28,6 +28,68 @@ message FlowShared {
   };
 }
 
+
+message RandomFlow {
+  string id = 1;
+  string label = 2;
+  repeated RandomTask tasks = 3;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "label", "tasks"]
+    }
+  };
+}
+
+message RandomTask {
+  bool optional = 1;
+  task.TaskType taskType = 2;
+
+  oneof p {
+    RPswap swap = 3;
+    RPsimple simple = 4;
+  }
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["optional", "taskType", "p"]
+    }
+  };
+}
+
+
+
+message RPsimple {
+  shared.Network network = 1;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["network"]
+    }
+  };
+}
+
+message RPswap {
+  repeated RPswapItem items = 1;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["items"]
+    }
+  };
+}
+message RPswapItem {
+  shared.Network network = 1;
+  shared.Token from = 2;
+  shared.Token to = 3;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["network", "from", "to"]
+    }
+  };
+}
+
 message Flow {
   string id = 1;
   string label = 2;
@@ -52,6 +114,13 @@ service FlowService {
   rpc UpdateFlow(UpdateFlowRequest) returns (UpdateFlowResponse) {
     option (google.api.http) = {
       post: "/api/gw/v1/flow/update",
+      body: "*"
+    };
+  }
+
+  rpc UpdateFlowV2(UpdateFlowV2Request) returns (UpdateFlowV2Response) {
+    option (google.api.http) = {
+      post: "/api/gw/v2/flow/update",
       body: "*"
     };
   }
@@ -124,6 +193,230 @@ service FlowService {
       body: "*"
     };
   }
+
+  rpc CreateFlowV2(CreateFlowV2Req) returns (CreateFlowV2Res) {
+    option (google.api.http) = {
+      post: "/api/gw/v2/flow/create",
+      body: "*"
+    };
+  }
+
+  rpc RandomFlowPreview(FlowPreviewReq) returns (RandomFlowPreviewRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow-random/preview",
+      body: "*"
+    };
+  }
+
+  rpc OnlyRandomFlowPreview(OnlyRandomFlowPreviewReq) returns (OnlyRandomFlowPreviewRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow-random/only-preview",
+      body: "*"
+    };
+  }
+  rpc OnlyRandomFlowFromTokens(OnlyRandomFlowPreviewReq) returns (OnlyRandomFlowFromTokensRes) {
+    option (google.api.http) = {
+      post: "/api/gw/v1/flow-random/only-preview-tokens",
+      body: "*"
+    };
+  }
+
+  rpc GetFlowV2(GetFlowV2Req) returns (GetFlowV2Res) {
+    option (google.api.http) = {
+      post: "/api/gw/v2/flow/get",
+      body: "*"
+    };
+  }
+}
+
+message UpdateFlowV2Request {
+  string id = 1;
+  string label = 2;
+  repeated FlowBlock blocks = 3;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "label", "blocks"]
+    }
+  };
+}
+
+message UpdateFlowV2Response {
+  string id = 1;
+  string label = 2;
+  repeated FlowBlock blocks = 3;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "label", "blocks"]
+    }
+  };
+}
+
+message GetFlowV2Req {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+}
+
+message GetFlowV2Res {
+  string id = 1;
+  string label = 2;
+  repeated FlowBlock blocks = 3;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "label", "blocks"]
+    }
+  };
+}
+
+
+message OnlyRandomFlowPreviewReq {
+
+  shared.Token start_token = 1;
+  shared.Token finish_token = 2;
+  shared.Network start_network = 3;
+  repeated RandomTask tasks = 4;
+  int64 task_count = 6;
+  bool ignore_start_token = 7;
+  bool ignore_finish_token = 8;
+
+  int64 min_delay = 9;
+  int64 max_delay = 10;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["label", "blocks", "min_delay", "max_delay"]
+    }
+  };
+}
+
+message OnlyRandomFlowFromTokensRes {
+  repeated shared.Token tokens = 1;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["tokens"]
+    }
+  };
+}
+
+message OnlyRandomFlowPreviewRes {
+  repeated UniqueFlow flow = 1;
+  double unique_percent = 2;
+
+  repeated TokenArr tokens = 3;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["flow", "unique_percent", "tokens"]
+    }
+  };
+}
+
+message FlowPreviewReq {
+  string label = 1;
+  repeated FlowBlock blocks = 2;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["label", "blocks"]
+    }
+  };
+}
+
+message RandomFlowPreviewRes {
+  repeated UniqueFlow flow = 1;
+  double unique_percent = 2;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["flow", "unique_percent"]
+    }
+  };
+}
+
+message TokenArr {
+  shared.Token from = 1;
+  repeated  shared.Token to = 2;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["from", "to"]
+    }
+  };
+}
+
+message UniqueFlow {
+  repeated Task tasks = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["tasks"]
+    }
+  };
+}
+
+message CreateFlowV2Req {
+  string label = 1;
+  repeated FlowBlock blocks = 2;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["label", "blocks"]
+    }
+  };
+}
+
+message FlowBlock {
+  int64 weight = 1;
+  oneof block {
+      FlowBlockMan man = 2;
+      FlowBlockRand rand = 3;
+  }
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["weight", "block"]
+    }
+  };
+}
+message FlowBlockMan {
+  repeated Task tasks = 1;
+  repeated Task random_tasks = 2;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["tasks", "random_tasks"]
+    }
+  };
+}
+
+message FlowBlockRand {
+
+  shared.Token start_token = 1;
+  shared.Token finish_token = 2;
+  shared.Network start_network = 3;
+  repeated RandomTask tasks = 4;
+  int64 task_count = 6;
+  int64 min_delay = 7;
+  int64 max_delay = 8;
+
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["tasks", "random_tasks", "max_delay", "min_delay"]
+    }
+  };
+}
+
+message CreateFlowV2Res {
+  string id = 1;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
 }
 
 message UseSharedFlowReq {
@@ -354,10 +647,24 @@ message ListFlowRequest {
 }
 
 message ListFlowResponse {
-  repeated Flow flows = 1;
+  repeated FlowListItem flows = 1;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
       required: ["flows"]
+    }
+  };
+}
+
+message FlowListItem {
+  string id = 1;
+  string label = 2;
+  optional string next_id = 6;
+  google.protobuf.Timestamp created_at = 7;
+  optional google.protobuf.Timestamp deleted_at = 8;
+  int64 version = 9;
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "label", "created_at", "version"]
     }
   };
 }

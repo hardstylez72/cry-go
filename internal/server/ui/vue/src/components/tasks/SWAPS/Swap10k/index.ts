@@ -1,4 +1,4 @@
-import {Network, Token} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import swap10k from "@/components/tasks/SWAPS/Swap10k/Block.vue";
@@ -11,6 +11,10 @@ export const Swap10kSpec: TaskSpec = {
   descFn(task) {
     const p = task.swap10k
     return ''
+  },
+  swap: (task: Task) => {
+    const p = task.swap10k
+    return {from: p.fromToken, to: p.toToken, network: p.network}
   },
   component: swap10k,
   menu: swap10kMenu,

@@ -58,6 +58,7 @@ type FlowRepository interface {
 	DeleteFlow(ctx context.Context, userId, flowId string) error
 	GetFlow(ctx context.Context, userId, flowId string) (*Flow, error)
 	UpdateFlow(ctx context.Context, parentFlowId string, req *Flow) (err error)
+	FlowMeta(ctx context.Context, userId, flowId string) (*FlowMeta, error)
 }
 
 type ProcessRepository interface {

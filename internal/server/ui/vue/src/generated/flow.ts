@@ -113,6 +113,72 @@ export class FlowService {
   /**
    *
    */
+  flowServiceOnlyRandomFlowPreview(
+    params: {
+      /**  */
+      body: OnlyRandomFlowPreviewReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<OnlyRandomFlowPreviewRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow-random/only-preview';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  flowServiceOnlyRandomFlowFromTokens(
+    params: {
+      /**  */
+      body: OnlyRandomFlowPreviewReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<OnlyRandomFlowFromTokensRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow-random/only-preview-tokens';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  flowServiceRandomFlowPreview(
+    params: {
+      /**  */
+      body: FlowPreviewReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<RandomFlowPreviewRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow-random/preview';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   flowServiceSharedFlow(
     params: {
       /**  */
@@ -352,6 +418,72 @@ export class FlowService {
       axios(configs, resolve, reject);
     });
   }
+  /**
+   *
+   */
+  flowServiceCreateFlowV2(
+    params: {
+      /**  */
+      body: CreateFlowV2Req;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<CreateFlowV2Res> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v2/flow/create';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  flowServiceGetFlowV2(
+    params: {
+      /**  */
+      body: GetFlowV2Req;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<GetFlowV2Res> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v2/flow/get';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
+  flowServiceUpdateFlowV2(
+    params: {
+      /**  */
+      body: UpdateFlowV2Request;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<UpdateFlowV2Response> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v2/flow/update';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
 }
 
 export interface AmUni {
@@ -418,6 +550,19 @@ export interface CreateFlowRequest {
 export interface CreateFlowResponse {
   /**  */
   flow: flow_Flow;
+}
+
+export interface CreateFlowV2Req {
+  /**  */
+  label: string;
+
+  /**  */
+  blocks: FlowBlock[];
+}
+
+export interface CreateFlowV2Res {
+  /**  */
+  id: string;
 }
 
 export interface DefaultBridge {
@@ -559,6 +704,81 @@ export interface ExchangeSwapTask {
   swapCompleted?: boolean;
 }
 
+export interface FlowBase {
+  /**  */
+  token?: Token;
+}
+
+export interface FlowBlock {
+  /**  */
+  weight: string;
+
+  /**  */
+  man?: FlowBlockMan;
+
+  /**  */
+  rand?: FlowBlockRand;
+}
+
+export interface FlowBlockMan {
+  /**  */
+  tasks: Task[];
+
+  /**  */
+  randomTasks: Task[];
+}
+
+export interface FlowBlockRand {
+  /**  */
+  startToken?: Token;
+
+  /**  */
+  finishToken?: Token;
+
+  /**  */
+  startNetwork?: Network;
+
+  /**  */
+  tasks: RandomTask[];
+
+  /**  */
+  taskCount?: string;
+
+  /**  */
+  minDelay: string;
+
+  /**  */
+  maxDelay: string;
+}
+
+export interface FlowListItem {
+  /**  */
+  id: string;
+
+  /**  */
+  label: string;
+
+  /**  */
+  nextId?: string;
+
+  /**  */
+  createdAt: Date;
+
+  /**  */
+  deletedAt?: Date;
+
+  /**  */
+  version: string;
+}
+
+export interface FlowPreviewReq {
+  /**  */
+  label: string;
+
+  /**  */
+  blocks: FlowBlock[];
+}
+
 export interface FlowShared {
   /**  */
   id: string;
@@ -593,6 +813,22 @@ export interface GetFlowRequest {
 export interface GetFlowResponse {
   /**  */
   flow: flow_Flow;
+}
+
+export interface GetFlowV2Req {
+  /**  */
+  id: string;
+}
+
+export interface GetFlowV2Res {
+  /**  */
+  id: string;
+
+  /**  */
+  label: string;
+
+  /**  */
+  blocks: FlowBlock[];
 }
 
 export interface HideFlowReq {
@@ -634,7 +870,7 @@ export interface ListFlowRequest {}
 
 export interface ListFlowResponse {
   /**  */
-  flows: flow_Flow[];
+  flows: FlowListItem[];
 }
 
 export interface MerklyMintAndBridgeNFTTask {
@@ -714,6 +950,51 @@ export interface OkexDepositTask {
   approveTx?: TaskTx;
 }
 
+export interface OnlyRandomFlowFromTokensRes {
+  /**  */
+  tokens: Token[];
+}
+
+export interface OnlyRandomFlowPreviewReq {
+  /**  */
+  startToken?: Token;
+
+  /**  */
+  finishToken?: Token;
+
+  /**  */
+  startNetwork?: Network;
+
+  /**  */
+  tasks?: RandomTask[];
+
+  /**  */
+  taskCount?: string;
+
+  /**  */
+  ignoreStartToken?: boolean;
+
+  /**  */
+  ignoreFinishToken?: boolean;
+
+  /**  */
+  minDelay: string;
+
+  /**  */
+  maxDelay: string;
+}
+
+export interface OnlyRandomFlowPreviewRes {
+  /**  */
+  flow: UniqueFlow[];
+
+  /**  */
+  uniquePercent: number;
+
+  /**  */
+  tokens: TokenArr[];
+}
+
 export interface OrbiterBridgeTask {
   /**  */
   amount: Amount;
@@ -747,6 +1028,49 @@ export interface OrbiterBridgeTask {
 
   /**  */
   tx?: TaskTx;
+}
+
+export interface RPsimple {
+  /**  */
+  network: Network;
+}
+
+export interface RPswap {
+  /**  */
+  items: RPswapItem[];
+}
+
+export interface RPswapItem {
+  /**  */
+  network: Network;
+
+  /**  */
+  from: Token;
+
+  /**  */
+  to: Token;
+}
+
+export interface RandomFlowPreviewRes {
+  /**  */
+  flow: UniqueFlow[];
+
+  /**  */
+  uniquePercent: number;
+}
+
+export interface RandomTask {
+  /**  */
+  optional: boolean;
+
+  /**  */
+  taskType: TaskType;
+
+  /**  */
+  swap?: RPswap;
+
+  /**  */
+  simple?: RPsimple;
 }
 
 export interface ShareFlowReq {
@@ -1084,12 +1408,25 @@ export interface TestNetBridgeSwapTask {
   tx?: TaskTx;
 }
 
+export interface TokenArr {
+  /**  */
+  from: Token;
+
+  /**  */
+  to: Token[];
+}
+
 export interface TxDetail {
   /**  */
   key: string;
 
   /**  */
   value: string;
+}
+
+export interface UniqueFlow {
+  /**  */
+  tasks: Task[];
 }
 
 export interface UpdateFlowRequest {
@@ -1100,6 +1437,28 @@ export interface UpdateFlowRequest {
 export interface UpdateFlowResponse {
   /**  */
   flow: flow_Flow;
+}
+
+export interface UpdateFlowV2Request {
+  /**  */
+  id: string;
+
+  /**  */
+  label: string;
+
+  /**  */
+  blocks: FlowBlock[];
+}
+
+export interface UpdateFlowV2Response {
+  /**  */
+  id: string;
+
+  /**  */
+  label: string;
+
+  /**  */
+  blocks: FlowBlock[];
 }
 
 export interface UseSharedFlowReq {
@@ -1219,6 +1578,9 @@ export interface flow_Flow {
 
   /**  */
   randomTasks: Task[];
+
+  /**  */
+  base?: FlowBase;
 }
 
 export enum Network {

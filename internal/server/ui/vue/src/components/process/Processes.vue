@@ -111,7 +111,7 @@
 
 import {defineComponent} from 'vue';
 import {processService} from "@/generated/services"
-import CreateFlow from "@/components/flow/CreateFlow.vue";
+import CreateFlow from "@/components/flow/OldCreateFlow.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import {Process, ProcessStatus} from "@/generated/process";
 import StatusCard from "@/components/StatusCard.vue";

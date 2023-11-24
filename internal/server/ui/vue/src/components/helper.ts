@@ -32,19 +32,19 @@ export const GetStatusText = (s: string): string => {
 export const GetStatusColor = (s: string): string => {
   switch (s) {
     case ProcessStatus.StatusError:
-      return "red"
+      return "#FF8A80"
     case ProcessStatus.StatusRunning:
-      return "blue"
+      return "#BBDEFB"
     case ProcessStatus.StatusReady:
-      return "grey"
+      return "#FFFFFF00"
     case ProcessStatus.StatusDone:
-      return "green"
+      return "#C8E6C9"
     case ProcessStatus.StatusRetry:
-      return "blue"
+      return "#BBDEFB"
     case ProcessStatus.StatusStop:
-      return "black"
+      return "#BDBDBD"
     default:
-      return "black"
+      return "#BDBDBD"
   }
 }
 

@@ -1,4 +1,4 @@
-import {Network, Token} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import JediSwap from "@/components/tasks/SWAPS/Jedi/Block.vue";
@@ -11,6 +11,10 @@ export const JediSwapSpec: TaskSpec = {
   descFn(task) {
     const p = task.jediSwapTask
     return ` (${p?.network} from ${p?.fromToken} to ${p?.toToken})`
+  },
+  swap: (task: Task) => {
+    const p = task.jediSwapTask
+    return {from: p.fromToken, to: p.toToken, network: p.network}
   },
   component: JediSwap,
   menu: MenuJediSwap,

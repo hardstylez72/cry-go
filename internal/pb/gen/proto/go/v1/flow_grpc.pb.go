@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FlowServiceClient interface {
 	UpdateFlow(ctx context.Context, in *UpdateFlowRequest, opts ...grpc.CallOption) (*UpdateFlowResponse, error)
+	UpdateFlowV2(ctx context.Context, in *UpdateFlowV2Request, opts ...grpc.CallOption) (*UpdateFlowV2Response, error)
 	CreateFlow(ctx context.Context, in *CreateFlowRequest, opts ...grpc.CallOption) (*CreateFlowResponse, error)
 	GetFlow(ctx context.Context, in *GetFlowRequest, opts ...grpc.CallOption) (*GetFlowResponse, error)
 	ListFlow(ctx context.Context, in *ListFlowRequest, opts ...grpc.CallOption) (*ListFlowResponse, error)
@@ -33,6 +34,11 @@ type FlowServiceClient interface {
 	SharedFlows(ctx context.Context, in *SharedFlowsReq, opts ...grpc.CallOption) (*SharedFlowsRes, error)
 	SharedFlow(ctx context.Context, in *SharedFlowReq, opts ...grpc.CallOption) (*SharedFlowRes, error)
 	UseSharedFlow(ctx context.Context, in *UseSharedFlowReq, opts ...grpc.CallOption) (*UseSharedFlowRes, error)
+	CreateFlowV2(ctx context.Context, in *CreateFlowV2Req, opts ...grpc.CallOption) (*CreateFlowV2Res, error)
+	RandomFlowPreview(ctx context.Context, in *FlowPreviewReq, opts ...grpc.CallOption) (*RandomFlowPreviewRes, error)
+	OnlyRandomFlowPreview(ctx context.Context, in *OnlyRandomFlowPreviewReq, opts ...grpc.CallOption) (*OnlyRandomFlowPreviewRes, error)
+	OnlyRandomFlowFromTokens(ctx context.Context, in *OnlyRandomFlowPreviewReq, opts ...grpc.CallOption) (*OnlyRandomFlowFromTokensRes, error)
+	GetFlowV2(ctx context.Context, in *GetFlowV2Req, opts ...grpc.CallOption) (*GetFlowV2Res, error)
 }
 
 type flowServiceClient struct {
@@ -46,6 +52,15 @@ func NewFlowServiceClient(cc grpc.ClientConnInterface) FlowServiceClient {
 func (c *flowServiceClient) UpdateFlow(ctx context.Context, in *UpdateFlowRequest, opts ...grpc.CallOption) (*UpdateFlowResponse, error) {
 	out := new(UpdateFlowResponse)
 	err := c.cc.Invoke(ctx, "/flow.FlowService/UpdateFlow", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) UpdateFlowV2(ctx context.Context, in *UpdateFlowV2Request, opts ...grpc.CallOption) (*UpdateFlowV2Response, error) {
+	out := new(UpdateFlowV2Response)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/UpdateFlowV2", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -142,11 +157,57 @@ func (c *flowServiceClient) UseSharedFlow(ctx context.Context, in *UseSharedFlow
 	return out, nil
 }
 
+func (c *flowServiceClient) CreateFlowV2(ctx context.Context, in *CreateFlowV2Req, opts ...grpc.CallOption) (*CreateFlowV2Res, error) {
+	out := new(CreateFlowV2Res)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/CreateFlowV2", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) RandomFlowPreview(ctx context.Context, in *FlowPreviewReq, opts ...grpc.CallOption) (*RandomFlowPreviewRes, error) {
+	out := new(RandomFlowPreviewRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/RandomFlowPreview", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) OnlyRandomFlowPreview(ctx context.Context, in *OnlyRandomFlowPreviewReq, opts ...grpc.CallOption) (*OnlyRandomFlowPreviewRes, error) {
+	out := new(OnlyRandomFlowPreviewRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/OnlyRandomFlowPreview", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) OnlyRandomFlowFromTokens(ctx context.Context, in *OnlyRandomFlowPreviewReq, opts ...grpc.CallOption) (*OnlyRandomFlowFromTokensRes, error) {
+	out := new(OnlyRandomFlowFromTokensRes)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/OnlyRandomFlowFromTokens", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *flowServiceClient) GetFlowV2(ctx context.Context, in *GetFlowV2Req, opts ...grpc.CallOption) (*GetFlowV2Res, error) {
+	out := new(GetFlowV2Res)
+	err := c.cc.Invoke(ctx, "/flow.FlowService/GetFlowV2", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FlowServiceServer is the server API for FlowService service.
 // All implementations must embed UnimplementedFlowServiceServer
 // for forward compatibility
 type FlowServiceServer interface {
 	UpdateFlow(context.Context, *UpdateFlowRequest) (*UpdateFlowResponse, error)
+	UpdateFlowV2(context.Context, *UpdateFlowV2Request) (*UpdateFlowV2Response, error)
 	CreateFlow(context.Context, *CreateFlowRequest) (*CreateFlowResponse, error)
 	GetFlow(context.Context, *GetFlowRequest) (*GetFlowResponse, error)
 	ListFlow(context.Context, *ListFlowRequest) (*ListFlowResponse, error)
@@ -157,6 +218,11 @@ type FlowServiceServer interface {
 	SharedFlows(context.Context, *SharedFlowsReq) (*SharedFlowsRes, error)
 	SharedFlow(context.Context, *SharedFlowReq) (*SharedFlowRes, error)
 	UseSharedFlow(context.Context, *UseSharedFlowReq) (*UseSharedFlowRes, error)
+	CreateFlowV2(context.Context, *CreateFlowV2Req) (*CreateFlowV2Res, error)
+	RandomFlowPreview(context.Context, *FlowPreviewReq) (*RandomFlowPreviewRes, error)
+	OnlyRandomFlowPreview(context.Context, *OnlyRandomFlowPreviewReq) (*OnlyRandomFlowPreviewRes, error)
+	OnlyRandomFlowFromTokens(context.Context, *OnlyRandomFlowPreviewReq) (*OnlyRandomFlowFromTokensRes, error)
+	GetFlowV2(context.Context, *GetFlowV2Req) (*GetFlowV2Res, error)
 	mustEmbedUnimplementedFlowServiceServer()
 }
 
@@ -166,6 +232,9 @@ type UnimplementedFlowServiceServer struct {
 
 func (UnimplementedFlowServiceServer) UpdateFlow(context.Context, *UpdateFlowRequest) (*UpdateFlowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateFlow not implemented")
+}
+func (UnimplementedFlowServiceServer) UpdateFlowV2(context.Context, *UpdateFlowV2Request) (*UpdateFlowV2Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateFlowV2 not implemented")
 }
 func (UnimplementedFlowServiceServer) CreateFlow(context.Context, *CreateFlowRequest) (*CreateFlowResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFlow not implemented")
@@ -197,6 +266,21 @@ func (UnimplementedFlowServiceServer) SharedFlow(context.Context, *SharedFlowReq
 func (UnimplementedFlowServiceServer) UseSharedFlow(context.Context, *UseSharedFlowReq) (*UseSharedFlowRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UseSharedFlow not implemented")
 }
+func (UnimplementedFlowServiceServer) CreateFlowV2(context.Context, *CreateFlowV2Req) (*CreateFlowV2Res, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFlowV2 not implemented")
+}
+func (UnimplementedFlowServiceServer) RandomFlowPreview(context.Context, *FlowPreviewReq) (*RandomFlowPreviewRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RandomFlowPreview not implemented")
+}
+func (UnimplementedFlowServiceServer) OnlyRandomFlowPreview(context.Context, *OnlyRandomFlowPreviewReq) (*OnlyRandomFlowPreviewRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method OnlyRandomFlowPreview not implemented")
+}
+func (UnimplementedFlowServiceServer) OnlyRandomFlowFromTokens(context.Context, *OnlyRandomFlowPreviewReq) (*OnlyRandomFlowFromTokensRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method OnlyRandomFlowFromTokens not implemented")
+}
+func (UnimplementedFlowServiceServer) GetFlowV2(context.Context, *GetFlowV2Req) (*GetFlowV2Res, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFlowV2 not implemented")
+}
 func (UnimplementedFlowServiceServer) mustEmbedUnimplementedFlowServiceServer() {}
 
 // UnsafeFlowServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -224,6 +308,24 @@ func _FlowService_UpdateFlow_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FlowServiceServer).UpdateFlow(ctx, req.(*UpdateFlowRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_UpdateFlowV2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFlowV2Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).UpdateFlowV2(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/UpdateFlowV2",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).UpdateFlowV2(ctx, req.(*UpdateFlowV2Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -408,6 +510,96 @@ func _FlowService_UseSharedFlow_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FlowService_CreateFlowV2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateFlowV2Req)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).CreateFlowV2(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/CreateFlowV2",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).CreateFlowV2(ctx, req.(*CreateFlowV2Req))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_RandomFlowPreview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FlowPreviewReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).RandomFlowPreview(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/RandomFlowPreview",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).RandomFlowPreview(ctx, req.(*FlowPreviewReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_OnlyRandomFlowPreview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OnlyRandomFlowPreviewReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).OnlyRandomFlowPreview(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/OnlyRandomFlowPreview",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).OnlyRandomFlowPreview(ctx, req.(*OnlyRandomFlowPreviewReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_OnlyRandomFlowFromTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(OnlyRandomFlowPreviewReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).OnlyRandomFlowFromTokens(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/OnlyRandomFlowFromTokens",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).OnlyRandomFlowFromTokens(ctx, req.(*OnlyRandomFlowPreviewReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FlowService_GetFlowV2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFlowV2Req)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FlowServiceServer).GetFlowV2(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/flow.FlowService/GetFlowV2",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FlowServiceServer).GetFlowV2(ctx, req.(*GetFlowV2Req))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FlowService_ServiceDesc is the grpc.ServiceDesc for FlowService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -418,6 +610,10 @@ var FlowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateFlow",
 			Handler:    _FlowService_UpdateFlow_Handler,
+		},
+		{
+			MethodName: "UpdateFlowV2",
+			Handler:    _FlowService_UpdateFlowV2_Handler,
 		},
 		{
 			MethodName: "CreateFlow",
@@ -458,6 +654,26 @@ var FlowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UseSharedFlow",
 			Handler:    _FlowService_UseSharedFlow_Handler,
+		},
+		{
+			MethodName: "CreateFlowV2",
+			Handler:    _FlowService_CreateFlowV2_Handler,
+		},
+		{
+			MethodName: "RandomFlowPreview",
+			Handler:    _FlowService_RandomFlowPreview_Handler,
+		},
+		{
+			MethodName: "OnlyRandomFlowPreview",
+			Handler:    _FlowService_OnlyRandomFlowPreview_Handler,
+		},
+		{
+			MethodName: "OnlyRandomFlowFromTokens",
+			Handler:    _FlowService_OnlyRandomFlowFromTokens_Handler,
+		},
+		{
+			MethodName: "GetFlowV2",
+			Handler:    _FlowService_GetFlowV2_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

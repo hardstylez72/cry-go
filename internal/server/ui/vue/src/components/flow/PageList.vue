@@ -5,6 +5,7 @@
         <div class="d-flex justify-end">
           <v-btn @click="$router.push({name: 'SharedFlowList'})" class="mx-1" variant="flat">Общие</v-btn>
           <v-btn @click=CreateFlow :class="noFlow ? 'onboarding' : ''" variant="flat">Добавить</v-btn>
+          <v-btn @click="$router.push({name: 'CreateFlowV2'})" variant="flat">ДобавитьV2</v-btn>
         </div>
       </template>
     </NavBar>
@@ -25,15 +26,10 @@
           rounded
           height="auto"
           elevation="1"
-          @click="viewFlow(item.id)"
+          @click="viewFlow(item.id, item.version)"
         >
           <div>
-            <div class="mr-2"><b>{{ `${item.label}` }}</b></div>
-            <div>
-              <div class="mr-2" v-for="(d, i) in getFlow(item)">
-                <b>{{ i + 1 }})</b> {{ d }}
-              </div>
-            </div>
+            <div class="mr-2"><b>{{ `${item.label}` }}</b> {{ formatTime(item.createdAt) }}</div>
           </div>
         </v-list-item>
       </v-list>
@@ -45,12 +41,13 @@
 
 import {defineComponent} from 'vue';
 import {flowService} from "@/generated/services"
-import {flow_Flow as Flow, TaskType} from "@/generated/flow";
-import CreateFlow from "@/components/flow/CreateFlow.vue";
+import {flow_Flow as Flow, FlowListItem, TaskType} from "@/generated/flow";
+import CreateFlow from "@/components/flow/OldCreateFlow.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import {getFlow} from "@/components/tasks/tasks";
 import Loader from "@/components/Loader.vue";
 import NavBar from "@/components/NavBar.vue";
+import {formatTime} from "../helper";
 
 export default defineComponent({
   name: "Constructor",
@@ -63,7 +60,7 @@ export default defineComponent({
   props: {},
   data() {
     return {
-      list: [] as Flow[],
+      list: [] as FlowListItem[],
       loading: true,
       loadingError: false,
     }
@@ -72,14 +69,20 @@ export default defineComponent({
     noFlow() {
       return this.getList.length === 0
     },
-    getList(): Flow[] {
+    getList(): FlowListItem[] {
       return this.list
     },
   },
   methods: {
+    formatTime,
     getFlow,
-    viewFlow(id: string) {
-      this.$router.push({name: 'Flow', params: {id}})
+    viewFlow(id: string, version: string) {
+
+      if (version == "2") {
+        this.$router.push({name: 'FlowViewV2', params: {id}})
+      } else {
+        this.$router.push({name: 'Flow', params: {id}})
+      }
     },
     showStep(flow: Flow): string {
       if (!flow || !flow.tasks) {
