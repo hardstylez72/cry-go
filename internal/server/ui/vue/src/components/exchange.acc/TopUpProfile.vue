@@ -3,7 +3,7 @@
     v-model="dialog"
     :close-on-content-click="false"
     :close-on-back="false"
-    persistent="true"
+    :persistent="true"
     width="400px"
     location="center"
   >

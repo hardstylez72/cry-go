@@ -7,7 +7,7 @@
     location="center"
     :close-on-content-click="false"
     :close-on-back="false"
-    persistent="true"
+    :persistent="true"
   >
     <template v-slot:activator="{ props }">
       <v-chip :disabled="disable" rounded variant="outlined" v-bind="props" @click="dialog=true">Изменить</v-chip>
@@ -124,7 +124,7 @@
                             </h4>
                             <a><h4 class="mx-2">{{ `${element.weight}) ${element.taskType}` }}</h4></a>
                             <a target="_blank" :href="taskSpec(element.taskType).service.link" class="mx-1">
-                              <v-img height="22px" :src="taskSpec(element.taskType).service.img"/>
+                              <v-img height="22px" width="22px" :src="taskSpec(element.taskType).service.img"/>
                             </a>
                           </div>
 
@@ -180,7 +180,7 @@
                                     `${element.weight}) ${element.taskType}`
                                   }}</h4></a>
                                 <a target="_blank" :href="taskSpec(element.taskType).service.link" class="mx-1">
-                                  <v-img height="22px" :src="taskSpec(element.taskType).service.img"/>
+                                  <v-img height="22px" width="22px" :src="taskSpec(element.taskType).service.img"/>
                                 </a>
                               </div>
 

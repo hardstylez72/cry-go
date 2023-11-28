@@ -7,7 +7,7 @@
       </template>
     </NavBar>
 
-    <v-radio-group style="float: left" v-model="issueType" inline="true">
+    <v-radio-group style="float: left" v-model="issueType" :inline="true">
       <v-radio class="mx-4" value="мои">Мои</v-radio>
       <v-radio class="mx-4" value="все">Все</v-radio>
     </v-radio-group>

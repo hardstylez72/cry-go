@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -109,6 +110,8 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 	result := make(chan ExecutorResult)
 	defer close(result)
 
+	h := halp.NewHalp(d.runner.profileRepository, d.settingsService, d.starknetcClient)
+
 	retryCount := 0
 	for {
 
@@ -141,7 +144,7 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 					SettingsService:      d.settingsService,
 					Snapshot:             d.snapshotService,
 					User:                 u,
-					Halper:               halp.NewHalp(d.runner.profileRepository, d.settingsService, d.starknetcClient),
+					Halper:               h,
 					PayService:           d.payService,
 					Orbiter:              d.orbiterService,
 				})
@@ -187,6 +190,7 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 		}
 
 		if execErr != nil {
+			outOfGas := &defi.ErrOutOfGas{}
 			switch true {
 			case errors.Is(execErr, task.ErrUserHasNoBalance):
 				d.SendAlert(ctx, userId, pId, execErr, l)
@@ -197,6 +201,22 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 					return errors.Wrap(err, "UpdateProcessTaskStatus")
 				}
 				return nil
+			case errors.As(execErr, &outOfGas):
+
+				profile, profileErr := h.Profile(ctx, pp.pp.ProfileId)
+				if profileErr != nil {
+					return err
+				}
+
+				if refuelErr := d.AutoRefuel(ctx, AutoRefuel{
+					Profile:   profile,
+					Err:       *outOfGas,
+					TaskId:    t.Id,
+					ProcessId: pId,
+				}); refuelErr != nil {
+					return err
+				}
+				continue
 			default:
 				retryCount++
 				if retryCount < getMaxRetry() {
@@ -249,6 +269,7 @@ func (d *Dispatcher) runPP(ctx context.Context, pId processId, ppId string, user
 		}
 	}
 }
+
 func (d *Dispatcher) SendAlert(ctx context.Context, userId string, pId string, execErr error, l *zap.SugaredLogger) {
 
 	if execErr == nil {

@@ -72,6 +72,7 @@ export enum Airdrop {
   StarkNet = "StarkNet",
   Orbiter = "Orbiter",
   Base = "Base",
+  Linea = "Linea",
 }
 
 export const Universal = [Airdrop.ZkSync, Airdrop.StarkNet, Airdrop.Orbiter, Airdrop.LayerZero, Airdrop.Base]

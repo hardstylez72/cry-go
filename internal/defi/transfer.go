@@ -129,6 +129,7 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 	}
 
 	d := &bozdo.TxData{
+		Code:         bozdo.CodeTransfer,
 		Data:         []byte{},
 		Value:        r.Amount,
 		ContractAddr: common.HexToAddress(r.ToAddr),
@@ -138,7 +139,7 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 		ExtraFee:     nil,
 	}
 
-	res, err := c.LondonReadyTx(ctx, opt, d)
+	res, err := c.London(ctx, c, opt, d)
 	if err != nil {
 		return nil, errors.Wrap(err, "LondonReadyTx")
 	}

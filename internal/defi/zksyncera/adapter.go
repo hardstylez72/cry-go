@@ -12,12 +12,30 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
 	"github.com/hardstylez72/cry/internal/defi/orbiter"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 	"github.com/zksync-sdk/zksync2-go/accounts"
 	"github.com/zksync-sdk/zksync2-go/contracts/erc20"
 )
+
+func errWrap(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if strings.Contains(err.Error(), "insufficient funds for gas") ||
+		strings.Contains(err.Error(), "eth_estimateGas: insufficient balance for transfer") ||
+		strings.Contains(err.Error(), "eth_estimateGas: execution reverted: Return amount is not enough") ||
+		strings.Contains(err.Error(), "not enough balance of ETH") {
+		err = &defi.ErrOutOfGas{
+			N:     v1.Network_ZKSYNCERA,
+			Token: v1.Token_ETH,
+		}
+	}
+	return err
+}
 
 type GetBalanceReq struct {
 	WalletAddress common.Address
@@ -148,7 +166,9 @@ type L1L2BridgeRes struct {
 	EstimatedGasCost *bozdo.EstimatedGasCost
 }
 
-func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) (*defi.OrbiterBridgeRes, error) {
+func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) (_ *defi.OrbiterBridgeRes, err error) {
+
+	defer func() { err = errWrap(err) }()
 
 	r := &defi.OrbiterBridgeRes{}
 
@@ -181,14 +201,17 @@ func (c *Client) OrbiterBridge(ctx context.Context, req *defi.OrbiterBridgeReq) 
 	return r, nil
 }
 
-func (c *Client) Transfer(ctx context.Context, r *defi.TransferReq) (*defi.TransferRes, error) {
+func (c *Client) Transfer(ctx context.Context, r *defi.TransferReq) (_ *defi.TransferRes, err error) {
+	defer func() { err = errWrap(err) }()
+
 	if r.Token == c.Cfg.MainToken {
 		return c.TransferMainToken(ctx, r)
 	}
 	return c.TransferToken(ctx, r)
 }
 
-func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.TransferRes, error) {
+func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (_ *defi.TransferRes, err error) {
+	defer func() { err = errWrap(err) }()
 	res := &defi.TransferRes{}
 
 	to, supported := c.Cfg.TokenMap[r.Token]
@@ -259,7 +282,8 @@ func (c *Client) TransferToken(ctx context.Context, r *defi.TransferReq) (*defi.
 	return res, nil
 
 }
-func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*defi.TransferRes, error) {
+func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (_ *defi.TransferRes, err error) {
+	defer func() { err = errWrap(err) }()
 
 	res := &defi.TransferRes{}
 
@@ -306,10 +330,127 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (*d
 	return res, nil
 }
 
-func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.DefaultRes, error) {
+func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (_ *bozdo.DefaultRes, err error) {
+	defer func() { err = errWrap(err) }()
 	return c.StargateBridge(ctx, req)
 }
 
 func (c *Client) Network() v1.Network {
 	return c.Cfg.Network
+}
+
+func (c *Client) BridgeNft(ctx context.Context, req *defi.BridgeNFTReq, taskType v1.TaskType) (_ *bozdo.DefaultRes, err error) {
+	defer func() { err = errWrap(err) }()
+	switch taskType {
+	case v1.TaskType_MerklyMintAndBridgeNFT:
+		return c.BridgeNftMerkly(ctx, req)
+	default:
+		return nil, errors.New("not supported")
+	}
+}
+
+func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.TaskType) (_ *bozdo.DefaultRes, err error) {
+	defer func() { err = errWrap(err) }()
+	m := &merkly.Maker{
+		TokenMap: c.Cfg.TokenMap,
+		Cli:      c.ClientL2,
+		Network:  c.Cfg.Network,
+		CA:       SpecMap["merkly"].Addr,
+	}
+
+	txData, _, err := m.MakeMintTx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &bozdo.DefaultRes{}
+
+	transactor, err := NewWalletTransactor(req.PK, c.NetworkId)
+	if err != nil {
+		return nil, err
+	}
+
+	tx := CreateFunctionCallTransaction(
+		transactor.WalletAddr,
+		txData.ContractAddr,
+		big.NewInt(0),
+		big.NewInt(0),
+		txData.Value,
+		txData.Data,
+		nil, nil,
+	)
+
+	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, transactor.Signer)
+	if err != nil {
+		return nil, errors.Wrap(err, "Make712Tx")
+	}
+
+	estimate.Name = "Mint"
+	estimate.Details = txData.Details
+	result.ECost = estimate
+
+	if req.EstimateOnly {
+		return result, nil
+	}
+
+	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
+	if err != nil {
+		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
+	}
+
+	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
+
+	return result, nil
+}
+
+func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1.TaskType) (_ *bozdo.DefaultRes, err error) {
+	defer func() { err = errWrap(err) }()
+	switch taskType {
+	case v1.TaskType_VeSyncSwap:
+		return c.VeSyncSwap(ctx, req)
+	case v1.TaskType_VelocoreSwap:
+		return c.VelocoreSwap(ctx, req)
+	case v1.TaskType_IzumiSwap:
+		return c.IzumiSwap(ctx, req)
+	case v1.TaskType_MaverickSwap:
+		return c.MaverickSwap(ctx, req)
+	case v1.TaskType_PancakeSwap:
+		return c.PancakeSwap(ctx, req)
+	case v1.TaskType_SpaceFISwap:
+
+		tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
+			Token:       req.FromToken,
+			WalletPK:    req.WalletPK,
+			Amount:      req.Amount,
+			SpenderAddr: c.Cfg.SpaceFI.Router,
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "TokenLimitChecker")
+		}
+
+		res, err := c.SpaceFiSwap(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		if tokenLimitChecker.ApproveTx != nil {
+			res.ApproveTx = tokenLimitChecker.ApproveTx
+		}
+		return res, nil
+
+	case v1.TaskType_MuteioSwap:
+		return c.MuteIOSwap(ctx, req)
+	case v1.TaskType_SyncSwap:
+		return c.SyncSwap(ctx, req)
+	case v1.TaskType_ZkSwap:
+		return c.ZkSwap(ctx, req)
+	case v1.TaskType_EzkaliburSwap:
+		return c.EzkaliburSwap(ctx, req)
+	case v1.TaskType_OdosSwap:
+		return c.OdosSwap(ctx, req)
+	case v1.TaskType_KyberSwap:
+		return c.KeyberSwap(ctx, req)
+	default:
+		return nil, errors.New("unsupported task type: " + taskType.String())
+	}
+
 }

@@ -14,7 +14,7 @@
 <script lang="ts">
 
 import {defineComponent, PropType} from 'vue';
-import {FlowBlock, RandomFlowPreviewRes} from "@/generated/flow";
+import {FlowBlock, FlowPreviewRes} from "@/generated/flow";
 import draggable from 'vuedraggable'
 import TaskChip from "@/components/tasks/TaskChip.vue";
 import TaskSelector from "@/components/flow/TaskSelector.vue";
@@ -67,7 +67,7 @@ export default defineComponent({
       this.timer.cb(() => {
 
         this.previewError = ''
-        flowService.flowServiceRandomFlowPreview({
+        flowService.flowServiceFlowPreview({
           body: {
             label: '',
             blocks: [
@@ -88,7 +88,7 @@ export default defineComponent({
     return {
       localBlock: {man: {tasks: [], randomTasks: []}} as FlowBlock,
       previewError: '',
-      preview: {} as RandomFlowPreviewRes,
+      preview: {} as FlowPreviewRes,
       timer: new Timer(),
     }
   }

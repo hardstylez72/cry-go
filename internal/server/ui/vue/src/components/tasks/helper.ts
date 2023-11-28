@@ -25,6 +25,8 @@ export const getAmountSend = (am?: Amount): string => {
       return `${String(am.sendPercent)}%`
     case am.sendValue !== undefined:
       return `${String(am.sendAmount)} `
+    case am.percRange !== undefined:
+      return `${String(am.percRange.min)}-${String(am.percRange.max)}%`
     default:
       return "invalid value"
   }
@@ -32,13 +34,26 @@ export const getAmountSend = (am?: Amount): string => {
 
 export const onlyInteger = (v: any) => {
   if (!v) {
-    return 'required'
+    return 'Обязательное поле'
   }
 
   if (Number.isInteger(Number(v))) {
     return true
   }
-  return 'number must be integer'
+  return 'Должно быть целое число'
 }
+
+export const moreThanZero = (v: any) => {
+
+  if (Number.isNaN(v)) {
+    return "Должно быть числом"
+  }
+  if (String(v) === "0") {
+    return "Должно быть больше 0"
+  }
+
+  return true
+}
+
 
 export const required = (v: any) => !!v || 'обязательно для заполнения'

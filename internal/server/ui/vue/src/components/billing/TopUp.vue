@@ -4,7 +4,7 @@
     width="800"
     :close-on-content-click="false"
     :close-on-back="false"
-    persistent="true"
+    :persistent="true"
   >
     <template v-slot:activator="{ props }">
       <v-btn density="comfortable" @click="dialog=true">Пополнить</v-btn>

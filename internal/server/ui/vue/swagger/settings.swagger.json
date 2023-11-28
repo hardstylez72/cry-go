@@ -123,6 +123,25 @@
       },
       "additionalProperties": {}
     },
+    "AutoRefuel": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "min": {
+          "type": "number",
+          "format": "double"
+        },
+        "max": {
+          "type": "number",
+          "format": "double"
+        },
+        "withdrawerId": {
+          "type": "string"
+        }
+      }
+    },
     "GetSettingsRequest": {
       "type": "object",
       "properties": {
@@ -166,7 +185,8 @@
         "PolygonZKEVM",
         "Fantom",
         "Base",
-        "opBNB"
+        "opBNB",
+        "Linea"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -195,6 +215,9 @@
         },
         "network": {
           "$ref": "#/definitions/Network"
+        },
+        "autoRefuel": {
+          "$ref": "#/definitions/AutoRefuel"
         }
       },
       "required": [

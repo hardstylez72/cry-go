@@ -5,24 +5,26 @@
 
 
       <div v-if="!baseNetworkFilter" class="d-inline-flex align-center">{{ `Тип фильтра: ` }}
-        <v-radio-group inline="true" v-model="filterType" hide-details>
+        <v-radio-group :inline="true" v-model="filterType" hide-details>
           <v-radio v-for="item in Filters" :value="item" :label="item"/>
         </v-radio-group>
       </div>
 
       <div v-if="!baseNetworkFilter">Значения фильтра:
-        <v-radio-group v-if="filterType === 'Сеть'" v-model="filterNetwork" inline="true">
-          <v-chip density="compact" size="5px" value="Все сети" @click="filterNetwork = 'Все сети'">{{
+        <v-radio-group v-if="filterType === 'Сеть'" v-model="filterNetwork" :inline="true">
+          <v-chip density="compact" variant="outlined" rounded size="4px" value="Все сети"
+                  @click="filterNetwork = 'Все сети'" class="px-1">
+            {{
               "Все сети"
             }}
           </v-chip>
-          <v-chip v-for="network in networks" @click="filterNetwork = network" :value="network"
-                  density="compact" class="mx-1 my-1">
-            <v-img height="22px" :src="networkProps[network].img"/>
-            {{ networkProps[network].name }}
+          <v-chip variant="outlined" rounded v-for="network in networks" @click="filterNetwork = network"
+                  :value="network"
+                  density="comfortable" class="mx-1 my-1">
+            <NetworkChip :network="network"/>
           </v-chip>
         </v-radio-group>
-        <v-radio-group v-if="filterType === 'Airdrop'" v-model="filterAirdrop" inline="true">
+        <v-radio-group v-if="filterType === 'Airdrop'" v-model="filterAirdrop" :inline="true">
           <v-radio value="Все Airdrop" label="Все Airdrop"/>
           <v-radio v-for="airdrop in airdrops" :value="airdrop" :label="airdrop"></v-radio>
         </v-radio-group>
@@ -52,6 +54,7 @@ import draggable from 'vuedraggable'
 import TaskChip from "@/components/tasks/TaskChip.vue";
 import {networkProps} from "@/components/helper";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
+import NetworkChip from "@/components/tasks/NetworkChip.vue";
 
 
 export default defineComponent({
@@ -71,6 +74,7 @@ export default defineComponent({
     },
   },
   components: {
+    NetworkChip,
     TaskChip,
     draggable,
   },

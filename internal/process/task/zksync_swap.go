@@ -282,7 +282,7 @@ func (h *ZkSyncSwapHalper) Execute(ctx context.Context, profile *halp.Profile, p
 			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
-			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balanceNative.WEI)
+			return nil, nil, ErrProfileHasInsufficientBalance(p.Network, v1.Token_ETH, &Gas.TotalGas, balanceNative.WEI)
 		}
 	}
 

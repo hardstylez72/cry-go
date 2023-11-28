@@ -75,7 +75,8 @@ func NewClient(c *ClientConfig) (*Client, error) {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum net: "+c.RPCEndpoint)
 	}
 	ethcli.Cfg.EstimateL1Gas = ethcli.EstimateL1GasFee
-
+	ethcli.London = defi.LondonReadyTx
+	
 	return &Client{
 		defi:      ethcli,
 		NetworkId: bozdo.ChainMap[v1.Network_OPTIMISM],

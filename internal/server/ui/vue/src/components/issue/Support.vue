@@ -12,7 +12,7 @@
       </v-btn>
     </template>
 
-    <template v-slot:default="{ props }">
+    <template v-slot:default>
       <v-card class="text-break text-pre-wrap">
         <v-card-title>
           Обращение в поддержку

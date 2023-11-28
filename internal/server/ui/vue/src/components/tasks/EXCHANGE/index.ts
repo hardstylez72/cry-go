@@ -18,7 +18,7 @@ export const ExchangeWithdrawSpec: TaskSpec = {
     return ` (${p?.network} am: ${p?.sendAllCoins ? 'all' : `[${p?.amountMin}:${p?.amountMax}]`} ${p?.token})`
   },
   service: {
-    name: 'Withdrawal',
+    name: 'С биржи',
     img: '',
     link: '',
     op: 'вывод',
@@ -39,7 +39,7 @@ export const ExchangeDeposit: TaskSpec = {
     return ` (${p?.network} ${p?.token})`
   },
   service: {
-    name: 'Deposit',
+    name: 'На биржу',
     link: 'https://www.okx.com/',
     img: '',
     op: 'депозит',

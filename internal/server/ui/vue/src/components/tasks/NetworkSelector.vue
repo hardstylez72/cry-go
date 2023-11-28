@@ -56,6 +56,7 @@ export default defineComponent({
       }
     }
   },
+
   props: {
     modelValue: {
       type: String as PropType<Network | null>,

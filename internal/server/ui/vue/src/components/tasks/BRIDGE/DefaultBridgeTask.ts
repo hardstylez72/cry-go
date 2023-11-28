@@ -61,7 +61,7 @@ import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 })
 export default class TaskDefaultBridge extends Vue {
   @Prop weight!: Number
-  @Prop disabled!: Boolean
+  @Prop disabled!: boolean
   @Prop task!: Task
 
   init = true

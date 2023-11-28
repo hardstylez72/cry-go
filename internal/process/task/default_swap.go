@@ -203,7 +203,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 	}
 
 	if am == nil || am.Cmp(big.NewInt(0)) == 0 {
-		return nil, nil, errors.New("not enough balance of " + p.FromToken.String())
+		return nil, nil, &defi.ErrOutOfGas{N: p.Network, Token: p.FromToken}
 	}
 
 	estimateOnly := estimation == nil
@@ -226,7 +226,7 @@ func (h *DefaultSwapTaskHalper) Execute(ctx context.Context, profile *halp.Profi
 			return nil, nil, errors.Wrap(err, "client.GetBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
-			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balance.WEI)
+			return nil, nil, ErrProfileHasInsufficientBalance(p.Network, v1.Token_ETH, &Gas.TotalGas, balance.WEI)
 		}
 	}
 

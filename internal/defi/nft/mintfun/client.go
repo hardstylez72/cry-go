@@ -37,7 +37,7 @@ func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq) (*bozdo.DefaultR
 		Debug:    req.Debug,
 		TaskType: v1.TaskType_MintFun,
 	}
-	tx, err := c.cli.LondonReadyTx(ctx, opt, data)
+	tx, err := c.cli.London(ctx, c.cli, opt, data)
 	if err != nil {
 		return nil, err
 	}

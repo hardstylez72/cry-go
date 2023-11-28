@@ -33,7 +33,7 @@
 
       <v-divider/>
 
-      <v-list density="compact" height="vh 90" nav="true">
+      <v-list density="compact" height="vh 90" :nav="true">
         <v-list-item v-if="userLoggedIn" prepend-icon="mdi-account-multiple-outline" color="green" title="Профили"
                      value="home"
                      @click="$router.push({name: 'Profiles'})"></v-list-item>
@@ -71,21 +71,21 @@
 
             <a v-if="userLoggedIn" href="https://t.me/drop_hunter_alert_bot" target="_blank">
               <div style="height: 20px" class="d-inline-flex">
-                <v-img src="/icons/telegram.png"/>
+                <v-img width="20px" src="/icons/telegram.png"/>
                 <span class="ml-2">Бот</span>
               </div>
             </a>
             <br/>
             <a href="https://t.me/+WX8iCLaJBelhNTVi" target="_blank">
               <div style="height: 20px" class="d-inline-flex">
-                <v-img src="/icons/telegram.png"/>
+                <v-img width="20px" src="/icons/telegram.png"/>
                 <span class="ml-2">Сообщество</span>
               </div>
             </a>
             <br/>
             <a href="https://github.com/hardstylez72/cry-service" target="_blank">
               <div style="height: 20px" class="d-inline-flex">
-                <v-img src="/icons/github.png"/>
+                <v-img width="20px" src="/icons/github.png"/>
                 <span class="ml-2">Github</span>
               </div>
             </a>

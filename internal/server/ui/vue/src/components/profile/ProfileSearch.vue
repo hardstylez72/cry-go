@@ -1,7 +1,7 @@
 <template>
   <div class="my-2">
     <v-autocomplete
-      chips="true"
+      :chips="true"
       closable-chips
       return-object
       v-model="selectedProfiles"
@@ -10,13 +10,13 @@
       :items="suggestedProfiles"
       :item-title="profileTitle"
       item-value="id"
-      :multiple="multiple"
+      :multiple="multiple === true"
       :rules="[required]"
       ref="label-input"
       label="Нужно выбрать профили, Например 1-10"
       density="comfortable"
       variant="outlined"
-      clearable="true"
+      :clearable="true"
       :disabled="disabled"
       no-data-text="Петушки не нашлись"
       :hide-no-data="hideNoData"
@@ -29,7 +29,7 @@
       </template>
     </v-autocomplete>
     <div class="d-inline-flex align-center">
-      <v-radio-group v-model="selectProfileType" inline="" hide-details density="compact" :disabled="disabled">
+      <v-radio-group v-model="selectProfileType" :inline="true" hide-details density="compact" :disabled="disabled">
         Выберите тип профилей:
         <v-radio v-if="profileTypeAllowed(ProfileType.EVM)" class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
         <v-radio v-if="profileTypeAllowed(ProfileType.StarkNet)" class="mx-8" :value="ProfileType.StarkNet">StarkNet

@@ -23,7 +23,7 @@
 
       </div>
 
-      <v-list v-else max-width="96vw" class="px-5" nav="true">
+      <v-list v-else max-width="96vw" class="px-5" :nav="true">
         <v-list-item
           density="compact"
           variant="plain"

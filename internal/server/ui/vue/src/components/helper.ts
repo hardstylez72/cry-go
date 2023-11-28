@@ -374,6 +374,11 @@ export const networkProps: Record<Network, network> = {
     img: '/icons/networks/opbnb.svg',
     value: Network.opBNB,
   },
+  Linea: {
+    name: 'Linea',
+    img: '/icons/networks/linea.ico',
+    value: Network.Linea,
+  },
 }
 
 

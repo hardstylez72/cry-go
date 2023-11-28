@@ -52,6 +52,9 @@ export const SwapOdosSpec: TaskSpec = {
     tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.BUSD),
     tokenSwapPair(Network.ZKSYNCERA, Token.BUSD, Token.ETH),
 
+    tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.WETH),
+    tokenSwapPair(Network.ZKSYNCERA, Token.WETH, Token.ETH),
+
     // Tokens
     tokenSwapPair(Network.ZKSYNCERA, Token.BUSD, Token.USDC),
     tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.BUSD),

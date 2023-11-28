@@ -109,7 +109,7 @@ func (c *Client) Supply(ctx context.Context, req *defi.LPReq) (*defi.LPRes, erro
 		Debug:        false,
 		TaskType:     v1.TaskType_AaveLP,
 	}
-	tx, err := c.cli.LondonReadyTx(ctx, opt, data)
+	tx, err := c.cli.London(ctx, c.cli, opt, data)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (c *Client) Withdraw(ctx context.Context, req *defi.LPReq) (*defi.LPRes, er
 		Debug:        false,
 		TaskType:     v1.TaskType_AaveLP,
 	}
-	tx, err := c.cli.LondonReadyTx(ctx, opt, data)
+	tx, err := c.cli.London(ctx, c.cli, opt, data)
 	if err != nil {
 		return nil, err
 	}

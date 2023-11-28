@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    fullscreen="true"
+    :fullscreen="true"
   >
     <template v-slot:activator="{ props }">
       <v-btn

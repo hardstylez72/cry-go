@@ -31,7 +31,7 @@
 
 
     <b>EMV </b> <span v-if="emv.length"><b>Networks: </b>{{ emv[0].networks }}</span>
-    <v-list max-width="96vw" class="px-5" nav="true">
+    <v-list max-width="96vw" class="px-5" :nav="true">
       <v-list-item
         density="compact"
         variant="plain"
@@ -60,7 +60,7 @@
     </v-list>
 
     <b>StarkNet </b><span v-if="urgent.length"><b>Networks: </b>{{ urgent[0].networks }}</span>
-    <v-list max-width="96vw" class="px-5" nav="true">
+    <v-list max-width="96vw" class="px-5" :nav="true">
       <v-list-item
         density="compact"
         variant="plain"

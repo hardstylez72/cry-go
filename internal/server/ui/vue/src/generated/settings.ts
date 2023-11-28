@@ -178,6 +178,20 @@ export class SettingsService {
   }
 }
 
+export interface AutoRefuel {
+  /**  */
+  enabled?: boolean;
+
+  /**  */
+  min?: number;
+
+  /**  */
+  max?: number;
+
+  /**  */
+  withdrawerId?: string;
+}
+
 export interface GetSettingsRequest {
   /**  */
   network: Network;
@@ -206,6 +220,9 @@ export interface NetworkSettings {
 
   /**  */
   network: Network;
+
+  /**  */
+  autoRefuel?: AutoRefuel;
 }
 
 export interface ResetRequest {
@@ -247,5 +264,6 @@ export enum Network {
   'PolygonZKEVM' = 'PolygonZKEVM',
   'Fantom' = 'Fantom',
   'Base' = 'Base',
-  'opBNB' = 'opBNB'
+  'opBNB' = 'opBNB',
+  'Linea' = 'Linea'
 }

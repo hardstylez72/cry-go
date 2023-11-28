@@ -4,7 +4,7 @@
       <v-radio-group
         density="comfortable"
         direction="horizontal"
-        inline="true"
+        :inline="true"
         v-model="kind"
         @change="amountKindChanged"
         :label="`Choose amount of ${coin} to send:`"

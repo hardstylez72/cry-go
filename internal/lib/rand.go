@@ -19,6 +19,16 @@ func RandFloatRange(min, max float64) float64 {
 	return Round(randomFloatInRange, prec)
 }
 
+func Randint64Range(min, max int64) int64 {
+
+	if min == max {
+		return min
+	}
+
+	tmp := rand.New(rand.NewSource(time.Now().UnixNano())).Int63n(max-min) + min
+	return tmp
+}
+
 func randFloatRange(min, max float64) float64 {
 	return min + rand.New(rand.NewSource(time.Now().UnixNano())).Float64()*(max-min)
 }

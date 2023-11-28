@@ -69,7 +69,7 @@ func (c *KyberSwapMaker) Quote(ctx context.Context, in *defi.DefaultSwapReq) (*Q
 
 	if res.StatusCode != 200 {
 		e, _ := io.ReadAll(res.Body)
-		return nil, errors.New("invalid status core: " + strconv.Itoa(res.StatusCode) + " " + string(e))
+		return nil, errors.New("invalid status code: " + strconv.Itoa(res.StatusCode) + " " + string(e))
 	}
 
 	response, err := io.ReadAll(res.Body)

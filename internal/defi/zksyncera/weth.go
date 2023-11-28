@@ -131,7 +131,8 @@ func (c *Client) UnWrapETH(ctx context.Context, req *defi.WETHReq) (*defi.WETHRe
 	return result, nil
 }
 
-func (c *Client) Make712Tx(ctx context.Context, tx *types.CallMsg, gasOpt *bozdo.Gas, signer *accounts.BaseSigner) ([]byte, *bozdo.EstimatedGasCost, error) {
+func (c *Client) Make712Tx(ctx context.Context, tx *types.CallMsg, gasOpt *bozdo.Gas, signer *accounts.BaseSigner) (_ []byte, _ *bozdo.EstimatedGasCost, err error) {
+	
 	nonce, err := c.ClientL2.NonceAt(ctx, tx.From, nil)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to GetGasPrice: %w", err)

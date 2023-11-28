@@ -9,71 +9,9 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
-	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
-func (c *Client) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
-	m := &merkly.Maker{
-		TokenMap: c.Cfg.TokenMap,
-		Cli:      c.ClientL2,
-		Network:  c.Cfg.Network,
-		CA:       SpecMap["merkly"].Addr,
-	}
-
-	txData, _, err := m.MakeMintTx(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	result := &bozdo.DefaultRes{}
-
-	transactor, err := NewWalletTransactor(req.PK, c.NetworkId)
-	if err != nil {
-		return nil, err
-	}
-
-	tx := CreateFunctionCallTransaction(
-		transactor.WalletAddr,
-		txData.ContractAddr,
-		big.NewInt(0),
-		big.NewInt(0),
-		txData.Value,
-		txData.Data,
-		nil, nil,
-	)
-
-	raw, estimate, err := c.Make712Tx(ctx, tx, req.Gas, transactor.Signer)
-	if err != nil {
-		return nil, errors.Wrap(err, "Make712Tx")
-	}
-
-	estimate.Name = "Mint"
-	estimate.Details = txData.Details
-	result.ECost = estimate
-
-	if req.EstimateOnly {
-		return result, nil
-	}
-
-	hash, err := c.ClientL2.SendRawTransaction(ctx, raw)
-	if err != nil {
-		return nil, errors.Wrap(err, "rpcL2.SendRawTransaction")
-	}
-
-	result.Tx = c.NewTx(hash, defi.CodeContract, txData.Details)
-
-	return result, nil
-}
-
-func (c *Client) BridgeNft(ctx context.Context, req *defi.BridgeNFTReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
-	switch taskType {
-	case v1.TaskType_MerklyMintAndBridgeNFT:
-		return c.BridgeNftMerkly(ctx, req)
-	default:
-		return nil, errors.New("not supported")
-	}
-}
 func (c *Client) BridgeNftMerkly(ctx context.Context, req *defi.BridgeNFTReq) (*bozdo.DefaultRes, error) {
 	m := &merkly.Maker{
 		TokenMap: c.Cfg.TokenMap,

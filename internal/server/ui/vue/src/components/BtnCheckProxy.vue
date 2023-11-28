@@ -3,14 +3,13 @@
     v-model="menu"
     :close-on-content-click="false"
   >
-
     <template v-slot:activator="{ props }">
       <v-icon v-bind="props"
               @click="click" icon="mdi-check-network-outline"/>
 
     </template>
 
-    <template v-slot:default="{ props }">
+    <template v-slot:default>
 
       <v-card>
         <v-card-text>

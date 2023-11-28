@@ -4,7 +4,7 @@
     width="1000"
     :close-on-content-click="false"
     :close-on-back="false"
-    persistent="true"
+    :persistent="true"
   >
     <template v-slot:activator="{ props }">
       <v-btn width="100%" :disabled="disabled" @click="dialog=true">Запланировать запуск

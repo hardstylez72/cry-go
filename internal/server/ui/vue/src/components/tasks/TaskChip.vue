@@ -1,12 +1,9 @@
 <template>
   <v-chip size="auto" density="compact" variant="outlined" rounded>
     <template v-slot:prepend>
-      <div class="d-inline-flex mx-1">
-        <v-img height="22px" v-if="service.img" :src="service.img"/>
-        {{ service.name }}
-      </div>
+      <v-img height="22px" width="20px" class="mx-1" v-if="service.img" :src="service.img" position="left"/>
     </template>
-
+    <div class="px-1">{{ service.name }}</div>
   </v-chip>
 </template>
 
@@ -26,6 +23,7 @@ export default defineComponent({
       return taskProps
     },
     service() {
+      console.log('this.taskType', this.taskType)
       const s = this.taskProps[this.taskType].service
       if (!s) {
         console.log('this.taskType', this.taskType)

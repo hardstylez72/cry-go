@@ -10,7 +10,7 @@
       </v-btn>
     </template>
 
-    <template v-slot:default="{ props }">
+    <template v-slot:default>
       <v-card class="px-4 py-4">
 
         <div class="d-flex justify-space-between">
@@ -58,6 +58,9 @@
             </v-card-item>
             <v-card-item>
               <Balance :profile-id="profileId" :network="Network.ZKSYNCERA"/>
+            </v-card-item>
+            <v-card-item>
+              <Balance :profile-id="profileId" :network="Network.Linea"/>
             </v-card-item>
           </div>
         </div>

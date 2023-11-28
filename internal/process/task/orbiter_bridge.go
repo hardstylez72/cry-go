@@ -71,9 +71,6 @@ func (t *OrbiterBridgeTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask,
 			return nil, err
 		}
 
-		if err != nil {
-			return nil, err
-		}
 		b, err := client.GetBalance(taskContext, &defi.GetBalanceReq{
 			WalletAddress: profile.Addr,
 			Token:         p.FromToken,

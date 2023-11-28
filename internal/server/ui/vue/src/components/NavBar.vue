@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar :elevation="2" absolute="true">
+  <v-app-bar :elevation="2" :absolute="true">
     <template v-slot:prepend>
       <v-icon class="mx-2 my-2 " size="30px" style="z-index: 9999"
               v-if="isMobile && !drawer"

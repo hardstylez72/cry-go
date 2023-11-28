@@ -22,7 +22,7 @@
 <script lang="ts">
 
 import {defineComponent, PropType} from 'vue';
-import {flow_Flow as Flow, RandomFlowPreviewRes, TaskType} from "@/generated/flow";
+import {flow_Flow as Flow, FlowPreviewRes, TaskType} from "@/generated/flow";
 import {getFlow, taskProps} from "@/components/tasks/tasks";
 import TaskBlock from "@/components/flow/TaskBlock.vue";
 
@@ -32,7 +32,7 @@ export default defineComponent({
   props: {
     data: {
       required: true,
-      type: Object as PropType<RandomFlowPreviewRes>
+      type: Object as PropType<FlowPreviewRes>
     },
     combo: {
       required: false,

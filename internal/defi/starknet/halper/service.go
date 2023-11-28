@@ -93,8 +93,23 @@ func (s *Service) Approve(ctx context.Context, req *ApproveReq) (*ApproveRes, er
 	return Request[ApproveReq, ApproveRes](ctx, s.cli, s.c.Host+"/starknet/approve", req)
 }
 
+var keyCache = map[string]string{}
+
 func (s *Service) AccountPubKey(ctx context.Context, req *AccountPubKeyReq) (*AccountPubKeyRes, error) {
-	return Request[AccountPubKeyReq, AccountPubKeyRes](ctx, s.cli, s.c.Host+"/starknet/account_pub", req)
+
+	pub, exist := keyCache[req.PrivateKey]
+	if exist {
+		return &AccountPubKeyRes{PublicKey: pub}, nil
+	}
+
+	res, err := Request[AccountPubKeyReq, AccountPubKeyRes](ctx, s.cli, s.c.Host+"/starknet/account_pub", req)
+	if err != nil {
+		return nil, err
+	}
+
+	keyCache[req.PrivateKey] = res.PublicKey
+
+	return res, nil
 }
 
 func (s *Service) IsAccountDeployed(ctx context.Context, req *IsAccountDeployedReq) (*IsAccountDeployedRes, error) {

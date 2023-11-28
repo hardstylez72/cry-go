@@ -90,6 +90,7 @@ export default defineComponent({
         [Network.POLIGON, [Token.USDC, Token.USDT]],
         [Network.BinanaceBNB, [Token.USDC, Token.USDT]],
         [Network.OPTIMISM, [Token.ETH, Token.USDC, Token.USDT]],
+        [Network.Linea, [Token.ETH]],
       ]),
       item: {
         network: Network.ARBITRUM,
@@ -115,6 +116,7 @@ export default defineComponent({
         Network.ARBITRUM,
         Network.ZKSYNCERA,
         Network.StarkNet,
+        Network.Linea,
       ]
     }
   },

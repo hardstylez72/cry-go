@@ -1,7 +1,7 @@
 <template>
   <div class="my-2" @focusin="click">
     <v-autocomplete
-      chips="true"
+      :chips="true"
       closable-chips
       return-object
       v-model="selectedProfiles"
@@ -15,11 +15,11 @@
       label="Поиск профилей"
       density="compact"
       variant="outlined"
-      clearable="true"
+      :clearable="true"
       :disabled="disabled"
       no-data-text="Петушки не нашлись"
-      hide-no-data="true"
-      hide-details="true"
+      :hide-no-data="true"
+      :hide-details="true"
     >
     </v-autocomplete>
   </div>

@@ -2,7 +2,7 @@
   <v-select
     density="compact"
     variant="outlined"
-    label="select exchange account"
+    label="Биржевой аккаунт"
     :rules="[required]"
     :items="withdrawers"
     item-value="id"
@@ -12,7 +12,7 @@
     :disabled="disabled"
   >
     <template v-slot:no-data>
-      <div class="mx-2">No exchange account found. <a href="/exchange_accounts">Create one</a></div>
+      <div class="mx-2">Биржевые аккаунты не найдены. <a href="/exchange_accounts">Создать</a></div>
     </template>
   </v-select>
 </template>

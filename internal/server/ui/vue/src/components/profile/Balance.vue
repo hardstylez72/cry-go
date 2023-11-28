@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{ `${network}:` }}
+    <NetworkChip :network="network"/>
     <span v-if="loading">
       <v-progress-circular
         indeterminate
@@ -30,10 +30,11 @@
 import {defineComponent, PropType} from 'vue';
 import {profileService} from "@/generated/services"
 import {Balance, Network} from "@/generated/profile";
+import NetworkChip from "@/components/tasks/NetworkChip.vue";
 
 export default defineComponent({
   name: "Balance.vue",
-  components: {},
+  components: {NetworkChip},
   props: {
     profileId: {
       type: String,

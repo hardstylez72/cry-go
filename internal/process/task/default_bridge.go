@@ -196,7 +196,11 @@ func (h *DefaultBridgeTaskHalper) Execute(ctx context.Context, profile *halp.Pro
 			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
-			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balance.WEI)
+			return nil, nil, ErrProfileHasInsufficientBalance(p.FromNetwork, v1.Token_ETH, &Gas.TotalGas, balance.WEI)
+		}
+
+		if p.FromToken == client.GetNetworkToken() {
+			am = ResolveNetworkTokenAmount(balanceNative.WEI, &gas.TotalGas, am)
 		}
 	}
 

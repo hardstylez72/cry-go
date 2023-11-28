@@ -5,7 +5,7 @@
       <i>{{ item.type }} ({{ item.subType }})</i>
     </v-chip>
     <div v-if="relationExist">
-      <v-chip class="mx-2" closable="true" @click:close="close">
+      <v-chip class="mx-2" :closable="true" @click:close="close">
         <b class="mx-1">{{ rel.num }}</b> <i>{{ rel.type }} ({{ rel.subType }})</i>
       </v-chip>
     </div>

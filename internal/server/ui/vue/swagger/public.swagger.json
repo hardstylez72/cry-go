@@ -198,7 +198,8 @@
         "MintFun",
         "MintMerkly",
         "MintZerius",
-        "KyberSwap"
+        "KyberSwap",
+        "EkuboSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

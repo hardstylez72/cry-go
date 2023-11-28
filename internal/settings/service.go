@@ -11,6 +11,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/base"
 	"github.com/hardstylez72/cry/internal/defi/bnb"
 	"github.com/hardstylez72/cry/internal/defi/etherium"
+	"github.com/hardstylez72/cry/internal/defi/linea"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
 	"github.com/hardstylez72/cry/internal/defi/poligon"
 	"github.com/hardstylez72/cry/internal/defi/starknet"
@@ -22,7 +23,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const LastSettingsUpdateTime = "2023-12-01 7:40:05"
+const LastSettingsUpdateTime = "2023-11-01 7:40:05"
 
 type GetSettingsNetworkRequest struct {
 	Network v1.Network
@@ -50,6 +51,7 @@ var Networks = []v1.Network{
 	v1.Network_POLIGON,
 	v1.Network_StarkNet,
 	v1.Network_Base,
+	v1.Network_Linea,
 }
 
 func NewService(rep repository.SettingsRepository) *Service {
@@ -160,6 +162,9 @@ func resolveSettings(in *v1.NetworkSettings, network v1.Network, force bool) (*v
 	case v1.Network_Base:
 		s.RPC = base.MainNetURL
 		s.GasMax = eth
+	case v1.Network_Linea:
+		s.RPC = linea.MainNetURL
+		s.GasMax = eth
 	}
 
 	return resolveNetworkSettings(in, s, force)
@@ -217,6 +222,8 @@ func resolveNetworkSettings(in *v1.NetworkSettings, s ResolveNet, force bool) (*
 			}
 		}
 	}
+
+	out.AutoRefuel = &v1.AutoRefuel{Enabled: false}
 
 	return out, nil
 }

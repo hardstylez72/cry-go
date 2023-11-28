@@ -21,8 +21,9 @@ func (r *pgRepository) GetSettings(ctx context.Context, userId string, network v
 		return nil, err
 	}
 
+	un := protojson.UnmarshalOptions{}
 	var s v1.NetworkSettings
-	if err := protojson.Unmarshal([]byte(payload), &s); err != nil {
+	if err := un.Unmarshal([]byte(payload), &s); err != nil {
 		return nil, err
 	}
 
@@ -37,7 +38,7 @@ func (r *pgRepository) UpdateSettings(ctx context.Context, userId string, reques
 
 	s := string(p)
 
-	if _, err := r.conn.ExecContext(ctx, `insert into settings_v2 (user_id, payload, key) values ($1, $2, $3) on conflict (user_id, key) do update set payload = $2`, userId, &s, request.GetNetwork().String()); err != nil {
+	if _, err := r.conn.ExecContext(ctx, `insert into settings_v2 (user_id, payload, key) values ($1, $2, $3) on conflict (user_id, key) do update set payload = $2, updated_at = now()`, userId, &s, request.GetNetwork().String()); err != nil {
 		return err
 	}
 	return nil

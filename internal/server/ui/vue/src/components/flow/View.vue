@@ -101,7 +101,7 @@
 
 import {defineComponent} from 'vue';
 import {flowService, processService, profileService} from "@/generated/services"
-import {flow_Flow as Flow, FlowBlock, RandomFlowPreviewRes, Task, TaskType} from "@/generated/flow";
+import {flow_Flow as Flow, FlowBlock, FlowPreviewRes, Task, TaskType} from "@/generated/flow";
 import {Profile} from "@/generated/profile";
 import ProfileCard from "@/components/profile/ProfileCard.vue";
 import {Delay, formatTime, getDate, getTime, isMobile, Timer, ts} from "@/components/helper";
@@ -139,7 +139,7 @@ export default defineComponent({
       flowLoading: true,
 
       blockMap: new Map<number, FlowBlock>(),
-      preview: null as null | RandomFlowPreviewRes,
+      preview: null as null | FlowPreviewRes,
       previewError: '',
       label: '',
     }
@@ -190,7 +190,7 @@ export default defineComponent({
       this.timer.cb(() => {
 
         this.previewError = ''
-        flowService.flowServiceRandomFlowPreview({
+        flowService.flowServiceFlowPreview({
           body: {
             label: '',
             blocks: this.blocks,

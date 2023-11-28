@@ -877,7 +877,8 @@
         "PolygonZKEVM",
         "Fantom",
         "Base",
-        "opBNB"
+        "opBNB",
+        "Linea"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"

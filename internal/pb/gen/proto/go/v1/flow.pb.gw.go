@@ -473,7 +473,7 @@ func local_request_FlowService_CreateFlowV2_0(ctx context.Context, marshaler run
 
 }
 
-func request_FlowService_RandomFlowPreview_0(ctx context.Context, marshaler runtime.Marshaler, client FlowServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_FlowService_FlowPreview_0(ctx context.Context, marshaler runtime.Marshaler, client FlowServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq FlowPreviewReq
 	var metadata runtime.ServerMetadata
 
@@ -485,12 +485,12 @@ func request_FlowService_RandomFlowPreview_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.RandomFlowPreview(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.FlowPreview(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_FlowService_RandomFlowPreview_0(ctx context.Context, marshaler runtime.Marshaler, server FlowServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_FlowService_FlowPreview_0(ctx context.Context, marshaler runtime.Marshaler, server FlowServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq FlowPreviewReq
 	var metadata runtime.ServerMetadata
 
@@ -502,7 +502,7 @@ func local_request_FlowService_RandomFlowPreview_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.RandomFlowPreview(ctx, &protoReq)
+	msg, err := server.FlowPreview(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -940,7 +940,7 @@ func RegisterFlowServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("POST", pattern_FlowService_RandomFlowPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowService_FlowPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -948,12 +948,12 @@ func RegisterFlowServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flow.FlowService/RandomFlowPreview", runtime.WithHTTPPathPattern("/api/gw/v1/flow-random/preview"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flow.FlowService/FlowPreview", runtime.WithHTTPPathPattern("/api/gw/v1/flow/preview"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_FlowService_RandomFlowPreview_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_FlowService_FlowPreview_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -961,7 +961,7 @@ func RegisterFlowServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			return
 		}
 
-		forward_FlowService_RandomFlowPreview_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_FlowService_FlowPreview_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1367,25 +1367,25 @@ func RegisterFlowServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("POST", pattern_FlowService_RandomFlowPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_FlowService_FlowPreview_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flow.FlowService/RandomFlowPreview", runtime.WithHTTPPathPattern("/api/gw/v1/flow-random/preview"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flow.FlowService/FlowPreview", runtime.WithHTTPPathPattern("/api/gw/v1/flow/preview"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_FlowService_RandomFlowPreview_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_FlowService_FlowPreview_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_FlowService_RandomFlowPreview_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_FlowService_FlowPreview_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1485,7 +1485,7 @@ var (
 
 	pattern_FlowService_CreateFlowV2_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "gw", "v2", "flow", "create"}, ""))
 
-	pattern_FlowService_RandomFlowPreview_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "gw", "v1", "flow-random", "preview"}, ""))
+	pattern_FlowService_FlowPreview_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "gw", "v1", "flow", "preview"}, ""))
 
 	pattern_FlowService_OnlyRandomFlowPreview_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "gw", "v1", "flow-random", "only-preview"}, ""))
 
@@ -1521,7 +1521,7 @@ var (
 
 	forward_FlowService_CreateFlowV2_0 = runtime.ForwardResponseMessage
 
-	forward_FlowService_RandomFlowPreview_0 = runtime.ForwardResponseMessage
+	forward_FlowService_FlowPreview_0 = runtime.ForwardResponseMessage
 
 	forward_FlowService_OnlyRandomFlowPreview_0 = runtime.ForwardResponseMessage
 

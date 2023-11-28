@@ -23,6 +23,8 @@ message NetworkSettings {
   string max_gas = 4;
   map<string, TaskSettings> task_settings = 5;
   shared.Network network = 6;
+  AutoRefuel auto_refuel = 7;
+
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
@@ -31,6 +33,13 @@ message NetworkSettings {
       ]
     }
   };
+}
+
+message AutoRefuel {
+  bool enabled = 1;
+  double min = 2;
+  double max = 3;
+  string withdrawer_id = 4;
 }
 
 

@@ -653,7 +653,8 @@ export enum Network {
   'PolygonZKEVM' = 'PolygonZKEVM',
   'Fantom' = 'Fantom',
   'Base' = 'Base',
-  'opBNB' = 'opBNB'
+  'opBNB' = 'opBNB',
+  'Linea' = 'Linea'
 }
 
 export enum ProfileSubType {
@@ -714,5 +715,6 @@ export enum TaskType {
   'MintFun' = 'MintFun',
   'MintMerkly' = 'MintMerkly',
   'MintZerius' = 'MintZerius',
-  'KyberSwap' = 'KyberSwap'
+  'KyberSwap' = 'KyberSwap',
+  'EkuboSwap' = 'EkuboSwap'
 }

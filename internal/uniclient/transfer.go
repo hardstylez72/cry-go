@@ -6,6 +6,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/avalanche"
 	"github.com/hardstylez72/cry/internal/defi/bnb"
 	"github.com/hardstylez72/cry/internal/defi/etherium"
+	"github.com/hardstylez72/cry/internal/defi/linea"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
 	"github.com/hardstylez72/cry/internal/defi/poligon"
 	"github.com/hardstylez72/cry/internal/defi/starknet"
@@ -40,6 +41,8 @@ func NewTransfer(network v1.Network, c *BaseClientConfig) (defi.Transfer, error)
 		cli, err = zksyncera.NewClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_StarkNet:
 		cli, err = starknet.NewClient(&starknet.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint, Proxy: c.ProxyString})
+	case v1.Network_Linea:
+		cli, err = linea.NewClient(&linea.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	default:
 		return nil, errors.New("network is not supported for Transfer")
 	}

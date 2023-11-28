@@ -75,7 +75,7 @@ func (a *Bridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo
 	if req.Debug {
 		log.Log.Debug("across bridge tx: ", zap.String("to", data.ContractAddr.String()))
 	}
-	tx, err := a.LondonReadyTx(ctx, opt, data)
+	tx, err := a.London(ctx, a.EtheriumClient, opt, data)
 	if err != nil {
 		return nil, err
 	}
@@ -305,6 +305,9 @@ func (a *Bridge) ResolveFromToken(network v1.Network, token v1.Token) (*common.A
 		addr := common.HexToAddress("0x82aF49447D8a07e3bd95BD0d56f35241523fBab1")
 		return &addr, nil
 	case network == v1.Network_OPTIMISM && token == v1.Token_ETH:
+		addr := common.HexToAddress("0x4200000000000000000000000000000000000006")
+		return &addr, nil
+	case network == v1.Network_Base && token == v1.Token_ETH:
 		addr := common.HexToAddress("0x4200000000000000000000000000000000000006")
 		return &addr, nil
 	default:

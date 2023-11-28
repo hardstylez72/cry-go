@@ -65,6 +65,7 @@ export default class TaskOrbiterBridgeBlock extends TaskDefaultBridge {
     tokenBridgePair(Network.ZKSYNCERA, Network.Etherium, Token.ETH, Token.ETH),
     tokenBridgePair(Network.ZKSYNCERA, Network.ArbitrumNova, Token.ETH, Token.ETH),
     tokenBridgePair(Network.ZKSYNCERA, Network.ZKSYNCLITE, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.ZKSYNCERA, Network.Linea, Token.ETH, Token.ETH),
 
     tokenBridgePair(Network.Base, Network.ARBITRUM, Token.ETH, Token.ETH),
     tokenBridgePair(Network.Base, Network.OPTIMISM, Token.ETH, Token.ETH),
@@ -72,6 +73,7 @@ export default class TaskOrbiterBridgeBlock extends TaskDefaultBridge {
     tokenBridgePair(Network.Base, Network.Etherium, Token.ETH, Token.ETH),
     tokenBridgePair(Network.Base, Network.ArbitrumNova, Token.ETH, Token.ETH),
     tokenBridgePair(Network.Base, Network.ZKSYNCLITE, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.Base, Network.Linea, Token.ETH, Token.ETH),
 
     tokenBridgePair(Network.ARBITRUM, Network.Base, Token.ETH, Token.ETH),
     tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.ETH, Token.ETH),
@@ -79,6 +81,7 @@ export default class TaskOrbiterBridgeBlock extends TaskDefaultBridge {
     tokenBridgePair(Network.ARBITRUM, Network.Etherium, Token.ETH, Token.ETH),
     tokenBridgePair(Network.ARBITRUM, Network.ArbitrumNova, Token.ETH, Token.ETH),
     tokenBridgePair(Network.ARBITRUM, Network.ZKSYNCLITE, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.ARBITRUM, Network.Linea, Token.ETH, Token.ETH),
 
     tokenBridgePair(Network.OPTIMISM, Network.Base, Token.ETH, Token.ETH),
     tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.ETH, Token.ETH),
@@ -86,6 +89,13 @@ export default class TaskOrbiterBridgeBlock extends TaskDefaultBridge {
     tokenBridgePair(Network.OPTIMISM, Network.Etherium, Token.ETH, Token.ETH),
     tokenBridgePair(Network.OPTIMISM, Network.ArbitrumNova, Token.ETH, Token.ETH),
     tokenBridgePair(Network.OPTIMISM, Network.ZKSYNCLITE, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.OPTIMISM, Network.Linea, Token.ETH, Token.ETH),
+
+    tokenBridgePair(Network.Linea, Network.Base, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.Linea, Network.ARBITRUM, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.Linea, Network.ZKSYNCERA, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.Linea, Network.Etherium, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.Linea, Network.OPTIMISM, Token.ETH, Token.ETH),
   ] as BridgePair[]
 
   swapOpt = {min: "", max: "", fee: '', error: 'fill up the form above'} as GetSwapOptionsRes

@@ -14,6 +14,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewEkuboSwapTask() *StarkNetSwap {
+	return NewStarkNetSwapTask(v1.TaskType_EkuboSwap, func(a *Input) (*v1.DefaultSwap, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_EkuboSwapTask)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_FibrousSwapTask) call an ambulance!")
+		}
+		return l.EkuboSwapTask, nil
+	})
+}
+
 func NewFibrousSwapTask() *StarkNetSwap {
 	return NewStarkNetSwapTask(v1.TaskType_FibrousSwap, func(a *Input) (*v1.DefaultSwap, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_FibrousSwapTask)
@@ -159,7 +169,12 @@ func (t *StarkNetSwap) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 			return nil, err
 		}
 
-		if txId != nil {
+		if txId != nil && *txId == "-" {
+			p.ApproveTx = &v1.TaskTx{TxId: "-"}
+			if err := a.UpdateTask(ctx, task); err != nil {
+				return nil, err
+			}
+		} else if txId != nil {
 			p.ApproveTx = NewStarkNetApproveTx(*txId)
 			if err := a.AddTx2(ctx, p.ApproveTx); err != nil {
 				return nil, err
@@ -170,8 +185,10 @@ func (t *StarkNetSwap) Run(ctx context.Context, a *Input) (*v1.ProcessTask, erro
 		}
 	}
 
-	if err := WaitTxComplete(taskContext, p.ApproveTx, task, client, a); err != nil {
-		return nil, err
+	if p.GetApproveTx().GetTxId() != "-" {
+		if err := WaitTxComplete(taskContext, p.ApproveTx, task, client, a); err != nil {
+			return nil, err
+		}
 	}
 
 	if p.GetTx().GetTxId() == "" {
@@ -246,7 +263,7 @@ func (h *StarketSwapHalper) Execute(ctx context.Context, profile *halp.Profile, 
 		return nil, nil, err
 	}
 
-	if approve != nil {
+	if approve != nil && *approve != "-" {
 		if err := client.WaitTxComplete(ctx, *approve); err != nil {
 			return nil, nil, err
 		}
@@ -289,7 +306,7 @@ func (h *StarketSwapHalper) Execute(ctx context.Context, profile *halp.Profile, 
 			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
-			return nil, nil, ErrProfileHasInsufficientBalance(v1.Token_ETH, &Gas.TotalGas, balanceNative.WEI)
+			return nil, nil, ErrProfileHasInsufficientBalance(p.Network, v1.Token_ETH, &Gas.TotalGas, balanceNative.WEI)
 		}
 	}
 	res, err := client.Swap(ctx, &defi.DefaultSwapReq{
@@ -352,6 +369,9 @@ func StarkNetApprove(ctx context.Context, token v1.Token, client *starknet.Clien
 		spender = "0x01b23ed400b210766111ba5b1e63e33922c6ba0c45e6ad56ce112e5f4c578e62"
 	case v1.TaskType_ZkLendLP:
 		spender = "0x04c0a5193d58f74fbace4b74dcf65481e734ed1714121bdc571da345540efa05"
+	case v1.TaskType_EkuboSwap:
+		tmp := "-"
+		return &tmp, nil
 	default:
 		return nil, errors.New("StarkNetApprove. unknown task type: " + taskType.String())
 	}

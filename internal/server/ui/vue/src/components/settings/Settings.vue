@@ -3,7 +3,7 @@
     <NavBar title="Настройки">
     </NavBar>
     <div>
-      <v-expansion-panels class="mt-4" multiple="multiple" variant="popout">
+      <v-expansion-panels class="mt-4" :multiple="true" variant="popout">
         <SettingsNetwork v-for="n in networks" :network="networkProps[n]"/>
       </v-expansion-panels>
     </div>
@@ -40,6 +40,7 @@ export default defineComponent({
         Network.Etherium,
         Network.StarkNet,
         Network.Base,
+        Network.Linea,
       ] as Network[],
     }
   },

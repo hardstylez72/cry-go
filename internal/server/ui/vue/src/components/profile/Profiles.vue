@@ -15,7 +15,7 @@
     <Loader v-if="loading && offset === 0"/>
     <div v-else>
       <div class="mr-6 d-flex justify-start">
-        <v-radio-group v-model="selectProfileType" inline="true" hide-details density="compact">
+        <v-radio-group v-model="selectProfileType" :inline="true" hide-details density="compact">
           <v-radio class="mx-8" :value="ProfileType.EVM">EVM</v-radio>
           <v-radio class="mx-8" :value="ProfileType.StarkNet">StarkNet</v-radio>
           <v-btn class="mx-3 my-2" density="default" @click="$router.push({name: 'ProfileRelations'})">Связи</v-btn>
@@ -39,7 +39,7 @@
       </div>
       <div v-else>
 
-        <v-list max-width="96vw" class="px-5" nav="true">
+        <v-list max-width="96vw" class="px-5" :nav="true">
           <v-list-item
             density="compact"
             variant="plain"

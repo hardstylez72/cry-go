@@ -46,5 +46,5 @@ func (c *minter) Mint(ctx context.Context, req *defi.SimpleReq, taskType v1.Task
 		TaskType: taskType,
 	}
 
-	return c.cli.LondonReadyTx(ctx, opt, txData)
+	return c.cli.London(ctx, c.cli, opt, txData)
 }

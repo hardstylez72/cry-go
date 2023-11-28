@@ -61,7 +61,7 @@ import {Component, Prop, Vue, Watch} from "vue-facing-decorator";
 })
 export default class DefaultLiquidityBridge extends Vue {
   @Prop weight!: Number
-  @Prop disabled!: Boolean
+  @Prop disabled!: boolean
   @Prop task!: Task
 
   @Watch('item', {deep: true})

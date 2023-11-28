@@ -600,6 +600,9 @@
         "sendValue": {
           "type": "string"
         },
+        "percRange": {
+          "$ref": "#/definitions/PercentRange"
+        },
         "send": {
           "$ref": "#/definitions/AmUni"
         },
@@ -1228,7 +1231,8 @@
         "PolygonZKEVM",
         "Fantom",
         "Base",
-        "opBNB"
+        "opBNB",
+        "Linea"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -1357,6 +1361,19 @@
         "fromToken",
         "toToken"
       ]
+    },
+    "PercentRange": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "string",
+          "format": "int64"
+        },
+        "max": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
     },
     "Process": {
       "type": "object",
@@ -1988,6 +2005,9 @@
         },
         "kyberSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "ekuboSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -2109,7 +2129,8 @@
         "MintFun",
         "MintMerkly",
         "MintZerius",
-        "KyberSwap"
+        "KyberSwap",
+        "EkuboSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

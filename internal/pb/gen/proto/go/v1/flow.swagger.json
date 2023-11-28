@@ -80,38 +80,6 @@
         ]
       }
     },
-    "/api/gw/v1/flow-random/preview": {
-      "post": {
-        "operationId": "FlowService_RandomFlowPreview",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/RandomFlowPreviewRes"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/FlowPreviewReq"
-            }
-          }
-        ],
-        "tags": [
-          "FlowService"
-        ]
-      }
-    },
     "/api/gw/v1/flow-shared": {
       "post": {
         "operationId": "FlowService_SharedFlow",
@@ -368,6 +336,38 @@
         ]
       }
     },
+    "/api/gw/v1/flow/preview": {
+      "post": {
+        "operationId": "FlowService_FlowPreview",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/FlowPreviewRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/FlowPreviewReq"
+            }
+          }
+        ],
+        "tags": [
+          "FlowService"
+        ]
+      }
+    },
     "/api/gw/v1/flow/publish": {
       "post": {
         "operationId": "FlowService_ShareFlow",
@@ -599,6 +599,9 @@
         },
         "sendValue": {
           "type": "string"
+        },
+        "percRange": {
+          "$ref": "#/definitions/PercentRange"
         },
         "send": {
           "$ref": "#/definitions/AmUni"
@@ -1005,6 +1008,22 @@
         "maxDelay": {
           "type": "string",
           "format": "int64"
+        },
+        "nativeTokenMinPercent": {
+          "type": "string",
+          "format": "int64"
+        },
+        "nativeTokenMaxPercent": {
+          "type": "string",
+          "format": "int64"
+        },
+        "nonnativeTokenMinPercent": {
+          "type": "string",
+          "format": "int64"
+        },
+        "nonnativeTokenMaxPercent": {
+          "type": "string",
+          "format": "int64"
         }
       },
       "required": [
@@ -1063,6 +1082,26 @@
       "required": [
         "label",
         "blocks"
+      ]
+    },
+    "FlowPreviewRes": {
+      "type": "object",
+      "properties": {
+        "flow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/UniqueFlow"
+          }
+        },
+        "uniquePercent": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "flow",
+        "uniquePercent"
       ]
     },
     "FlowShared": {
@@ -1295,7 +1334,8 @@
         "PolygonZKEVM",
         "Fantom",
         "Base",
-        "opBNB"
+        "opBNB",
+        "Linea"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -1512,6 +1552,19 @@
         "toToken"
       ]
     },
+    "PercentRange": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "string",
+          "format": "int64"
+        },
+        "max": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "ProcessStatus": {
       "type": "string",
       "enum": [
@@ -1562,32 +1615,15 @@
         },
         "to": {
           "$ref": "#/definitions/Token"
+        },
+        "am": {
+          "$ref": "#/definitions/Amount"
         }
       },
       "required": [
         "network",
         "from",
         "to"
-      ]
-    },
-    "RandomFlowPreviewRes": {
-      "type": "object",
-      "properties": {
-        "flow": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/UniqueFlow"
-          }
-        },
-        "uniquePercent": {
-          "type": "number",
-          "format": "double"
-        }
-      },
-      "required": [
-        "flow",
-        "uniquePercent"
       ]
     },
     "RandomTask": {
@@ -2019,6 +2055,9 @@
         },
         "kyberSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "ekuboSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [
@@ -2140,7 +2179,8 @@
         "MintFun",
         "MintMerkly",
         "MintZerius",
-        "KyberSwap"
+        "KyberSwap",
+        "EkuboSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

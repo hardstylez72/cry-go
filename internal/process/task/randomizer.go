@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/maps"
@@ -253,7 +254,7 @@ func (r RandomTask) ToToken() *v1.Token {
 	}
 }
 
-func ExtractItems(f []*v1.RandomTask, optional bool) []RandomTask {
+func ExtractItems(f []*v1.RandomTask, amNative, amToken *v1.Amount, optional bool) []RandomTask {
 
 	out := []RandomTask{}
 
@@ -267,6 +268,13 @@ func ExtractItems(f []*v1.RandomTask, optional bool) []RandomTask {
 		case *v1.RandomTask_Swap:
 			p := task.P.(*v1.RandomTask_Swap)
 			for _, item := range p.Swap.GetItems() {
+
+				if bozdo.NativeTokenMap[item.Network].String() == item.From.String() {
+					item.Am = amNative
+				} else {
+					item.Am = amToken
+				}
+
 				out = append(out, RandomTask{
 					Type: task.TaskType,
 					Kind: v1.TaskKind_TKSwap,
@@ -302,8 +310,26 @@ func RandomizeRandomBlock(b *v1.FlowBlock_Rand, ignoreStartToken, ignoreFinishTo
 		limitMap[el.TaskType]++
 	}
 
-	optionalTasks := ExtractItems(b.Rand.Tasks, true)
-	tasks := ExtractItems(b.Rand.Tasks, false)
+	amNative := &v1.Amount{
+		Kind: &v1.Amount_PercRange{
+			PercRange: &v1.PercentRange{
+				Min: b.Rand.NativeTokenMinPercent,
+				Max: b.Rand.NativeTokenMaxPercent,
+			},
+		},
+	}
+
+	amToken := &v1.Amount{
+		Kind: &v1.Amount_PercRange{
+			PercRange: &v1.PercentRange{
+				Min: b.Rand.NonnativeTokenMinPercent,
+				Max: b.Rand.NonnativeTokenMaxPercent,
+			},
+		},
+	}
+
+	optionalTasks := ExtractItems(b.Rand.Tasks, amNative, amToken, true)
+	tasks := ExtractItems(b.Rand.Tasks, amNative, amToken, false)
 
 	arg := PermuteArg{
 		In:               tasks,

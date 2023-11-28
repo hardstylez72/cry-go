@@ -17,6 +17,8 @@ import (
 	"go.uber.org/zap"
 )
 
+type London func(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *bozdo.TxData) (*bozdo.DefaultRes, error)
+
 type TxOpt struct {
 	NoSend       bool
 	Pk           string
@@ -26,7 +28,7 @@ type TxOpt struct {
 	TaskType     v1.TaskType
 }
 
-func (c *EtheriumClient) LondonReadyTx(ctx context.Context, opt *TxOpt, data *bozdo.TxData) (*bozdo.DefaultRes, error) {
+func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *bozdo.TxData) (*bozdo.DefaultRes, error) {
 	wt, err := NewWalletTransactor(opt.Pk)
 	if err != nil {
 		return nil, err
@@ -67,9 +69,9 @@ func (c *EtheriumClient) LondonReadyTx(ctx context.Context, opt *TxOpt, data *bo
 
 		dynamic.GasTipCap = gasTipCap
 
-		dynamic.GasFeeCap = bozdo.BigIntSum(header.BaseFee, bozdo.Percent(header.BaseFee, 50), dynamic.GasTipCap)
+		dynamic.GasFeeCap = bozdo.BigIntSum(header.BaseFee, header.BaseFee, dynamic.GasTipCap)
 
-		gas, err := c.Cli.EstimateGas(ctx, txToCallMsg(wt.WalletAddr, types.NewTx(&dynamic)))
+		gas, err := c.Cli.EstimateGas(ctx, TxToCallMsg(wt.WalletAddr, types.NewTx(&dynamic)))
 		if err != nil {
 			return nil, err
 		}
@@ -125,7 +127,7 @@ func (c *EtheriumClient) LondonReadyTx(ctx context.Context, opt *TxOpt, data *bo
 	return r, nil
 }
 
-func txToCallMsg(from common.Address, tx *types.Transaction) ethereum.CallMsg {
+func TxToCallMsg(from common.Address, tx *types.Transaction) ethereum.CallMsg {
 	return ethereum.CallMsg{
 		From:      from,
 		To:        tx.To(),

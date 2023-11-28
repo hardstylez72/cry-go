@@ -4,107 +4,163 @@
       {{ block.weight }}) Рандомизированный блок
     </v-card-title>
     <v-card-text>
-      <v-form validate-on="lazy" ref="form">
+      <!--      <v-form validate-on="submit" ref="form">-->
 
-        <div class="flex-wrap d-flex align-center">
-          <div>
-            <NetworkSelector style="width: 200px" label="Сеть"
-                             :items="[
+      <div class="flex-wrap d-flex align-center">
+        <div>
+          <NetworkSelector style="width: 200px" label="Сеть"
+                           :items="[
                              Network.Base,
                               Network.ZKSYNCERA,
                                Network.StarkNet,
                                Network.ARBITRUM]"
-                             v-model="network"
-                             :disabled="disable"
-                             class="mx-2"/>
-          </div>
-
-          <div>
-            <v-text-field label="Кол-во" type="number" v-model="taskCount" variant="outlined" density="compact"
-                          style="width: 120px" :disabled="disable" :rules="[required, taskCountRule]"/>
-          </div>
-          <div style="width: 500px">
-            <v-range-slider
-              v-model="randomRange"
-              density="compact"
-              :min="1"
-              step="10"
-              :max="600"
-              persistent-hint
-              label=""
-              center-affix
-              hide-details
-              :disabled="disable"
-            >
-              <template v-slot:prepend>
-                <span style="width: 60px">{{ humanDuration(randomRange[0]) }}</span>
-              </template>
-              <template v-slot:append>
-                <span style="width: 60px">{{ humanDuration(randomRange[1]) }}</span>
-              </template>
-            </v-range-slider>
-          </div>
-
-        </div>
-        <div v-if="tasks.length">
-          <TokenRadioGroup :disabled="disable" label="Монета на вход" :items="fromTokens" v-model="startToken"
-                           class="mx-3"/>
-        </div>
-
-        <div v-if="tasks.length">
-          <TokenRadioGroup :disabled="disable" label="Монета на выход" :items="toTokens" v-model="finishToken"
-                           class="mx-3"/>
-        </div>
-
-
-        <div>
-          <h4>Основные</h4>
-          <v-chip-group :rules="[required]">
-            <TaskSelectorChip v-if="network" :base-network-filter="network" label="Добавить"
-                              :disable="disable"
-                              @addStep="addStep"
-                              :exclude-jobs="[TaskJob.LP, TaskJob.Bridge, TaskJob.Exchange, TaskJob.Other]"
-            />
-            <v-chip v-for="(task, index) in getTasks" rounded variant="outlined"
-                    class="mx-1" :disabled="disable">
-              <a target="_blank" :href="taskSpec(task.taskType).service.link" class="mx-1">
-                <v-img height="22px" :src="taskSpec(task.taskType).service.img"/>
-              </a>
-              {{ task.taskType }}
-
-              <template v-slot:append>
-                <v-icon icon="mdi-close" @click="taskDeleted(index)"/>
-              </template>
-
-
-            </v-chip>
-          </v-chip-group>
-
+                           v-model="network"
+                           :disabled="disable"
+                           class="mx-2"/>
         </div>
 
         <div>
-          <h4>Случайные</h4>
+          <v-text-field label="Кол-во" type="number" v-model="taskCount" variant="outlined" density="compact"
+                        style="width: 120px" :disabled="disable" :rules="[required, taskCountRule]"/>
+        </div>
 
-          <v-chip-group>
-            <TaskSelectorChip v-if="network" :base-network-filter="network" label="Добавить"
-                              @addStep="addRandomStep" :disable="disable"
-                              :exclude-jobs="[TaskJob.Swap, TaskJob.LP, TaskJob.Bridge, TaskJob.Exchange, TaskJob.Other]"/>
 
-            <v-chip v-for="(task, index) in randomTasks" rounded closable="true" @click:close="randomTaskDeleted(index)"
-                    variant="outlined" class="mx-1" :disabled="disable">
+        <div v-if="tasks.length" style="width: 170px">
+          <TokenSelector :disabled="disable" label="Монета на вход" :items="fromTokens" v-model="startToken"
+                         class="mx-3"/>
+        </div>
+
+        <div v-if="tasks.length" style="width: 170px">
+          <TokenSelector :disabled="disable" label="Монета на выход" :items="toTokens" v-model="finishToken"
+                         class="mx-3"/>
+        </div>
+
+
+        <div style="width: 500px">
+          <v-range-slider
+            :rules="[required]"
+            v-model="randomRange"
+            density="compact"
+            :min="1"
+            step="10"
+            :max="600"
+            persistent-hint
+            label="Задержка"
+            center-affix
+            hide-details
+            :disabled="disable"
+          >
+            <template v-slot:prepend>
+              <span style="width: 60px">{{ humanDuration(randomRange[0]) }}</span>
+            </template>
+            <template v-slot:append>
+              <span style="width: 60px">{{ humanDuration(randomRange[1]) }}</span>
+            </template>
+          </v-range-slider>
+        </div>
+      </div>
+
+      <div style="width: 500px">
+        <v-range-slider
+          :rules="[required]"
+          v-model="nativeAmountTokenRange"
+          density="compact"
+          :min="50"
+          step="1"
+          :max="95"
+          persistent-hint
+          label="Обьем нативного токена"
+          center-affix
+          hide-details
+          :disabled="disable"
+        >
+          <template v-slot:prepend>
+            <span style="width: 60px">{{ nativeAmountTokenRange[0] }}%</span>
+          </template>
+          <template v-slot:append>
+            <span style="width: 60px">{{ nativeAmountTokenRange[1] }}%</span>
+          </template>
+        </v-range-slider>
+      </div>
+
+      <div style="width: 500px">
+        <v-range-slider
+          :rules="[required]"
+          v-model="nonnativeAmountTokenRange"
+          density="compact"
+          :min="50"
+          step="1"
+          :max="100"
+          persistent-hint
+          label="Обьем не-нативного токена"
+          center-affix
+          hide-details
+          :disabled="disable"
+        >
+          <template v-slot:prepend>
+            <span style="width: 60px">{{ nonnativeAmountTokenRange[0] }}%</span>
+          </template>
+          <template v-slot:append>
+            <span style="width: 60px">{{ nonnativeAmountTokenRange[1] }}%</span>
+          </template>
+        </v-range-slider>
+      </div>
+
+
+      <div>
+        <h4>Основные</h4>
+
+        <v-chip-group>
+          <TaskSelectorChip v-if="network" :base-network-filter="network" label="Добавить"
+                            :disable="disable"
+                            @addStep="addStep"
+                            :exclude-jobs="[TaskJob.LP, TaskJob.Bridge, TaskJob.Exchange, TaskJob.Other]"
+          />
+          <v-chip v-for="(task, index) in getTasks" rounded variant="outlined"
+                  class="mx-1" :disabled="disable">
+            <template v-slot:prepend>
               <a target="_blank" :href="taskSpec(task.taskType).service.link" class="mx-1">
-                <v-img height="22px" :src="taskSpec(task.taskType).service.img"/>
+                <v-img height="22px" width="22px" :src="taskSpec(task.taskType).service.img"/>
               </a>
-              {{ task.taskType }}
-            </v-chip>
-          </v-chip-group>
-        </div>
+            </template>
 
-        <div v-if="previewError">
-          Ошибка формирования комбинаций
-        </div>
-        <RandomFlowPreview v-else :data="preview" v-if="preview" :combo="preview.uniquePercent"/>
-      </v-form>
+            {{ task.taskType }}
+
+            <template v-slot:append>
+              <v-icon icon="mdi-close" @click="taskDeleted(index)"/>
+            </template>
+
+
+          </v-chip>
+        </v-chip-group>
+      </div>
+
+      <div>
+        <h4>Случайные</h4>
+
+        <v-chip-group>
+          <TaskSelectorChip v-if="network" :base-network-filter="network" label="Добавить"
+                            @addStep="addRandomStep" :disable="disable"
+                            :exclude-jobs="[TaskJob.Swap, TaskJob.LP, TaskJob.Bridge, TaskJob.Exchange, TaskJob.Other]"/>
+
+          <v-chip v-for="(task, index) in randomTasks" rounded :closable="true" @click:close="randomTaskDeleted(index)"
+                  variant="outlined" class="mx-1" :disabled="disable">
+            <template v-slot:prepend>
+              <a target="_blank" :href="taskSpec(task.taskType).service.link" class="mx-1">
+                <v-img height="22px" width="22px" :src="taskSpec(task.taskType).service.img"/>
+              </a>
+            </template>
+
+            {{ task.taskType }}
+          </v-chip>
+        </v-chip-group>
+      </div>
+
+      <div v-if="previewError">
+        Ошибка формирования комбинаций
+      </div>
+      <RandomFlowPreview v-else :data="preview" v-if="preview" :combo="preview.uniquePercent"/>
+      <!--      </v-form>-->
     </v-card-text>
   </v-card>
 
@@ -117,7 +173,7 @@ import {
   FlowBlock,
   Network,
   OnlyRandomFlowPreviewReq,
-  RandomFlowPreviewRes,
+  FlowPreviewRes,
   RandomTask,
   TaskType,
   Token
@@ -186,8 +242,27 @@ export default defineComponent({
       },
       deep: true,
     },
+    nativeAmountTokenRange: {
+      handler() {
+        this.localBlock.rand.nativeTokenMinPercent = this.nativeAmountTokenRange[0]
+        this.localBlock.rand.nativeTokenMaxPercent = this.nativeAmountTokenRange[1]
+      },
+      deep: true,
+    },
+    nonnativeAmountTokenRange: {
+      handler() {
+        this.localBlock.rand.nonnativeTokenMinPercent = this.nonnativeAmountTokenRange[0]
+        this.localBlock.rand.nonnativeTokenMaxPercent = this.nonnativeAmountTokenRange[1]
+      },
+      deep: true,
+    },
     tasks: {
       async handler() {
+        if (!this.init) {
+          this.taskCount = this.tasks.length ? this.tasks.length - 1 : 1
+          this.startToken = null
+        }
+
         const tasks = []
         tasks.push(...this.tasks)
         tasks.push(...this.randomTasks)
@@ -210,6 +285,9 @@ export default defineComponent({
       handler() {
         this.loadToTokens()
         this.localBlock.rand.startToken = this.startToken
+        if (!this.init) {
+          this.finishToken = null
+        }
       },
     },
     finishToken: {
@@ -244,13 +322,16 @@ export default defineComponent({
   emits: ['blockChanged'],
   data() {
     return {
-      randomRange: [180, 300] as Array<Number>,
+      init: true,
+      randomRange: [0, 60] as Array<any>,
+      nativeAmountTokenRange: [80, 95] as Array<any>,
+      nonnativeAmountTokenRange: [80, 100] as Array<any>,
       network: Network.ZKSYNCERA as null | Network,
       startToken: null as Token | null,
       finishToken: null as Token | null,
       tasks: [] as RandomTask[],
       randomTasks: [] as RandomTask[],
-      preview: null as null | RandomFlowPreviewRes,
+      preview: null as null | FlowPreviewRes,
       previewError: '',
       taskCount: 1,
       timerTokenCombo: new Timer(),
@@ -271,19 +352,28 @@ export default defineComponent({
 
     async sync() {
 
-      if (!await this.validateForm()) {
-        return
+      // if (!await this.validateForm()) {
+      //   return
+      // }
+
+      const block: FlowBlock = {
+        weight: this.block.weight,
+        rand: {
+          startNetwork: this.network,
+          maxDelay: this.randomRange[1],
+          minDelay: this.randomRange[0],
+          tasks: [...this.randomTasks, ...this.tasks],
+          taskCount: this.taskCount,
+          startToken: this.startToken,
+          finishToken: this.finishToken,
+          nativeTokenMinPercent: this.nativeAmountTokenRange[0].toString(),
+          nativeTokenMaxPercent: this.nativeAmountTokenRange[1].toString(),
+          nonnativeTokenMinPercent: this.nonnativeAmountTokenRange[0].toString(),
+          nonnativeTokenMaxPercent: this.nonnativeAmountTokenRange[1].toString(),
+        }
       }
 
-      this.$emit('blockChanged', {
-        startNetwork: this.network,
-        maxDelay: this.randomRange[1],
-        minDelay: this.randomRange[0],
-        tasks: [...this.randomTasks, ...this.tasks],
-        taskCount: this.taskCount,
-        startToken: this.startToken,
-        finishToken: this.finishToken,
-      })
+      this.$emit('blockChanged', block)
     },
     async validateForm(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага
@@ -490,6 +580,14 @@ export default defineComponent({
         this.randomRange = [this.block.rand.minDelay, this.block.rand.maxDelay]
       }
 
+      if (this.block.rand.nativeTokenMaxPercent) {
+        this.nativeAmountTokenRange = [this.block.rand.nativeTokenMinPercent, this.block.rand.nativeTokenMaxPercent]
+      }
+
+      if (this.block.rand.nonnativeTokenMinPercent) {
+        this.nonnativeAmountTokenRange = [this.block.rand.nonnativeTokenMinPercent, this.block.rand.nonnativeTokenMaxPercent]
+      }
+
 
       this.block.rand.tasks.forEach((v) => {
         if (v.optional) {
@@ -534,6 +632,10 @@ export default defineComponent({
 
       this.sync()
     }
+
+    setTimeout(() => {
+      this.init = false
+    }, 1000)
   }
 })
 

@@ -38,7 +38,7 @@
 
 import {defineComponent, PropType} from 'vue';
 import {flowService} from "@/generated/services"
-import {flow_Flow as Flow, RandomFlowPreviewRes, Task, TaskType} from "@/generated/flow";
+import {flow_Flow as Flow, FlowPreviewRes, Task, TaskType} from "@/generated/flow";
 import CreateFlow from "@/components/flow/OldCreateFlow.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import {getFlow, taskProps} from "@/components/tasks/tasks";

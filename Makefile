@@ -33,6 +33,9 @@ send-dev:
 	ssh -t root@$(dev) "docker-compose -f /root/app/cry/docker-compose.yaml pull"
 	ssh -t root@$(dev) "docker-compose -f /root/app/cry/docker-compose.yaml up -d"
 
+#knock -v 170.64.160.93 7000 8000 9000
+#knock -v 170.64.160.93 9000  8000 7000
+
 deploy-dev:
 	$(MAKE) build-dev
 	$(MAKE) send-dev

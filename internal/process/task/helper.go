@@ -42,7 +42,7 @@ func GasStation(ecost *bozdo.EstimatedGasCost, network v1.Network) *v1.Estimatio
 }
 
 func ResolveNetworkTokenAmount(balance, gas, value *big.Int) *big.Int {
-	gas = bozdo.BigIntSum(bozdo.Percent(gas, 10), gas)
+	gas = bozdo.BigIntSum(bozdo.Percent(gas, 50), gas)
 	need := new(big.Int).Add(gas, value)
 	if need.Cmp(balance) <= 0 {
 		return value

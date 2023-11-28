@@ -3,7 +3,7 @@
   <v-expansion-panel @group:selected="loadSettings">
     <v-expansion-panel-title>
       <div class="d-flex align-center ">
-        <v-img height="22px" :src="network.img" class="mx-4"/>
+        <v-img height="22px" width="22px" :src="network.img" class="mx-4"/>
         <div>{{ network.name }}</div>
       </div>
 
@@ -11,7 +11,7 @@
     <v-expansion-panel-text>
       <Loader v-if="loading"/>
       <v-card v-else>
-        <v-form ref="form">
+        <v-form ref="form" validate-on="lazy input">
           <div class="d-flex justify-end">
             <v-btn v-if="settingsChanged" variant="flat" @click=Update :loading="updating" class="ma-3">Обновить</v-btn>
             <v-btn @click=Reset variant="flat" :loading="reseting" class="ma-3">Сброс</v-btn>
@@ -48,6 +48,42 @@
               <v-col>
                 <NetworkMaxGas v-model="settings.maxGas" :network="network.value"/>
               </v-col>
+            </v-row>
+            <v-row class="align-center my-2 px-2">
+              <v-checkbox
+                density="compact"
+                hide-details
+                label="Авто-пополнение с биржи"
+                v-model="settings.autoRefuel.enabled"
+              />
+
+              <div v-if="settings.autoRefuel.enabled" class="d-flex flex-wrap">
+                <v-text-field
+                  :label="`Минимум`"
+                  density="compact"
+                  v-model="settings.autoRefuel.min"
+                  variant="outlined"
+                  style="width: 130px; height: 40px;"
+                  class="mx-2 mr-3"
+                  :rules="[required, moreThanZero, gte]"
+                  :suffix="nativeToken"
+                />
+                <v-text-field
+                  :label="`Maксимум`"
+                  density="compact"
+                  v-model="settings.autoRefuel.max"
+                  variant="outlined"
+                  style="width: 130px; height: 40px;"
+                  class="mx-2 mr-6"
+                  :rules="[required, moreThanZero, gte]"
+                  :suffix="nativeToken"
+                />
+                <div style="width: 200px">
+                  <WithdrawerSelect v-model="settings.autoRefuel.withdrawerId"/>
+                </div>
+
+              </div>
+
             </v-row>
 
             <v-row class="my-1">
@@ -102,10 +138,12 @@ import NetworkMaxGas from "@/components/settings/NetworkMaxGas.vue";
 import Loader from "@/components/Loader.vue";
 import TaskSettingsC from "@/components/settings/TaskSettings.vue";
 import {taskProps} from "@/components/tasks/tasks";
+import WithdrawerSelect from "@/components/exchange.acc/WithdrawerSelect.vue";
+import {moreThanZero, required} from "@/components/tasks/helper";
 
 export default defineComponent({
   name: "SettingsNetwork",
-  components: {TaskSettingsC, Loader, NetworkMaxGas, NetworkGasMultiplier},
+  components: {WithdrawerSelect, TaskSettingsC, Loader, NetworkMaxGas, NetworkGasMultiplier},
   props: {
     network: {
       type: Object as PropType<network>,
@@ -116,6 +154,7 @@ export default defineComponent({
     settings: {
       handler() {
         this.settingsChanged = !deepEqual(this.settings, this.orig)
+        console.log('this.settingsChanged ', this.settingsChanged)
       },
       deep: true,
     }
@@ -125,7 +164,6 @@ export default defineComponent({
       timer: new Timer(),
       loading: false,
       suggestedGasPrice: 0,
-      ETHPrice: 2000,
       settings: {} as NetworkSettings,
       orig: {} as NetworkSettings,
       settingsChanged: false,
@@ -141,8 +179,46 @@ export default defineComponent({
     Network() {
       return Network
     },
+    nativeToken(): string {
+      const n = this.network.value
+      switch (n) {
+        case Network.ARBITRUM:
+          return 'ETH'
+        case Network.Linea:
+          return 'ETH'
+        case Network.Base:
+          return 'ETH'
+        case Network.ZKSYNCERA:
+          return 'ETH'
+        case Network.Etherium:
+          return 'ETH'
+        case Network.OPTIMISM:
+          return "ETH"
+        case Network.StarkNet:
+          return "ETH"
+        case Network.BinanaceBNB:
+          return "BNB"
+        case Network.AVALANCHE:
+          return 'AVAX'
+        case Network.POLIGON:
+          return "MATIC"
+      }
+    },
   },
   methods: {
+    gte(a: any) {
+
+      if (Number.isNaN(this.settings.autoRefuel.min) || Number.isNaN(this.settings.autoRefuel.max)) {
+        return "Должно быть числом"
+      }
+      if (Number(this.settings.autoRefuel.min) > Number(this.settings.autoRefuel.max)) {
+        return "Минимус > Максимус"
+      }
+
+      return true
+    },
+    moreThanZero,
+    required,
     slippageAvailable(t: TaskType) {
       return taskProps[t].networks.has(this.network.value)
     },
@@ -169,7 +245,9 @@ export default defineComponent({
     },
 
     sync() {
-      this.orig = Object.assign({}, this.settings)
+
+      let j = JSON.stringify(this.settings)
+      this.orig = JSON.parse(j)
       this.taskMap = castTaskSettingsMap(this.settings.taskSettings)
     },
     async Reset() {
@@ -215,12 +293,15 @@ export default defineComponent({
       try {
         this.loading = true
         const res = await settingsService.settingsServiceGetSettings({body: {network: this.network.value}})
+
+        if (!res.settings.autoRefuel) {
+          res.settings.autoRefuel = {}
+        }
         this.settings = res.settings
         this.sync()
       } finally {
         this.loading = false
       }
-
     },
     async validate(): Promise<boolean> {
       // @ts-ignore попизди мне еще что руки из жопы у меня ага

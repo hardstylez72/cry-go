@@ -14,36 +14,36 @@
   <v-card>
     <v-card-text>
 
-      <!--      <v-form ref="form">-->
+      <v-form ref="form">
 
-      <v-text-field
-        v-model="label"
-        label="Название сценария"
-        density="comfortable"
-        variant="outlined"
-        :rules="[required]"
-        :disabled="disable"
-      ></v-text-field>
+        <v-text-field
+          v-model="label"
+          label="Название сценария"
+          density="comfortable"
+          variant="outlined"
+          :rules="[required]"
+          :disabled="disable"
+        ></v-text-field>
 
-      <div v-for="block in blocks">
-        <component
-          class="my-2"
-          v-if="block.man"
-          is="ManBlock"
-          :disable="disable"
-          :block="block"
-          @flow-changed="flowChanged"
-        />
-        <component
-          class="my-2"
-          v-if="block.rand"
-          is="RandomBlock"
-          :disable="disable"
-          :block="block"
-          @block-changed="flowChanged"
-        />
-      </div>
-      <!--      </v-form>-->
+        <div v-for="block in blocks">
+          <component
+            class="my-2"
+            v-if="block.man"
+            is="ManBlock"
+            :disable="disable"
+            :block="block"
+            @flow-changed="flowChanged"
+          />
+          <component
+            class="my-2"
+            v-if="block.rand"
+            is="RandomBlock"
+            :disable="disable"
+            :block="block"
+            @block-changed="flowChanged"
+          />
+        </div>
+      </v-form>
       <Preview :data="preview"/>
     </v-card-text>
   </v-card>
@@ -54,7 +54,7 @@
 import {defineComponent} from 'vue';
 import {flowService} from "@/generated/services"
 import {
-  FlowBlock, RandomFlowPreviewRes,
+  FlowBlock, FlowPreviewRes,
 } from "@/generated/flow";
 import NavBar from "@/components/NavBar.vue";
 import RandomBlock from "@/components/flow/RandomBlock.vue";
@@ -71,7 +71,7 @@ export default defineComponent({
       blockMap: new Map<number, FlowBlock>(),
       disable: false,
       saveLoading: false,
-      preview: null as null | RandomFlowPreviewRes,
+      preview: null as null | FlowPreviewRes,
       previewError: '',
       timer: new Timer(),
       label: '',
@@ -89,19 +89,26 @@ export default defineComponent({
   methods: {
     required,
     async flowChanged(block: FlowBlock) {
+
+      if (!block || !block.weight) {
+        return
+      }
+
+      console.log('block + ' + block.weight, block.rand)
+
       this.blockMap.set(Number(block.weight), block)
 
       await this.validateForm()
 
       this.loadPreview()
     },
-    async loadTokenCombo() {
+    async loadPreview() {
 
       this.timer.add(100)
       this.timer.cb(() => {
 
         this.previewError = ''
-        flowService.flowServiceRandomFlowPreview({body: {blocks: this.blocks, label: ''}})
+        flowService.flowServiceFlowPreview({body: {blocks: this.blocks, label: ''}})
           .then((data) => {
             this.preview = data
           }).catch(() => {

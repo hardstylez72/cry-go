@@ -2,7 +2,7 @@
   <v-dialog v-model="dialog" min-width="400px" width="auto" height="auto" location="center"
             :close-on-back="false"
             :close-on-content-click="false"
-            persistent="true">
+            :persistent="true">
     <template v-slot:activator="{ props }">
       <v-btn @click="dialog = true" :loading="loading" class="mb-4 mx-4">
         <v-tooltip

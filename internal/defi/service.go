@@ -78,6 +78,7 @@ type EtheriumClient struct {
 	Cfg              *Config
 	RpcCli           *rpc.Client
 	traderJoeService *traderjoe.Service
+	London           London
 }
 
 func (c *EtheriumClient) Network() v1.Network {

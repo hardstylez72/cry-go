@@ -120,7 +120,7 @@ export default defineComponent({
     return {
       duration: "0",
       random: true,
-      randomRange: [180, 300] as Array<Number>
+      randomRange: [180, 300] as Array<any>
     }
   },
   methods: {

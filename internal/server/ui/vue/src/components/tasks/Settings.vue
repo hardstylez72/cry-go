@@ -6,7 +6,7 @@
         height="auto"
         :close-on-content-click="false"
         :close-on-back="false"
-        persistent="true"
+        :persistent="true"
         location="center"
         location-strategy="static"
         min-width="320px"

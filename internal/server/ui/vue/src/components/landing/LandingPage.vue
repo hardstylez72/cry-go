@@ -28,24 +28,23 @@
       <h2 class="text-center text-h5 font-weight-bold text-blue-darken-2 my-5">Интеграции</h2>
       <TaskSelector @taskSelected="addStep"/>
 
-      <v-card v-if="tasks">
-        <v-card-title class="d-flex justify-space-between px-0 align-center">
-          <div class="d-inline-flex align-center">
-            <a><h4 :id="tasks.weight" class="mx-2">{{ `${tasks.taskType}` }}</h4></a>
-            <a target="_blank" :href="taskSpec(tasks).service.link" class="mx-1">
-              <v-img height="22px" :src="taskSpec(tasks).service.img"/>
-            </a>
-          </div>
-        </v-card-title>
-        <component
-
-          style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;"
-          :is="tasks.component"
-          :weight="tasks.weight"
-          :task="tasks.task"
-          :spec="taskSpec(tasks)"
-        />
-      </v-card>
+      <!--      <v-card v-if="tasks">-->
+      <!--        <v-card-title class="d-flex justify-space-between px-0 align-center">-->
+      <!--          <div class="d-inline-flex align-center">-->
+      <!--            <a><h4 :id="tasks.weight" class="mx-2">{{ `${tasks.taskType}` }}</h4></a>-->
+      <!--            <a target="_blank" :href="taskSpec(tasks).service.link" class="mx-1">-->
+      <!--              <v-img height="22px" :src="taskSpec(tasks).service.img"/>-->
+      <!--            </a>-->
+      <!--          </div>-->
+      <!--        </v-card-title>-->
+      <!--        <component-->
+      <!--          style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;"-->
+      <!--          :is="tasks.component"-->
+      <!--          :weight="tasks.weight"-->
+      <!--          :task="tasks.task"-->
+      <!--          :spec="taskSpec(tasks)"-->
+      <!--        />-->
+      <!--      </v-card>-->
     </div>
 
     <div class="my-5">

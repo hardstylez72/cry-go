@@ -5,7 +5,7 @@
     location="bottom"
     max-width="700px"
     v-model="menu"
-    persistent="true"
+    :persistent="true"
     no-click-animation
     transition="false"
     :close-on-content-click="false"

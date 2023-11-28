@@ -13,7 +13,6 @@ import {createVuetify, ThemeDefinition} from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import {md3} from 'vuetify/blueprints'
-import {VSkeletonLoader} from "vuetify/labs/VSkeletonLoader";
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 
 export const myCustomLightTheme: ThemeDefinition = {
@@ -36,7 +35,7 @@ export const myCustomDarkTheme: ThemeDefinition = {
   },
 }
 export default createVuetify({
-  components: {...components, VSkeletonLoader},
+  components: {...components},
   directives,
   blueprint: md3,
   theme: {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/big"
 	"net/http"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
@@ -28,16 +29,38 @@ func (c *KyberSwapMaker) makeBaseURL(network v1.Network) string {
 		return "unknown"
 	}
 }
-func (c *KyberSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (*bozdo.TxData, error) {
+func (c *KyberSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapReq) (_ *bozdo.TxData, err error) {
 
-	quote, err := c.Quote(ctx, req)
-	if err != nil {
-		return nil, errors.Wrap(err, "Quote")
+	var quote *QuoteRes
+	quoteCount := 0
+	for {
+		quote, err = c.Quote(ctx, req)
+		if err != nil {
+			if quoteCount > 5 {
+				return nil, errors.Wrap(err, "Quote")
+			}
+			quoteCount++
+
+			time.Sleep(time.Second * 5)
+			continue
+		}
+		break
 	}
 
-	prepared, err := c.Build(ctx, req, quote)
-	if err != nil {
-		return nil, errors.Wrap(err, "Build")
+	var prepared *BuildRes
+	buildCount := 0
+	for {
+		prepared, err = c.Build(ctx, req, quote)
+		if err != nil {
+			if buildCount > 5 {
+				return nil, errors.Wrap(err, "Build")
+			}
+			buildCount++
+
+			time.Sleep(time.Second * 5)
+			continue
+		}
+		break
 	}
 
 	if prepared.Code != 0 {
@@ -55,17 +78,11 @@ func (c *KyberSwapMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapRe
 		}
 	}
 
-	//gas, ok := big.NewInt(0).SetString(prepared.Data.Gas, 10)
-	//if !ok {
-	//	return nil, errors.New("invalid gas amount: " + prepared.Data.Gas)
-	//}
-
 	return &bozdo.TxData{
 		Data:         data,
 		Value:        value,
 		ContractAddr: common.HexToAddress(prepared.Data.RouterAddress),
 		Details:      bozdo.NewKyperSwap(prepared.Data.AmountInUsd, prepared.Data.AmountOutUsd, prepared.Data.OutputChange.Percent),
 		//Rate: defi.CalcRate(req.FromToken, req.ToToken, req.Amount, out),
-		//Gas: gas,
 	}, nil
 }

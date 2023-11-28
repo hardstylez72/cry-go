@@ -6,7 +6,6 @@ import (
 	"time"
 
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
-	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/orbiter"
 	"github.com/hardstylez72/cry/internal/pay"
 	"github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -16,8 +15,6 @@ import (
 	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/hardstylez72/cry/internal/snapshot"
 	"github.com/pkg/errors"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -1495,28 +1492,55 @@ var SpecMap = map[v1.TaskType]Spec{
 			}, nil
 		},
 	},
+	v1.TaskType_EkuboSwap: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewEkuboSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_EkuboSwapTask).EkuboSwapTask
+			return NewEkuboSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_EkuboSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_EkuboSwapTask)")
+			}
+			return Marshal(t.EkuboSwapTask)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			return &v1.Task{
+				TaskType: in.Type,
+				Task:     &v1.Task_EkuboSwapTask{EkuboSwapTask: CastDefaultSwap(in.P)},
+			}, nil
+		},
+		Input: func(m *v1.Task) (*TaskInput, error) {
+			p, ok := m.Task.(*v1.Task_EkuboSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_EkuboSwapTask)")
+			}
+			return &TaskInput{
+				Network: p.EkuboSwapTask.Network,
+				Token:   p.EkuboSwapTask.FromToken,
+			}, nil
+		},
+		Output: func(m *v1.Task) (*TaskOutput, error) {
+			p, ok := m.Task.(*v1.Task_EkuboSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_EkuboSwapTask)")
+			}
+			return &TaskOutput{
+				Network: p.EkuboSwapTask.Network,
+				Token:   p.EkuboSwapTask.ToToken,
+			}, nil
+		},
+	},
 }
 
 func CastDefaultSwap(p any) *v1.DefaultSwap {
 
 	pa := p.(*v1.RPswapItem)
 
-	am := &v1.Amount{
-		Kind: &v1.Amount_SendAll{
-			SendAll: true,
-		},
-	}
-
-	if pa.From.String() == bozdo.NativeTokenMap[pa.Network].String() {
-		am = &v1.Amount{
-			Kind: &v1.Amount_SendPercent{
-				SendPercent: 80,
-			},
-		}
-	}
-
 	return &v1.DefaultSwap{
-		Amount:    am,
+		Amount:    pa.Am,
 		Network:   pa.Network,
 		FromToken: pa.From,
 		ToToken:   pa.To,
@@ -1580,7 +1604,9 @@ func UpdateTask(ctx context.Context, after *v1.ProcessTask, d repository.Process
 	}
 
 	if after.Status != before.Status {
-		if after.Error != nil {
+		if after.Error != nil &&
+			after.Status != v1.ProcessStatus_StatusRunning &&
+			after.Status != v1.ProcessStatus_StatusDone {
 			_ = d.RecordStatusChanged(ctx, before.Id, before.Status, after.Status, *after.Error)
 		} else {
 			_ = d.RecordStatusChanged(ctx, before.Id, before.Status, after.Status)
@@ -1650,19 +1676,8 @@ func (w *Wrap) Run(ctx context.Context, a *Input) (task *v1.ProcessTask, err err
 		With("task", a.Task.Task.TaskType.String()).
 		With("user_id", a.UserId)
 
-	tr := otel.Tracer("")
-	pctx, span := tr.Start(ctx, "RunTask")
-	span.SetAttributes(
-		attribute.String("tId", taskId),
-		attribute.String("pId", a.ProcessId),
-		attribute.String("ppId", a.ProfileId),
-		attribute.String("tType", a.Task.Task.TaskType.String()),
-		attribute.String("userId", a.UserId),
-	)
-	defer span.End()
-
 	l.Debug("task running")
-	task, err = w.Tasker.Run(pctx, a)
+	task, err = w.Tasker.Run(ctx, a)
 	if err != nil {
 		l.Error(fmt.Sprintf("task [%s] finished with error ", a.Task.Task.TaskType.String()), zap.Error(err))
 	} else {
@@ -1681,12 +1696,12 @@ func (w *Wrap) Run(ctx context.Context, a *Input) (task *v1.ProcessTask, err err
 		a.Task.Error = &e
 		a.Task.Status = v1.ProcessStatus_StatusError
 
-		if err := a.UpdateTask(pctx, a.Task); err != nil {
+		if err := a.UpdateTask(ctx, a.Task); err != nil {
 			return nil, err
 		}
 	} else {
 		a.Task.Error = nil
-		if err := a.UpdateTask(pctx, a.Task); err != nil {
+		if err := a.UpdateTask(ctx, a.Task); err != nil {
 			return nil, err
 		}
 	}

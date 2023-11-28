@@ -106,13 +106,20 @@ func ResolveAmount(amount *v1.Amount, balance *big.Int) (*big.Int, error) {
 		amountKind := amount.Kind.(*v1.Amount_SendAmount)
 		f := new(big.Float).SetFloat64(float64(amountKind.SendAmount))
 		am, _ = f.Int(nil)
-		//case *v1.Amount_SendValue:
-		//	value := amount.Kind.(*v1.Amount_SendValue)
-		//	f, err := lib.StringToFloat(value.SendValue)
-		//	if err != nil {
-		//		return nil, err
-		//	}
-		//	return TokenAmountFloatToWEI(f, token), nil
+	//case *v1.Amount_SendValue:
+	//	value := amount.Kind.(*v1.Amount_SendValue)
+	//	f, err := lib.StringToFloat(value.SendValue)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	return TokenAmountFloatToWEI(f, token), nil
+	case *v1.Amount_PercRange:
+
+		amountKind := amount.Kind.(*v1.Amount_PercRange)
+		perc := lib.Randint64Range(amountKind.PercRange.Min, amountKind.PercRange.Max)
+
+		b1p := new(big.Int).Div(balance, new(big.Int).SetInt64(100))
+		am.Mul(b1p, new(big.Int).SetInt64(perc))
 	}
 
 	return am, nil

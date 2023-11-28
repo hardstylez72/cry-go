@@ -6,7 +6,7 @@ import MenuTaskMaverickSwap from "@/components/tasks/SWAPS/Maverick/Menu.vue";
 import {tokenSwapPair} from "@/components/helper";
 
 export const MaverickSwapSpec: TaskSpec = {
-  deprecated: false,
+  deprecated: true,
   canBeEstimated: true,
   descFn(task) {
     const p = task.maverickSwapTask

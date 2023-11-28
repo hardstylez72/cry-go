@@ -14,17 +14,14 @@
 
     </template>
 
-    <template v-slot:default="{ props }">
+    <template v-slot:default>
       <v-card width="auto">
         <v-card-text>
 
           <span class="d-flex justify-space-between">
             <div>
                <h3 class="d-inline-flex">
-                   {{ taskSpec(task.task.taskType).service.name }}
-                   <a target="_blank" :href="taskSpec(task.task.taskType).service.link" class="mx-1">
-                    <v-img height="22px" :src="taskSpec(task.task.taskType).service.img"/>
-                   </a>
+                 <TaskChip :task-type="task.task.taskType"/>
                </h3>
               <div>
                <StatusCard :status="task.status"/>
@@ -113,10 +110,11 @@ import EstimateTask from "@/components/tasks/Estimate.vue";
 import Support from "@/components/issue/Support.vue";
 import {TaskSpec} from "@/components/tasks/utils";
 import TaskBlock from "@/components/flow/TaskBlock.vue";
+import TaskChip from "@/components/tasks/TaskChip.vue";
 
 export default defineComponent({
   name: "ProcessTaskMenu",
-  components: {TaskBlock, Support, EstimateTask, StatusCard, ViewFlow},
+  components: {TaskChip, TaskBlock, Support, EstimateTask, StatusCard, ViewFlow},
   watch: {
     menu: {
       handler(a, b) {

@@ -82,7 +82,7 @@ func (s *Service) Withdraw(ctx context.Context, req *exchange.WithdrawRequest) (
 		Chain:  req.Network,
 		ToAddr: req.ToAddress,
 		Pwd:    "-",
-		Amt:    am - 2*feee,
+		Amt:    am - feee,
 		Fee:    feee,
 		Dest:   okex.WithdrawalDigitalAddressDestination,
 	})
@@ -129,6 +129,11 @@ func (s *Service) WaitConfirm(ctx context.Context, id exchange.WithdrawId) (*str
 	pendings := 0
 
 	for pendings < maxPendings {
+
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+
 		pendings++
 		res, err := s.cli.Rest.Funding.GetWithdrawalHistory(ctx, funding.GetWithdrawalHistory{
 			WdId: id,

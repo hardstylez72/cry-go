@@ -683,7 +683,8 @@
         "PolygonZKEVM",
         "Fantom",
         "Base",
-        "opBNB"
+        "opBNB",
+        "Linea"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -856,7 +857,8 @@
         "MintFun",
         "MintMerkly",
         "MintZerius",
-        "KyberSwap"
+        "KyberSwap",
+        "EkuboSwap"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

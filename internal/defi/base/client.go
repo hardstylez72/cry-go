@@ -93,6 +93,7 @@ func NewClient(c *ClientConfig) (*Client, error) {
 	}
 
 	ethcli.Cfg.EstimateL1Gas = ethcli.EstimateL1GasFee
+	ethcli.London = defi.LondonReadyTx
 
 	return &Client{
 		defi:      ethcli,

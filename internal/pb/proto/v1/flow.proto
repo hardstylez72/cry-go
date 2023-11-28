@@ -82,6 +82,7 @@ message RPswapItem {
   shared.Network network = 1;
   shared.Token from = 2;
   shared.Token to = 3;
+  shared.Amount am = 4;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
@@ -201,9 +202,9 @@ service FlowService {
     };
   }
 
-  rpc RandomFlowPreview(FlowPreviewReq) returns (RandomFlowPreviewRes) {
+  rpc FlowPreview(FlowPreviewReq) returns (FlowPreviewRes) {
     option (google.api.http) = {
-      post: "/api/gw/v1/flow-random/preview",
+      post: "/api/gw/v1/flow/preview",
       body: "*"
     };
   }
@@ -329,7 +330,7 @@ message FlowPreviewReq {
   };
 }
 
-message RandomFlowPreviewRes {
+message FlowPreviewRes {
   repeated UniqueFlow flow = 1;
   double unique_percent = 2;
 
@@ -402,6 +403,12 @@ message FlowBlockRand {
   int64 task_count = 6;
   int64 min_delay = 7;
   int64 max_delay = 8;
+
+  int64 native_token_min_percent = 9;
+  int64 native_token_max_percent = 10;
+
+  int64 nonnative_token_min_percent = 11;
+  int64 nonnative_token_max_percent = 12;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
@@ -596,6 +603,7 @@ message Task {
     task.SimpleTask mintMerklyTask = 48;
     task.SimpleTask mintZeriusTask = 49;
     task.DefaultSwap kyberSwapTask = 50;
+    task.DefaultSwap ekuboSwapTask = 51;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

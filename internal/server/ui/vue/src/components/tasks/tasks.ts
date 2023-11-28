@@ -43,6 +43,7 @@ import {TestNetSpec} from "@/components/tasks/BRIDGE/TestNet";
 import {ZkSyncBridgeFromETHSpec} from "@/components/tasks/BRIDGE/ZkSyncFromEth";
 import {ZkSyncBridgeToETHSpec} from "@/components/tasks/BRIDGE/ZkSyncToEth";
 import {DelaySpec} from "@/components/tasks/OTHER/Delay";
+import {SwapEkuboSpec} from "@/components/tasks/SWAPS/Ekubo";
 
 
 export interface TaskArg {
@@ -124,6 +125,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   MintMerkly: NFTMerklyMintSpec,
   MintZerius: NFTZeriusMintSpec,
   KyberSwap: KyberSwapSpec,
+  EkuboSwap: SwapEkuboSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

@@ -51,7 +51,7 @@ import {required} from "@/components/tasks/helper";
 })
 export default class DefaultSwapTask extends Vue {
   @Prop weight!: Number
-  @Prop disabled!: Boolean
+  @Prop disabled!: boolean
   @Prop task!: Task
 
   @Watch('pair', {

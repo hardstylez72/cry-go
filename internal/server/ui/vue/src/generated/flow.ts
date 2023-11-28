@@ -157,28 +157,6 @@ export class FlowService {
   /**
    *
    */
-  flowServiceRandomFlowPreview(
-    params: {
-      /**  */
-      body: FlowPreviewReq;
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<RandomFlowPreviewRes> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + '/api/gw/v1/flow-random/preview';
-
-      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
-
-      let data = params['body'];
-
-      configs.data = data;
-
-      axios(configs, resolve, reject);
-    });
-  }
-  /**
-   *
-   */
   flowServiceSharedFlow(
     params: {
       /**  */
@@ -355,6 +333,28 @@ export class FlowService {
   /**
    *
    */
+  flowServiceFlowPreview(
+    params: {
+      /**  */
+      body: FlowPreviewReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<FlowPreviewRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/flow/preview';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   flowServiceShareFlow(
     params: {
       /**  */
@@ -515,6 +515,9 @@ export interface Amount {
 
   /**  */
   sendValue?: string;
+
+  /**  */
+  percRange?: PercentRange;
 
   /**  */
   send?: AmUni;
@@ -749,6 +752,18 @@ export interface FlowBlockRand {
 
   /**  */
   maxDelay: string;
+
+  /**  */
+  nativeTokenMinPercent?: string;
+
+  /**  */
+  nativeTokenMaxPercent?: string;
+
+  /**  */
+  nonnativeTokenMinPercent?: string;
+
+  /**  */
+  nonnativeTokenMaxPercent?: string;
 }
 
 export interface FlowListItem {
@@ -777,6 +792,14 @@ export interface FlowPreviewReq {
 
   /**  */
   blocks: FlowBlock[];
+}
+
+export interface FlowPreviewRes {
+  /**  */
+  flow: UniqueFlow[];
+
+  /**  */
+  uniquePercent: number;
 }
 
 export interface FlowShared {
@@ -1030,6 +1053,14 @@ export interface OrbiterBridgeTask {
   tx?: TaskTx;
 }
 
+export interface PercentRange {
+  /**  */
+  min?: string;
+
+  /**  */
+  max?: string;
+}
+
 export interface RPsimple {
   /**  */
   network: Network;
@@ -1049,14 +1080,9 @@ export interface RPswapItem {
 
   /**  */
   to: Token;
-}
-
-export interface RandomFlowPreviewRes {
-  /**  */
-  flow: UniqueFlow[];
 
   /**  */
-  uniquePercent: number;
+  am?: Amount;
 }
 
 export interface RandomTask {
@@ -1348,6 +1374,9 @@ export interface Task {
 
   /**  */
   kyberSwapTask?: DefaultSwap;
+
+  /**  */
+  ekuboSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1602,7 +1631,8 @@ export enum Network {
   'PolygonZKEVM' = 'PolygonZKEVM',
   'Fantom' = 'Fantom',
   'Base' = 'Base',
-  'opBNB' = 'opBNB'
+  'opBNB' = 'opBNB',
+  'Linea' = 'Linea'
 }
 
 export enum TaskType {
@@ -1652,7 +1682,8 @@ export enum TaskType {
   'MintFun' = 'MintFun',
   'MintMerkly' = 'MintMerkly',
   'MintZerius' = 'MintZerius',
-  'KyberSwap' = 'KyberSwap'
+  'KyberSwap' = 'KyberSwap',
+  'EkuboSwap' = 'EkuboSwap'
 }
 
 export enum Token {

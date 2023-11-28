@@ -24,7 +24,8 @@ export const OrbiterBridgeSpec: TaskSpec = {
     Network.ZKSYNCERA,
     Network.ARBITRUM,
     Network.Base,
+    Network.Linea,
   ]),
-  airdrops: new Set<Airdrop>([Airdrop.Base, Airdrop.Orbiter, Airdrop.ZkSync, Airdrop.LayerZero]),
+  airdrops: new Set<Airdrop>([Airdrop.Base, Airdrop.Orbiter, Airdrop.ZkSync, Airdrop.LayerZero, Airdrop.Linea]),
   profileType: new Set([ProfileType.EVM])
 }

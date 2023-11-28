@@ -215,7 +215,7 @@ func (h *DefaultLiquidityBridgeTaskHalper) Execute(ctx context.Context, from, to
 			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
-			return nil, nil, ErrProfileHasInsufficientBalance(networker.GetNetworkToken(), &Gas.TotalGas, balance.WEI)
+			return nil, nil, ErrProfileHasInsufficientBalance(p.FromNetwork, networker.GetNetworkToken(), &Gas.TotalGas, balance.WEI)
 		}
 	}
 

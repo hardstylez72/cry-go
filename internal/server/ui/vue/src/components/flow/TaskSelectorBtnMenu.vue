@@ -3,9 +3,9 @@
     location-strategy="connected"
     max-width="700px"
     v-model="menu"
-    persistent="true"
+    :persistent="true"
     no-click-animation
-    transition="false"
+    :transition="false"
     :close-on-content-click="false"
     :close-on-back="false">
     <template v-slot:activator="{ props }">

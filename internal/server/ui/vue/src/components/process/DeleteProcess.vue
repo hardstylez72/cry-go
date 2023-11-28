@@ -8,7 +8,7 @@
       <v-btn variant="flat" color="blue-grey-darken-3" @click="menu=true">Удалить</v-btn>
     </template>
 
-    <template v-slot:default="{ props }">
+    <template v-slot:default>
       <v-card>
         <v-card-title>
           Process delete

@@ -7,6 +7,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/base"
 	"github.com/hardstylez72/cry/internal/defi/bnb"
 	"github.com/hardstylez72/cry/internal/defi/etherium"
+	"github.com/hardstylez72/cry/internal/defi/linea"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
 	"github.com/hardstylez72/cry/internal/defi/poligon"
 	"github.com/hardstylez72/cry/internal/defi/starknet"
@@ -48,6 +49,8 @@ func NewBaseClient(network v1.Network, c *BaseClientConfig) (defi.Networker, err
 		cli, err = zksyncera.NewClient(&zksyncera.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_ZKSYNCLITE:
 		cli, err = zksynclite.NewClient(&zksynclite.Config{HttpCli: proxy.Cli, RPCETHURL: c.RPCEndpoint})
+	case v1.Network_Linea:
+		cli, err = linea.NewClient(&linea.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_StarkNet:
 		cli, err = starknet.NewClient(&starknet.ClientConfig{
 			HttpCli:     proxy.Cli,

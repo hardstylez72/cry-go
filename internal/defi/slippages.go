@@ -69,4 +69,5 @@ var SlippageMap = map[v1.TaskType]SlippagePercent{
 	v1.TaskType_AvnuSwap:       SlippagePercent2,
 	v1.TaskType_FibrousSwap:    SlippagePercent2,
 	v1.TaskType_KyberSwap:      SlippagePercent05,
+	v1.TaskType_EkuboSwap:      SlippagePercent05,
 }

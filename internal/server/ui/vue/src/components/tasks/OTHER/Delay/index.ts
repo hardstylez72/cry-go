@@ -17,7 +17,7 @@ export const DelaySpec: TaskSpec = {
     return ` (${p?.random ? `${humanDuration(p?.minRandom)}:${humanDuration(p?.maxRandom)}` : humanDuration(p?.duration)})`
   },
   service: {
-    name: 'Delay',
+    name: 'Zzz',
     link: '',
     img: '',
     op: '',

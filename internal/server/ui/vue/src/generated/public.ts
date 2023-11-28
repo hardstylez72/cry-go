@@ -214,5 +214,6 @@ export enum TaskType {
   'MintFun' = 'MintFun',
   'MintMerkly' = 'MintMerkly',
   'MintZerius' = 'MintZerius',
-  'KyberSwap' = 'KyberSwap'
+  'KyberSwap' = 'KyberSwap',
+  'EkuboSwap' = 'EkuboSwap'
 }

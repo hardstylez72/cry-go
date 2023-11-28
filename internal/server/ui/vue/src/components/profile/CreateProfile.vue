@@ -41,7 +41,7 @@
         <v-radio-group
           class="my-2"
           v-model="selectProfileType"
-          inline="true"
+          :inline="true"
           hide-details
           density="compact"
           :disabled="needSave">
@@ -53,7 +53,7 @@
       <v-radio-group
         class="my-2"
         v-model="selectProfileSubType"
-        inline="true"
+        :inline="true"
         hide-details
         density="compact"
         :disabled="needSave">
@@ -87,7 +87,7 @@
         auto-grow
         @input="preparseText"
         density="compact"
-        clearable="true"
+        :clearable="true"
         variant="outlined"
         placeholder="<metamask-pk> required, <proxy> optional, <custom label> optional] ..."
         v-model="text"

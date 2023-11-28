@@ -252,5 +252,6 @@ export enum Network {
   'PolygonZKEVM' = 'PolygonZKEVM',
   'Fantom' = 'Fantom',
   'Base' = 'Base',
-  'opBNB' = 'opBNB'
+  'opBNB' = 'opBNB',
+  'Linea' = 'Linea'
 }

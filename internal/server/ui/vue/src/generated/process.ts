@@ -517,6 +517,9 @@ export interface Amount {
   sendValue?: string;
 
   /**  */
+  percRange?: PercentRange;
+
+  /**  */
   send?: AmUni;
 
   /**  */
@@ -943,6 +946,14 @@ export interface OrbiterBridgeTask {
   tx?: TaskTx;
 }
 
+export interface PercentRange {
+  /**  */
+  min?: string;
+
+  /**  */
+  max?: string;
+}
+
 export interface Process {
   /**  */
   id: string;
@@ -1349,6 +1360,9 @@ export interface Task {
 
   /**  */
   kyberSwapTask?: DefaultSwap;
+
+  /**  */
+  ekuboSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {
@@ -1551,7 +1565,8 @@ export enum Network {
   'PolygonZKEVM' = 'PolygonZKEVM',
   'Fantom' = 'Fantom',
   'Base' = 'Base',
-  'opBNB' = 'opBNB'
+  'opBNB' = 'opBNB',
+  'Linea' = 'Linea'
 }
 
 export enum ProcessStatus {
@@ -1615,7 +1630,8 @@ export enum TaskType {
   'MintFun' = 'MintFun',
   'MintMerkly' = 'MintMerkly',
   'MintZerius' = 'MintZerius',
-  'KyberSwap' = 'KyberSwap'
+  'KyberSwap' = 'KyberSwap',
+  'EkuboSwap' = 'EkuboSwap'
 }
 
 export enum Token {

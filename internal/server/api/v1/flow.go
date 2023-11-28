@@ -319,7 +319,7 @@ func (s *FlowService) OnlyRandomFlowPreview(ctx context.Context, req *v1.OnlyRan
 
 func (s *FlowService) OnlyRandomFlowFromTokens(ctx context.Context, req *v1.OnlyRandomFlowPreviewReq) (*v1.OnlyRandomFlowFromTokensRes, error) {
 
-	tasks := task.ExtractItems(req.Tasks, false)
+	tasks := task.ExtractItems(req.Tasks, nil, nil, false)
 
 	m := map[v1.Token]bool{}
 	tokens := make([]v1.Token, 0)
@@ -336,7 +336,7 @@ func (s *FlowService) OnlyRandomFlowFromTokens(ctx context.Context, req *v1.Only
 	}, nil
 }
 
-func (s *FlowService) RandomFlowPreview(ctx context.Context, req *v1.FlowPreviewReq) (*v1.RandomFlowPreviewRes, error) {
+func (s *FlowService) FlowPreview(ctx context.Context, req *v1.FlowPreviewReq) (*v1.FlowPreviewRes, error) {
 
 	dreams, err := LetTheDreamsComeTrue(req.GetBlocks())
 	if err != nil {
@@ -353,7 +353,7 @@ func (s *FlowService) RandomFlowPreview(ctx context.Context, req *v1.FlowPreview
 		uf = uf[:3]
 	}
 
-	return &v1.RandomFlowPreviewRes{
+	return &v1.FlowPreviewRes{
 		Flow:          uf,
 		UniquePercent: 1,
 	}, nil
