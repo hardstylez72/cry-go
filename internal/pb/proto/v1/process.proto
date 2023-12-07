@@ -54,10 +54,15 @@ message Process {
   optional google.protobuf.Timestamp run_after = 15;
   optional ProcessStopReason stop_reason = 16;
   int64 flow_version = 17;
+  bool parallel = 18;
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["id", "status", "profiles", "flow_id","created_at", "updated_at", "flow_label", "progress", "auto_retry", "flow", "flow_version"]
+      required: [
+        "id", "status", "profiles", "flow_id",
+        "created_at", "updated_at", "flow_label",
+        "progress", "auto_retry", "flow", "flow_version",
+      "parallel"]
     }
   };
 }
@@ -494,9 +499,10 @@ message CreateProcessRequest {
   string flow_id = 1;
   repeated string profile_ids = 2;
   optional google.protobuf.Timestamp run_after = 8;
+  bool parallel = 9;
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     json_schema: {
-      required: ["flow_id", "profile_ids"]
+      required: ["flow_id", "profile_ids", "parallel"]
     }
   };
 }

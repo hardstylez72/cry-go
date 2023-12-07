@@ -604,6 +604,7 @@ message Task {
     task.SimpleTask mintZeriusTask = 49;
     task.DefaultSwap kyberSwapTask = 50;
     task.DefaultSwap ekuboSwapTask = 51;
+    task.DefaultLP nostraLPTask = 52;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

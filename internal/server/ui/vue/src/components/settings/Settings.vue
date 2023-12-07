@@ -41,6 +41,7 @@ export default defineComponent({
         Network.StarkNet,
         Network.Base,
         Network.Linea,
+        Network.Zora,
       ] as Network[],
     }
   },

@@ -138,7 +138,6 @@ func (c *EtheriumClient) StargateBridgeSwapSTG(ctx context.Context, req *Stargat
 
 func Estimate(tx *types.Transaction, extraFee *big.Int, name string, details []bozdo.TxDetail) *bozdo.EstimatedGasCost {
 	gasLimit := new(big.Int).SetUint64(tx.Gas())
-	gasLimit = bozdo.BigIntSum(gasLimit, bozdo.Percent(gasLimit, 30))
 
 	if tx.Type() == types.DynamicFeeTxType {
 		fee := bozdo.BigIntSum(tx.GasFeeCap())

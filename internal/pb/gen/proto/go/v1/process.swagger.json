@@ -655,11 +655,15 @@
         "runAfter": {
           "type": "string",
           "format": "date-time"
+        },
+        "parallel": {
+          "type": "boolean"
         }
       },
       "required": [
         "flowId",
-        "profileIds"
+        "profileIds",
+        "parallel"
       ]
     },
     "CreateProcessResponse": {
@@ -1232,7 +1236,8 @@
         "Fantom",
         "Base",
         "opBNB",
-        "Linea"
+        "Linea",
+        "Zora"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -1434,6 +1439,9 @@
         "flowVersion": {
           "type": "string",
           "format": "int64"
+        },
+        "parallel": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -1447,7 +1455,8 @@
         "progress",
         "autoRetry",
         "flow",
-        "flowVersion"
+        "flowVersion",
+        "parallel"
       ]
     },
     "ProcessProfile": {
@@ -2008,6 +2017,9 @@
         },
         "ekuboSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "nostraLPTask": {
+          "$ref": "#/definitions/DefaultLP"
         }
       },
       "required": [
@@ -2130,7 +2142,8 @@
         "MintMerkly",
         "MintZerius",
         "KyberSwap",
-        "EkuboSwap"
+        "EkuboSwap",
+        "NostraLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

@@ -3,16 +3,7 @@
     <v-container>
       <v-row>
         <v-col>
-          <v-select
-            density="compact"
-            variant="outlined"
-            label="network"
-            v-on:change="inputChanged"
-            :rules="[required]"
-            :items="networks"
-            v-model="item.network"
-            :disabled="disabled"
-          />
+          <NetworkSelector label="Сеть" :items="networks" v-model="item.network"/>
         </v-col>
       </v-row>
     </v-container>
@@ -24,8 +15,12 @@ import {Network, SimpleTask, Task, TaskType} from "@/generated/flow";
 import {taskProps} from "@/components/tasks/tasks";
 import {Component} from "vue-facing-decorator";
 import DefaultSimple from "@/components/tasks/OTHER/DefaultSimple";
+import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
 
-@Component({name: 'Dmail'})
+@Component({
+  name: 'Dmail',
+  components: {NetworkSelector}
+})
 export default class Dmail extends DefaultSimple {
 
   networks = [Network.ZKSYNCERA, Network.StarkNet]

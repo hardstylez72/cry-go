@@ -72,7 +72,7 @@ type AccountGenerated struct {
 	Pub  string `json:"pub"`
 }
 
-type ZkLendRes struct {
+type LPRes struct {
 	DefaultRes
 }
 
@@ -120,6 +120,7 @@ type HalperService interface {
 	SendDmail(ctx context.Context, req *SendDmailReq) (*SendDmailRes, error)
 	Mint(ctx context.Context, req *MintReq) (*MintRes, error)
 	Transfer(ctx context.Context, req *TransferReq) (*TransferRes, error)
-	ZkLend(ctx context.Context, req *ZkLendReq) (*ZkLendRes, error)
+	ZkLend(ctx context.Context, req *LPRreq) (*LPRes, error)
 	Balance(ctx context.Context, req *BalanceReq) (*BalanceRes, error)
+	Nostra(ctx context.Context, req *LPRreq) (*LPRes, error)
 }

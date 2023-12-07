@@ -59,6 +59,7 @@ enum TaskType {
   MintZerius = 45;
   KyberSwap = 46;
   EkuboSwap = 47;
+  NostraLP = 48;
 }
 
 

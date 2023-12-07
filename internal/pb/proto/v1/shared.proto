@@ -34,6 +34,7 @@ enum Network {
   Base = 17;
   opBNB = 18;
   Linea = 19;
+  Zora = 20;
 }
 
 enum Token {

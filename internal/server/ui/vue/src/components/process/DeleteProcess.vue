@@ -5,7 +5,7 @@
     width="200px"
   >
     <template v-slot:activator="{ props }">
-      <v-btn variant="flat" color="blue-grey-darken-3" @click="menu=true">Удалить</v-btn>
+      <v-btn variant="flat" density="compact" color="red" @click="menu=true">Удалить</v-btn>
     </template>
 
     <template v-slot:default>
@@ -50,7 +50,7 @@ export default defineComponent({
     async remove() {
       try {
         await processService.processServiceCancelProcess({body: {processId: this.processId}})
-        this.$router.push({name: "Processes"})
+        this.$emit('processRemoved')
       } catch (e) {
 
       }

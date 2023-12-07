@@ -4,8 +4,7 @@
       <template v-slot:default>
         <div class="d-flex justify-end">
           <v-btn @click="$router.push({name: 'SharedFlowList'})" class="mx-1" variant="flat">Общие</v-btn>
-          <v-btn @click=CreateFlow :class="noFlow ? 'onboarding' : ''" variant="flat">Добавить</v-btn>
-          <v-btn @click="$router.push({name: 'CreateFlowV2'})" variant="flat">ДобавитьV2</v-btn>
+          <v-btn @click="$router.push({name: 'CreateFlowV2'})" variant="flat">Добавить</v-btn>
         </div>
       </template>
     </NavBar>
@@ -26,11 +25,20 @@
           rounded
           height="auto"
           elevation="1"
-          @click="viewFlow(item.id, item.version)"
         >
-          <div>
-            <div class="mr-2"><b>{{ `${item.label}` }}</b> {{ formatTime(item.createdAt) }}</div>
+          <div class="d-flex justify-space-between">
+            <div @click="viewFlow(item.id, item.version)" style="cursor: pointer">
+              <div class="mr-2"><b>{{ `${item.label}` }}</b> {{ formatTime(item.createdAt) }}</div>
+            </div>
+            <div>
+              <v-btn variant="flat" density="compact"
+                     color="red" @click="DeleteFlow(item)">
+                <v-icon v-if="isMobile()" icon="mdi-delete"/>
+                <span v-else>Удалить</span>
+              </v-btn>
+            </div>
           </div>
+
         </v-list-item>
       </v-list>
     </div>
@@ -47,7 +55,7 @@ import CheckBox from "@/components/CheckBox.vue";
 import {getFlow} from "@/components/tasks/tasks";
 import Loader from "@/components/Loader.vue";
 import NavBar from "@/components/NavBar.vue";
-import {formatTime} from "../helper";
+import {formatTime, isMobile} from "../helper";
 
 export default defineComponent({
   name: "Constructor",
@@ -74,6 +82,15 @@ export default defineComponent({
     },
   },
   methods: {
+    isMobile,
+    async DeleteFlow(l: FlowListItem) {
+      try {
+        await flowService.flowServiceDeleteFlow({body: {id: l.id}})
+        await this.UpdateList()
+      } catch (e) {
+
+      }
+    },
     formatTime,
     getFlow,
     viewFlow(id: string, version: string) {

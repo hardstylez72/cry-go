@@ -52,7 +52,7 @@ type TransferReq struct {
 	Amount string `json:"amount"`
 }
 
-type ZkLendReq struct {
+type LPRreq struct {
 	BaseTx
 	Token  string `json:"token"`
 	Amount string `json:"amount"`
@@ -67,8 +67,12 @@ func (s *Service) Balance(ctx context.Context, req *BalanceReq) (*BalanceRes, er
 	return Request[BalanceReq, BalanceRes](ctx, s.cli, s.c.Host+"/starknet/balance", req)
 }
 
-func (s *Service) ZkLend(ctx context.Context, req *ZkLendReq) (*ZkLendRes, error) {
-	return Request[ZkLendReq, ZkLendRes](ctx, s.cli, s.c.Host+"/starknet/zklend", req)
+func (s *Service) ZkLend(ctx context.Context, req *LPRreq) (*LPRes, error) {
+	return Request[LPRreq, LPRes](ctx, s.cli, s.c.Host+"/starknet/zklend", req)
+}
+
+func (s *Service) Nostra(ctx context.Context, req *LPRreq) (*LPRes, error) {
+	return Request[LPRreq, LPRes](ctx, s.cli, s.c.Host+"/starknet/nostra", req)
 }
 
 func (s *Service) Transfer(ctx context.Context, req *TransferReq) (*TransferRes, error) {

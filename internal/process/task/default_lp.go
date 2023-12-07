@@ -12,6 +12,22 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewNostraLPTask() *DefaultLPTask {
+	return &DefaultLPTask{
+		taskType: v1.TaskType_NostraLP,
+		extractor: func(a *Input) (*v1.DefaultLP, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_NostraLPTask)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_NostraLPTask) call an ambulance!")
+			}
+			return l.NostraLPTask, nil
+		},
+		DefaultLPTaskHalper: &DefaultLPTaskHalper{
+			TaskType: v1.TaskType_NostraLP,
+		},
+	}
+}
+
 func NewZkLendLPTask() *DefaultLPTask {
 	return &DefaultLPTask{
 		taskType: v1.TaskType_ZkLendLP,
@@ -117,7 +133,12 @@ func (t *DefaultLPTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, err
 				return nil, err
 			}
 
-			if txId != nil {
+			if txId != nil && *txId == "-" {
+				token.ApproveTx = &v1.TaskTx{TxId: "-"}
+				if err := a.UpdateTask(ctx, task); err != nil {
+					return nil, err
+				}
+			} else if txId != nil {
 				token.ApproveTx = NewStarkNetApproveTx(*txId)
 				if err := a.AddTx2(ctx, token.ApproveTx); err != nil {
 					return nil, err

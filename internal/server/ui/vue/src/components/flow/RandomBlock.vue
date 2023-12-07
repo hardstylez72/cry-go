@@ -1,10 +1,21 @@
 <template>
   <v-card elevation="5" density="compact" variant="elevated">
-    <v-card-title>
-      {{ block.weight }}) Рандомизированный блок
+    <v-card-title class="d-flex justify-space-between">
+      <div>
+        {{ block.weight }}) Рандомизированный блок
+        <Explain>
+          <template v-slot:default>
+            <div>Блок позволяет составить случайные цепочки задач из выбранных проектов (swap/mint) на определенной сети
+            </div>
+            <br/>
+          </template>
+        </Explain>
+      </div>
+
+
+      <v-icon icon="mdi-close" v-if="!disable" @click="removeBlock"/>
     </v-card-title>
     <v-card-text>
-      <!--      <v-form validate-on="submit" ref="form">-->
 
       <div class="flex-wrap d-flex align-center">
         <div>
@@ -20,14 +31,24 @@
         </div>
 
         <div>
-          <v-text-field label="Кол-во" type="number" v-model="taskCount" variant="outlined" density="compact"
-                        style="width: 120px" :disabled="disable" :rules="[required, taskCountRule]"/>
+          <v-text-field label="Длинна цепочки" type="number" v-model="taskCount" variant="outlined" density="compact"
+                        style="width: 120px" :disabled="disable" :rules="[required, taskCountRule]">
+            <template v-slot:append-inner>
+              <Explain>
+                <template v-slot:default>
+                  Максимальное количество задач в генерируемой цепочке.
+                  Должно быть меньше или равно количеству основных задач
+                </template>
+              </Explain>
+            </template>
+          </v-text-field>
         </div>
 
 
-        <div v-if="tasks.length" style="width: 170px">
+        <div v-if="tasks.length" style="width: 200px">
           <TokenSelector :disabled="disable" label="Монета на вход" :items="fromTokens" v-model="startToken"
                          class="mx-3"/>
+
         </div>
 
         <div v-if="tasks.length" style="width: 170px">
@@ -36,28 +57,37 @@
         </div>
 
 
-        <div style="width: 500px">
-          <v-range-slider
-            :rules="[required]"
-            v-model="randomRange"
-            density="compact"
-            :min="1"
-            step="10"
-            :max="600"
-            persistent-hint
-            label="Задержка"
-            center-affix
-            hide-details
-            :disabled="disable"
-          >
-            <template v-slot:prepend>
-              <span style="width: 60px">{{ humanDuration(randomRange[0]) }}</span>
-            </template>
-            <template v-slot:append>
-              <span style="width: 60px">{{ humanDuration(randomRange[1]) }}</span>
-            </template>
-          </v-range-slider>
-        </div>
+      </div>
+
+      <div style="width: 500px">
+        <v-range-slider
+          :rules="[required]"
+          v-model="randomRange"
+          density="compact"
+          :min="1"
+          step="10"
+          :max="600"
+          persistent-hint
+          center-affix
+          hide-details
+          :disabled="disable"
+        >
+          <template v-slot:label>
+            Задержка
+            <Explain>
+              <template v-slot:default>
+                <div> Перед каждой задачей будет сгенерирована случайная задержка из выбранного диапазона
+                </div>
+              </template>
+            </Explain>
+          </template>
+          <template v-slot:prepend>
+            <span style="width: 60px">{{ humanDuration(randomRange[0]) }}</span>
+          </template>
+          <template v-slot:append>
+            <span style="width: 60px">{{ humanDuration(randomRange[1]) }}</span>
+          </template>
+        </v-range-slider>
       </div>
 
       <div style="width: 500px">
@@ -65,15 +95,23 @@
           :rules="[required]"
           v-model="nativeAmountTokenRange"
           density="compact"
-          :min="50"
+          :min="1"
           step="1"
           :max="95"
           persistent-hint
-          label="Обьем нативного токена"
           center-affix
           hide-details
           :disabled="disable"
         >
+          <template v-slot:label>
+            Обьем нативного токена
+            <Explain>
+              <template v-slot:default>
+                <div> позволяет выбрать интервал в процентах от текущего баланса для обмена
+                </div>
+              </template>
+            </Explain>
+          </template>
           <template v-slot:prepend>
             <span style="width: 60px">{{ nativeAmountTokenRange[0] }}%</span>
           </template>
@@ -88,15 +126,23 @@
           :rules="[required]"
           v-model="nonnativeAmountTokenRange"
           density="compact"
-          :min="50"
+          :min="1"
           step="1"
           :max="100"
           persistent-hint
-          label="Обьем не-нативного токена"
           center-affix
           hide-details
           :disabled="disable"
         >
+          <template v-slot:label>
+            Обьем не-нативного токена
+            <Explain>
+              <template v-slot:default>
+                <div> позволяет выбрать интервал в процентах от текущего баланса для обмена
+                </div>
+              </template>
+            </Explain>
+          </template>
           <template v-slot:prepend>
             <span style="width: 60px">{{ nonnativeAmountTokenRange[0] }}%</span>
           </template>
@@ -108,7 +154,15 @@
 
 
       <div>
-        <h4>Основные</h4>
+        <h4>Основные
+          <Explain>
+            <template v-slot:default>
+              <div> Из выбранных основных задач будут случайным образом формироваться цепочки
+                задач указанной длинны
+              </div>
+            </template>
+          </Explain>
+        </h4>
 
         <v-chip-group>
           <TaskSelectorChip v-if="network" :base-network-filter="network" label="Добавить"
@@ -136,7 +190,15 @@
       </div>
 
       <div>
-        <h4>Случайные</h4>
+        <h4>Случайные
+          <Explain>
+            <template v-slot:default>
+              <div>Случайные задачи будут с вероятностью 50% вставлены в случайное место в цепочку.
+                Случайные задачи не учитываются при формировании длинны цепочки
+              </div>
+            </template>
+          </Explain>
+        </h4>
 
         <v-chip-group>
           <TaskSelectorChip v-if="network" :base-network-filter="network" label="Добавить"
@@ -190,6 +252,7 @@ import {flowService} from "@/generated/services";
 import {humanDuration, Timer} from "@/components/helper";
 import TokenRadioGroup from "@/components/tasks/TokenRadioGroup.vue";
 import {required} from "@/components/tasks/helper";
+import Explain from "@/components/Explain.vue";
 
 
 export default defineComponent({
@@ -221,6 +284,7 @@ export default defineComponent({
     }
   },
   components: {
+    Explain,
     TokenRadioGroup,
     RandomFlowPreview,
     TaskSelectorChip,
@@ -349,7 +413,9 @@ export default defineComponent({
   methods: {
     required,
     humanDuration,
-
+    removeBlock() {
+      this.$emit('removeBlock', this.block.weight)
+    },
     async sync() {
 
       // if (!await this.validateForm()) {

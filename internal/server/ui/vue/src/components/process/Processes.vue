@@ -68,37 +68,34 @@
           rounded
           height="auto"
           elevation="1"
-          @click="viewProcess(item.id)"
           style="border: 0px solid "
         >
-          <div class="d-flex justify-start align-center">
-            <StatusCard :status="item.status" class="mx-2"/>
-            <div class="mr-2">
-              <v-progress-linear
-                :model-value="item.progress"
-                color="blue"
-                height="25"
-                style="width: 100px"
-              >
-                <template v-slot:default="{ value }">
-                  <strong>{{ Math.ceil(value) }}%</strong>
-                </template>
-              </v-progress-linear>
+          <div class="d-flex justify-space-between align-center">
+            <div class="d-inline-flex" @click="viewProcess(item.id)" style="cursor: pointer">
+              <StatusCard :status="item.status" class="mx-2"/>
+              <div class="mr-2">
+                <v-progress-linear
+                  :model-value="item.progress"
+                  color="blue"
+                  height="25"
+                  style="width: 100px"
+                >
+                  <template v-slot:default="{ value }">
+                    <strong>{{ Math.ceil(value) }}%</strong>
+                  </template>
+                </v-progress-linear>
+              </div>
+              <div class="mr-2 text-h6 text-blue-darken-1"><b>{{ `${item.flowLabel}` }}</b></div>
+              <div class="mr-2" v-if="item.runAfter && item.status === ProcessStatus.StatusReady"> Запуск запланирован
+                {{ formatTime(item.runAfter) }}
+              </div>
+              <div class="mr-2">Created: {{ dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
             </div>
+            <DeleteProcess class="mx-1" :process-id="item.id" @processRemoved="processRemoved"/>
 
-            <div class="mr-2 text-h6 text-blue-darken-1"><b>{{ `${item.flowLabel}` }}</b></div>
-            <div class="mr-2" v-if="item.runAfter && item.status === ProcessStatus.StatusReady"> Запуск запланирован
-              {{ formatTime(item.runAfter) }}
-            </div>
-            <div class="mr-2">Created: {{ dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</div>
           </div>
 
           <div class="mr-2">Profiles: <b>{{ getProfiles(item) }}</b></div>
-          <!--          <div><b>Flow:</b>-->
-          <!--            <div class="mr-2" v-for="(d, i) in getFlow(item.flow)">-->
-          <!--              <b>{{ i + 1 }})</b> {{ d }}-->
-          <!--            </div>-->
-          <!--          </div>-->
         </v-list-item>
         <v-btn v-if="showNext" @click="next" :loading="nextLoading" width="100%">More</v-btn>
       </v-list>
@@ -122,6 +119,7 @@ import Loader from "@/components/Loader.vue";
 import NavBar from "@/components/NavBar.vue";
 import {Delay, formatTime, isMobile, Timer} from "@/components/helper";
 import {fi} from "vuetify/locale";
+import DeleteProcess from "@/components/process/DeleteProcess.vue";
 
 export default defineComponent({
   name: "Processes",
@@ -158,6 +156,7 @@ export default defineComponent({
     },
   },
   components: {
+    DeleteProcess,
     NavBar,
     Loader,
     BtnProcessStopResume,
@@ -306,6 +305,9 @@ export default defineComponent({
     }
   },
   methods: {
+    processRemoved() {
+      this.statusChanged()
+    },
     formatTime,
     statusChanged() {
       this.timer.add(100)
@@ -386,12 +388,7 @@ export default defineComponent({
             prev = start
           }
         }
-
-
       }
-
-
-      console.log(out)
       return out
     },
     next() {

@@ -13,6 +13,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	"github.com/hardstylez72/cry/internal/defi/zksynclite"
+	"github.com/hardstylez72/cry/internal/defi/zora"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/socks5"
 	"github.com/pkg/errors"
@@ -59,6 +60,8 @@ func NewBaseClient(network v1.Network, c *BaseClientConfig) (defi.Networker, err
 		})
 	case v1.Network_Base:
 		cli, err = base.NewClient(&base.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+	case v1.Network_Zora:
+		cli, err = zora.NewClient(&zora.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	default:
 		return nil, errors.New("network is not supported for Networker")
 	}

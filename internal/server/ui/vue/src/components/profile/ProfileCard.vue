@@ -45,6 +45,9 @@
             <v-card-item>
               <Balance :profile-id="profileId" :network="Network.BinanaceBNB"/>
             </v-card-item>
+            <v-card-item>
+              <Balance :profile-id="profileId" :network="Network.Zora"/>
+            </v-card-item>
           </div>
           <div>
             <v-card-item>

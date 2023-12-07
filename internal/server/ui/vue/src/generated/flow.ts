@@ -1377,6 +1377,9 @@ export interface Task {
 
   /**  */
   ekuboSwapTask?: DefaultSwap;
+
+  /**  */
+  nostraLPTask?: DefaultLP;
 }
 
 export interface TaskTx {
@@ -1632,7 +1635,8 @@ export enum Network {
   'Fantom' = 'Fantom',
   'Base' = 'Base',
   'opBNB' = 'opBNB',
-  'Linea' = 'Linea'
+  'Linea' = 'Linea',
+  'Zora' = 'Zora'
 }
 
 export enum TaskType {
@@ -1683,7 +1687,8 @@ export enum TaskType {
   'MintMerkly' = 'MintMerkly',
   'MintZerius' = 'MintZerius',
   'KyberSwap' = 'KyberSwap',
-  'EkuboSwap' = 'EkuboSwap'
+  'EkuboSwap' = 'EkuboSwap',
+  'NostraLP' = 'NostraLP'
 }
 
 export enum Token {

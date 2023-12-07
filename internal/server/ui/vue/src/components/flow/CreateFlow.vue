@@ -12,10 +12,13 @@
   </NavBar>
 
   <v-card>
+    <div>
+      <v-btn @click="addManBlock" class="mx-1 font-weight-bold">Мужцкий блок 💪💪💪</v-btn>
+      <v-btn @click="addRandBlock" class="mx-1 font-weight-bold">Рандомизированный блок</v-btn>
+    </div>
+
     <v-card-text>
-
       <v-form ref="form">
-
         <v-text-field
           v-model="label"
           label="Название сценария"
@@ -33,6 +36,7 @@
             :disable="disable"
             :block="block"
             @flow-changed="flowChanged"
+            @removeBlock="removeBlock"
           />
           <component
             class="my-2"
@@ -41,6 +45,7 @@
             :disable="disable"
             :block="block"
             @block-changed="flowChanged"
+            @removeBlock="removeBlock"
           />
         </div>
       </v-form>
@@ -75,6 +80,7 @@ export default defineComponent({
       previewError: '',
       timer: new Timer(),
       label: '',
+      parallel: false,
     }
   },
   computed: {
@@ -87,14 +93,36 @@ export default defineComponent({
     }
   },
   methods: {
+    removeBlock(i: number) {
+      this.blockMap.delete(i)
+      const tmp = new Map<number, FlowBlock>()
+      let order = []
+      this.blockMap.forEach((k, v) => {
+        order.push(k.weight)
+      })
+      order = order.sort()
+      order.forEach((w, index) => {
+        index++
+        const t = this.blockMap.get(w)
+        t.weight = index
+        tmp.set(index, t)
+      })
+      this.blockMap = tmp
+    },
+    addManBlock() {
+      const weight = this.blockMap.size + 1
+      this.blockMap.set(weight, {man: {tasks: [], randomTasks: []}, weight: weight})
+    },
+    addRandBlock() {
+      const weight = this.blockMap.size + 1
+      this.blockMap.set(weight, {rand: {tasks: []}, weight: weight})
+    },
     required,
     async flowChanged(block: FlowBlock) {
 
       if (!block || !block.weight) {
         return
       }
-
-      console.log('block + ' + block.weight, block.rand)
 
       this.blockMap.set(Number(block.weight), block)
 
@@ -136,6 +164,7 @@ export default defineComponent({
           body: {
             blocks: this.blocks,
             label: this.label,
+
           }
         })
         this.$router.push({name: "FlowViewV2", params: {id: res.id}})
@@ -147,7 +176,6 @@ export default defineComponent({
   created() {
     this.blockMap.set(1, {man: {tasks: [], randomTasks: []}, weight: 1})
     this.blockMap.set(2, {rand: {tasks: []}, weight: 2})
-    this.blockMap.set(3, {man: {tasks: [], randomTasks: []}, weight: 3})
   }
 })
 

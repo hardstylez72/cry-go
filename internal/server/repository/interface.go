@@ -76,6 +76,7 @@ type ProcessRepository interface {
 	GetProcessUser(ctx context.Context, processId string) (*string, error)
 	UpdateProcessTime(ctx context.Context, id string) error
 	UpdateProcessAutoRetry(ctx context.Context, id string, enable bool) error
+	ProcessParallel(ctx context.Context, processId string) (*bool, error)
 
 	ProcessProfileRepository
 	ProcessTaskRepository

@@ -199,7 +199,8 @@
         "MintMerkly",
         "MintZerius",
         "KyberSwap",
-        "EkuboSwap"
+        "EkuboSwap",
+        "NostraLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

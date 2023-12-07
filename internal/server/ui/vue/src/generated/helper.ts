@@ -654,7 +654,8 @@ export enum Network {
   'Fantom' = 'Fantom',
   'Base' = 'Base',
   'opBNB' = 'opBNB',
-  'Linea' = 'Linea'
+  'Linea' = 'Linea',
+  'Zora' = 'Zora'
 }
 
 export enum ProfileSubType {
@@ -716,5 +717,6 @@ export enum TaskType {
   'MintMerkly' = 'MintMerkly',
   'MintZerius' = 'MintZerius',
   'KyberSwap' = 'KyberSwap',
-  'EkuboSwap' = 'EkuboSwap'
+  'EkuboSwap' = 'EkuboSwap',
+  'NostraLP' = 'NostraLP'
 }

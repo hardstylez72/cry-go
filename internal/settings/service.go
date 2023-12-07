@@ -17,13 +17,14 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	"github.com/hardstylez72/cry/internal/defi/zksynclite"
+	"github.com/hardstylez72/cry/internal/defi/zora"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 )
 
-const LastSettingsUpdateTime = "2023-11-01 7:40:05"
+const LastSettingsUpdateTime = "2023-12-04 7:40:05"
 
 type GetSettingsNetworkRequest struct {
 	Network v1.Network
@@ -52,6 +53,7 @@ var Networks = []v1.Network{
 	v1.Network_StarkNet,
 	v1.Network_Base,
 	v1.Network_Linea,
+	v1.Network_Zora,
 }
 
 func NewService(rep repository.SettingsRepository) *Service {
@@ -164,6 +166,9 @@ func resolveSettings(in *v1.NetworkSettings, network v1.Network, force bool) (*v
 		s.GasMax = eth
 	case v1.Network_Linea:
 		s.RPC = linea.MainNetURL
+		s.GasMax = eth
+	case v1.Network_Zora:
+		s.RPC = zora.MainNetURL
 		s.GasMax = eth
 	}
 

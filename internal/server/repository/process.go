@@ -32,6 +32,7 @@ type Process struct {
 	AutoRetry  bool           `db:"auto_retry"`
 	RunAfter   sql.NullTime   `db:"run_after"`
 	StopReason sql.NullString `db:"stop_reason"`
+	Parallel   bool           `db:"parallel"`
 }
 
 func (a *ProcessArg) FromPB(pb *v1.Process, userId string) error {
@@ -42,6 +43,7 @@ func (a *ProcessArg) FromPB(pb *v1.Process, userId string) error {
 	a.UserId = userId
 	a.FlowId = pb.FlowId
 	a.UpdatedAt = pb.UpdatedAt.AsTime()
+	a.Parallel = pb.Parallel
 
 	profiles := make([]ProcessProfileArg, 0)
 	for _, p := range pb.Profiles {
@@ -110,6 +112,7 @@ func (a *ProcessArg) ToPB(meta FlowMeta) (*v1.Process, error) {
 		DeletedAt:   nil,
 		AutoRetry:   a.AutoRetry,
 		FlowVersion: int64(meta.Version),
+		Parallel:    a.Parallel,
 	}
 
 	if a.StartedAt.Valid {
@@ -364,6 +367,15 @@ func (r *pgRepository) GetProcessStatus(ctx context.Context, processId string) (
 
 	temp := v1.ProcessStatus(v1.ProcessStatus_value[s])
 	return &temp, nil
+}
+
+func (r *pgRepository) ProcessParallel(ctx context.Context, processId string) (*bool, error) {
+	var s bool
+	if err := r.conn.GetContext(ctx, &s, `select parallel from process where id = $1`, processId); err != nil {
+		return nil, err
+	}
+
+	return &s, nil
 }
 
 func (r *pgRepository) GetProcessUser(ctx context.Context, processId string) (*string, error) {

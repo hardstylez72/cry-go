@@ -76,6 +76,11 @@ func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *boz
 			return nil, err
 		}
 		dynamic.Gas = gas
+
+		if opt.Debug {
+			log.Log.Debug(fmt.Sprintf("estimate: gas:%d feeCap:%s tipCap:%s",
+				gas, dynamic.GasFeeCap.String(), dynamic.GasTipCap.String()))
+		}
 	}
 
 	if opt.Gas.RuleSet() {
@@ -99,11 +104,12 @@ func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *boz
 
 	if !opt.NoSend {
 
-		tx := types.NewTx(&dynamic)
-
 		if opt.Debug {
-			log.Log.Debug("swap tx gas "+opt.TaskType.String(), zap.String("gas", TxGas(tx)))
+			log.Log.Debug(fmt.Sprintf("execute: gas:%d feeCap:%s tipCap:%s",
+				dynamic.Gas, dynamic.GasFeeCap.String(), dynamic.GasTipCap.String()))
 		}
+
+		tx := types.NewTx(&dynamic)
 
 		signer := types.NewLondonSigner(c.Cfg.NetworkId)
 
@@ -156,7 +162,7 @@ func (c *EtheriumClient) EstimateL1GasFee(ctx context.Context, data []byte) (*bi
 	if err != nil {
 		return nil, err
 	}
-	return l1Gasfee, nil
+	return bozdo.BigIntSum(l1Gasfee, bozdo.Percent(l1Gasfee, 70)), nil
 }
 
 func TxGas(tx *types.Transaction) string {

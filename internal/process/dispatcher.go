@@ -270,13 +270,29 @@ func (d *Dispatcher) RunDispatcher(ctx context.Context) {
 			continue
 		}
 
-		go func(pId string) {
-			if err := d.RunP(ctx, pId); err != nil {
-				l.Error("RunDispatcher.RunP", zap.Error(err))
-			}
-			d.pTable.Remove(pId)
-			l.Debug("process finished")
-		}(pId)
+		parallel, err := d.r.ProcessParallel(ctx, pId)
+		if err != nil {
+			continue
+		}
+
+		if *parallel {
+			go func(pId string) {
+				if err := d.RunParallelP(ctx, pId); err != nil {
+					l.Error("RunDispatcher.RunP", zap.Error(err))
+				}
+				d.pTable.Remove(pId)
+				l.Debug("process finished")
+			}(pId)
+		} else {
+			go func(pId string) {
+				if err := d.RunP(ctx, pId); err != nil {
+					l.Error("RunDispatcher.RunP", zap.Error(err))
+				}
+				d.pTable.Remove(pId)
+				l.Debug("process finished")
+			}(pId)
+		}
+
 	}
 }
 func (d *Dispatcher) initProcess(ctx context.Context, id processId) error {

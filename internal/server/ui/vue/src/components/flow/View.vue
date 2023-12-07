@@ -45,6 +45,7 @@
 
 
     <div class="d-flex flex-wrap mx-8">
+      <v-checkbox label="запустить параллельно" v-model="parallel"/>
       <v-btn
         width="100%"
         :disabled="selectedProfiles.length === 0" @click="startProcess">
@@ -57,43 +58,58 @@
   </div>
 
   <v-spacer class="my-6"/>
-  <v-form ref="form">
 
-    <v-text-field
-      v-model="label"
-      label="Название сценария"
-      density="comfortable"
-      variant="outlined"
-      :rules="[required]"
-      :disabled="disabled"
-    ></v-text-field>
+  <div class="px-4 py-4">
 
-    <div v-for="block in blocks">
-      <component
-        class="my-2"
-        v-if="block.man"
-        is="ManBlock"
-        :disable="disabled"
-        :block="block"
-        @flow-changed="flowChanged"
-      />
-      <component
-        class="my-2"
-        v-if="block.rand"
-        is="RandomBlock"
-        :disable="disabled"
-        :block="block"
-        @block-changed="flowChanged"
-      />
-    </div>
+    <v-form ref="form">
+      <div class="my-3 ml-4">
+        <v-btn v-if="!disabled" @click="addManBlock" class="mx-1 font-weight-bold">Мужцкий блок 💪💪💪
+        </v-btn>
+        <v-btn v-if="!disabled" @click="addRandBlock" class="mx-1 font-weight-bold">Рандомизированный
+          блок
+        </v-btn>
+      </div>
 
-  </v-form>
 
-  <Preview :data="preview">
-    <template v-slot:default>
-      <h3 class="my-1">Возможные финальные комбинации</h3>
-    </template>
-  </Preview>
+      <v-text-field
+        v-model="label"
+        label="Название сценария"
+        density="comfortable"
+        variant="outlined"
+        :rules="[required]"
+        :disabled="disabled"
+      ></v-text-field>
+
+      <div v-for="block in blocks">
+        <component
+          class="my-2"
+          v-if="block.man"
+          is="ManBlock"
+          :disable="disabled"
+          :block="block"
+          @flow-changed="flowChanged"
+          @removeBlock="removeBlock"
+        />
+        <component
+          class="my-2"
+          v-if="block.rand"
+          is="RandomBlock"
+          :disable="disabled"
+          :block="block"
+          @block-changed="flowChanged"
+          @removeBlock="removeBlock"
+        />
+      </div>
+
+    </v-form>
+
+    <Preview :data="preview">
+      <template v-slot:default>
+        <h3 class="my-1">Возможные финальные комбинации</h3>
+      </template>
+    </Preview>
+
+  </div>
 
 </template>
 
@@ -142,6 +158,7 @@ export default defineComponent({
       preview: null as null | FlowPreviewRes,
       previewError: '',
       label: '',
+      parallel: false,
     }
   },
   computed: {
@@ -157,6 +174,31 @@ export default defineComponent({
     }
   },
   methods: {
+
+    removeBlock(i: number) {
+      this.blockMap.delete(i)
+      const tmp = new Map<number, FlowBlock>()
+      let order = []
+      this.blockMap.forEach((k, v) => {
+        order.push(k.weight)
+      })
+      order = order.sort()
+      order.forEach((w, index) => {
+        index++
+        const t = this.blockMap.get(w)
+        t.weight = index
+        tmp.set(index, t)
+      })
+      this.blockMap = tmp
+    },
+    addManBlock() {
+      const weight = this.blockMap.size + 1
+      this.blockMap.set(weight, {man: {tasks: [], randomTasks: []}, weight: weight})
+    },
+    addRandBlock() {
+      const weight = this.blockMap.size + 1
+      this.blockMap.set(weight, {rand: {tasks: []}, weight: weight})
+    },
     formatTime,
     required,
     isMobile,
@@ -247,6 +289,7 @@ export default defineComponent({
             runAfter: runAfter,
             flowId: this.flowId,
             profileIds: this.selectedProfiles.map((p) => p.id),
+            parallel: this.parallel,
           }
         })
       }
@@ -261,6 +304,7 @@ export default defineComponent({
         body: {
           flowId: this.flowId,
           profileIds: this.selectedProfiles.map((p) => p.id),
+          parallel: this.parallel,
         }
       })
       this.$router.push({name: "ViewProcess", params: {id: res.process.id}})

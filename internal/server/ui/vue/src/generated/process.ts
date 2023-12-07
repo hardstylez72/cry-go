@@ -545,6 +545,9 @@ export interface CreateProcessRequest {
 
   /**  */
   runAfter?: Date;
+
+  /**  */
+  parallel: boolean;
 }
 
 export interface CreateProcessResponse {
@@ -999,6 +1002,9 @@ export interface Process {
 
   /**  */
   flowVersion: string;
+
+  /**  */
+  parallel: boolean;
 }
 
 export interface ProcessProfile {
@@ -1363,6 +1369,9 @@ export interface Task {
 
   /**  */
   ekuboSwapTask?: DefaultSwap;
+
+  /**  */
+  nostraLPTask?: DefaultLP;
 }
 
 export interface TaskTx {
@@ -1566,7 +1575,8 @@ export enum Network {
   'Fantom' = 'Fantom',
   'Base' = 'Base',
   'opBNB' = 'opBNB',
-  'Linea' = 'Linea'
+  'Linea' = 'Linea',
+  'Zora' = 'Zora'
 }
 
 export enum ProcessStatus {
@@ -1631,7 +1641,8 @@ export enum TaskType {
   'MintMerkly' = 'MintMerkly',
   'MintZerius' = 'MintZerius',
   'KyberSwap' = 'KyberSwap',
-  'EkuboSwap' = 'EkuboSwap'
+  'EkuboSwap' = 'EkuboSwap',
+  'NostraLP' = 'NostraLP'
 }
 
 export enum Token {

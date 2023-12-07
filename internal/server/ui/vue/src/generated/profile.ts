@@ -825,7 +825,8 @@ export enum Network {
   'Fantom' = 'Fantom',
   'Base' = 'Base',
   'opBNB' = 'opBNB',
-  'Linea' = 'Linea'
+  'Linea' = 'Linea',
+  'Zora' = 'Zora'
 }
 
 export enum ProfileSubType {

@@ -193,6 +193,7 @@ export default defineComponent({
             runAfter: runAfter,
             flowId: this.flowId,
             profileIds: this.selectedProfiles.map((p) => p.id),
+            parallel: false,
           }
         })
       }
@@ -207,6 +208,7 @@ export default defineComponent({
         body: {
           flowId: this.flowId,
           profileIds: this.selectedProfiles.map((p) => p.id),
+          parallel: false,
         }
       })
       this.$router.push({name: "ViewProcess", params: {id: res.process.id}})

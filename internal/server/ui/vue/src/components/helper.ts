@@ -379,6 +379,11 @@ export const networkProps: Record<Network, network> = {
     img: '/icons/networks/linea.ico',
     value: Network.Linea,
   },
+  Zora: {
+    name: 'Zora',
+    img: '/icons/networks/zora.png',
+    value: Network.Zora,
+  },
 }
 
 

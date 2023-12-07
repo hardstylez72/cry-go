@@ -322,6 +322,21 @@ var SpecMap = map[v1.TaskType]Spec{
 			return Marshal(t.AaveLPTask)
 		},
 	},
+	v1.TaskType_NostraLP: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewNostraLPTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_NostraLPTask).NostraLPTask
+			return NewNostraLPTask().EstimateLPCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_NostraLPTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_NostraLPTask)")
+			}
+			return Marshal(t.NostraLPTask)
+		},
+	},
 	// NFT
 	v1.TaskType_MintFun: {
 		Payable: true,

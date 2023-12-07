@@ -878,7 +878,8 @@
         "Fantom",
         "Base",
         "opBNB",
-        "Linea"
+        "Linea",
+        "Zora"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"

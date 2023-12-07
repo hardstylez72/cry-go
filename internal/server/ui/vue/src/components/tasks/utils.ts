@@ -44,7 +44,8 @@ export interface TaskSpec {
 
   networks: Set<Network>
 
-  airdrops: Set<Airdrop>
+
+  airdrops: Set<Airdrop>   //deprecated
   job: TaskJob
 
   profileType: Set<ProfileType>

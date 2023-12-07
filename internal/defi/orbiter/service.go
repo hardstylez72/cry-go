@@ -46,6 +46,7 @@ func NewService() (*Service, error) {
 	supportedNetworks.Set(v1.Network_Base)
 	supportedNetworks.Set(v1.Network_ArbitrumNova)
 	supportedNetworks.Set(v1.Network_Linea)
+	supportedNetworks.Set(v1.Network_Zora)
 
 	chains := make([]Chain, 0)
 	if err := json.Unmarshal(chainsJson, &chains); err != nil {
@@ -245,6 +246,8 @@ func MakeChainMap(in []Chain) *lib.BiMap[v1.Network, string] {
 			out.Set(v1.Network_ArbitrumNova, c.InternalId)
 		case "59144":
 			out.Set(v1.Network_Linea, c.InternalId)
+		case "7777777":
+			out.Set(v1.Network_Zora, c.InternalId)
 		}
 	}
 

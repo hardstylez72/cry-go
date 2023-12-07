@@ -73,6 +73,52 @@ func (d *Dispatcher) RunPP(ctx context.Context, profileId, processId, userId str
 
 	return err
 }
+func (d *Dispatcher) RunPPParallel(ctx context.Context, profileId, processId, userId string) error {
+
+	l := log.Log.With("ppId", profileId).With("pId", processId)
+	l.Debug("ppId started")
+	defer l.Debug("ppId finished")
+
+	processMap, ok := d.pTable.Get(processId)
+	if !ok {
+		return nil
+	}
+	profileBusy, ok := processMap.ppTable.Get(profileId)
+	if !ok {
+		return nil
+	}
+
+	if profileBusy {
+		return nil
+	}
+	processMap.ppTable.Set(profileId, true)
+	defer processMap.ppTable.Set(profileId, false)
+
+	tr := otel.Tracer("")
+	pctx, span := tr.Start(ctx, "RunPP")
+	span.SetAttributes(attribute.String("ppId", profileId), attribute.String("pId", processId))
+	defer span.End()
+
+	d.stat.ActiveProfiles.Inc()
+	defer d.stat.ActiveProfiles.Dec()
+
+	parallel, err := d.r.ProcessParallel(ctx, processId)
+	if err != nil {
+		return errors.Wrap(err, "r.ProcessParallel")
+	}
+
+	if *parallel {
+
+	} else {
+		err = d.runPP(pctx, processId, profileId, userId, l)
+	}
+
+	if _, err := d.resolvePPStatus(pctx, profileId, l); err != nil {
+		return errors.Wrap(err, "RunPP")
+	}
+
+	return err
+}
 
 type ExecutorResult struct {
 	Task *v1.ProcessTask

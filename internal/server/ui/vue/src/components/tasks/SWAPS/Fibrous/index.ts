@@ -6,7 +6,7 @@ import Menu from "@/components/tasks/SWAPS/Fibrous/Menu.vue";
 import {tokenBridgePair, tokenSwapPair} from "@/components/helper";
 
 export const SwapFibrousSpec: TaskSpec = {
-  deprecated: true,
+  deprecated: false,
   canBeEstimated: true,
   descFn(task) {
     const p = task.fibrousSwapTask

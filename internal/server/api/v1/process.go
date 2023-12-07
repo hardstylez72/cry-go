@@ -127,6 +127,7 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 			FinishedAt: nil,
 			StartedAt:  nil,
 			RunAfter:   req.RunAfter,
+			Parallel:   req.Parallel,
 		}
 
 		a := &repository.ProcessArg{}
@@ -211,6 +212,7 @@ func (s *ProcessService) CreateProcess(ctx context.Context, req *v1.CreateProces
 			FinishedAt: nil,
 			StartedAt:  nil,
 			RunAfter:   req.RunAfter,
+			Parallel:   req.Parallel,
 		}
 
 		a := &repository.ProcessArg{}

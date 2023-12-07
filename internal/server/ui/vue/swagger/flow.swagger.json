@@ -1335,7 +1335,8 @@
         "Fantom",
         "Base",
         "opBNB",
-        "Linea"
+        "Linea",
+        "Zora"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -2058,6 +2059,9 @@
         },
         "ekuboSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "nostraLPTask": {
+          "$ref": "#/definitions/DefaultLP"
         }
       },
       "required": [
@@ -2180,7 +2184,8 @@
         "MintMerkly",
         "MintZerius",
         "KyberSwap",
-        "EkuboSwap"
+        "EkuboSwap",
+        "NostraLP"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

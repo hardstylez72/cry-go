@@ -2,6 +2,7 @@ package process
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/hardstylez72/cry/internal/log"
@@ -90,6 +91,91 @@ func (d *Dispatcher) RunP(ctx context.Context, processId string) error {
 
 	return nil
 }
+func (d *Dispatcher) RunParallelP(ctx context.Context, processId string) error {
+
+	l := log.Log.With("processId", processId).With("fn", "RunP")
+
+	err := d.r.UpdateProcessStatus(ctx, &repository.UpdateProcess{Id: processId, Status: v1.ProcessStatus_StatusRunning.String()})
+	if err != nil {
+		l.Error("UpdateProcessStatus", err)
+		return err
+	}
+
+	l.Debug("process running")
+
+	ppTable, running := d.pTable.Get(processId)
+	if !running {
+		return errors.New("process not running")
+	}
+
+	d.stat.ActiveProcesses.Inc()
+	defer d.stat.ActiveProcesses.Dec()
+
+	tr := otel.Tracer("")
+	pctx, span := tr.Start(ctx, "RunP")
+	span.SetAttributes(attribute.String("pId", processId))
+	defer span.End()
+
+	wg := sync.WaitGroup{}
+	wg.Add(len(ppTable.ppOrder))
+
+	for _, ppId := range ppTable.ppOrder {
+
+		go func(ppId string) error {
+			defer wg.Done()
+			ppStatus, err := d.r.GetProcessProfileStatus(pctx, ppId)
+			if err != nil {
+				return err
+			}
+			switch *ppStatus {
+			case v1.ProcessStatus_StatusDone:
+				return nil
+			}
+
+			userId, err := d.r.GetProcessUser(pctx, processId)
+			if err != nil {
+				return errors.Wrap(err, "GetProcessUser")
+			}
+
+			err = d.RunPP(pctx, ppId, processId, *userId)
+			if err != nil {
+				l.Error("runner.RunProfile", err)
+				return err
+			}
+
+			status, err := d.ResolvePStatus(pctx, processId, l)
+			if err != nil {
+				l.Error("ResolvePStatus", err)
+				return err
+			}
+			if *status == v1.ProcessStatus_StatusDone {
+				d.NotifyUserProcessFinished(ctx, *userId, processId, l)
+			}
+
+			switch *status {
+			case v1.ProcessStatus_StatusError,
+				v1.ProcessStatus_StatusDone,
+				v1.ProcessStatus_StatusStop:
+				return nil
+			}
+
+			ppStatus, err = d.r.GetProcessProfileStatus(pctx, ppId)
+			if err != nil {
+				return err
+			}
+			switch *ppStatus {
+			case v1.ProcessStatus_StatusDone:
+				return nil
+			default:
+				return nil
+			}
+		}(ppId)
+	}
+
+	wg.Wait()
+
+	return nil
+}
 func (d *Dispatcher) StartProcess(processId string) {
 
 	_, running := d.pTable.Get(processId)
@@ -113,12 +199,31 @@ func (d *Dispatcher) KillProcess(ctx context.Context, processId string) error {
 }
 func (d *Dispatcher) StopProcess(ctx context.Context, processId string) error {
 
+	parallel, err := d.r.ProcessParallel(ctx, processId)
+	if err != nil {
+		return err
+	}
 	l := log.Log.With("processId", processId).With("fn", "Dispatcher.StopProcess")
 	l.Debug("signal stop received")
 	defer l.Debug("process stopped")
 	processTable, running := d.pTable.Get(processId)
 	if running {
-		processTable.signals <- SignalStop
+		if *parallel {
+			wg := sync.WaitGroup{}
+			wg.Add(len(processTable.ppOrder))
+			for _ = range processTable.ppOrder {
+				go func() {
+					defer wg.Done()
+					processTable.signals <- SignalStop
+				}()
+			}
+
+			wg.Wait()
+
+		} else {
+			processTable.signals <- SignalStop
+		}
+
 	} else {
 		d.pTable.Set(processId, nil)
 		defer d.pTable.Remove(processId)
@@ -128,6 +233,7 @@ func (d *Dispatcher) StopProcess(ctx context.Context, processId string) error {
 		})
 	}
 	ticker := time.NewTicker(time.Second)
+
 	for {
 		status, err := d.r.GetProcessStatus(ctx, processId)
 		if err != nil {
@@ -143,6 +249,7 @@ func (d *Dispatcher) StopProcess(ctx context.Context, processId string) error {
 		case <-ticker.C:
 		}
 	}
+	
 }
 func (d *Dispatcher) ResolvePStatus(ctx context.Context, processId string, l *zap.SugaredLogger) (*v1.ProcessStatus, error) {
 

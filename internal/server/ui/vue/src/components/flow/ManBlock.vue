@@ -1,8 +1,25 @@
 <template>
   <v-card rounded variant="elevated" density="compact" elevation="5">
-    <v-card-title>
-      {{ block.weight }}) Мужицкий блок
-      <ManBlockDetails :disable="disable" :block="block" @flowChanged="flowChanged"/>
+    <v-card-title class="d-flex justify-space-between">
+      <div>
+        {{ block.weight }}) Мужицкий блок
+        <Explain>
+          <template v-slot:default>
+            <div>Блок представляет полную свободу создания сценариев с ограниченными возможностями рандомизации</div>
+            <br/>
+            Удобен для работы с:
+            <ul>
+              <li>Биржей</li>
+              <li>Мостами</li>
+              <li>Фиксированными цепочками задач</li>
+              <li>Пулами ликвидностями и лендингами</li>
+            </ul>
+          </template>
+        </Explain>
+        <ManBlockDetails :disable="disable" :block="block" @flowChanged="flowChanged"/>
+      </div>
+      <v-icon icon="mdi-close" v-if="!disable" @click="removeBlock"/>
+
     </v-card-title>
     <v-card-text>
       <Preview :data="preview"/>
@@ -24,10 +41,12 @@ import ManBlockDetails from "@/components/flow/ManBlockDetails.vue";
 import Preview from "@/components/flow/Preview.vue";
 import {flowService} from "@/generated/services";
 import {Timer} from "@/components/helper";
+import Explain from "@/components/Explain.vue";
 
 export default defineComponent({
   name: "FormV2",
   components: {
+    Explain,
     Preview,
     ManBlockDetails,
     TaskSelectorChip,
@@ -57,6 +76,9 @@ export default defineComponent({
     }
   },
   methods: {
+    removeBlock() {
+      this.$emit('removeBlock', this.block.weight)
+    },
     flowChanged(block: FlowBlock) {
       this.$emit('flowChanged', block)
       this.localBlock = block

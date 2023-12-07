@@ -1,21 +1,27 @@
 <template>
-  <v-tooltip
+  <v-menu
     v-model="show"
-    width="300px"
-    height="auto"
     location="end"
-    attach
     :open-on-click="true"
+    :open-on-hover="true"
+    width="350px"
+    z-index="2"
+
   >
     <template v-slot:activator="{ props }">
       <v-icon v-bind="props" class="mx-1" @click="show = !show" icon="mdi-information-outline"/>
     </template>
 
+    <template v-slot:default>
+      <v-card width="300px" style="white-space: pre-wrap; line-break: auto" class="px-2 py-2">
+        <v-card-text>
+          <slot name="default"/>
+        </v-card-text>
+      </v-card>
+    </template>
 
-    {{ text }}
 
-
-  </v-tooltip>
+  </v-menu>
 </template>
 
 <script lang="ts">
@@ -31,12 +37,6 @@ export default defineComponent({
     return {
       show: false
     }
-  },
-  props: {
-    text: {
-      type: String,
-      required: true,
-    },
   },
 
 })
