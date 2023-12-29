@@ -71,6 +71,3 @@ standalone:
 	cp -r internal/server/migrations ./build/
 	cp Dockerfile ./build/Dockerfile
 	cp standalone.sh ./build/standalone.sh
-
-# knock -v 170.64.160.93 7000 8000 9000
-#  knock -v 170.64.160.93   9000 8000 7000

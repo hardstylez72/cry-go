@@ -46,8 +46,6 @@ export const IZUMISwapSpec: TaskSpec = {
     tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.USDC),
     tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.ETH),
 
-    tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.BUSD),
-    tokenSwapPair(Network.ZKSYNCERA, Token.BUSD, Token.ETH),
 
     // Tokens
 

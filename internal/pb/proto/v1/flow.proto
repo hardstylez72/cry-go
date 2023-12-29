@@ -569,7 +569,7 @@ message Task {
     task.ZkSyncOfficialBridgeToEthereumTask  zkSyncOfficialBridgeToEthereumTask = 14;
     task.OrbiterBridgeTask orbiterBridgeTask = 15;
     task.ZkSyncOfficialBridgeFromEthereumTask zkSyncOfficialBridgeFromEthereumTask = 16;
-    task.WETHTask wETHTask = 17;
+    task.WETHTask wETHTask = 17; //deprecated
     task.DefaultSwap muteioSwapTask = 18;
     task.DefaultLP syncSwapLPTask = 19;
     task.DefaultSwap maverickSwapTask = 20;
@@ -605,6 +605,7 @@ message Task {
     task.DefaultSwap kyberSwapTask = 50;
     task.DefaultSwap ekuboSwapTask = 51;
     task.DefaultLP nostraLPTask = 52;
+    task.DefaultSwap wethSwapTask = 53;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

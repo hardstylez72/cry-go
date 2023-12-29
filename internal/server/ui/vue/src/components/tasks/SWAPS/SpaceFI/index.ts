@@ -39,12 +39,8 @@ export const SpaceFISwapSpec: TaskSpec = {
     tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.SPACE),
     tokenSwapPair(Network.ZKSYNCERA, Token.SPACE, Token.ETH),
 
-    tokenSwapPair(Network.ZKSYNCERA, Token.ETH, Token.BUSD),
-    tokenSwapPair(Network.ZKSYNCERA, Token.BUSD, Token.ETH),
 
     // Tokens
 
-    tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.BUSD),
-    tokenSwapPair(Network.ZKSYNCERA, Token.BUSD, Token.USDC),
   ]
 }

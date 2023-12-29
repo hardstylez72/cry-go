@@ -319,7 +319,7 @@ func (s *FlowService) OnlyRandomFlowPreview(ctx context.Context, req *v1.OnlyRan
 
 func (s *FlowService) OnlyRandomFlowFromTokens(ctx context.Context, req *v1.OnlyRandomFlowPreviewReq) (*v1.OnlyRandomFlowFromTokensRes, error) {
 
-	tasks := task.ExtractItems(req.Tasks, nil, nil, false)
+	tasks := task.ExtractItems(req.Tasks, req.StartNetwork, nil, nil, false)
 
 	m := map[v1.Token]bool{}
 	tokens := make([]v1.Token, 0)
@@ -358,17 +358,6 @@ func (s *FlowService) FlowPreview(ctx context.Context, req *v1.FlowPreviewReq) (
 		UniquePercent: 1,
 	}, nil
 }
-
-//func groupTokens(in [][]*v1.Task) []*v1.TokenArr {
-//
-//	tmp := map[v1.Token]map[v1.Token]bool{}
-//
-//	for _, tasks := range in {
-//		if len(tasks) > 1 {
-//			start := tasks[0].
-//		}
-//	}
-//}
 
 func LetTheDreamsComeTrue(blocks []*v1.FlowBlock) ([][]*v1.Task, error) {
 	flows := [][][]*v1.Task{}

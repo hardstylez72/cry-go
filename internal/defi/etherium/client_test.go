@@ -12,6 +12,7 @@ func Test(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, r)
 
+	r.defi.Cli.FilterLogs()
 	//
 	//t.Run("balance", func(t *testing.T) {
 	//	b, err := r.GetFundingBalance(context.Background(), &defi.GetBalanceReq{

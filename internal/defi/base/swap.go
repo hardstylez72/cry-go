@@ -13,6 +13,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/odos"
 	"github.com/hardstylez72/cry/internal/defi/pancake"
+	"github.com/hardstylez72/cry/internal/defi/weth"
 	"github.com/hardstylez72/cry/internal/defi/woofi"
 	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -67,6 +68,9 @@ func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1
 		data, err = cli.MakeSwapTx(ctx, req)
 	case v1.TaskType_WoofiSwap:
 		cli := woofi.NewSwapper(c.defi.Cfg.Dict.Woofi.Router, c.defi.Cli, c.defi.Cfg.TokenMap)
+		data, err = cli.MakeSwapTx(ctx, req)
+	case v1.TaskType_WETH:
+		cli := weth.Client{WethAddr: c.defi.Cfg.TokenMap[v1.Token_WETH]}
 		data, err = cli.MakeSwapTx(ctx, req)
 	}
 	if err != nil {

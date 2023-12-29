@@ -249,7 +249,7 @@ func (d *Dispatcher) StopProcess(ctx context.Context, processId string) error {
 		case <-ticker.C:
 		}
 	}
-	
+
 }
 func (d *Dispatcher) ResolvePStatus(ctx context.Context, processId string, l *zap.SugaredLogger) (*v1.ProcessStatus, error) {
 
@@ -280,9 +280,9 @@ func (d *Dispatcher) ResolvePStatus(ctx context.Context, processId string, l *za
 }
 func (d *Dispatcher) RetryProcess(ctx context.Context, processId string) error {
 
-	if err := d.StopProcess(ctx, processId); err != nil {
-		return err
-	}
+	//if err := d.StopProcess(ctx, processId); err != nil {
+	//	return err
+	//}
 
 	user, err := d.r.GetProcessUser(ctx, processId)
 	if err != nil {

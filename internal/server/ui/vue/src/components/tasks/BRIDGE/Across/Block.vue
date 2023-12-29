@@ -60,11 +60,13 @@ import TaskDefaultBridge from "@/components/tasks/BRIDGE/DefaultBridgeTask";
 export default class TaskAcrossBridgeBlock extends TaskDefaultBridge {
   pairs = [
     tokenBridgePair(Network.ZKSYNCERA, Network.ARBITRUM, Token.USDC, Token.USDCBridged),
+    tokenBridgePair(Network.ZKSYNCERA, Network.ARBITRUM, Token.USDT, Token.USDT),
 
     tokenBridgePair(Network.ARBITRUM, Network.ZKSYNCERA, Token.USDCBridged, Token.USDC),
     tokenBridgePair(Network.ARBITRUM, Network.ZKSYNCERA, Token.ETH, Token.ETH),
     tokenBridgePair(Network.ARBITRUM, Network.Base, Token.ETH, Token.ETH),
     tokenBridgePair(Network.ARBITRUM, Network.Base, Token.USDCBridged, Token.USDCBridged),
+    tokenBridgePair(Network.ARBITRUM, Network.ZKSYNCERA, Token.USDT, Token.USDT),
 
     tokenBridgePair(Network.OPTIMISM, Network.Base, Token.USDCBridged, Token.USDCBridged),
     tokenBridgePair(Network.OPTIMISM, Network.Base, Token.ETH, Token.ETH),

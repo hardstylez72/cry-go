@@ -13,6 +13,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewWETHSwapTask() *DefaultSwapTask {
+	return NewDefaultSwapTaskTask(v1.TaskType_WETH, func(a *Input) (*v1.DefaultSwap, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_WethSwapTask)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_WethSwapTask) call an ambulance!")
+		}
+		return l.WethSwapTask, nil
+	})
+}
+
 func NewKyberSwapTask() *DefaultSwapTask {
 	return NewDefaultSwapTaskTask(v1.TaskType_KyberSwap, func(a *Input) (*v1.DefaultSwap, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_KyberSwapTask)

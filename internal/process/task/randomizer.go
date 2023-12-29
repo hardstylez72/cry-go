@@ -254,7 +254,7 @@ func (r RandomTask) ToToken() *v1.Token {
 	}
 }
 
-func ExtractItems(f []*v1.RandomTask, amNative, amToken *v1.Amount, optional bool) []RandomTask {
+func ExtractItems(f []*v1.RandomTask, network v1.Network, amNative, amToken *v1.Amount, optional bool) []RandomTask {
 
 	out := []RandomTask{}
 
@@ -269,6 +269,9 @@ func ExtractItems(f []*v1.RandomTask, amNative, amToken *v1.Amount, optional boo
 			p := task.P.(*v1.RandomTask_Swap)
 			for _, item := range p.Swap.GetItems() {
 
+				if item.Network != network {
+					continue
+				}
 				if bozdo.NativeTokenMap[item.Network].String() == item.From.String() {
 					item.Am = amNative
 				} else {
@@ -283,6 +286,9 @@ func ExtractItems(f []*v1.RandomTask, amNative, amToken *v1.Amount, optional boo
 			}
 		case *v1.RandomTask_Simple:
 			p := task.P.(*v1.RandomTask_Simple)
+			if p.Simple.Network != network {
+				continue
+			}
 			out = append(out, RandomTask{
 				Type: task.TaskType,
 				Kind: v1.TaskKind_TKSimple,
@@ -328,8 +334,8 @@ func RandomizeRandomBlock(b *v1.FlowBlock_Rand, ignoreStartToken, ignoreFinishTo
 		},
 	}
 
-	optionalTasks := ExtractItems(b.Rand.Tasks, amNative, amToken, true)
-	tasks := ExtractItems(b.Rand.Tasks, amNative, amToken, false)
+	optionalTasks := ExtractItems(b.Rand.Tasks, b.Rand.StartNetwork, amNative, amToken, true)
+	tasks := ExtractItems(b.Rand.Tasks, b.Rand.StartNetwork, amNative, amToken, false)
 
 	arg := PermuteArg{
 		In:               tasks,

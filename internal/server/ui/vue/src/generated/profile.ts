@@ -311,6 +311,28 @@ export class ProfileService {
   /**
    *
    */
+  profileServiceTransferP2P(
+    params: {
+      /**  */
+      body: TransferP2PReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<TransferP2PRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/profile/p2p/transfer';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   profileServiceAddProfileRelation(
     params: {
       /**  */
@@ -751,6 +773,25 @@ export interface StarkNetAccountDeployedReq {
 export interface StarkNetAccountDeployedRes {
   /**  */
   deployed: boolean;
+}
+
+export interface TransferP2PReq {
+  /**  */
+  from?: string;
+
+  /**  */
+  to?: string;
+
+  /**  */
+  network?: Network;
+
+  /**  */
+  token?: Token;
+}
+
+export interface TransferP2PRes {
+  /**  */
+  result?: string;
 }
 
 export interface UnrelatedProfile {

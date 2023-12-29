@@ -3,6 +3,11 @@ import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router'
 
 const routes = [
   {
+    name: 'Collector',
+    path: '/scripts/collector',
+    component: () => import('@/components/scripts/Collector.vue'),
+  },
+  {
     name: 'ZkSyncStat',
     path: '/stats/zksync',
     component: () => import('@/components/stats/checker/ZkSync.vue'),

@@ -15,7 +15,7 @@ type CommonTransactionReceipt struct {
 	TransactionHash *felt.Felt `json:"transaction_hash"`
 	// ActualFee The fee that was charged by the sequencer
 	ActualFee    *felt.Felt       `json:"actual_fee"`
-	Status       TransactionState `json:"status"`
+	Status       TransactionState `json:"finality_status"`
 	BlockHash    *felt.Felt       `json:"block_hash"`
 	BlockNumber  uint64           `json:"block_number"`
 	Type         TransactionType  `json:"type"`

@@ -416,6 +416,8 @@ func (c *Client) Swap(ctx context.Context, req *defi.DefaultSwapReq, taskType v1
 		return c.MaverickSwap(ctx, req)
 	case v1.TaskType_PancakeSwap:
 		return c.PancakeSwap(ctx, req)
+	case v1.TaskType_WETH:
+		return c.WETH(ctx, req)
 	case v1.TaskType_SpaceFISwap:
 
 		tokenLimitChecker, err := c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{

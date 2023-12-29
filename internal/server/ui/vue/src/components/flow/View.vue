@@ -45,7 +45,7 @@
 
 
     <div class="d-flex flex-wrap mx-8">
-      <v-checkbox label="запустить параллельно" v-model="parallel"/>
+      <!--      <v-checkbox label="запустить параллельно" v-model="parallel"/>-->
       <v-btn
         width="100%"
         :disabled="selectedProfiles.length === 0" @click="startProcess">

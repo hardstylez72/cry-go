@@ -167,9 +167,9 @@ func (d *Dispatcher) SkipTask(ctx context.Context, processId, profileId, taskId 
 }
 func (d *Dispatcher) RetryProcessProfile(ctx context.Context, processId, profileId, taskId string) error {
 
-	if err := d.StopProcess(ctx, processId); err != nil {
-		return err
-	}
+	//if err := d.StopProcess(ctx, processId); err != nil {
+	//	return err
+	//}
 
 	status, err := d.r.GetTaskStatus(ctx, taskId)
 	if err != nil {

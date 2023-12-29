@@ -121,26 +121,6 @@ type Transfer interface {
 	Transfer(ctx context.Context, r *TransferReq) (*TransferRes, error)
 }
 
-type WETHReq struct {
-	Amount *big.Int
-
-	Wrap bool
-
-	WalletPK     string
-	EstimateOnly bool
-	Gas          *bozdo.Gas
-}
-
-type WETHRes struct {
-	Tx    *bozdo.Transaction
-	ECost *bozdo.EstimatedGasCost
-}
-
-type WETH interface {
-	Networker
-	SwapWETH(ctx context.Context, req *WETHReq) (*WETHRes, error)
-}
-
 type LiquidityBridger interface {
 	Networker
 	LiquidityBridge(ctx context.Context, req *LiquidityBridgeReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)

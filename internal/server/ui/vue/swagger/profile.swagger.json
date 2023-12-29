@@ -304,6 +304,38 @@
         ]
       }
     },
+    "/api/gw/v1/profile/p2p/transfer": {
+      "post": {
+        "operationId": "ProfileService_TransferP2P",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/TransferP2PRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TransferP2PReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
     "/api/gw/v1/profile/relations/add": {
       "post": {
         "operationId": "ProfileService_AddProfileRelation",
@@ -1158,6 +1190,31 @@
         "USDp"
       ],
       "default": "USDT"
+    },
+    "TransferP2PReq": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "network": {
+          "$ref": "#/definitions/Network"
+        },
+        "token": {
+          "$ref": "#/definitions/Token"
+        }
+      }
+    },
+    "TransferP2PRes": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "string"
+        }
+      }
     },
     "UnrelatedProfile": {
       "type": "object",

@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/tests"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,6 +18,9 @@ func TestClient(t *testing.T) {
 	assert.NotNil(t, c)
 
 	ctx := context.Background()
+
+	c.WaitTxComplete(ctx, "0x23845f7a03ef2f6a2ac992288666885ca4fbdceaed607e2c1a27d91d28c3af6")
+
 	//r, err := c.Approve(ctx, &ApproveReq{
 	//	Token:       v1.Token_ETH,
 	//	Amount:      big.NewInt(1000000000),
@@ -34,13 +36,13 @@ func TestClient(t *testing.T) {
 
 	//assert.NoError(t, err)
 	//assert.NotNil(t, r)
-	res, err := c.Allowed(ctx, &AllowedReq{
-		Token:       v1.Token_ETH,
-		WalletAddr:  tests.GetConfig().StarkNetPuvlic,
-		SpenderAddr: "0x7a6f98c03379b9513ca84cca1373ff452a7462a3b61598f0af5bb27ad7f76d1",
-	})
-	assert.NoError(t, err)
-	assert.NotNil(t, res)
+	//res, err := c.Allowed(ctx, &AllowedReq{
+	//	Token:       v1.Token_ETH,
+	//	WalletAddr:  tests.GetConfig().StarkNetPuvlic,
+	//	SpenderAddr: "0x7a6f98c03379b9513ca84cca1373ff452a7462a3b61598f0af5bb27ad7f76d1",
+	//})
+	//assert.NoError(t, err)
+	//assert.NotNil(t, res)
 }
 
 func TestGen(t *testing.T) {

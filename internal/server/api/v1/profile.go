@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"encoding/hex"
+	"math/big"
 	"sync"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/google/uuid"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
@@ -626,4 +628,110 @@ func (s *ProfileService) SearchProfileRelation(ctx context.Context, req *v1.Sear
 	}
 
 	return &v1.SearchProfileRelationRes{Items: tmp}, nil
+}
+
+func (s *ProfileService) TransferP2P(ctx context.Context, req *v1.TransferP2PReq) (*v1.TransferP2PRes, error) {
+	userId, err := user.ResolveUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	to, err := s.repository.GetProfile(ctx, req.GetTo())
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "куда профиль не взялся" + err.Error()}, nil
+	}
+
+	if to.UserId != userId {
+		return nil, errors.New("invalid user id")
+	}
+
+	from, err := s.repository.GetProfile(ctx, req.GetFrom())
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "откуда профиль не взялся" + err.Error()}, nil
+	}
+
+	if from.UserId != userId {
+		return nil, errors.New("invalid user id")
+	}
+
+	settigs, err := s.settingsService.GetSettings(ctx, userId, req.Network)
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "нет настроек" + err.Error()}, nil
+	}
+
+	tr, err := uniclient.NewTransfer(req.Network, &uniclient.BaseClientConfig{
+		ProxyString: from.Proxy.String,
+		RPCEndpoint: settigs.RpcEndpoint,
+	})
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "нет такой буквы" + err.Error()}, nil
+	}
+
+	fromSubType := v1.ProfileSubType(v1.ProfileSubType_value[from.SubType])
+
+	fromAdd, err := tr.GetPublicKey(string(from.MmskPk), fromSubType)
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "публичный ключь откуда отправлять хуйня" + err.Error()}, nil
+	}
+	toAddr, err := tr.GetPublicKey(string(to.MmskPk), v1.ProfileSubType(v1.ProfileSubType_value[to.SubType]))
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "публичный ключь куда отправлять хуйня" + err.Error()}, nil
+	}
+
+	balance, err := tr.GetBalance(ctx, &defi.GetBalanceReq{
+		WalletAddress: fromAdd,
+		Token:         req.Token,
+	})
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "не взяли баланс: " + err.Error()}, nil
+	}
+
+	if balance.WEI.Cmp(big.NewInt(500000000000000)) <= 0 {
+		return &v1.TransferP2PRes{Result: "пусто"}, nil
+	}
+
+	estimate, err := tr.Transfer(ctx, &defi.TransferReq{
+		Pk:           string(from.MmskPk),
+		ToAddr:       toAddr,
+		Token:        req.Token,
+		Amount:       balance.WEI,
+		PSubType:     fromSubType,
+		Gas:          nil,
+		EstimateOnly: true,
+	})
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "трансфер не удался, а жаль:" + err.Error()}, nil
+	}
+
+	gas := &bozdo.Gas{
+		Network:       req.Network,
+		GasMultiplier: 1,
+		GasLimit:      *estimate.ECost.GasLimit,
+		GasPrice:      *estimate.ECost.GasPrice,
+		TotalGas:      *estimate.ECost.TotalGasWei,
+	}
+
+	amount := balance.WEI
+	if req.Token == v1.Token_ETH {
+		amount = big.NewInt(0).Sub(balance.WEI, estimate.ECost.TotalGasWei)
+	}
+
+	res, err := tr.Transfer(ctx, &defi.TransferReq{
+		Pk:           string(from.MmskPk),
+		ToAddr:       toAddr,
+		Token:        req.Token,
+		Amount:       amount,
+		PSubType:     fromSubType,
+		Gas:          gas,
+		EstimateOnly: false,
+	})
+	if err != nil {
+		return &v1.TransferP2PRes{Result: "трансфер не удался, а жаль:" + err.Error()}, nil
+	}
+
+	if err := tr.WaitTxComplete(ctx, res.Tx.Id); err != nil {
+		return &v1.TransferP2PRes{Result: "не дождались транзы"}, nil
+	}
+	return &v1.TransferP2PRes{Result: "ok " + balance.HumanReadable + req.Token.String() + " " + res.Tx.Url}, nil
+
 }

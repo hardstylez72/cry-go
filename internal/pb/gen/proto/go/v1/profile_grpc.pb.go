@@ -38,6 +38,7 @@ type ProfileServiceClient interface {
 	DeleteProfileRelation(ctx context.Context, in *DeleteProfileRelationReq, opts ...grpc.CallOption) (*DeleteProfileRelationRes, error)
 	AddProfileRelation(ctx context.Context, in *AddProfileRelationReq, opts ...grpc.CallOption) (*AddProfileRelationRes, error)
 	SearchProfileRelation(ctx context.Context, in *SearchProfileRelationReq, opts ...grpc.CallOption) (*SearchProfileRelationRes, error)
+	TransferP2P(ctx context.Context, in *TransferP2PReq, opts ...grpc.CallOption) (*TransferP2PRes, error)
 }
 
 type profileServiceClient struct {
@@ -192,6 +193,15 @@ func (c *profileServiceClient) SearchProfileRelation(ctx context.Context, in *Se
 	return out, nil
 }
 
+func (c *profileServiceClient) TransferP2P(ctx context.Context, in *TransferP2PReq, opts ...grpc.CallOption) (*TransferP2PRes, error) {
+	out := new(TransferP2PRes)
+	err := c.cc.Invoke(ctx, "/profile.ProfileService/TransferP2P", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility
@@ -212,6 +222,7 @@ type ProfileServiceServer interface {
 	DeleteProfileRelation(context.Context, *DeleteProfileRelationReq) (*DeleteProfileRelationRes, error)
 	AddProfileRelation(context.Context, *AddProfileRelationReq) (*AddProfileRelationRes, error)
 	SearchProfileRelation(context.Context, *SearchProfileRelationReq) (*SearchProfileRelationRes, error)
+	TransferP2P(context.Context, *TransferP2PReq) (*TransferP2PRes, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -266,6 +277,9 @@ func (UnimplementedProfileServiceServer) AddProfileRelation(context.Context, *Ad
 }
 func (UnimplementedProfileServiceServer) SearchProfileRelation(context.Context, *SearchProfileRelationReq) (*SearchProfileRelationRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchProfileRelation not implemented")
+}
+func (UnimplementedProfileServiceServer) TransferP2P(context.Context, *TransferP2PReq) (*TransferP2PRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferP2P not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 
@@ -568,6 +582,24 @@ func _ProfileService_SearchProfileRelation_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_TransferP2P_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransferP2PReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).TransferP2P(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.ProfileService/TransferP2P",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).TransferP2P(ctx, req.(*TransferP2PReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -638,6 +670,10 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchProfileRelation",
 			Handler:    _ProfileService_SearchProfileRelation_Handler,
+		},
+		{
+			MethodName: "TransferP2P",
+			Handler:    _ProfileService_TransferP2P_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

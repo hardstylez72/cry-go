@@ -181,6 +181,7 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 
 	if cfg.Env == config.Local {
 		h = cors.Handler(cors.Options{
+
 			AllowedMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 			AllowedHeaders:     []string{"*"},
 			AllowedOrigins:     []string{"http://localhost:*"},

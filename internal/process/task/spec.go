@@ -261,21 +261,7 @@ var SpecMap = map[v1.TaskType]Spec{
 			return Marshal(t.OkexBinanaceTask)
 		},
 	},
-	v1.TaskType_WETH: {
-		Payable: true,
-		Tasker:  &Wrap{Tasker: &WethTask{}},
-		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
-			p := a.Task.Task.(*v1.Task_WETHTask).WETHTask
-			return EstimateWethTaskCost(ctx, p, a.Profile)
-		},
-		Desc: func(m *v1.Task) ([]byte, error) {
-			t, ok := m.Task.(*v1.Task_WETHTask)
-			if !ok {
-				return nil, errors.New("m.Task.(*v1.Task_WETHTask)")
-			}
-			return Marshal(t.WETHTask)
-		},
-	},
+
 	// LP
 	v1.TaskType_SyncSwapLP: {
 		Payable: true,
@@ -1546,6 +1532,21 @@ var SpecMap = map[v1.TaskType]Spec{
 				Network: p.EkuboSwapTask.Network,
 				Token:   p.EkuboSwapTask.ToToken,
 			}, nil
+		},
+	},
+	v1.TaskType_WETH: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewWETHSwapTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_WethSwapTask).WethSwapTask
+			return NewWETHSwapTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_WethSwapTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_WethSwapTask)")
+			}
+			return Marshal(t.WethSwapTask)
 		},
 	},
 }

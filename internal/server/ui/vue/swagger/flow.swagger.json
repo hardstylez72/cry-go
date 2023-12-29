@@ -1956,7 +1956,8 @@
           "$ref": "#/definitions/ZkSyncOfficialBridgeFromEthereumTask"
         },
         "wETHTask": {
-          "$ref": "#/definitions/WETHTask"
+          "$ref": "#/definitions/WETHTask",
+          "title": "deprecated"
         },
         "muteioSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
@@ -2062,6 +2063,9 @@
         },
         "nostraLPTask": {
           "$ref": "#/definitions/DefaultLP"
+        },
+        "wethSwapTask": {
+          "$ref": "#/definitions/DefaultSwap"
         }
       },
       "required": [

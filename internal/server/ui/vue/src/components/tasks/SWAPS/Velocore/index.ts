@@ -6,7 +6,7 @@ import MenuTaskVelocoreSwap from "@/components/tasks/SWAPS/Velocore/Menu.vue";
 import {tokenSwapPair} from "@/components/helper";
 
 export const VelocoreSwapSpec: TaskSpec = {
-  deprecated: false,
+  deprecated: true,
   canBeEstimated: true,
   descFn(task) {
     const p = task.velocoreSwapTask

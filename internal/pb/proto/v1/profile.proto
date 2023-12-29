@@ -150,6 +150,23 @@ service ProfileService {
     };
   }
 
+  rpc TransferP2P(TransferP2PReq) returns (TransferP2PRes) {
+    option (google.api.http) = {
+      post:"/api/gw/v1/profile/p2p/transfer",
+      body: "*"
+    };
+  }
+}
+
+message TransferP2PReq {
+  string from = 1;
+  string to = 2;
+  shared.Network network = 3;
+  shared.Token token = 4;
+}
+
+message TransferP2PRes {
+  string result = 1;
 }
 
 message SearchProfileRelationReq {

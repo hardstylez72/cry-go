@@ -41,13 +41,9 @@ export const KyberSwapSpec: TaskSpec = {
     tokenSwapPair(Network.ZKSYNCERA, Token.BUSD, Token.ETH),
 
     // Tokens
-    tokenSwapPair(Network.ZKSYNCERA, Token.BUSD, Token.USDC),
-    tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.BUSD),
 
     tokenSwapPair(Network.ZKSYNCERA, Token.USDC, Token.USDT),
     tokenSwapPair(Network.ZKSYNCERA, Token.USDT, Token.USDC),
 
-    tokenSwapPair(Network.ZKSYNCERA, Token.BUSD, Token.USDT),
-    tokenSwapPair(Network.ZKSYNCERA, Token.USDT, Token.BUSD),
   ]
 }

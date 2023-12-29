@@ -1372,6 +1372,9 @@ export interface Task {
 
   /**  */
   nostraLPTask?: DefaultLP;
+
+  /**  */
+  wethSwapTask?: DefaultSwap;
 }
 
 export interface TaskTx {

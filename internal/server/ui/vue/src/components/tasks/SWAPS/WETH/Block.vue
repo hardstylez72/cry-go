@@ -5,148 +5,79 @@
         <v-col>
           <NetworkSelector
             label="from network"
-            :items="networks"
+            :items="GetFromNetworks"
             :disabled="disabled"
-            v-model="item.network"
+            v-model="network"
+          />
+        </v-col>
+        <v-col>
+          <v-autocomplete
+            density="compact"
+            variant="outlined"
+            label="direction"
+            v-on:change="inputChanged"
+            :rules="[required]"
+            :items="getPairs"
+            v-model="pair"
+            :disabled="disabled"
+            item-title="name"
+            return-object
           />
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <v-autocomplete
-            density="compact"
-            variant="outlined"
-            label="from token"
-            v-on:change="inputChanged"
-            :rules="[required]"
-            :items="tokens"
-            v-model="fromToken"
-            :disabled="disabled"
-            item-title="code"
-            return-object
-            hide-details
-          />
-        </v-col>
-        <v-col>
-          <v-autocomplete
-            return-object
-            density="compact"
-            variant="outlined"
-            v-on:change="inputChanged"
-            label="to token"
-            :items="getToTokens"
-            :rules="[required]"
-            v-model="toToken"
-            :disabled="true"
-            item-title="code"
-            hide-details
-          />
+          <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>
         </v-col>
       </v-row>
-      <AmountInput :coin="fromToken" :disabled="disabled" v-model="item.amount"/>
     </v-container>
   </v-card-actions>
 </template>
 
 <script lang="ts">
-import {Network, Task, TaskType, Token, WETHTask} from "@/generated/flow";
-import {defineComponent, PropType} from "vue";
-import WEIInputField from "@/components/WEIInputField.vue";
-import AmountInput from "@/components/tasks/AmountInput.vue";
-import {required} from "@/components/tasks/helper";
-import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
+import {DefaultSwap, Network, Task, TaskType, Token} from "@/generated/flow";
+import {taskProps} from "@/components/tasks/tasks";
+import {SwapPair, tokenSwapPair} from "@/components/helper";
+import DefaultSwapTask from "@/components/tasks/SWAPS/DefaultSwapTask.js";
+import {Component} from "vue-facing-decorator";
 
-export default defineComponent({
-  name: "TaskWethSwap",
-  components: {NetworkSelector, AmountInput, WEIInputField},
-  emits: ['taskChanged'],
-  props: {
-    weight: {
-      type: Number,
-      required: true,
-    },
-    disabled: {
-      type: Boolean,
-      required: true,
-    },
-    task: {
-      type: Object as PropType<Task>,
-      required: false,
-    }
-  },
-  computed: {
-    Token() {
-      return Token
-    },
-    getToTokens(): Token[] {
-      return this.tokens.filter((n) => n !== this.toToken)
-    }
-  },
-  watch: {
-    fromToken: {
-      handler() {
-        if (this.fromToken === Token.WETH) {
-          this.toToken = Token.ETH
-          this.item.wrap = false
-        } else {
-          this.toToken = Token.WETH
-          this.item.wrap = true
-        }
-        this.$emit('taskChanged', this.getTask())
-      },
-    },
-    item: {
-      handler() {
-        this.$emit('taskChanged', this.getTask())
-      },
-      deep: true
-    },
-    task: {
-      handler(b, a) {
-        if (JSON.stringify(a) !== JSON.stringify(b)) {
-          this.syncTask()
-        }
-      },
-      deep: true
-    }
-  },
+@Component({name: 'WETH'})
+export default class WETHSwap extends DefaultSwapTask {
 
-  data() {
-    return {
-      fromToken: Token.ETH,
-      toToken: Token.WETH,
-      networks: [Network.ZKSYNCERA] as Network[],
-      tokens: [Token.WETH, Token.ETH] as Token[],
-      item: {} as WETHTask,
-    }
-  },
-  methods: {
-    required,
-    getTask(): Task {
-      return {
-        weight: this.weight.toString(),
-        wETHTask: this.item,
-        taskType: TaskType.WETH,
-        description: "",
-      }
-    },
-    inputChanged() {
-    },
-    syncTask() {
-      if (this.task) {
-        if (this.task.wETHTask) {
-          this.item = this.task.wETHTask
-          this.fromToken = this.item.wrap ? Token.ETH : Token.WETH
-          this.$emit('taskChanged', this.getTask())
-        }
-      }
-    }
-  },
   created() {
-    this.$emit('taskChanged', this.getTask())
-    this.syncTask()
+    if (this.task?.wethSwapTask) {
+      this.item = this.task.wethSwapTask
+    }
   }
-})
+
+  getTask(): Task {
+    const taskType = TaskType.WETH
+    const task = {
+      weight: this.weight.toString(),
+      wethSwapTask: this.item,
+      taskType: taskType,
+      description: "",
+    }
+    task.description = taskProps[taskType].descFn(task)
+    return task
+  }
+
+  syncTask() {
+    if (this.task) {
+      if (this.task.wethSwapTask) {
+        this.pairs = this.taskProps[this.task.taskType].swapParis
+        this.item = this.task.wethSwapTask
+        this.network = this.item.network
+        if (this.item.network && this.item.fromToken && this.item.toToken) {
+          this.pair = tokenSwapPair(this.item.network, this.item.fromToken, this.item.toToken)
+        }
+        this.$emit('taskChanged', this.getTask())
+      }
+    }
+  }
+}
+
+
 </script>
 
 <style scoped>

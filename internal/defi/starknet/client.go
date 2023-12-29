@@ -13,7 +13,7 @@ import (
 	"github.com/hardstylez72/cry/starknet.go/rpc"
 )
 
-const MainnetRPC = gateway.MAINNET_BASE
+const MainnetRPC = "https://free-rpc.nethermind.io/mainnet-juno/v0_5"
 
 type Client struct {
 	GW          *gateway.Gateway
@@ -53,10 +53,6 @@ func NewClient(cfg *ClientConfig) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	//gwp := gateway.NewProvider(
-	//	gateway.WithChain(cfg.RPCEndpoint),
-	//	gateway.WithHttpClient(*cfg.HttpCli),
-	//)
 	gwp := rpc.NewProvider(crpc)
 
 	host := "http://localhost:7272"
