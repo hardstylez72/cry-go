@@ -9,6 +9,11 @@ export interface token {
 }
 
 export const tokenProps: Record<Token, token> = {
+  CORE: {
+    name: 'CORE',
+    img: '/icons/networks/core.png',
+    value: Token.CORE,
+  },
   ETH: {
     name: 'ETH',
     img: '/icons/coins/ETH.webp',

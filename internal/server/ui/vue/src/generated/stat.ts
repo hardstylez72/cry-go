@@ -223,5 +223,6 @@ export enum Token {
   'IZI' = 'IZI',
   'USDCBridged' = 'USDCBridged',
   'BUSD' = 'BUSD',
-  'USDp' = 'USDp'
+  'USDp' = 'USDp',
+  'CORE' = 'CORE'
 }

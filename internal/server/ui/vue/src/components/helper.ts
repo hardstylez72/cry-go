@@ -279,6 +279,11 @@ export interface network {
 }
 
 export const networkProps: Record<Network, network> = {
+  Core: {
+    name: 'CORE',
+    img: '/icons/networks/core.png',
+    value: Network.Core,
+  },
   Etherium: {
     name: 'Ethereum',
     img: '/icons/networks/ethereum.svg',

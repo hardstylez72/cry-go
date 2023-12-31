@@ -187,6 +187,7 @@
                               <v-icon v-if="!disable" icon="mdi-close" @click="taskDeleted(element.weight)"></v-icon>
                             </v-card-title>
                             <component
+                              :key="element.weight"
                               @taskChanged="taskChanged"
                               style="box-shadow: rgba(0, 0, 0, 0.16) 0 3px 6px, rgba(0, 0, 0, 0.23) 0 3px 6px;"
                               :is="element.component"

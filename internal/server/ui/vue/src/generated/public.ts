@@ -216,5 +216,6 @@ export enum TaskType {
   'MintZerius' = 'MintZerius',
   'KyberSwap' = 'KyberSwap',
   'EkuboSwap' = 'EkuboSwap',
-  'NostraLP' = 'NostraLP'
+  'NostraLP' = 'NostraLP',
+  'CoreDaoBridge' = 'CoreDaoBridge'
 }

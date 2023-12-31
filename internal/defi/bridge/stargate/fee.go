@@ -1,4 +1,4 @@
-package defi
+package stargate
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
-	"github.com/hardstylez72/cry/internal/defi/contracts/stargate/router"
+	"github.com/hardstylez72/cry/internal/defi/bridge/stargate/abi/router"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
@@ -23,8 +23,8 @@ type GetStargateBridgeFeeRes struct {
 	Fee2 *big.Int
 }
 
-func (c *EtheriumClient) GetStargateBridgeFee(ctx context.Context, req *GetStargateBridgeFeeReq) (*GetStargateBridgeFeeRes, error) {
-	trx, err := router.NewRouterCaller(c.Cfg.Dict.Stargate.StargateRouterAddress, c.Cli)
+func (c *Bridge) GetStargateBridgeFee(ctx context.Context, req *GetStargateBridgeFeeReq) (*GetStargateBridgeFeeRes, error) {
+	trx, err := router.NewRouterCaller(c.Cli.Cfg.Dict.Stargate.StargateRouterAddress, c.Cli.Cli)
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-import {Network} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import MenuTaskTestNetBridge from "@/components/tasks/BRIDGE/TestNet/Menu.vue";
@@ -11,6 +11,12 @@ export const TestNetSpec: TaskSpec = {
   component: TaskTestNetBridgeSwap,
   descFn(task) {
     return `[${task.testNetBridgeSwapTask?.minAmount}:${task.testNetBridgeSwapTask?.maxAmount}]`
+  },
+  bridge: (task: Task) => {
+    const p = task.testNetBridgeSwapTask
+    return {
+      from: Token.ETH, to: Token.ETH, fromNetwork: p?.network, toNetwork: Network.GOERLIETH
+    }
   },
   service: {
     name: 'TestNet-bridge',

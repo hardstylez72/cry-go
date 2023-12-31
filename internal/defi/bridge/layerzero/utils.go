@@ -32,6 +32,7 @@ var LayerZeroChainMap = map[v1.Network]uint16{
 	v1.Network_Fantom:       112,
 	v1.Network_Base:         184,
 	v1.Network_opBNB:        202,
+	v1.Network_Core:         153,
 
 	//SBNameMetis:         151,
 }

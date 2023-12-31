@@ -2,8 +2,8 @@
   <div class="task-container" :style="`background-color: ${color}`">
 
     <div class="d-inline-flex align-center" v-if="task.taskType !== TaskType.Delay">
-      <v-img height="12px" v-if="p.service.img" :src="p.service.img" style="opacity: 0.5"/>
-      <div><b>{{ p.service.name }}</b></div>
+
+      <TaskChip :task-type="task.taskType" text-style/>
       <span class="font-weight-thin" style="font-weight: 100;">({{ p.job }})</span>
     </div>
     <div class="text-center justify-center align-center" v-else>
@@ -22,6 +22,13 @@
       <div v-else-if="p.job === TaskJob.NFT">
         <span>mint</span>
         <span v-if="p.nft(task) && p.nft(task).toNetwork">& bridge</span>
+      </div>
+      <div v-else-if="p.job === TaskJob.Bridge">
+        <span class="d-inline-flex align-center">
+        <NetworkChip no-label :network="p.bridge(task).fromNetwork"/>
+        ->
+        <NetworkChip no-label :network="p.bridge(task).toNetwork"/>
+        </span>
       </div>
       <div v-else-if="task.taskType === TaskType.Delay">
       </div>
@@ -45,10 +52,12 @@ import {getFlow, taskProps} from "@/components/tasks/tasks";
 import Loader from "@/components/Loader.vue";
 import NavBar from "@/components/NavBar.vue";
 import {TaskJob} from "@/components/tasks/utils";
+import TaskChip from "@/components/tasks/TaskChip.vue";
+import NetworkChip from "@/components/tasks/NetworkChip.vue";
 
 export default defineComponent({
   name: "TaskBlock",
-  components: {},
+  components: {NetworkChip, TaskChip},
   props: {
     task: {
       required: true,

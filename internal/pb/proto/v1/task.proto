@@ -60,6 +60,7 @@ enum TaskType {
   KyberSwap = 46;
   EkuboSwap = 47;
   NostraLP = 48;
+  CoreDaoBridge = 49;
 }
 
 

@@ -1,86 +1,52 @@
 <template>
-  <MenuTaskSettings :network="item.fromNetwork"/>
-  <div>Network: <b>{{ `${item.fromNetwork} to ${item.toNetwork}` }}</b></div>
-  <div>Token: <b>{{ `${item.fromToken} to ${item.toToken}` }}</b></div>
-  <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>
-  <div>Status:
-    <span :style="`color: ${getStatusColor(getStatus)}`">{{ getStatus }}</span>
+  <div>
+    <div class="d-inline-flex pb-3">
+      <MenuTaskSettings :network="item.fromNetwork"/>
+    </div>
+    <div>
+      <div class="d-inline-flex align-center">
+        <NetworkChip :network="item.fromNetwork"/>
+        ->
+        <NetworkChip :network="item.toNetwork"/>
+      </div>
+    </div>
+
+    <div>
+      <div class="d-inline-flex align-center">
+        <TokenChip :token="item.fromToken"/>
+        ->
+        <TokenChip :token="item.toToken"/>
+      </div>
+    </div>
+
+    <div>Amount to swap: {{ getAmountSend(item.amount) }}</div>
+    <div>Status:
+      <span :style="statusColor">{{ getTxStatus }}</span>
+      <GasOptions :item="item.tx" :network="item.fromNetwork"/>
+    </div>
   </div>
-  <div v-if="item.lzscanUrl"><a :href="item.lzscanUrl">LayerZero scan</a></div>
-  <GasOptions :item="item.tx" :network="item.fromNetwork"/>
 </template>
 
 <script lang="ts">
-import {AmUni, Network, StargateBridgeTask, Task, TaskType, Token} from "@/generated/flow";
-import {defineComponent, PropType} from "vue";
-import {ProcessStatus} from "@/generated/process";
-import {getAmountSend, getStatusColor} from "@/components/tasks/helper";
-import GasOptions from "@/components/tasks/Details.vue";
-import {taskProps} from "../../tasks";
-import MenuTaskSettings from "@/components/tasks/Settings.vue";
 
-export default defineComponent({
-  name: "MenuTaskStargateBridge",
-  methods: {getAmountSend, getStatusColor},
-  components: {MenuTaskSettings, GasOptions},
-  props: {
-    task: {
-      type: Object as PropType<Task>,
-      required: true,
-    },
-    status: {
-      type: String as PropType<ProcessStatus>,
-      required: true,
-    }
-  },
-  data() {
-    return {
-      item: {} as StargateBridgeTask,
-    }
-  },
-  watch: {
-    task: {
-      handler() {
-        if (this.task?.stargateBridgeTask) {
-          this.item = this.task.stargateBridgeTask
-        }
-      },
-      deep: true
-    }
-  },
-  computed: {
-    taskProps() {
-      return taskProps
-    },
-    getStatus(): string {
-      if (this.status == ProcessStatus.StatusDone) {
-        return 'completed'
-      }
-      if (this.status == ProcessStatus.StatusError) {
-        return 'error'
-      }
+import {Component} from "vue-facing-decorator";
+import DefaultBridgeMenu from "@/components/tasks/BRIDGE/DefaultBridgeMenu";
+import NetworkChip from "@/components/tasks/NetworkChip.vue";
+import TokenSelector from "@/components/tasks/TokenSelector.vue";
+import TokenChip from "@/components/tasks/TokenChip.vue";
 
-      if (this.item.layerZeroStatus) {
-        return 'waiting stargate swap complete'
-      }
-
-      if (!this.item.tx) {
-        return 'not started'
-      }
-
-      if (this.item.txCompleted) {
-        return 'transaction send'
-      }
-
-      return 'waiting'
-    },
-  },
-  async created() {
-    if (this.task?.stargateBridgeTask) {
-      this.item = this.task.stargateBridgeTask
+@Component({
+  name: 'BridgeAcrossMenu',
+  components: {TokenChip, TokenSelector, NetworkChip}
+})
+export default class BridgeAcrossMenu extends DefaultBridgeMenu {
+  created() {
+    if (this.task?.stargateBridge) {
+      this.item = this.task.stargateBridge
     }
   }
-})
+}
+
 </script>
 
 <style scoped>

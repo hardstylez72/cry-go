@@ -3,8 +3,12 @@ package uniclient
 import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/arbitrum"
+	"github.com/hardstylez72/cry/internal/defi/avalanche"
 	"github.com/hardstylez72/cry/internal/defi/base"
+	"github.com/hardstylez72/cry/internal/defi/bnb"
+	"github.com/hardstylez72/cry/internal/defi/core"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
+	"github.com/hardstylez72/cry/internal/defi/poligon"
 	"github.com/hardstylez72/cry/internal/defi/zksyncera"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/socks5"
@@ -34,6 +38,14 @@ func NewBridger(network v1.Network, c *BaseClientConfig, taskType v1.TaskType) (
 		return optimism.NewClient(&optimism.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_Base:
 		return base.NewClient(&base.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+	case v1.Network_BinanaceBNB:
+		return bnb.NewClient(&bnb.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+	case v1.Network_Core:
+		return core.NewClient(&core.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+	case v1.Network_POLIGON:
+		return poligon.NewClient(&poligon.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+	case v1.Network_AVALANCHE:
+		return avalanche.NewClient(&avalanche.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	default:
 		return nil, errors.New("network is not supported for bridger")
 	}

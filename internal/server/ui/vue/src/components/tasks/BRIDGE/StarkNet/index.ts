@@ -1,4 +1,4 @@
-import {Network} from "@/generated/flow";
+import {Network, Task} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import StrarkNetBridge from "@/components/tasks/BRIDGE/StarkNet/Block.vue";
@@ -10,6 +10,12 @@ export const BridgeStarknetSpec: TaskSpec = {
   descFn(task) {
     const p = task.starkNetBridgeTask
     return ''
+  },
+  bridge: (task: Task) => {
+    const p = task.starkNetBridgeTask
+    return {
+      from: p?.token, to: p?.token, fromNetwork: p?.fromNetwork, toNetwork: p?.toNetwork
+    }
   },
   component: StrarkNetBridge,
   menu: MenuStarkNetBridge,

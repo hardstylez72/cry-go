@@ -9,6 +9,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/across"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/defi/bridge/stargate"
 	"github.com/hardstylez72/cry/internal/defi/generic"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -52,12 +53,6 @@ func (c *Client) TxViewFn(id string) string {
 	return c.defi.TxViewFn(id)
 }
 
-func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.DefaultRes, error) {
-	return FW1(ctx, c.defi.StargateBridgeSwap, req)
-}
-func (c *Client) GetStargateBridgeFee(ctx context.Context, req *defi.GetStargateBridgeFeeReq) (*defi.GetStargateBridgeFeeRes, error) {
-	return FW1(ctx, c.defi.GetStargateBridgeFee, req)
-}
 func (c *Client) GetNetworkToken() defi.Token {
 	return c.defi.GetNetworkToken()
 }
@@ -116,6 +111,8 @@ func (c *Client) Bridge(ctx context.Context, req *defi.DefaultBridgeReq, taskTyp
 	case v1.TaskType_AcrossBridge:
 		b := across.NewAcrossBridge(c.defi)
 		return FW1(ctx, b.Bridge, req)
+	case v1.TaskType_StargateBridge:
+		return stargate.NewBridge(c.defi).Bridge(ctx, req)
 	default:
 		return nil, errors.New("bridge unsupported")
 	}
@@ -125,6 +122,8 @@ func (c *Client) WaitForConfirm(ctx context.Context, txId string, taskType v1.Ta
 	case v1.TaskType_AcrossBridge:
 		b := across.NewAcrossBridge(c.defi)
 		return b.WaitForConfirm(ctx, txId, receiver)
+	case v1.TaskType_StargateBridge:
+		return stargate.NewBridge(c.defi).WaitForConfirm(ctx, txId, taskType, receiver)
 	default:
 		return errors.New("bridge unsupported")
 	}

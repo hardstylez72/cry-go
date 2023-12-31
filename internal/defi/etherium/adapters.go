@@ -17,13 +17,6 @@ func (c *Client) TxViewFn(id string) string {
 	return c.defi.TxViewFn(id)
 }
 
-func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo.DefaultRes, error) {
-	return c.defi.StargateBridgeSwap(ctx, req)
-}
-func (c *Client) GetStargateBridgeFee(ctx context.Context, req *defi.GetStargateBridgeFeeReq) (*defi.GetStargateBridgeFeeRes, error) {
-	return c.defi.GetStargateBridgeFee(ctx, req)
-}
-
 func (c *Client) GetNetworkToken() defi.Token {
 	return c.defi.GetNetworkToken()
 }

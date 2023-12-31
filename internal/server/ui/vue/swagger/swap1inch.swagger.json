@@ -242,7 +242,8 @@
         "Base",
         "opBNB",
         "Linea",
-        "Zora"
+        "Zora",
+        "Core"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"

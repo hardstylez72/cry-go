@@ -1,6 +1,7 @@
 package bnb
 
 import (
+	"context"
 	"math/big"
 	"net/http"
 
@@ -66,12 +67,15 @@ func NewClient(c *ClientConfig) (*Client, error) {
 			return "https://bscscan.com/tx/" + txId
 		},
 		NetworkId: bozdo.ChainMap[v1.Network_BinanaceBNB],
+		EstimateL1Gas: func(ctx context.Context, data []byte) (*big.Int, error) {
+			return big.NewInt(0), nil
+		},
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum net: "+c.RPCEndpoint)
 	}
-	ethcli.London = defi.LondonReadyTx
-	
+	ethcli.London = defi.NeLondonReadyTx
+
 	return &Client{
 		defi:      ethcli,
 		NetworkId: bozdo.ChainMap[v1.Network_BinanaceBNB],

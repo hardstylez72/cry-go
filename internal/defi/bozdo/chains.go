@@ -18,6 +18,7 @@ var ChainMap = map[v1.Network]*big.Int{
 	v1.Network_Linea:       big.NewInt(59144),
 	v1.Network_Zora:        big.NewInt(7777777),
 	//v1.Network_Gnosis:      big.NewInt(100),
+	v1.Network_Core: big.NewInt(1116),
 }
 
 var NativeTokenMap = map[v1.Network]v1.Token{
@@ -33,4 +34,5 @@ var NativeTokenMap = map[v1.Network]v1.Token{
 	v1.Network_Linea:       v1.Token_ETH,
 	v1.Network_Zora:        v1.Token_ETH,
 	//v1.Network_Gnosis:      v1.Token_xDAI,
+	v1.Network_Core: v1.Token_CORE,
 }

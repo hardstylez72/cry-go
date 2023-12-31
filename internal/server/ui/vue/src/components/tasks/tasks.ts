@@ -45,6 +45,7 @@ import {ZkSyncBridgeToETHSpec} from "@/components/tasks/BRIDGE/ZkSyncToEth";
 import {DelaySpec} from "@/components/tasks/OTHER/Delay";
 import {SwapEkuboSpec} from "@/components/tasks/SWAPS/Ekubo";
 import {LPNostraLPSpec} from "@/components/tasks/LP/Nostra";
+import {CoreDaoBridgeSpec} from "@/components/tasks/BRIDGE/CoreDao";
 
 
 export interface TaskArg {
@@ -128,6 +129,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
   KyberSwap: KyberSwapSpec,
   EkuboSwap: SwapEkuboSpec,
   NostraLP: LPNostraLPSpec,
+  CoreDaoBridge: CoreDaoBridgeSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

@@ -35,6 +35,7 @@ enum Network {
   opBNB = 18;
   Linea = 19;
   Zora = 20;
+  Core = 21;
 }
 
 enum Token {
@@ -57,6 +58,7 @@ enum Token {
   USDCBridged = 16;
   BUSD = 17;
   USDp = 18;
+  CORE = 19;
 }
 
 enum ProcessStatus {

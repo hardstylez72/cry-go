@@ -867,7 +867,8 @@ export enum Network {
   'Base' = 'Base',
   'opBNB' = 'opBNB',
   'Linea' = 'Linea',
-  'Zora' = 'Zora'
+  'Zora' = 'Zora',
+  'Core' = 'Core'
 }
 
 export enum ProfileSubType {
@@ -900,5 +901,6 @@ export enum Token {
   'IZI' = 'IZI',
   'USDCBridged' = 'USDCBridged',
   'BUSD' = 'BUSD',
-  'USDp' = 'USDp'
+  'USDp' = 'USDp',
+  'CORE' = 'CORE'
 }

@@ -1,4 +1,4 @@
-import {Network} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import Block from "@/components/tasks/BRIDGE/Across/Block.vue";
@@ -10,6 +10,12 @@ export const AcrossBridgeSpec: TaskSpec = {
   descFn(task) {
     const p = task.acrossBridgeTask
     return ` (${p?.fromNetwork} ${p?.fromToken} to ${p?.toNetwork} ${p?.toToken})`
+  },
+  bridge: (task: Task) => {
+    const p = task.acrossBridgeTask
+    return {
+      from: p?.fromToken, to: p?.toToken, fromNetwork: p?.fromNetwork, toNetwork: p?.toNetwork
+    }
   },
   component: Block,
   menu: Menu,

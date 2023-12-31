@@ -302,7 +302,8 @@
         "Base",
         "opBNB",
         "Linea",
-        "Zora"
+        "Zora",
+        "Core"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -347,7 +348,8 @@
         "IZI",
         "USDCBridged",
         "BUSD",
-        "USDp"
+        "USDp",
+        "CORE"
       ],
       "default": "USDT"
     }

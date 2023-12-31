@@ -1,5 +1,5 @@
 <template>
-  <v-chip size="auto" density="compact" variant="outlined" rounded>
+  <v-chip size="auto" density="compact" :variant="textStyle ? 'text' : 'outlined'" rounded>
     <template v-slot:prepend>
       <v-img height="22px" width="20px" class="mx-1" v-if="service.img" :src="service.img" position="left"/>
     </template>
@@ -32,6 +32,11 @@ export default defineComponent({
     }
   },
   props: {
+    textStyle: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     taskType: {
       type: String as PropType<TaskType>,
       required: true,

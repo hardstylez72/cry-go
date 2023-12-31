@@ -1,6 +1,7 @@
 package avalanche
 
 import (
+	"context"
 	"math/big"
 	"net/http"
 
@@ -63,6 +64,9 @@ func NewClient(c *ClientConfig) (*Client, error) {
 		Httpcli:   config.HttpCli,
 		TxViewFn:  TxViewer,
 		NetworkId: bozdo.ChainMap[v1.Network_AVALANCHE],
+		EstimateL1Gas: func(ctx context.Context, data []byte) (*big.Int, error) {
+			return big.NewInt(0), nil
+		},
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum main: "+c.RPCEndpoint)

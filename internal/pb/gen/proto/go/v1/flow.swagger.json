@@ -1336,7 +1336,8 @@
         "Base",
         "opBNB",
         "Linea",
-        "Zora"
+        "Zora",
+        "Core"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -2066,6 +2067,12 @@
         },
         "wethSwapTask": {
           "$ref": "#/definitions/DefaultSwap"
+        },
+        "coreDaoBridge": {
+          "$ref": "#/definitions/DefaultBridge"
+        },
+        "stargateBridge": {
+          "$ref": "#/definitions/DefaultBridge"
         }
       },
       "required": [
@@ -2189,7 +2196,8 @@
         "MintZerius",
         "KyberSwap",
         "EkuboSwap",
-        "NostraLP"
+        "NostraLP",
+        "CoreDaoBridge"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -2240,7 +2248,8 @@
         "IZI",
         "USDCBridged",
         "BUSD",
-        "USDp"
+        "USDp",
+        "CORE"
       ],
       "default": "USDT"
     },

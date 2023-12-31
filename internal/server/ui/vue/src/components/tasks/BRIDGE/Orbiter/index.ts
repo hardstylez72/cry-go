@@ -1,4 +1,4 @@
-import {Network} from "@/generated/flow";
+import {Network, Task} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import MenuTaskOrbiterBridge from "@/components/tasks/BRIDGE/Orbiter/Menu.vue";
@@ -12,6 +12,12 @@ export const OrbiterBridgeSpec: TaskSpec = {
   descFn(task) {
     let p = task.orbiterBridgeTask
     return ` (from ${p?.fromNetwork} ${p?.fromToken} to ${p?.toNetwork} ${p?.toToken})`
+  },
+  bridge: (task: Task) => {
+    const p = task.orbiterBridgeTask
+    return {
+      from: p?.fromToken, to: p?.toToken, fromNetwork: p?.fromNetwork, toNetwork: p?.toNetwork
+    }
   },
   service: {
     name: 'Orbiter',

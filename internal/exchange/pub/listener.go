@@ -20,6 +20,7 @@ var p = Pairs{
 	BNB:   250,
 	ETH:   1900,
 	MATIC: 0.7,
+	CORE:  0.55,
 }
 
 type Pairs struct {
@@ -27,6 +28,7 @@ type Pairs struct {
 	BNB   float64
 	ETH   float64
 	MATIC float64
+	CORE  float64
 }
 
 func Price() *Pairs {
@@ -122,6 +124,7 @@ func (l *Listener) GetData() (*Pairs, error) {
 		BNB:   bnb,
 		ETH:   eth,
 		MATIC: matic,
+		CORE:  0.55,
 	}, nil
 }
 

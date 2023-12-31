@@ -1,4 +1,4 @@
-import {Network} from "@/generated/flow";
+import {Network, Task, Token} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import Dmail from "@/components/tasks/OTHER/Dmail/Block.vue";
@@ -16,6 +16,11 @@ export const ZkSyncBridgeToETHSpec: TaskSpec = {
   descFn(task) {
     let p = task.zkSyncOfficialBridgeToEthereumTask
     return ` (from ${Network.ZKSYNCERA} to ${Network.Etherium} ETH)`
+  },
+  bridge: (task: Task) => {
+    return {
+      from: Token.ETH, to: Token.ETH, fromNetwork: Network.ZKSYNCERA, toNetwork: Network.Etherium
+    }
   },
   service: {
     name: 'zksync',

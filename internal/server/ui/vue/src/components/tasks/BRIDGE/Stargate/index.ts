@@ -1,4 +1,4 @@
-import {Network} from "@/generated/flow";
+import {Network, Task} from "@/generated/flow";
 import {ProfileType} from "@/generated/profile";
 import {Airdrop, TaskJob, TaskSpec} from "@/components/tasks/utils";
 import Menu from "@/components/tasks/BRIDGE/Stargate/Menu.vue";
@@ -10,8 +10,14 @@ export const StargateBridgeSpec: TaskSpec = {
   menu: Menu,
   component: Block,
   descFn(task) {
-    let p = task.stargateBridgeTask
+    let p = task.stargateBridge
     return ` (${p?.fromNetwork} ${p?.fromToken} to ${p?.toNetwork} ${p?.toToken})`
+  },
+  bridge: (task: Task) => {
+    const p = task.stargateBridge
+    return {
+      from: p?.fromToken, to: p?.toToken, fromNetwork: p?.fromNetwork, toNetwork: p?.toNetwork
+    }
   },
   service: {
     name: 'Stargate',
@@ -25,8 +31,8 @@ export const StargateBridgeSpec: TaskSpec = {
     Network.AVALANCHE,
     Network.OPTIMISM,
     Network.ARBITRUM,
-    Network.ZKSYNCERA]),
+  ]),
   job: TaskJob.Bridge,
-  airdrops: new Set<Airdrop>([Airdrop.LayerZero, Airdrop.ZkSync]),
+  airdrops: new Set<Airdrop>([Airdrop.LayerZero]),
   profileType: new Set([ProfileType.EVM])
 }

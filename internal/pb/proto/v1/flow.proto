@@ -606,6 +606,8 @@ message Task {
     task.DefaultSwap ekuboSwapTask = 51;
     task.DefaultLP nostraLPTask = 52;
     task.DefaultSwap wethSwapTask = 53;
+    task.DefaultBridge coreDaoBridge = 54;
+    task.DefaultBridge stargateBridge = 55;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

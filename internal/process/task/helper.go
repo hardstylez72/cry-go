@@ -3,12 +3,14 @@ package task
 import (
 	"context"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
+	"github.com/hardstylez72/cry/internal/lib"
+	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
-	"github.com/hardstylez72/cry/internal/process/halp"
 	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/pkg/errors"
 )
@@ -202,64 +204,6 @@ func NewStarkNetApproveTx(id string) *v1.TaskTx {
 	return txx
 }
 
-func BalanceSnapshotBefore(ctx context.Context, client defi.Networker, token v1.Token, profile *halp.Profile) ([]bozdo.TxDetail, error) {
-
-	result := make([]bozdo.TxDetail, 0)
-
-	if client.GetNetworkToken().String() != token.String() {
-		bToken, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-			WalletAddress: profile.Addr,
-			Token:         token,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, bozdo.NewTokenBalanceBefore(bToken.WEI, client.Network(), token))
-	}
-
-	bToken, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.Addr,
-		Token:         client.GetNetworkToken(),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	result = append(result, bozdo.NewNativeBalanceBefore(bToken.WEI, client.Network(), client.GetNetworkToken()))
-
-	return result, nil
-}
-
-func BalanceSnapshotAfter(ctx context.Context, client defi.Networker, token v1.Token, profile *halp.Profile) ([]bozdo.TxDetail, error) {
-
-	result := make([]bozdo.TxDetail, 0)
-
-	if client.GetNetworkToken().String() != token.String() {
-		bToken, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-			WalletAddress: profile.Addr,
-			Token:         token,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, bozdo.NewTokenBalanceAfter(bToken.WEI, client.Network(), token))
-	}
-
-	bToken, err := client.GetBalance(ctx, &defi.GetBalanceReq{
-		WalletAddress: profile.Addr,
-		Token:         client.GetNetworkToken(),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	result = append(result, bozdo.NewNativeBalanceAfter(bToken.WEI, client.Network(), client.GetNetworkToken()))
-
-	return result, nil
-}
-
 func NewTx(tx *bozdo.Transaction, gas *bozdo.Gas) *v1.TaskTx {
 
 	if tx == nil {
@@ -320,4 +264,105 @@ func getSlippageFromConst(taskType v1.TaskType) defi.SlippagePercent {
 		return defi.SlippagePercent05
 	}
 	return v
+}
+
+func GasManager(e *v1.EstimationTx, s *v1.NetworkSettings, n v1.Network, tt v1.TaskType) (*bozdo.Gas, error) {
+
+	if e.GasLimit == nil {
+		e.GasLimit = &v1.AmUni{}
+	}
+	limit, ok := big.NewInt(0).SetString(e.GasLimit.Wei, 10)
+	if !ok {
+		log.Log.Error("GasLimit: " + e.GasLimit.Wei)
+		limit = big.NewInt(0)
+	}
+
+	if e.GasPrice == nil {
+		e.GasPrice = &v1.AmUni{}
+	}
+	gasPrice, ok := big.NewInt(0).SetString(e.GasPrice.Wei, 10)
+	if !ok {
+		log.Log.Error("GasPrice: " + e.GasPrice.Wei)
+		gasPrice = big.NewInt(0)
+	}
+
+	if e.Gas == nil {
+		e.Gas = &v1.AmUni{}
+	}
+	totalGas, ok := big.NewInt(0).SetString(e.Gas.Wei, 10)
+	if !ok {
+		log.Log.Error("Gas total: " + e.Gas.Wei)
+		totalGas = big.NewInt(0)
+	}
+
+	beforeMultiplier := big.NewInt(totalGas.Int64())
+
+	maxGas := big.NewInt(0)
+	tmp, ok := big.NewInt(0).SetString(s.GetMaxGas(), 10)
+	if ok {
+		maxGas = tmp
+	}
+
+	gas := &bozdo.Gas{
+		Network:             n,
+		MaxGas:              *maxGas,
+		GasBeforeMultiplier: *beforeMultiplier,
+		GasLimit:            *limit,
+		GasPrice:            *gasPrice,
+		TotalGas:            *totalGas,
+	}
+
+	if tt != v1.TaskType_Dmail {
+		gas = GasMultiplier(&s.GasMultiplier, gas)
+	}
+
+	if maxGas.Cmp(&gas.TotalGas) <= -1 {
+		max := defi.AmountUni(maxGas, n)
+		estimated := defi.AmountUni(&gas.TotalGas, n)
+		return nil, ErrGasIsOverMax(max.Usd, estimated.Usd)
+	}
+
+	if err := validateSwapRateRatio(e, s, tt); err != nil {
+		return nil, err
+	}
+
+	return gas, nil
+}
+
+func validateSwapRateRatio(e *v1.EstimationTx, s *v1.NetworkSettings, tt v1.TaskType) error {
+	var limit float64 = 0
+	for _, d := range e.Details {
+		if d.Key == bozdo.TxDetailEaxchnageRateRatio {
+			value := strings.ReplaceAll(d.Value, " %", "")
+			f, err := lib.StringToFloat(value)
+			if err != nil {
+				return nil
+			}
+			limit = f
+		}
+	}
+
+	if limit == 0 {
+		return nil
+	}
+
+	v, exist := s.TaskSettings[tt.String()]
+	if !exist {
+		return nil
+	}
+
+	if v.GetSwapRateRatio() == "" {
+		return nil
+	}
+
+	max, err := lib.StringToFloat(v.GetSwapRateRatio())
+	if err != nil {
+		return nil
+	}
+
+	if limit < max {
+		return nil
+	}
+
+	return ErrSwapRateBiggerThenAllowed(limit, max)
 }

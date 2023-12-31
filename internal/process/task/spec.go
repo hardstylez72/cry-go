@@ -571,17 +571,17 @@ var SpecMap = map[v1.TaskType]Spec{
 	},
 	v1.TaskType_StargateBridge: {
 		Payable: true,
-		Tasker:  &Wrap{Tasker: &StargateTask{}},
+		Tasker:  &Wrap{Tasker: NewStargateBridgeTask()},
 		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
-			p := a.Task.Task.(*v1.Task_StargateBridgeTask).StargateBridgeTask
-			return EstimateStargateBridgeSwapCost(ctx, p, a.Profile)
+			p := a.Task.Task.(*v1.Task_StargateBridge).StargateBridge
+			return NewStargateBridgeTask().EstimateCost(ctx, a.Profile, p, nil)
 		},
 		Desc: func(m *v1.Task) ([]byte, error) {
-			t, ok := m.Task.(*v1.Task_StargateBridgeTask)
+			t, ok := m.Task.(*v1.Task_StargateBridge)
 			if !ok {
-				return nil, errors.New("m.Task.(*v1.Task_StargateBridgeTask)")
+				return nil, errors.New("m.Task.(*v1.Task_StargateBridge)")
 			}
-			return Marshal(t.StargateBridgeTask)
+			return Marshal(t.StargateBridge)
 		},
 	},
 	v1.TaskType_AcrossBridge: {
@@ -618,6 +618,22 @@ var SpecMap = map[v1.TaskType]Spec{
 			return Marshal(t.StarkNetBridgeTask)
 		},
 	},
+	v1.TaskType_CoreDaoBridge: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewCoreDaoBridgeTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_CoreDaoBridge).CoreDaoBridge
+			return NewCoreDaoBridgeTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_CoreDaoBridge)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_CoreDaoBridge)")
+			}
+			return Marshal(t.CoreDaoBridge)
+		},
+	},
+
 	// SWAPS
 	v1.TaskType_TestNetBridgeSwap: {
 		Payable:  true,

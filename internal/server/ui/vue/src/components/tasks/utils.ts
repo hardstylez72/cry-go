@@ -38,6 +38,7 @@ export interface TaskSpec {
   descFn: DescFn
 
   swap?: (task: Task) => { from: Token, to: Token, network: Network }
+  bridge?: (task: Task) => { from: Token, to: Token, fromNetwork: Network, toNetwork: Network }
   nft?: (task: Task) => { network: Network, toNetwork?: Network }
   simple?: (task: Task) => { network: Network }
   service: Service

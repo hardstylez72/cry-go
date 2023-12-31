@@ -229,6 +229,18 @@ func NewSwapRateRatio(exchange, pool float64) TxDetail {
 func CastUSD(wei *big.Int, network v1.Network, token v1.Token) string {
 	var gasTokenPrice float64
 
+	if network == v1.Network_BinanaceBNB {
+		gasTokenPrice = pub.Price().BNB
+		amUsd := EthToUsd(WEIToEther(wei), gasTokenPrice)
+		return amUsd.String()
+	}
+
+	if network == v1.Network_Core {
+		gasTokenPrice = pub.Price().CORE
+		amUsd := EthToUsd(WEIToEther(wei), gasTokenPrice)
+		return amUsd.String()
+	}
+
 	switch token {
 	case v1.Token_USDC, v1.Token_USDT, v1.Token_USDCBridged:
 		gasTokenPrice = 1

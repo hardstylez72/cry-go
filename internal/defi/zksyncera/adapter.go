@@ -330,11 +330,6 @@ func (c *Client) TransferMainToken(ctx context.Context, r *defi.TransferReq) (_ 
 	return res, nil
 }
 
-func (c *Client) StargateBridgeSwap(ctx context.Context, req *defi.DefaultBridgeReq) (_ *bozdo.DefaultRes, err error) {
-	defer func() { err = errWrap(err) }()
-	return c.StargateBridge(ctx, req)
-}
-
 func (c *Client) Network() v1.Network {
 	return c.Cfg.Network
 }

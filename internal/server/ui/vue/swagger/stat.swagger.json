@@ -197,7 +197,8 @@
         "IZI",
         "USDCBridged",
         "BUSD",
-        "USDp"
+        "USDp",
+        "CORE"
       ],
       "default": "USDT"
     },

@@ -43,6 +43,8 @@ func AmountUni(wei *big.Int, network v1.Network) *v1.AmUni {
 		gasTokenPrice = pub.Price().BNB
 	case v1.Network_AVALANCHE:
 		gasTokenPrice = pub.Price().AVAX
+	case v1.Network_Core:
+		gasTokenPrice = pub.Price().CORE
 	}
 
 	amEth := WEIToEther(wei)

@@ -1,6 +1,6 @@
 <template>
   <span class="d-inline-flex">
-      <v-img :src="p.img" height="22px" width="20px" class="mx-1"/>
+      <v-img v-if="!noLabel" :src="p.img" height="22px" width="20px" class="mx-1"/>
   {{ p.name }}
   </span>
 
@@ -20,6 +20,11 @@ export default defineComponent({
     }
   },
   props: {
+    noLabel: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     network: {
       type: String as PropType<Network>,
       required: true,

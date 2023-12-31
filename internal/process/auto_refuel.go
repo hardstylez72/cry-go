@@ -112,6 +112,8 @@ func CastTokenToOkex(t v1.Token) string {
 		return "BNB"
 	case v1.Token_MATIC:
 		return "MATIC"
+	case v1.Token_CORE:
+		return "CORE"
 	default:
 		return ""
 	}
@@ -139,6 +141,8 @@ func CastNetworkToOkex(t v1.Network) string {
 		return "AVAX-Avalanche C-Chain"
 	case v1.Network_Etherium:
 		return "ETH-ERC20"
+	case v1.Network_Core:
+		return "CORE-CORE"
 	default:
 		return ""
 	}

@@ -171,3 +171,128 @@ func TxGas(tx *types.Transaction) string {
 		tx.Gas(), Gwei(tx.GasPrice()).String(), Gwei(tx.GasFeeCap()).String(), Gwei(tx.GasTipCap()).String())
 	return s
 }
+
+func NeLondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *bozdo.TxData) (*bozdo.DefaultRes, error) {
+	wt, err := NewWalletTransactor(opt.Pk)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce, err := c.Cli.NonceAt(ctx, wt.WalletAddr, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	legacyTx := types.LegacyTx{
+		Nonce: nonce,
+		To:    &data.ContractAddr,
+		Value: data.Value,
+		Data:  data.Data,
+	}
+
+	l1Fee, err := c.Cfg.EstimateL1Gas(ctx, data.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	if opt.Debug {
+		log.Log.Debug("l1Fee "+opt.TaskType.String(), zap.String("l1Fee", WEIToEther(l1Fee).String()+" ETH"))
+	}
+
+	legacyTx.Value = data.Value
+
+	if opt.NoSend || !opt.Gas.RuleSet() {
+
+		gp, err := c.Cli.SuggestGasPrice(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		legacyTx.GasPrice = gp
+
+		gas, err := c.Cli.EstimateGas(ctx, TxToCallMsg(wt.WalletAddr, types.NewTx(&legacyTx)))
+		if err != nil {
+			return nil, err
+		}
+		legacyTx.Gas = gas
+
+		if opt.Debug {
+			log.Log.Debug(fmt.Sprintf("estimate: gas:%d feeCap:%s tipCap:%s",
+				gas, legacyTx.Gas, legacyTx.GasPrice.String()))
+		}
+	}
+
+	if opt.Gas.RuleSet() {
+		legacyTx.Gas = opt.Gas.GasLimit.Uint64()
+		legacyTx.GasPrice = &opt.Gas.GasPrice
+	}
+
+	r := &bozdo.DefaultRes{
+		ECost: Estimate(types.NewTx(&legacyTx), bozdo.BigIntSum(l1Fee, data.ExtraFee), "", nil),
+	}
+
+	r.ECost.Details = data.Details
+	if l1Fee != nil && l1Fee.Cmp(big.NewInt(0)) != 0 {
+		r.ECost.Details = append(r.ECost.Details, bozdo.NewProtocolFeeDetails(l1Fee, c.Network(), c.Cfg.MainToken))
+	}
+
+	if data.Rate != nil && opt.ExchangeRate != nil {
+		r.ECost.Details = append(r.ECost.Details, bozdo.NewSwapRateRatio(*opt.ExchangeRate, *data.Rate))
+	}
+
+	if !opt.NoSend {
+
+		if opt.Debug {
+			log.Log.Debug(fmt.Sprintf("execute: gas:%d gasPrice::%s",
+				legacyTx.Gas, legacyTx.GasPrice.String()))
+		}
+
+		signer := types.NewCancunSigner(c.Cfg.NetworkId)
+
+		tx, err := types.SignNewTx(wt.PrivateKey, signer, &legacyTx)
+		if err != nil {
+			return nil, err
+		}
+
+		addr, err := signer.Sender(tx)
+		if err != nil {
+			return nil, err
+		}
+
+		println(addr.String())
+		if err := c.Cli.SendTransaction(ctx, tx); err != nil {
+			return nil, err
+		}
+
+		r.Tx = c.NewTx(tx.Hash(), data.Code, r.ECost.Details)
+	}
+
+	return r, nil
+}
+
+func Estimate(tx *types.Transaction, extraFee *big.Int, name string, details []bozdo.TxDetail) *bozdo.EstimatedGasCost {
+	gasLimit := new(big.Int).SetUint64(tx.Gas())
+
+	if tx.Type() == types.DynamicFeeTxType {
+		fee := bozdo.BigIntSum(tx.GasFeeCap())
+
+		return &bozdo.EstimatedGasCost{
+			Name:        "bridge",
+			GasLimit:    gasLimit,
+			GasPrice:    fee,
+			TotalGasWei: new(big.Int).Mul(bozdo.BigIntSum(fee), gasLimit),
+			Details:     details,
+			ExtraFee:    extraFee,
+		}
+	}
+
+	return &bozdo.EstimatedGasCost{
+		Type:        bozdo.TxTypeLegacy,
+		Name:        name,
+		GasLimit:    gasLimit,
+		GasPrice:    tx.GasPrice(),
+		TotalGasWei: new(big.Int).Mul(gasLimit, tx.GasPrice()),
+		Details:     details,
+		ExtraFee:    extraFee,
+	}
+}

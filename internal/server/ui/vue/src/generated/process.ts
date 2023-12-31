@@ -1375,6 +1375,12 @@ export interface Task {
 
   /**  */
   wethSwapTask?: DefaultSwap;
+
+  /**  */
+  coreDaoBridge?: DefaultBridge;
+
+  /**  */
+  stargateBridge?: DefaultBridge;
 }
 
 export interface TaskTx {
@@ -1579,7 +1585,8 @@ export enum Network {
   'Base' = 'Base',
   'opBNB' = 'opBNB',
   'Linea' = 'Linea',
-  'Zora' = 'Zora'
+  'Zora' = 'Zora',
+  'Core' = 'Core'
 }
 
 export enum ProcessStatus {
@@ -1645,7 +1652,8 @@ export enum TaskType {
   'MintZerius' = 'MintZerius',
   'KyberSwap' = 'KyberSwap',
   'EkuboSwap' = 'EkuboSwap',
-  'NostraLP' = 'NostraLP'
+  'NostraLP' = 'NostraLP',
+  'CoreDaoBridge' = 'CoreDaoBridge'
 }
 
 export enum Token {
@@ -1667,5 +1675,6 @@ export enum Token {
   'IZI' = 'IZI',
   'USDCBridged' = 'USDCBridged',
   'BUSD' = 'BUSD',
-  'USDp' = 'USDp'
+  'USDp' = 'USDp',
+  'CORE' = 'CORE'
 }

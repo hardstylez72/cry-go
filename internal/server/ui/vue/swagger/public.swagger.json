@@ -200,7 +200,8 @@
         "MintZerius",
         "KyberSwap",
         "EkuboSwap",
-        "NostraLP"
+        "NostraLP",
+        "CoreDaoBridge"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

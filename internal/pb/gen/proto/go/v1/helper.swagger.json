@@ -685,7 +685,8 @@
         "Base",
         "opBNB",
         "Linea",
-        "Zora"
+        "Zora",
+        "Core"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -860,7 +861,8 @@
         "MintZerius",
         "KyberSwap",
         "EkuboSwap",
-        "NostraLP"
+        "NostraLP",
+        "CoreDaoBridge"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

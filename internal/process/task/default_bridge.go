@@ -22,6 +22,26 @@ func NewAcrossBridgeTask() *DefaultBridge {
 	})
 }
 
+func NewCoreDaoBridgeTask() *DefaultBridge {
+	return NewDefaultBridgeTask(v1.TaskType_CoreDaoBridge, func(a *Input) (*v1.DefaultBridge, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_CoreDaoBridge)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_CoreDaoBridge) call an ambulance!")
+		}
+		return l.CoreDaoBridge, nil
+	})
+}
+
+func NewStargateBridgeTask() *DefaultBridge {
+	return NewDefaultBridgeTask(v1.TaskType_StargateBridge, func(a *Input) (*v1.DefaultBridge, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_StargateBridge)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_StargateBridge) call an ambulance!")
+		}
+		return l.StargateBridge, nil
+	})
+}
+
 func NewDefaultBridgeTask(taskType v1.TaskType, extractor func(a *Input) (*v1.DefaultBridge, error)) *DefaultBridge {
 	return &DefaultBridge{
 		taskType:  taskType,

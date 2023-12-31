@@ -254,5 +254,6 @@ export enum Network {
   'Base' = 'Base',
   'opBNB' = 'opBNB',
   'Linea' = 'Linea',
-  'Zora' = 'Zora'
+  'Zora' = 'Zora',
+  'Core' = 'Core'
 }

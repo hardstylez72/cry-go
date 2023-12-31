@@ -10,6 +10,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/avalanche"
 	"github.com/hardstylez72/cry/internal/defi/base"
 	"github.com/hardstylez72/cry/internal/defi/bnb"
+	"github.com/hardstylez72/cry/internal/defi/core"
 	"github.com/hardstylez72/cry/internal/defi/etherium"
 	"github.com/hardstylez72/cry/internal/defi/linea"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
@@ -54,6 +55,7 @@ var Networks = []v1.Network{
 	v1.Network_Base,
 	v1.Network_Linea,
 	v1.Network_Zora,
+	v1.Network_Core,
 }
 
 func NewService(rep repository.SettingsRepository) *Service {
@@ -132,6 +134,7 @@ func resolveSettings(in *v1.NetworkSettings, network v1.Network, force bool) (*v
 	poligonMax := "40000000000000000000"
 	avalancheMax := "1000000000000000000"
 	bnbGas := "100000000000000000"
+	coreGas := "10000000000000000000"
 
 	switch network {
 	case v1.Network_POLIGON:
@@ -170,6 +173,9 @@ func resolveSettings(in *v1.NetworkSettings, network v1.Network, force bool) (*v
 	case v1.Network_Zora:
 		s.RPC = zora.MainNetURL
 		s.GasMax = eth
+	case v1.Network_Core:
+		s.RPC = core.MainNetURL
+		s.GasMax = coreGas
 	}
 
 	return resolveNetworkSettings(in, s, force)
