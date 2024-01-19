@@ -349,13 +349,11 @@ func StarkNetApprove(ctx context.Context, token v1.Token, client *starknet.Clien
 
 	spender := ""
 	switch taskType {
-	case v1.TaskType_Dmail:
-		spender = "0x0454f0bd015e730e5adbb4f080b075fdbf55654ff41ee336203aa2e1ac4d4309"
 	case v1.TaskType_StarkNetIdMint:
 		spender = "0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af"
 	case v1.TaskType_EkuboSwap, v1.TaskType_NostraLP, v1.TaskType_Swap10k,
 		v1.TaskType_FibrousSwap, v1.TaskType_JediSwap, v1.TaskType_MySwap,
-		v1.TaskType_ProtossSwap, v1.TaskType_SithSwap, v1.TaskType_AvnuSwap, v1.TaskType_ZkLendLP:
+		v1.TaskType_ProtossSwap, v1.TaskType_SithSwap, v1.TaskType_AvnuSwap, v1.TaskType_ZkLendLP, v1.TaskType_Dmail:
 		tmp := "-"
 		return &tmp, nil
 	default:

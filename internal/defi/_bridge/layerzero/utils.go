@@ -1,6 +1,8 @@
 package layerzero
 
 import (
+	"encoding/hex"
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -33,6 +35,7 @@ var LayerZeroChainMap = map[v1.Network]uint16{
 	v1.Network_Base:         184,
 	v1.Network_opBNB:        202,
 	v1.Network_Core:         153,
+	v1.Network_Conflux:      212,
 
 	//SBNameMetis:         151,
 }
@@ -78,4 +81,23 @@ type GetStargateBridgeFeeReq struct {
 type GetStargateBridgeFeeRes struct {
 	Fee1 *big.Int
 	Fee2 *big.Int
+}
+
+type AdapterParamsV2 struct {
+	Version      uint16
+	GasAmount    *big.Int
+	NativeForDst *big.Int
+	AddressOnDst common.Address
+}
+
+func MakeLayerZeroAdapterParamsV2(p AdapterParamsV2) ([]byte, error) {
+
+	vesion := fmt.Sprintf("%0.4X", p.Version)
+	gasAmount := fmt.Sprintf("%0.64X", p.GasAmount)
+	NativeForDst := fmt.Sprintf("%0.64X", p.NativeForDst)
+	addr := p.AddressOnDst.String()[2:]
+
+	out := vesion + gasAmount + NativeForDst + addr
+
+	return hex.DecodeString(out)
 }

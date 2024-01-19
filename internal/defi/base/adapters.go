@@ -6,11 +6,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
-	"github.com/hardstylez72/cry/internal/defi/aave"
-	"github.com/hardstylez72/cry/internal/defi/across"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/across"
+	"github.com/hardstylez72/cry/internal/defi/_lp/aave"
+	"github.com/hardstylez72/cry/internal/defi/_nft/mintfun"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/generic"
-	"github.com/hardstylez72/cry/internal/defi/nft/mintfun"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )

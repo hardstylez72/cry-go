@@ -4,18 +4,18 @@
       <v-row>
         <v-col cols="6">
           <NetworkSelector
-            label="from network"
-            :items="getFromNetworks"
-            :disabled="disabled"
-            v-model="item.fromNetwork"
+              label="from network"
+              :items="getFromNetworks"
+              :disabled="disabled"
+              v-model="item.fromNetwork"
           />
         </v-col>
         <v-col cols="6">
           <NetworkSelector
-            label="to network"
-            :items="getToNetworks"
-            :disabled="disabled"
-            v-model="item.toNetwork"
+              label="to network"
+              :items="getToNetworks"
+              :disabled="disabled"
+              v-model="item.toNetwork"
           />
         </v-col>
       </v-row>
@@ -161,7 +161,6 @@ export default defineComponent({
           Network.AVALANCHE,
           Network.ARBITRUM,
           Network.ArbitrumNova,
-          Network.Base,
           Network.Canto,
           Network.Fantom,
           Network.Meter,

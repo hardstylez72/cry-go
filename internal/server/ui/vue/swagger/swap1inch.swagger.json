@@ -243,7 +243,8 @@
         "opBNB",
         "Linea",
         "Zora",
-        "Core"
+        "Core",
+        "Conflux"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"

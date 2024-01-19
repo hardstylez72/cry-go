@@ -2,14 +2,12 @@ package v1
 
 import (
 	"context"
-	"time"
 
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
 	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/server/repository/pg"
 	"github.com/hardstylez72/cry/internal/server/user"
-	"github.com/hardstylez72/cry/internal/settings"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -19,15 +17,6 @@ func (s *HelperService) GetUser(ctx context.Context, _ *v1.GetUserRequest) (*v1.
 	userId, err := user.ResolveUserId(ctx)
 	if err != nil {
 		return nil, status.New(codes.Unauthenticated, "").Err()
-	}
-
-	settingsLastUpdateDate, err := time.Parse(time.DateTime, settings.LastSettingsUpdateTime)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := s.settingsService.ResolveAllSettings(ctx, userId, settingsLastUpdateDate); err != nil {
-		return nil, err
 	}
 
 	u, err := s.userRepository.GetUserById(ctx, userId)

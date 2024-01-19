@@ -68,33 +68,7 @@ func (t *DmailTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, error) 
 	if err != nil {
 		return nil, err
 	}
-
-	if p.GetApproveTx().GetTxId() == "" && p.Network == v1.Network_StarkNet {
-		client, err := NewStarkNetClient(profile)
-		if err != nil {
-			return nil, err
-		}
-
-		txId, err := StarkNetApprove(taskContext, v1.Token_ETH, client, profile, t.Type())
-		if err != nil {
-			return nil, err
-		}
-
-		if txId != nil {
-			p.ApproveTx = NewStarkNetApproveTx(*txId)
-			if err := a.AddTx2(ctx, p.ApproveTx); err != nil {
-				return nil, err
-			}
-			if err := a.UpdateTask(ctx, task); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	if err := WaitTxComplete(taskContext, p.ApproveTx, task, client, a); err != nil {
-		return nil, err
-	}
-
+	
 	if p.GetTx().GetTxId() == "" {
 
 		estimation, err := EstimateDmailSwapCost(taskContext, p, profile)
@@ -171,24 +145,6 @@ func EstimateDmailSwapCost(ctx context.Context, p *v1.SimpleTask, profile *halp.
 	s, err := profile.GetNetworkSettings(ctx, p.Network)
 	if err != nil {
 		return nil, err
-	}
-
-	if p.Network == v1.Network_StarkNet {
-		client, err := NewStarkNetClient(profile)
-		if err != nil {
-			return nil, err
-		}
-
-		approve, err := StarkNetApprove(ctx, v1.Token_ETH, client, profile, v1.TaskType_Dmail)
-		if err != nil {
-			return nil, err
-		}
-
-		if approve != nil {
-			if err := client.WaitTxComplete(ctx, *approve); err != nil {
-				return nil, err
-			}
-		}
 	}
 
 	client, err := uniclient.NewDmailClient(p.Network, s.BaseConfig())

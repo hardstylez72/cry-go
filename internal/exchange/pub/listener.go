@@ -21,6 +21,7 @@ var p = Pairs{
 	ETH:   1900,
 	MATIC: 0.7,
 	CORE:  0.55,
+	CFX:   0.2,
 }
 
 type Pairs struct {
@@ -29,6 +30,7 @@ type Pairs struct {
 	ETH   float64
 	MATIC float64
 	CORE  float64
+	CFX   float64
 }
 
 func Price() *Pairs {
@@ -90,6 +92,11 @@ func (l *Listener) GetData() (*Pairs, error) {
 		return nil, err
 	}
 
+	cfx, err := l.cli.GetPairRate(ctx, "CFXUSDT")
+	if err != nil {
+		return nil, err
+	}
+
 	wg := sync.WaitGroup{}
 	wg.Add(3)
 
@@ -125,6 +132,7 @@ func (l *Listener) GetData() (*Pairs, error) {
 		ETH:   eth,
 		MATIC: matic,
 		CORE:  0.55,
+		CFX:   cfx,
 	}, nil
 }
 

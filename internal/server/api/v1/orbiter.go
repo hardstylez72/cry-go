@@ -3,7 +3,7 @@ package v1
 import (
 	"context"
 
-	"github.com/hardstylez72/cry/internal/defi/orbiter"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/orbiter"
 	"github.com/hardstylez72/cry/internal/lib"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 )

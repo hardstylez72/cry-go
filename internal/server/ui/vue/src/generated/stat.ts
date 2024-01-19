@@ -224,5 +224,6 @@ export enum Token {
   'USDCBridged' = 'USDCBridged',
   'BUSD' = 'BUSD',
   'USDp' = 'USDp',
-  'CORE' = 'CORE'
+  'CORE' = 'CORE',
+  'CFX' = 'CFX'
 }

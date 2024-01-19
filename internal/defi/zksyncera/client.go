@@ -27,6 +27,7 @@ var ZEROADDR = common.HexToAddress("0x0000000000000000000000000000000000000000")
 type SyncSwap struct {
 	RouterSwap         common.Address
 	ClassicPoolFactory common.Address
+	StablePoolFactory  common.Address
 }
 
 type Muteio struct {
@@ -127,6 +128,7 @@ func NewClient(c *ClientConfig) (*Client, error) {
 	syncSwap := SyncSwap{
 		RouterSwap:         SpecMap["syncSwapRouter"].Addr,      // mainnet
 		ClassicPoolFactory: SpecMap["syncSwapPoolFactory"].Addr, // mainnet
+		StablePoolFactory:  common.HexToAddress("0x5b9f21d407F35b10CbfDDca17D5D84b129356ea3"),
 	}
 
 	muteio := Muteio{

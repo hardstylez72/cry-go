@@ -3,10 +3,11 @@ package task
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"time"
 
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
-	"github.com/hardstylez72/cry/internal/defi/orbiter"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/orbiter"
 	"github.com/hardstylez72/cry/internal/pay"
 	"github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/process/halp"
@@ -323,6 +324,22 @@ var SpecMap = map[v1.TaskType]Spec{
 			return Marshal(t.NostraLPTask)
 		},
 	},
+	v1.TaskType_StakeSTG: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewStakeSTGTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_StakeSTG).StakeSTG
+			return NewStakeSTGTask().EstimateLPCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_StakeSTG)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_StakeSTG)")
+			}
+			return Marshal(t.StakeSTG)
+		},
+	},
+
 	// NFT
 	v1.TaskType_MintFun: {
 		Payable: true,
@@ -496,11 +513,98 @@ var SpecMap = map[v1.TaskType]Spec{
 		},
 		CastR: func(in RandomTask) (*v1.Task, error) {
 			from := CastDefaultSimple(in.P).Network
+
+			var tos []v1.Network
+			switch from {
+			case v1.Network_ZKSYNCERA:
+				tos = []v1.Network{
+					v1.Network_OPTIMISM,
+					v1.Network_ARBITRUM,
+					v1.Network_AVALANCHE,
+					v1.Network_POLIGON,
+					v1.Network_BinanaceBNB,
+					v1.Network_ArbitrumNova,
+					v1.Network_Base,
+					v1.Network_Canto,
+					v1.Network_Fantom,
+					v1.Network_Meter,
+					v1.Network_opBNB,
+					v1.Network_PolygonZKEVM,
+					v1.Network_Tenet,
+				}
+			case v1.Network_BinanaceBNB:
+				tos = []v1.Network{
+					v1.Network_ZKSYNCERA,
+					v1.Network_OPTIMISM,
+					v1.Network_ARBITRUM,
+					v1.Network_AVALANCHE,
+					v1.Network_POLIGON,
+					v1.Network_ArbitrumNova,
+					v1.Network_Base,
+					v1.Network_Canto,
+					v1.Network_Fantom,
+					v1.Network_Meter,
+					v1.Network_opBNB,
+					v1.Network_PolygonZKEVM,
+					v1.Network_Tenet,
+				}
+			case v1.Network_ARBITRUM:
+				tos = []v1.Network{
+					v1.Network_BinanaceBNB,
+					v1.Network_ZKSYNCERA,
+					v1.Network_OPTIMISM,
+					v1.Network_AVALANCHE,
+					v1.Network_POLIGON,
+					v1.Network_ArbitrumNova,
+					v1.Network_Base,
+					v1.Network_Canto,
+					v1.Network_Fantom,
+					v1.Network_Meter,
+					v1.Network_opBNB,
+					v1.Network_PolygonZKEVM,
+					v1.Network_Tenet,
+				}
+			case v1.Network_POLIGON:
+				tos = []v1.Network{
+					v1.Network_BinanaceBNB,
+					v1.Network_ZKSYNCERA,
+					v1.Network_OPTIMISM,
+					v1.Network_AVALANCHE,
+					v1.Network_ARBITRUM,
+					v1.Network_ArbitrumNova,
+					v1.Network_Base,
+					v1.Network_Canto,
+					v1.Network_Fantom,
+					v1.Network_Meter,
+					v1.Network_opBNB,
+					v1.Network_PolygonZKEVM,
+					v1.Network_Tenet,
+				}
+			case v1.Network_Base:
+				tos = []v1.Network{
+					v1.Network_BinanaceBNB,
+					v1.Network_ZKSYNCERA,
+					v1.Network_OPTIMISM,
+					v1.Network_AVALANCHE,
+					v1.Network_ARBITRUM,
+					v1.Network_ArbitrumNova,
+					v1.Network_Base,
+					v1.Network_Canto,
+					v1.Network_Fantom,
+					v1.Network_Meter,
+					v1.Network_opBNB,
+					v1.Network_PolygonZKEVM,
+					v1.Network_Tenet,
+				}
+			}
+
+			to := tos[rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(tos))]
+
 			return &v1.Task{
 				TaskType: in.Type,
 				Task: &v1.Task_MerklyMintAndBridgeNFTTask{MerklyMintAndBridgeNFTTask: &v1.MerklyMintAndBridgeNFTTask{
 					FromNetwork: from,
-					ToNetwork:   v1.Network_POLIGON, //todo: fix
+					ToNetwork:   to,
 				}},
 			}, nil
 		},
@@ -631,6 +735,21 @@ var SpecMap = map[v1.TaskType]Spec{
 				return nil, errors.New("m.Task.(*v1.Task_CoreDaoBridge)")
 			}
 			return Marshal(t.CoreDaoBridge)
+		},
+	},
+	v1.TaskType_MerklyRefuel: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewMerklyRefuelBridgeTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_MerklyRefuel).MerklyRefuel
+			return NewMerklyRefuelBridgeTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_MerklyRefuel)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_MerklyRefuel)")
+			}
+			return Marshal(t.MerklyRefuel)
 		},
 	},
 
@@ -1674,12 +1793,12 @@ func UpdateTask(ctx context.Context, after *v1.ProcessTask, d repository.Process
 
 func (w *Wrap) Run(ctx context.Context, a *Input) (task *v1.ProcessTask, err error) {
 
-	defer func() {
-		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("task panic: %+v", r))
-			task = nil
-		}
-	}()
+	//defer func() {
+	//	if r := recover(); r != nil {
+	//		err = errors.New(fmt.Sprintf("task panic: %+v", r))
+	//		task = nil
+	//	}
+	//}()
 
 	if IsPayableTask(a.Task.Task.TaskType) {
 		funds, err := a.PayService.FundsServiceClient.GetFunds(ctx, &paycli.GetFundsReq{

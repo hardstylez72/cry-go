@@ -1337,7 +1337,8 @@
         "opBNB",
         "Linea",
         "Zora",
-        "Core"
+        "Core",
+        "Conflux"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -2073,6 +2074,12 @@
         },
         "stargateBridge": {
           "$ref": "#/definitions/DefaultBridge"
+        },
+        "stakeSTG": {
+          "$ref": "#/definitions/DefaultLP"
+        },
+        "merklyRefuel": {
+          "$ref": "#/definitions/DefaultBridge"
         }
       },
       "required": [
@@ -2197,7 +2204,9 @@
         "KyberSwap",
         "EkuboSwap",
         "NostraLP",
-        "CoreDaoBridge"
+        "CoreDaoBridge",
+        "StakeSTG",
+        "MerklyRefuel"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -2249,7 +2258,8 @@
         "USDCBridged",
         "BUSD",
         "USDp",
-        "CORE"
+        "CORE",
+        "CFX"
       ],
       "default": "USDT"
     },

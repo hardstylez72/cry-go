@@ -255,5 +255,6 @@ export enum Network {
   'opBNB' = 'opBNB',
   'Linea' = 'Linea',
   'Zora' = 'Zora',
-  'Core' = 'Core'
+  'Core' = 'Core',
+  'Conflux' = 'Conflux'
 }

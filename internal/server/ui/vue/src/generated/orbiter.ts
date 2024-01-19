@@ -286,7 +286,8 @@ export enum Network {
   'opBNB' = 'opBNB',
   'Linea' = 'Linea',
   'Zora' = 'Zora',
-  'Core' = 'Core'
+  'Core' = 'Core',
+  'Conflux' = 'Conflux'
 }
 
 export enum Token {
@@ -309,5 +310,6 @@ export enum Token {
   'USDCBridged' = 'USDCBridged',
   'BUSD' = 'BUSD',
   'USDp' = 'USDp',
-  'CORE' = 'CORE'
+  'CORE' = 'CORE',
+  'CFX' = 'CFX'
 }

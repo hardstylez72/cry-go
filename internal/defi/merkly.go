@@ -7,9 +7,9 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/layerzero"
+	"github.com/hardstylez72/cry/internal/defi/_nft/merkly"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
-	"github.com/hardstylez72/cry/internal/defi/nft/merkly"
 	"github.com/pkg/errors"
 )
 

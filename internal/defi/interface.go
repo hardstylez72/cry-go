@@ -45,28 +45,9 @@ type TestNetworkBridgeSwapper interface {
 	TestNetBridgeSwap(ctx context.Context, req *TestNetBridgeSwapReq) (*TestNetBridgeSwapRes, error)
 }
 
-type Swapper interface {
-	Networker
-	Swap(ctx context.Context, req *DefaultSwapReq, taskType v1.TaskType) (*bozdo.DefaultRes, error)
-}
-
 type OrbiterSwapper interface {
 	Transfer
 	OrbiterBridge(ctx context.Context, req *OrbiterBridgeReq) (*OrbiterBridgeRes, error)
-}
-
-type DefaultSwapReq struct {
-	Network      v1.Network
-	Amount       *big.Int
-	FromToken    v1.Token
-	ToToken      v1.Token
-	WalletPK     string
-	EstimateOnly bool
-	Gas          *bozdo.Gas
-	Slippage     SlippagePercent
-	Debug        bool
-	SubType      v1.ProfileSubType
-	ExchangeRate *float64
 }
 
 type TxCode = string
@@ -123,32 +104,6 @@ type SimpleReq struct {
 	PK      string
 	SubType v1.ProfileSubType
 	*bozdo.BaseReq
-}
-
-type LP interface {
-	LP(ctx context.Context, req *LPReq, taskType v1.TaskType) (*LPRes, error)
-	Networker
-}
-
-type LPReq struct {
-	Amount *big.Int
-	Tokens []v1.Token
-
-	PK  string
-	Add bool
-
-	EstimateOnly bool
-	Gas          *bozdo.Gas
-	Debug        bool
-
-	PSubType v1.ProfileSubType
-}
-
-type LPRes struct {
-	Tx        *bozdo.Transaction
-	Approves  []bozdo.Transaction
-	ECost     *bozdo.EstimatedGasCost
-	TxDetails []bozdo.TxDetail
 }
 
 func CalcRate(from, to v1.Token, amIn, amOut *big.Int) *float64 {

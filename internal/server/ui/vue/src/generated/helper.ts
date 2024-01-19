@@ -656,7 +656,8 @@ export enum Network {
   'opBNB' = 'opBNB',
   'Linea' = 'Linea',
   'Zora' = 'Zora',
-  'Core' = 'Core'
+  'Core' = 'Core',
+  'Conflux' = 'Conflux'
 }
 
 export enum ProfileSubType {
@@ -720,5 +721,7 @@ export enum TaskType {
   'KyberSwap' = 'KyberSwap',
   'EkuboSwap' = 'EkuboSwap',
   'NostraLP' = 'NostraLP',
-  'CoreDaoBridge' = 'CoreDaoBridge'
+  'CoreDaoBridge' = 'CoreDaoBridge',
+  'StakeSTG' = 'StakeSTG',
+  'MerklyRefuel' = 'MerklyRefuel'
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/hardstylez72/cry/internal/defi"
+	kyberswap "github.com/hardstylez72/cry/internal/defi/_swap/kyberSwap"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	kyberswap "github.com/hardstylez72/cry/internal/defi/kyberSwap"
 	"github.com/hardstylez72/cry/internal/socks5"
 )
 

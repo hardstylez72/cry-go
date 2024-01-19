@@ -26,7 +26,12 @@ type getSyncSwapFeeRes struct {
 }
 
 func (c *Client) getSyncSwapFee(ctx context.Context, req *getSyncSwapFeeReq) (*getSyncSwapFeeRes, error) {
-	cstorage, err := syncswappoolfactory.NewStorageCaller(c.Cfg.SyncSwap.ClassicPoolFactory, c.ClientL2)
+
+	poolFactory := c.Cfg.SyncSwap.ClassicPoolFactory
+	if defi.IsStablePool(req.ToToken, req.FromToken) {
+		poolFactory = c.Cfg.SyncSwap.StablePoolFactory
+	}
+	cstorage, err := syncswappoolfactory.NewStorageCaller(poolFactory, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}
@@ -117,6 +122,11 @@ type GetSyncSwapPoolReq struct {
 
 func (c *Client) GetSyncSwapPool(ctx context.Context, req *GetSyncSwapPoolReq) (*common.Address, error) {
 
+	poolFactory := c.Cfg.SyncSwap.ClassicPoolFactory
+	if defi.IsStablePool(req.B, req.A) {
+		poolFactory = c.Cfg.SyncSwap.StablePoolFactory
+	}
+
 	A, supported := c.Cfg.TokenMap[req.A]
 	if !supported {
 		return nil, defi.ErrTokenNotSupportedFn(req.A)
@@ -126,7 +136,7 @@ func (c *Client) GetSyncSwapPool(ctx context.Context, req *GetSyncSwapPoolReq) (
 		return nil, defi.ErrTokenNotSupportedFn(req.B)
 	}
 
-	cstorage, err := syncswappoolfactory.NewStorageCaller(c.Cfg.SyncSwap.ClassicPoolFactory, c.ClientL2)
+	cstorage, err := syncswappoolfactory.NewStorageCaller(poolFactory, c.ClientL2)
 	if err != nil {
 		return nil, err
 	}

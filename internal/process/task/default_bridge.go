@@ -12,6 +12,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewMerklyRefuelBridgeTask() *DefaultBridge {
+	return NewDefaultBridgeTask(v1.TaskType_MerklyRefuel, func(a *Input) (*v1.DefaultBridge, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_MerklyRefuel)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_MerklyRefuel) call an ambulance!")
+		}
+		return l.MerklyRefuel, nil
+	})
+}
+
 func NewAcrossBridgeTask() *DefaultBridge {
 	return NewDefaultBridgeTask(v1.TaskType_AcrossBridge, func(a *Input) (*v1.DefaultBridge, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_AcrossBridgeTask)
@@ -213,10 +223,10 @@ func (h *DefaultBridgeTaskHalper) Execute(ctx context.Context, profile *halp.Pro
 			Token:         client.GetNetworkToken(),
 		})
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "client.GetFundingBalance")
+			return nil, nil, errors.Wrap(err, "client.GetBalance")
 		}
 		if balanceNative.WEI.Cmp(&Gas.TotalGas) <= 0 {
-			return nil, nil, ErrProfileHasInsufficientBalance(p.FromNetwork, v1.Token_ETH, &Gas.TotalGas, balance.WEI)
+			return nil, nil, ErrProfileHasInsufficientBalance(p.FromNetwork, client.GetNetworkToken(), &Gas.TotalGas, balance.WEI)
 		}
 
 		if p.FromToken == client.GetNetworkToken() {

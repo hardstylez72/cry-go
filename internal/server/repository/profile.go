@@ -214,7 +214,7 @@ func listProfiles(ctx context.Context, conn *sqlx.DB, userId string, profileType
     and p.deleted_at is null 
 	and p."type" = $2
 	order by p.num asc
-	offset $3 limit 30`)
+	offset $3`)
 	out := make([]Profile, 0)
 	if err := conn.SelectContext(ctx, &out, q, userId, profileType, offset); err != nil {
 		return nil, err

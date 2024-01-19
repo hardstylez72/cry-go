@@ -132,6 +132,115 @@ func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *boz
 
 	return r, nil
 }
+func LondonReadyBoosty(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *bozdo.TxData) (*bozdo.DefaultRes, error) {
+	wt, err := NewWalletTransactor(opt.Pk)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce, err := c.Cli.NonceAt(ctx, wt.WalletAddr, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	dynamic := types.DynamicFeeTx{
+		ChainID: c.Cfg.NetworkId,
+		Nonce:   nonce,
+		To:      &data.ContractAddr,
+		Value:   data.Value,
+		Data:    data.Data,
+	}
+
+	gasTipCap, err := c.Cli.SuggestGasTipCap(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	gasTipCap = bozdo.BigIntSum(gasTipCap, gasTipCap)
+
+	l1Fee, err := c.Cfg.EstimateL1Gas(ctx, data.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	if opt.Debug {
+		log.Log.Debug("l1Fee "+opt.TaskType.String(), zap.String("l1Fee", WEIToEther(l1Fee).String()+" ETH"))
+	}
+
+	dynamic.Value = data.Value
+
+	if opt.NoSend || !opt.Gas.RuleSet() {
+
+		header, err := c.Cli.HeaderByNumber(ctx, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		dynamic.GasTipCap = gasTipCap
+
+		dynamic.GasFeeCap = bozdo.BigIntSum(header.BaseFee, header.BaseFee, dynamic.GasTipCap)
+
+		gas, err := c.Cli.EstimateGas(ctx, TxToCallMsg(wt.WalletAddr, types.NewTx(&dynamic)))
+		if err != nil {
+			return nil, err
+		}
+		dynamic.Gas = gas
+
+		if opt.Debug {
+			log.Log.Debug(fmt.Sprintf("estimate: gas:%d feeCap:%s tipCap:%s",
+				gas, dynamic.GasFeeCap.String(), dynamic.GasTipCap.String()))
+		}
+	}
+
+	if opt.Gas.RuleSet() {
+		dynamic.Gas = opt.Gas.GasLimit.Uint64()
+		dynamic.GasFeeCap = &opt.Gas.GasPrice
+		dynamic.GasTipCap = gasTipCap
+	}
+
+	r := &bozdo.DefaultRes{
+		ECost: Estimate(types.NewTx(&dynamic), bozdo.BigIntSum(l1Fee, data.ExtraFee), "", nil),
+	}
+
+	r.ECost.Details = data.Details
+	if l1Fee != nil && l1Fee.Cmp(big.NewInt(0)) != 0 {
+		r.ECost.Details = append(r.ECost.Details, bozdo.NewProtocolFeeDetails(l1Fee, c.Network(), c.Cfg.MainToken))
+	}
+
+	if data.Rate != nil && opt.ExchangeRate != nil {
+		r.ECost.Details = append(r.ECost.Details, bozdo.NewSwapRateRatio(*opt.ExchangeRate, *data.Rate))
+	}
+
+	if !opt.NoSend {
+
+		if opt.Debug {
+			log.Log.Debug(fmt.Sprintf("execute: gas:%d feeCap:%s tipCap:%s",
+				dynamic.Gas, dynamic.GasFeeCap.String(), dynamic.GasTipCap.String()))
+		}
+
+		tx := types.NewTx(&dynamic)
+
+		signer := types.NewLondonSigner(c.Cfg.NetworkId)
+
+		signature, err := crypto.Sign(signer.Hash(tx).Bytes(), wt.PrivateKey)
+		if err != nil {
+			return nil, err
+		}
+
+		tx, err = tx.WithSignature(signer, signature)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := c.Cli.SendTransaction(ctx, tx); err != nil {
+			return nil, err
+		}
+
+		r.Tx = c.NewTx(tx.Hash(), data.Code, r.ECost.Details)
+	}
+
+	return r, nil
+}
 
 func TxToCallMsg(from common.Address, tx *types.Transaction) ethereum.CallMsg {
 	return ethereum.CallMsg{

@@ -1,7 +1,8 @@
 <template>
   <v-chip size="auto" density="compact" :variant="textStyle ? 'text' : 'outlined'" rounded>
     <template v-slot:prepend>
-      <v-img height="22px" width="20px" class="mx-1" v-if="service.img" :src="service.img" position="left"/>
+      <v-img height="22px" width="20px" class="mx-1" v-if="service.img" :src="service.img" position="left"
+             :href="service.link"/>
     </template>
     <div class="px-1">{{ service.name }}</div>
   </v-chip>

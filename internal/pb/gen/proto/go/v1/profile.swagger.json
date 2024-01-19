@@ -912,7 +912,8 @@
         "opBNB",
         "Linea",
         "Zora",
-        "Core"
+        "Core",
+        "Conflux"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -1189,7 +1190,8 @@
         "USDCBridged",
         "BUSD",
         "USDp",
-        "CORE"
+        "CORE",
+        "CFX"
       ],
       "default": "USDT"
     },

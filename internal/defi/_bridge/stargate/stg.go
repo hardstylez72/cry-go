@@ -3,18 +3,21 @@ package stargate
 import (
 	"context"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/layerzero"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/stargate/abi/stg"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
-	"github.com/hardstylez72/cry/internal/defi/bridge/stargate/abi/routereth"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )
 
-func (c *Bridge) BridgeETH(ctx context.Context, req *defi.DefaultBridgeReq) (_ *bozdo.DefaultRes, _ error) {
-	details := []bozdo.TxDetail{}
+func (c *Bridge) BridgeSTG(ctx context.Context, req *defi.DefaultBridgeReq) (_ *bozdo.DefaultRes, _ error) {
 
-	ca := c.Cli.Cfg.Dict.Stargate.StargateRouterEthAddress
+	ca, ok := c.Cli.Cfg.TokenMap[v1.Token_STG]
+	if !ok {
+		return nil, errors.New("no stg address")
+	}
 
 	w, err := defi.NewWalletTransactor(req.PK)
 	if err != nil {
@@ -31,23 +34,17 @@ func (c *Bridge) BridgeETH(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 
 	destChainId := layerzero.LayerZeroChainMap[req.ToNetwork]
 
-	details = append(details, bozdo.NewLZFeeDetails(fee.Fee1, c.Cli.Cfg.Network, v1.Token_ETH))
-
-	amSlip, err := defi.Slippage(req.Amount, req.Slippage)
-	if err != nil {
-		return nil, err
-	}
-	abi, err := routereth.StorageMetaData.GetAbi()
+	abi, err := stg.StgMetaData.GetAbi()
 	if err != nil {
 		return nil, err
 	}
 
-	pack, err := abi.Pack("SwapETH",
+	pack, err := abi.Pack("sendTokens",
 		destChainId,
-		w.WalletAddr,
 		w.WalletAddr.Bytes(),
 		req.Amount,
-		amSlip,
+		common.HexToAddress("0x0000000000000000000000000000000000000000"),
+		[]byte{},
 	)
 	if err != nil {
 		return nil, err
@@ -55,9 +52,9 @@ func (c *Bridge) BridgeETH(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 
 	txData := &bozdo.TxData{
 		Data:         pack,
-		Value:        bozdo.BigIntSum(req.Amount, fee.Fee1),
+		Value:        fee.Fee1,
 		ContractAddr: ca,
-		Details:      details,
+		Details:      []bozdo.TxDetail{bozdo.NewLZFeeDetails(fee.Fee1, req.FromNetwork, req.FromToken)},
 		Code:         bozdo.CodeBridge,
 	}
 
@@ -70,4 +67,5 @@ func (c *Bridge) BridgeETH(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 	}
 
 	return c.Cli.London(ctx, c.Cli, opt, txData)
+
 }

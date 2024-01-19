@@ -61,16 +61,16 @@
 
       <div style="width: 500px">
         <v-range-slider
-          :rules="[required]"
-          v-model="randomRange"
-          density="compact"
-          :min="1"
-          step="10"
-          :max="600"
-          persistent-hint
-          center-affix
-          hide-details
-          :disabled="disable"
+            :rules="[required]"
+            v-model="randomRange"
+            density="compact"
+            :min="1"
+            step="10"
+            :max="600"
+            persistent-hint
+            center-affix
+            hide-details
+            :disabled="disable"
         >
           <template v-slot:label>
             Задержка
@@ -92,16 +92,16 @@
 
       <div style="width: 500px">
         <v-range-slider
-          :rules="[required]"
-          v-model="nativeAmountTokenRange"
-          density="compact"
-          :min="1"
-          step="1"
-          :max="95"
-          persistent-hint
-          center-affix
-          hide-details
-          :disabled="disable"
+            :rules="[required]"
+            v-model="nativeAmountTokenRange"
+            density="compact"
+            :min="1"
+            step="1"
+            :max="95"
+            persistent-hint
+            center-affix
+            hide-details
+            :disabled="disable"
         >
           <template v-slot:label>
             Обьем нативного токена
@@ -123,16 +123,16 @@
 
       <div style="width: 500px">
         <v-range-slider
-          :rules="[required]"
-          v-model="nonnativeAmountTokenRange"
-          density="compact"
-          :min="1"
-          step="1"
-          :max="100"
-          persistent-hint
-          center-affix
-          hide-details
-          :disabled="disable"
+            :rules="[required]"
+            v-model="nonnativeAmountTokenRange"
+            density="compact"
+            :min="1"
+            step="1"
+            :max="100"
+            persistent-hint
+            center-affix
+            hide-details
+            :disabled="disable"
         >
           <template v-slot:label>
             Обьем не-нативного токена
@@ -548,7 +548,17 @@ export default defineComponent({
             }
           });
           break
-        case TaskJob.NFT, TaskJob.Simple:
+        case TaskJob.Simple:
+          this.randomTasks.push({
+            taskType: task,
+            optional: true,
+            simple: {
+              network: this.network
+            }
+          });
+          break
+
+        case TaskJob.NFT:
           this.randomTasks.push({
             taskType: task,
             optional: true,
@@ -575,10 +585,19 @@ export default defineComponent({
             }
           });
           break
-        case TaskJob.NFT, TaskJob.Simple:
+        case TaskJob.Simple:
           this.randomTasks.push({
             taskType: task,
-            optional: true,
+            optional: false,
+            simple: {
+              network: this.network
+            }
+          });
+          break
+        case TaskJob.NFT:
+          this.randomTasks.push({
+            taskType: task,
+            optional: false,
             simple: {
               network: this.network
             }
@@ -666,7 +685,14 @@ export default defineComponent({
                 swap: v.swap
               });
               break
-            case TaskJob.NFT, TaskJob.Simple:
+            case TaskJob.Simple:
+              this.randomTasks.push({
+                taskType: v.taskType,
+                optional: v.optional,
+                simple: v.simple
+              });
+              break
+            case TaskJob.NFT:
               this.randomTasks.push({
                 taskType: v.taskType,
                 optional: v.optional,
@@ -684,7 +710,14 @@ export default defineComponent({
                 swap: v.swap
               });
               break
-            case TaskJob.NFT, TaskJob.Simple:
+            case  TaskJob.Simple:
+              this.tasks.push({
+                taskType: v.taskType,
+                optional: v.optional,
+                simple: v.simple
+              });
+              break
+            case TaskJob.NFT:
               this.tasks.push({
                 taskType: v.taskType,
                 optional: v.optional,

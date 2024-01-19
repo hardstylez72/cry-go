@@ -36,6 +36,7 @@ enum Network {
   Linea = 19;
   Zora = 20;
   Core = 21;
+  Conflux = 22;
 }
 
 enum Token {
@@ -59,6 +60,7 @@ enum Token {
   BUSD = 17;
   USDp = 18;
   CORE = 19;
+  CFX = 20;
 }
 
 enum ProcessStatus {

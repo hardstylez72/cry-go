@@ -12,6 +12,22 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewStakeSTGTask() *DefaultLPTask {
+	return &DefaultLPTask{
+		taskType: v1.TaskType_StakeSTG,
+		extractor: func(a *Input) (*v1.DefaultLP, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_StakeSTG)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_StakeSTG) call an ambulance!")
+			}
+			return l.StakeSTG, nil
+		},
+		DefaultLPTaskHalper: &DefaultLPTaskHalper{
+			TaskType: v1.TaskType_StakeSTG,
+		},
+	}
+}
+
 func NewNostraLPTask() *DefaultLPTask {
 	return &DefaultLPTask{
 		taskType: v1.TaskType_NostraLP,

@@ -6,8 +6,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/merkly"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/stargate"
+	stakestg "github.com/hardstylez72/cry/internal/defi/_swap/stakeSTG"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	"github.com/hardstylez72/cry/internal/defi/bridge/stargate"
 	"github.com/hardstylez72/cry/internal/defi/generic"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
@@ -71,6 +73,8 @@ func (c *Client) Bridge(ctx context.Context, req *defi.DefaultBridgeReq, taskTyp
 	switch taskType {
 	case v1.TaskType_StargateBridge:
 		return stargate.NewBridge(c.defi).Bridge(ctx, req)
+	case v1.TaskType_MerklyRefuel:
+		return merkly.NewBridge(c.defi, common.HexToAddress("0x0e1f20075c90ab31fc2dd91e536e6990262cf76d")).Bridge(ctx, req)
 	default:
 		return nil, errors.New("bridge unsupported")
 	}
@@ -79,7 +83,18 @@ func (c *Client) WaitForConfirm(ctx context.Context, txId string, taskType v1.Ta
 	switch taskType {
 	case v1.TaskType_StargateBridge:
 		return stargate.NewBridge(c.defi).WaitForConfirm(ctx, txId, taskType, receiver)
+	case v1.TaskType_MerklyRefuel:
+		return merkly.NewBridge(c.defi, common.HexToAddress("0x0e1f20075c90ab31fc2dd91e536e6990262cf76d")).WaitForConfirm(ctx, txId)
 	default:
 		return errors.New("bridge unsupported")
+	}
+}
+
+func (c *Client) LP(ctx context.Context, req *defi.LPReq, taskType v1.TaskType) (*defi.LPRes, error) {
+	switch taskType {
+	case v1.TaskType_StakeSTG:
+		return stakestg.NewClient(c.defi, common.HexToAddress("0x3AB2DA31bBD886A7eDF68a6b60D3CDe657D3A15D")).LP(ctx, req)
+	default:
+		return nil, errors.New("unsupported task: " + taskType.String())
 	}
 }

@@ -213,8 +213,8 @@ export default defineComponent({
     async copyFlow() {
       try {
         const res = await flowService.flowServiceCopyFlow({body: {id: this.flowId}})
-        this.$router.push(`/flow/${res.id}`, {force: true})
-        window.location.assign(`/flow/${res.id}`)
+        this.$router.push(`/flow/random/${res.id}`, {force: true})
+        window.location.assign(`/flow/random/${res.id}`)
       } finally {
 
       }

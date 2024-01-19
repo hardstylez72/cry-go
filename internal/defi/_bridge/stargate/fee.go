@@ -6,8 +6,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/hardstylez72/cry/internal/defi/bridge/layerzero"
-	"github.com/hardstylez72/cry/internal/defi/bridge/stargate/abi/router"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/layerzero"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/stargate/abi/router"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"
 )

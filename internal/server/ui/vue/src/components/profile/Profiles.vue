@@ -23,10 +23,10 @@
 
         <div style="width: 100px">
           <v-checkbox
-            density="compact"
-            label="Адреса"
-            v-model="showWalletAddrs"
-            hide-details
+              density="compact"
+              label="Адреса"
+              v-model="showWalletAddrs"
+              hide-details
           />
         </div>
       </div>
@@ -39,18 +39,19 @@
       </div>
       <div v-else>
 
-        <v-list max-width="96vw" class="px-5" :nav="true">
+        <v-list max-width="96vw" class="px-5">
           <v-list-item
-            density="compact"
-            variant="plain"
-            class="my-0"
-            v-for="item in getList"
-            :key="item.id"
-            rounded
-            height="auto"
-            width="auto"
-            elevation="1"
-            style="border: 0 solid "
+              @click="profileClick"
+              density="compact"
+              variant="plain"
+              class="my-0"
+              v-for="item in getList"
+              :key="item.num"
+              rounded
+              height="auto"
+              width="auto"
+              elevation="1"
+              style="border: 0 solid "
           >
 
             <v-row align="center">
@@ -83,8 +84,6 @@
             </v-row>
           </v-list-item>
         </v-list>
-        <v-btn width="100%" @click="loadMore" :loading="loading" v-if="!loadedAll">Загрузить еще
-        </v-btn>
 
       </div>
     </div>
@@ -157,6 +156,9 @@ export default defineComponent({
     },
   },
   methods: {
+    profileClick() {
+
+    },
     reset() {
       this.loadedAll = false
       this.list = []
@@ -199,7 +201,6 @@ export default defineComponent({
       await this.UpdateList()
     },
     async loadMore() {
-      this.offset += 30
       await this.UpdateList()
     }
   },

@@ -1381,6 +1381,12 @@ export interface Task {
 
   /**  */
   stargateBridge?: DefaultBridge;
+
+  /**  */
+  stakeSTG?: DefaultLP;
+
+  /**  */
+  merklyRefuel?: DefaultBridge;
 }
 
 export interface TaskTx {
@@ -1586,7 +1592,8 @@ export enum Network {
   'opBNB' = 'opBNB',
   'Linea' = 'Linea',
   'Zora' = 'Zora',
-  'Core' = 'Core'
+  'Core' = 'Core',
+  'Conflux' = 'Conflux'
 }
 
 export enum ProcessStatus {
@@ -1653,7 +1660,9 @@ export enum TaskType {
   'KyberSwap' = 'KyberSwap',
   'EkuboSwap' = 'EkuboSwap',
   'NostraLP' = 'NostraLP',
-  'CoreDaoBridge' = 'CoreDaoBridge'
+  'CoreDaoBridge' = 'CoreDaoBridge',
+  'StakeSTG' = 'StakeSTG',
+  'MerklyRefuel' = 'MerklyRefuel'
 }
 
 export enum Token {
@@ -1676,5 +1685,6 @@ export enum Token {
   'USDCBridged' = 'USDCBridged',
   'BUSD' = 'BUSD',
   'USDp' = 'USDp',
-  'CORE' = 'CORE'
+  'CORE' = 'CORE',
+  'CFX' = 'CFX'
 }

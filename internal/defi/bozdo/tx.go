@@ -241,6 +241,12 @@ func CastUSD(wei *big.Int, network v1.Network, token v1.Token) string {
 		return amUsd.String()
 	}
 
+	if network == v1.Network_POLIGON {
+		gasTokenPrice = pub.Price().MATIC
+		amUsd := EthToUsd(WEIToEther(wei), gasTokenPrice)
+		return amUsd.String()
+	}
+
 	switch token {
 	case v1.Token_USDC, v1.Token_USDT, v1.Token_USDCBridged:
 		gasTokenPrice = 1

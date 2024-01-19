@@ -4,11 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/hardstylez72/cry/internal/snapshot"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -55,14 +53,10 @@ func (t *SnapshotVoteTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 		return a.Task, nil
 	case v1.ProcessStatus_StatusRetry, v1.ProcessStatus_StatusReady, v1.ProcessStatus_StatusRunning:
 
-		before := a.Task.Status
 		after := v1.ProcessStatus_StatusRunning
 		a.Task.Status = after
 		if err := a.ProcessRepository.UpdateProcessTask(ctx, task, task.Id, a.ProcessId, a.ProfileId); err != nil {
 			return nil, errors.Wrap(err, "UpdateProcessTask")
-		}
-		if err := a.ProcessRepository.RecordStatusChanged(ctx, task.Id, before, after); err != nil {
-			log.Log.Warn("RecordStatusChanged", zap.Error(err))
 		}
 	}
 
@@ -146,15 +140,15 @@ func (t *SnapshotVoteTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 			break
 		}
 	}
-	task.Status = v1.ProcessStatus_StatusDone
-	task.FinishedAt = timestamppb.Now()
 
-	if err := a.ProcessRepository.UpdateProcessTask(ctx, task, a.Task.Id, a.ProcessId, a.ProfileId); err != nil {
-		return nil, errors.Wrap(err, "UpdateProcessTask")
-	}
+	if p.Proposal != nil && len(p.Proposal) > 0 {
+		task.Status = v1.ProcessStatus_StatusDone
+		task.FinishedAt = timestamppb.Now()
 
-	if err := a.ProcessRepository.RecordStatusChanged(ctx, task.Id, v1.ProcessStatus_StatusRunning, v1.ProcessStatus_StatusDone); err != nil {
-		log.Log.Warn("RecordStatusChanged", zap.Error(err))
+		if err := a.ProcessRepository.UpdateProcessTask(ctx, task, a.Task.Id, a.ProcessId, a.ProfileId); err != nil {
+			return nil, errors.Wrap(err, "UpdateProcessTask")
+		}
+
 	}
 
 	return task, nil

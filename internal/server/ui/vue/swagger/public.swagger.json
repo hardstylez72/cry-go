@@ -201,7 +201,9 @@
         "KyberSwap",
         "EkuboSwap",
         "NostraLP",
-        "CoreDaoBridge"
+        "CoreDaoBridge",
+        "StakeSTG",
+        "MerklyRefuel"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

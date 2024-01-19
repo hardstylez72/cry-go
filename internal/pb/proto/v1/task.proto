@@ -61,6 +61,8 @@ enum TaskType {
   EkuboSwap = 47;
   NostraLP = 48;
   CoreDaoBridge = 49;
+  StakeSTG = 50;
+  MerklyRefuel = 51;
 }
 
 

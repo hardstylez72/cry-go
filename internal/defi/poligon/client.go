@@ -75,7 +75,7 @@ func NewClient(c *ClientConfig) (*Client, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to connect to ethereum main: "+c.RPCEndpoint)
 	}
-	ethcli.London = defi.LondonReadyTx
+	ethcli.London = defi.LondonReadyBoosty
 
 	return &Client{defi: ethcli, NetworkId: bozdo.ChainMap[v1.Network_POLIGON]}, nil
 }

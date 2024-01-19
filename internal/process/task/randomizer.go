@@ -337,34 +337,45 @@ func RandomizeRandomBlock(b *v1.FlowBlock_Rand, ignoreStartToken, ignoreFinishTo
 	optionalTasks := ExtractItems(b.Rand.Tasks, b.Rand.StartNetwork, amNative, amToken, true)
 	tasks := ExtractItems(b.Rand.Tasks, b.Rand.StartNetwork, amNative, amToken, false)
 
-	arg := PermuteArg{
-		In:               tasks,
-		Limit:            limitMap,
-		StartFromNetwork: b.Rand.StartNetwork,
-		MaxCount:         10_000,
-		MaxItemLenght:    int(b.Rand.TaskCount),
-		Debug:            false,
-	}
+	var cases [][]RandomTask
+	var err error
 
-	if !ignoreStartToken {
-		arg.StartToken = &b.Rand.StartToken
-	}
+	if len(tasks) > 0 {
+		arg := PermuteArg{
+			In:               tasks,
+			Limit:            limitMap,
+			StartFromNetwork: b.Rand.StartNetwork,
+			MaxCount:         10_000,
+			MaxItemLenght:    int(b.Rand.TaskCount),
+			Debug:            false,
+		}
 
-	if !ignoreFinishToken {
-		arg.FinishToken = &b.Rand.FinishToken
-	}
+		if !ignoreStartToken {
+			arg.StartToken = &b.Rand.StartToken
+		}
 
-	cases, err := Permute(arg)
-	if err != nil {
-		return nil, err
-	}
+		if !ignoreFinishToken {
+			arg.FinishToken = &b.Rand.FinishToken
+		}
 
-	rand.Shuffle(len(cases), func(i, j int) {
-		cases[i], cases[j] = cases[j], cases[i]
-	})
+		cases, err = Permute(arg)
+		if err != nil {
+			return nil, err
+		}
 
-	for _, randomTask := range optionalTasks {
-		cases = AddOptionalTask(cases, randomTask, 1)
+		rand.Shuffle(len(cases), func(i, j int) {
+			cases[i], cases[j] = cases[j], cases[i]
+		})
+
+		for _, randomTask := range optionalTasks {
+			cases = AddOptionalTask(cases, randomTask, 1)
+		}
+	} else {
+
+		cases = make([][]RandomTask, 100)
+		for _, randomTask := range optionalTasks {
+			cases = AddOptionalTask(cases, randomTask, 1)
+		}
 	}
 
 	out, err := CastTasks(cases)
@@ -374,7 +385,17 @@ func RandomizeRandomBlock(b *v1.FlowBlock_Rand, ignoreStartToken, ignoreFinishTo
 
 	out = InsertDelays(out, minDelay, maxDelay)
 
-	return out, nil
+	tmp := [][]*v1.Task{}
+
+	for _, e := range out {
+		if len(e) == 0 {
+			continue
+		}
+
+		tmp = append(tmp, e)
+	}
+
+	return tmp, nil
 }
 
 func InsertDelays(out [][]*v1.Task, minDelay, maxDelay int64) [][]*v1.Task {
@@ -434,7 +455,7 @@ func TokenCombo(flows [][]*v1.Task) []*v1.TokenArr {
 		var input *TaskInput
 		var err error
 		start := 0
-		for start < len(flows) {
+		for start < len(flow) {
 			firstTask := flow[start]
 
 			input, err = taskInput(firstTask)

@@ -7,9 +7,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	core_dao "github.com/hardstylez72/cry/internal/defi/_bridge/core.dao"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/stargate"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
-	core_dao "github.com/hardstylez72/cry/internal/defi/bridge/core.dao"
-	"github.com/hardstylez72/cry/internal/defi/bridge/stargate"
 	"github.com/hardstylez72/cry/internal/defi/generic"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
 	"github.com/pkg/errors"

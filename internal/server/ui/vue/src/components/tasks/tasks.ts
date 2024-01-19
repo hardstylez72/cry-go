@@ -46,108 +46,112 @@ import {DelaySpec} from "@/components/tasks/OTHER/Delay";
 import {SwapEkuboSpec} from "@/components/tasks/SWAPS/Ekubo";
 import {LPNostraLPSpec} from "@/components/tasks/LP/Nostra";
 import {CoreDaoBridgeSpec} from "@/components/tasks/BRIDGE/CoreDao";
+import {StakeSTGSpec} from "@/components/tasks/LP/StakeSTG";
+import {merklyRefuelSpec} from "@/components/tasks/BRIDGE/MerklyRefuel";
 
 
 export interface TaskArg {
-  task?: Task
-  component: any
-  weight: number
+    task?: Task
+    component: any
+    weight: number
 
-  taskType: TaskType
+    taskType: TaskType
 }
 
 
 const deprecated: TaskSpec = {
-  deprecated: true,
-  canBeEstimated: false,
-  menu: null,
-  component: null,
-  descFn(task) {
-    return ''
-  },
+    deprecated: true,
+    canBeEstimated: false,
+    menu: null,
+    component: null,
+    descFn(task) {
+        return ''
+    },
 
-  service: {
-    name: '',
-    img: '',
-    link: '',
-    op: '',
+    service: {
+        name: '',
+        img: '',
+        link: '',
+        op: '',
 
-  },
-  job: TaskJob.Other,
-  networks: new Set<Network>(allNetworks),
-  airdrops: new Set<Airdrop>(),
-  profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
+    },
+    job: TaskJob.Other,
+    networks: new Set<Network>(allNetworks),
+    airdrops: new Set<Airdrop>(),
+    profileType: new Set([ProfileType.EVM, ProfileType.StarkNet])
 }
 
 export const taskProps: Record<TaskType, TaskSpec> = {
-  Delay: DelaySpec,
-  StargateBridge: StargateBridgeSpec,
-  WithdrawExchange: ExchangeWithdrawSpec,
-  OkexDeposit: ExchangeDeposit,
-  TestNetBridgeSwap: TestNetSpec,
-  SnapshotVote: SnapshotSpec,
-  SyncSwap: SyncSwapSpec,
-  ZkSyncOfficialBridgeToEthereum: ZkSyncBridgeToETHSpec,
-  Mock: deprecated,
-  OkexBinance: deprecated,
-  Swap1inch: deprecated,
-  OrbiterBridge: OrbiterBridgeSpec,
-  ZkSyncOfficialBridgeFromEthereum: ZkSyncBridgeFromETHSpec,
-  WETH: WETHSwapSpec,
-  MuteioSwap: MuteIOSwapSpec,
-  SyncSwapLP: SyncSwapLPSpec,
-  MaverickSwap: MaverickSwapSpec,
-  SpaceFISwap: SpaceFISwapSpec,
-  VelocoreSwap: VelocoreSwapSpec,
-  IzumiSwap: IZUMISwapSpec,
-  VeSyncSwap: VeSyncSpec,
-  EzkaliburSwap: EzkaliburSwapSpec,
-  ZkSwap: ZkSwapSpec,
-  TraderJoeSwap: TraderJoeSpec,
-  MerklyMintAndBridgeNFT: NFTMerklySpec,
-  DeployStarkNetAccount: DeploySpec,
-  Swap10k: Swap10kSpec,
-  PancakeSwap: PancakeSwapSpec,
-  SithSwap: SithSwapSpec,
-  JediSwap: JediSwapSpec,
-  MySwap: MySwapSpec,
-  ProtossSwap: ProtossSwapSpec,
-  StarkNetBridge: BridgeStarknetSpec,
-  Dmail: DmailSpec,
-  StarkNetIdMint: StarknetIdMintSpec,
-  OdosSwap: SwapOdosSpec,
-  AcrossBridge: AcrossBridgeSpec,
-  AvnuSwap: SwapAvnuSpec,
-  FibrousSwap: SwapFibrousSpec,
-  ExchangeSwap: ExchangeSwapSpec,
-  ZkLendLP: LPZkLendLPSpec,
-  WoofiSwap: SwapWoofiSpec,
-  AaveLP: LPAaveSpec,
-  MintFun: NFTMintFunSpec,
-  MintMerkly: NFTMerklyMintSpec,
-  MintZerius: NFTZeriusMintSpec,
-  KyberSwap: KyberSwapSpec,
-  EkuboSwap: SwapEkuboSpec,
-  NostraLP: LPNostraLPSpec,
-  CoreDaoBridge: CoreDaoBridgeSpec,
+    Delay: DelaySpec,
+    StargateBridge: StargateBridgeSpec,
+    WithdrawExchange: ExchangeWithdrawSpec,
+    OkexDeposit: ExchangeDeposit,
+    TestNetBridgeSwap: TestNetSpec,
+    SnapshotVote: SnapshotSpec,
+    SyncSwap: SyncSwapSpec,
+    ZkSyncOfficialBridgeToEthereum: ZkSyncBridgeToETHSpec,
+    Mock: deprecated,
+    OkexBinance: deprecated,
+    Swap1inch: deprecated,
+    OrbiterBridge: OrbiterBridgeSpec,
+    ZkSyncOfficialBridgeFromEthereum: ZkSyncBridgeFromETHSpec,
+    WETH: WETHSwapSpec,
+    MuteioSwap: MuteIOSwapSpec,
+    SyncSwapLP: SyncSwapLPSpec,
+    MaverickSwap: MaverickSwapSpec,
+    SpaceFISwap: SpaceFISwapSpec,
+    VelocoreSwap: VelocoreSwapSpec,
+    IzumiSwap: IZUMISwapSpec,
+    VeSyncSwap: VeSyncSpec,
+    EzkaliburSwap: EzkaliburSwapSpec,
+    ZkSwap: ZkSwapSpec,
+    TraderJoeSwap: TraderJoeSpec,
+    MerklyMintAndBridgeNFT: NFTMerklySpec,
+    DeployStarkNetAccount: DeploySpec,
+    Swap10k: Swap10kSpec,
+    PancakeSwap: PancakeSwapSpec,
+    SithSwap: SithSwapSpec,
+    JediSwap: JediSwapSpec,
+    MySwap: MySwapSpec,
+    ProtossSwap: ProtossSwapSpec,
+    StarkNetBridge: BridgeStarknetSpec,
+    Dmail: DmailSpec,
+    StarkNetIdMint: StarknetIdMintSpec,
+    OdosSwap: SwapOdosSpec,
+    AcrossBridge: AcrossBridgeSpec,
+    AvnuSwap: SwapAvnuSpec,
+    FibrousSwap: SwapFibrousSpec,
+    ExchangeSwap: ExchangeSwapSpec,
+    ZkLendLP: LPZkLendLPSpec,
+    WoofiSwap: SwapWoofiSpec,
+    AaveLP: LPAaveSpec,
+    MintFun: NFTMintFunSpec,
+    MintMerkly: NFTMerklyMintSpec,
+    MintZerius: NFTZeriusMintSpec,
+    KyberSwap: KyberSwapSpec,
+    EkuboSwap: SwapEkuboSpec,
+    NostraLP: LPNostraLPSpec,
+    CoreDaoBridge: CoreDaoBridgeSpec,
+    StakeSTG: StakeSTGSpec,
+    MerklyRefuel: merklyRefuelSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {
-  const result: string[] = []
-  if (!flow || !flow.tasks) {
-    return result
-  }
-
-  flow.tasks.forEach((task) => {
-
-    if (!task || !task.taskType) {
-      return
+    const result: string[] = []
+    if (!flow || !flow.tasks) {
+        return result
     }
 
-    const out = task.taskType + " " + taskProps[task.taskType].descFn(task)
-    result.push(out)
-  })
-  return result
+    flow.tasks.forEach((task) => {
+
+        if (!task || !task.taskType) {
+            return
+        }
+
+        const out = task.taskType + " " + taskProps[task.taskType].descFn(task)
+        result.push(out)
+    })
+    return result
 }
 
 export const taskComponentMap = new Map<TaskType, any>()
@@ -156,19 +160,19 @@ export const estimatedTaskMap = new Map<TaskType, boolean>()
 export const taskTypes: TaskType[] = []
 
 for (let name of Object.getOwnPropertyNames(taskProps)) {
-  const n = name as TaskType
+    const n = name as TaskType
 
-  const v = taskProps[n]
-  if (v) {
-    if (v.deprecated) {
-      continue
+    const v = taskProps[n]
+    if (v) {
+        if (v.deprecated) {
+            continue
+        }
+
+        taskComponentMap.set(n, v.component)
+        menuTaskComponentMap.set(n, v.menu)
+        taskTypes.push(n)
+        estimatedTaskMap.set(n, v.canBeEstimated)
     }
-
-    taskComponentMap.set(n, v.component)
-    menuTaskComponentMap.set(n, v.menu)
-    taskTypes.push(n)
-    estimatedTaskMap.set(n, v.canBeEstimated)
-  }
 }
 
 

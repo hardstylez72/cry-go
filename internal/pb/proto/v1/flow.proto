@@ -608,6 +608,8 @@ message Task {
     task.DefaultSwap wethSwapTask = 53;
     task.DefaultBridge coreDaoBridge = 54;
     task.DefaultBridge stargateBridge = 55;
+    task.DefaultLP stakeSTG = 56;
+    task.DefaultBridge merklyRefuel = 57;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

@@ -198,7 +198,8 @@
         "USDCBridged",
         "BUSD",
         "USDp",
-        "CORE"
+        "CORE",
+        "CFX"
       ],
       "default": "USDT"
     },
