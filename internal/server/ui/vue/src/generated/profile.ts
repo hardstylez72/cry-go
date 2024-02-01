@@ -869,7 +869,10 @@ export enum Network {
   'Linea' = 'Linea',
   'Zora' = 'Zora',
   'Core' = 'Core',
-  'Conflux' = 'Conflux'
+  'Conflux' = 'Conflux',
+  'Fuse' = 'Fuse',
+  'Loot' = 'Loot',
+  'Klaytn' = 'Klaytn'
 }
 
 export enum ProfileSubType {
@@ -904,5 +907,8 @@ export enum Token {
   'BUSD' = 'BUSD',
   'USDp' = 'USDp',
   'CORE' = 'CORE',
-  'CFX' = 'CFX'
+  'CFX' = 'CFX',
+  'FUSE' = 'FUSE',
+  'AGLD' = 'AGLD',
+  'KLAY' = 'KLAY'
 }

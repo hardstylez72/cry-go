@@ -189,7 +189,10 @@
         "Linea",
         "Zora",
         "Core",
-        "Conflux"
+        "Conflux",
+        "Fuse",
+        "Loot",
+        "Klaytn"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"

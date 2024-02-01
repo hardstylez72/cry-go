@@ -37,7 +37,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>
+          <!--          <AmountInput :coin="item.fromToken" :disabled="disabled" v-model="item.amount"/>-->
         </v-col>
       </v-row>
 
@@ -53,32 +53,30 @@ import {Component} from "vue-facing-decorator";
 import TaskDefaultBridge from "@/components/tasks/BRIDGE/DefaultBridgeTask";
 
 @Component({
-  name: 'TaskACoreDaoBridgeBlock',
+  name: 'TaskAcrossBridgeBlock',
   components: {NetworkSelector}
 })
 
-export default class TaskACoreDaoBridgeBlock extends TaskDefaultBridge {
+export default class TaskAcrossBridgeBlock extends TaskDefaultBridge {
   pairs = [
-    tokenBridgePair(Network.BinanaceBNB, Network.Core, Token.USDT, Token.USDT),
-    tokenBridgePair(Network.Core, Network.BinanaceBNB, Token.USDT, Token.USDT),
-      
-    tokenBridgePair(Network.POLIGON, Network.Core, Token.USDT, Token.USDT),
-    tokenBridgePair(Network.Core, Network.POLIGON, Token.USDT, Token.USDT),
+    tokenBridgePair(Network.POLIGON, Network.Fuse, Token.MATIC, Token.FUSE),
+    tokenBridgePair(Network.POLIGON, Network.Loot, Token.MATIC, Token.AGLD),
+    tokenBridgePair(Network.POLIGON, Network.Klaytn, Token.MATIC, Token.KLAY),
   ]
 
   getTask(): Task {
     return {
       weight: this.weight.toString(),
-      coreDaoBridge: this.item,
-      taskType: TaskType.CoreDaoBridge,
+      l2passRefuel: this.item,
+      taskType: TaskType.L2PassRefuel,
       description: JSON.stringify(this.item),
     }
   }
 
   syncTask() {
     if (this.task) {
-      if (this.task.coreDaoBridge) {
-        this.item = this.task.coreDaoBridge
+      if (this.task.l2passRefuel) {
+        this.item = this.task.l2passRefuel
 
         if (this.item.fromNetwork && this.item.toNetwork && this.item.fromToken && this.item.toToken) {
           this.pair = tokenBridgePair(this.item.fromNetwork, this.item.toNetwork, this.item.fromToken, this.item.toToken)

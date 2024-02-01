@@ -279,6 +279,21 @@ export interface network {
 }
 
 export const networkProps: Record<Network, network> = {
+    Klaytn: {
+        name: 'Klaytn',
+        img: '/icons/networks/klaytn.svg',
+        value: Network.Klaytn,
+    },
+    Loot: {
+        name: 'Loot',
+        img: '/icons/networks/loot.svg',
+        value: Network.Loot,
+    },
+    Fuse: {
+        name: 'Fuse',
+        img: '/icons/networks/fuse.svg',
+        value: Network.Fuse,
+    },
     Conflux: {
         name: 'Conflux',
         img: '/icons/networks/cfx.svg',

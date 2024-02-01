@@ -34,14 +34,9 @@ func (d *Dispatcher) RunP(ctx context.Context, processId string) error {
 	d.stat.ActiveProcesses.Inc()
 	defer d.stat.ActiveProcesses.Dec()
 
-	tr := otel.Tracer("")
-	pctx, span := tr.Start(ctx, "RunP")
-	span.SetAttributes(attribute.String("pId", processId))
-	defer span.End()
-
 	for _, ppId := range ppTable.ppOrder {
 
-		ppStatus, err := d.r.GetProcessProfileStatus(pctx, ppId)
+		ppStatus, err := d.r.GetProcessProfileStatus(ctx, ppId)
 		if err != nil {
 			return err
 		}
@@ -50,18 +45,18 @@ func (d *Dispatcher) RunP(ctx context.Context, processId string) error {
 			continue
 		}
 
-		userId, err := d.r.GetProcessUser(pctx, processId)
+		userId, err := d.r.GetProcessUser(ctx, processId)
 		if err != nil {
 			return errors.Wrap(err, "GetProcessUser")
 		}
 
-		err = d.RunPP(pctx, ppId, processId, *userId)
+		err = d.RunPP(ctx, ppId, processId, *userId)
 		if err != nil {
 			l.Error("runner.RunProfile", err)
 			return err
 		}
 
-		status, err := d.ResolvePStatus(pctx, processId, l)
+		status, err := d.ResolvePStatus(ctx, processId, l)
 		if err != nil {
 			l.Error("ResolvePStatus", err)
 			return err
@@ -77,7 +72,7 @@ func (d *Dispatcher) RunP(ctx context.Context, processId string) error {
 			return nil
 		}
 
-		ppStatus, err = d.r.GetProcessProfileStatus(pctx, ppId)
+		ppStatus, err = d.r.GetProcessProfileStatus(ctx, ppId)
 		if err != nil {
 			return err
 		}

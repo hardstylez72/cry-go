@@ -657,7 +657,10 @@ export enum Network {
   'Linea' = 'Linea',
   'Zora' = 'Zora',
   'Core' = 'Core',
-  'Conflux' = 'Conflux'
+  'Conflux' = 'Conflux',
+  'Fuse' = 'Fuse',
+  'Loot' = 'Loot',
+  'Klaytn' = 'Klaytn'
 }
 
 export enum ProfileSubType {
@@ -723,5 +726,6 @@ export enum TaskType {
   'NostraLP' = 'NostraLP',
   'CoreDaoBridge' = 'CoreDaoBridge',
   'StakeSTG' = 'StakeSTG',
-  'MerklyRefuel' = 'MerklyRefuel'
+  'MerklyRefuel' = 'MerklyRefuel',
+  'L2PassRefuel' = 'L2PassRefuel'
 }

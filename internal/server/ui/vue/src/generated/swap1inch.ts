@@ -256,5 +256,8 @@ export enum Network {
   'Linea' = 'Linea',
   'Zora' = 'Zora',
   'Core' = 'Core',
-  'Conflux' = 'Conflux'
+  'Conflux' = 'Conflux',
+  'Fuse' = 'Fuse',
+  'Loot' = 'Loot',
+  'Klaytn' = 'Klaytn'
 }

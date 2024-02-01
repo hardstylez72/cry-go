@@ -6,6 +6,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
+	core_dao "github.com/hardstylez72/cry/internal/defi/_bridge/core.dao"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/l2pass"
 	"github.com/hardstylez72/cry/internal/defi/_bridge/merkly"
 	"github.com/hardstylez72/cry/internal/defi/_bridge/stargate"
 	stakestg "github.com/hardstylez72/cry/internal/defi/_swap/stakeSTG"
@@ -71,20 +73,28 @@ func (c *Client) BridgeNft(ctx context.Context, req *defi.BridgeNFTReq, taskType
 
 func (c *Client) Bridge(ctx context.Context, req *defi.DefaultBridgeReq, taskType v1.TaskType) (*bozdo.DefaultRes, error) {
 	switch taskType {
+	case v1.TaskType_CoreDaoBridge:
+		return core_dao.NewBridge(c.defi).Bridge(ctx, req)
 	case v1.TaskType_StargateBridge:
 		return stargate.NewBridge(c.defi).Bridge(ctx, req)
 	case v1.TaskType_MerklyRefuel:
 		return merkly.NewBridge(c.defi, common.HexToAddress("0x0e1f20075c90ab31fc2dd91e536e6990262cf76d")).Bridge(ctx, req)
+	case v1.TaskType_L2PassRefuel:
+		return l2pass.NewBridge(c.defi, common.HexToAddress("0x222228060e7efbb1d78bb5d454581910e3922222")).Bridge(ctx, req)
 	default:
 		return nil, errors.New("bridge unsupported")
 	}
 }
 func (c *Client) WaitForConfirm(ctx context.Context, txId string, taskType v1.TaskType, receiver string) error {
 	switch taskType {
+	case v1.TaskType_CoreDaoBridge:
+		return core_dao.NewBridge(c.defi).WaitForConfirm(ctx, txId, taskType, receiver)
 	case v1.TaskType_StargateBridge:
 		return stargate.NewBridge(c.defi).WaitForConfirm(ctx, txId, taskType, receiver)
 	case v1.TaskType_MerklyRefuel:
 		return merkly.NewBridge(c.defi, common.HexToAddress("0x0e1f20075c90ab31fc2dd91e536e6990262cf76d")).WaitForConfirm(ctx, txId)
+	case v1.TaskType_L2PassRefuel:
+		return l2pass.NewBridge(c.defi, common.HexToAddress("0x222228060e7efbb1d78bb5d454581910e3922222")).WaitForConfirm(ctx, txId)
 	default:
 		return errors.New("bridge unsupported")
 	}

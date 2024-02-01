@@ -752,6 +752,21 @@ var SpecMap = map[v1.TaskType]Spec{
 			return Marshal(t.MerklyRefuel)
 		},
 	},
+	v1.TaskType_L2PassRefuel: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewL2PassRefuelBridgeTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_L2PassRefuel).L2PassRefuel
+			return NewL2PassRefuelBridgeTask().EstimateCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_L2PassRefuel)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_L2PassRefuel)")
+			}
+			return Marshal(t.L2PassRefuel)
+		},
+	},
 
 	// SWAPS
 	v1.TaskType_TestNetBridgeSwap: {

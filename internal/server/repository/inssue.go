@@ -93,6 +93,8 @@ func (db *issueRepository) UpdateStatus(ctx context.Context, issueId, status, us
 		return err
 	}
 
+	defer func() {}()
+
 	issue, err := db.Issue(ctx, issueId)
 	if err != nil {
 		return err

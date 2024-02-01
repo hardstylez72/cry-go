@@ -1239,7 +1239,10 @@
         "Linea",
         "Zora",
         "Core",
-        "Conflux"
+        "Conflux",
+        "Fuse",
+        "Loot",
+        "Klaytn"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -2038,6 +2041,9 @@
         },
         "merklyRefuel": {
           "$ref": "#/definitions/DefaultBridge"
+        },
+        "l2passRefuel": {
+          "$ref": "#/definitions/DefaultBridge"
         }
       },
       "required": [
@@ -2164,7 +2170,8 @@
         "NostraLP",
         "CoreDaoBridge",
         "StakeSTG",
-        "MerklyRefuel"
+        "MerklyRefuel",
+        "L2PassRefuel"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -2217,7 +2224,10 @@
         "BUSD",
         "USDp",
         "CORE",
-        "CFX"
+        "CFX",
+        "FUSE",
+        "AGLD",
+        "KLAY"
       ],
       "default": "USDT"
     },

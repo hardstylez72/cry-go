@@ -304,7 +304,10 @@
         "Linea",
         "Zora",
         "Core",
-        "Conflux"
+        "Conflux",
+        "Fuse",
+        "Loot",
+        "Klaytn"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -351,7 +354,10 @@
         "BUSD",
         "USDp",
         "CORE",
-        "CFX"
+        "CFX",
+        "FUSE",
+        "AGLD",
+        "KLAY"
       ],
       "default": "USDT"
     }

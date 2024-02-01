@@ -1395,6 +1395,9 @@ export interface Task {
 
   /**  */
   merklyRefuel?: DefaultBridge;
+
+  /**  */
+  l2passRefuel?: DefaultBridge;
 }
 
 export interface TaskTx {
@@ -1653,7 +1656,10 @@ export enum Network {
   'Linea' = 'Linea',
   'Zora' = 'Zora',
   'Core' = 'Core',
-  'Conflux' = 'Conflux'
+  'Conflux' = 'Conflux',
+  'Fuse' = 'Fuse',
+  'Loot' = 'Loot',
+  'Klaytn' = 'Klaytn'
 }
 
 export enum TaskType {
@@ -1708,7 +1714,8 @@ export enum TaskType {
   'NostraLP' = 'NostraLP',
   'CoreDaoBridge' = 'CoreDaoBridge',
   'StakeSTG' = 'StakeSTG',
-  'MerklyRefuel' = 'MerklyRefuel'
+  'MerklyRefuel' = 'MerklyRefuel',
+  'L2PassRefuel' = 'L2PassRefuel'
 }
 
 export enum Token {
@@ -1732,5 +1739,8 @@ export enum Token {
   'BUSD' = 'BUSD',
   'USDp' = 'USDp',
   'CORE' = 'CORE',
-  'CFX' = 'CFX'
+  'CFX' = 'CFX',
+  'FUSE' = 'FUSE',
+  'AGLD' = 'AGLD',
+  'KLAY' = 'KLAY'
 }

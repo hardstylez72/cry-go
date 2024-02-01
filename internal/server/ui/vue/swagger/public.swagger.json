@@ -203,7 +203,8 @@
         "NostraLP",
         "CoreDaoBridge",
         "StakeSTG",
-        "MerklyRefuel"
+        "MerklyRefuel",
+        "L2PassRefuel"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

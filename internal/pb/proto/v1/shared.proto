@@ -37,6 +37,9 @@ enum Network {
   Zora = 20;
   Core = 21;
   Conflux = 22;
+  Fuse = 23;
+  Loot = 24;
+  Klaytn = 25;
 }
 
 enum Token {
@@ -61,6 +64,9 @@ enum Token {
   USDp = 18;
   CORE = 19;
   CFX = 20;
+  FUSE = 21;
+  AGLD = 22;
+  KLAY = 23;
 }
 
 enum ProcessStatus {

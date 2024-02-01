@@ -225,5 +225,8 @@ export enum Token {
   'BUSD' = 'BUSD',
   'USDp' = 'USDp',
   'CORE' = 'CORE',
-  'CFX' = 'CFX'
+  'CFX' = 'CFX',
+  'FUSE' = 'FUSE',
+  'AGLD' = 'AGLD',
+  'KLAY' = 'KLAY'
 }

@@ -6,7 +6,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/hardstylez72/cry/internal/server/repository/pg/otelsql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/pressly/goose"
@@ -22,22 +21,8 @@ func NewPGConnection(connString string) (*sql.DB, error) {
 
 	var err error
 	const postgresDriverName = "pgx"
-	driverName, err := otelsql.Register(postgresDriverName, otelsql.WithSpanOptions(otelsql.SpanOptions{
-		Ping:                 false,
-		RowsNext:             false,
-		DisableErrSkip:       false,
-		DisableQuery:         false,
-		OmitConnResetSession: true,
-		OmitConnPrepare:      true,
-		OmitConnQuery:        false,
-		OmitRows:             true,
-		OmitConnectorConnect: true,
-	}))
-	if err != nil {
-		return nil, err
-	}
 
-	sqlDB, err := sql.Open(driverName, connString)
+	sqlDB, err := sql.Open(postgresDriverName, connString)
 	if err != nil {
 		return nil, err
 	}

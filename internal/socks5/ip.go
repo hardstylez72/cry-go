@@ -27,11 +27,11 @@ func (p *Proxy) GetIpStat(ctx context.Context) (*GetIpStatRes, error) {
 
 	sub := strings.Split(p.Config.Host, ":")
 	if len(sub) != 2 || sub[1] == "80" {
-		res, err := p.GetIp(ctx)
-		if err != nil {
-			return nil, err
-		}
-		ip = res.Ip
+		//res, err := p.GetIp(ctx)
+		//if err != nil {
+		//	return nil, err
+		//}
+		//ip = res.Ip
 	} else {
 		ip = sub[0]
 	}

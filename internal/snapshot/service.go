@@ -30,6 +30,7 @@ type ActiveProposalsReq struct {
 	ProviderRPC string `json:"provider_rpc"`
 	Space       string `json:"space"`
 	Pk          string `json:"pk"`
+	Proxy       string `json:"proxy"`
 }
 
 func (s *Service) ActiveProposals(ctx context.Context, req *ActiveProposalsReq) ([]Proposal, error) {
@@ -56,7 +57,7 @@ func (s *Service) ActiveProposals(ctx context.Context, req *ActiveProposalsReq) 
 		if err != nil {
 			return nil, err
 		}
-		return nil, errors.Wrap(err, string(body))
+		return nil, errors.New(string(body))
 	}
 
 	body, err := io.ReadAll(res.Body)
@@ -98,6 +99,7 @@ type VoteReq struct {
 	ProviderRPC string `json:"provider_rpc" json:"provider_rpc"`
 	Space       string `json:"space" json:"space"`
 	Pk          string `json:"pk" json:"pk"`
+	Proxy       string `json:"proxy"`
 }
 
 func (s *Service) Vote(ctx context.Context, req *VoteReq) error {

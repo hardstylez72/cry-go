@@ -219,5 +219,6 @@ export enum TaskType {
   'NostraLP' = 'NostraLP',
   'CoreDaoBridge' = 'CoreDaoBridge',
   'StakeSTG' = 'StakeSTG',
-  'MerklyRefuel' = 'MerklyRefuel'
+  'MerklyRefuel' = 'MerklyRefuel',
+  'L2PassRefuel' = 'L2PassRefuel'
 }

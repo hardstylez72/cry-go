@@ -48,6 +48,7 @@ import {LPNostraLPSpec} from "@/components/tasks/LP/Nostra";
 import {CoreDaoBridgeSpec} from "@/components/tasks/BRIDGE/CoreDao";
 import {StakeSTGSpec} from "@/components/tasks/LP/StakeSTG";
 import {merklyRefuelSpec} from "@/components/tasks/BRIDGE/MerklyRefuel";
+import {l2PassRefuelSpec} from "@/components/tasks/BRIDGE/L2Pass";
 
 
 export interface TaskArg {
@@ -134,6 +135,7 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     CoreDaoBridge: CoreDaoBridgeSpec,
     StakeSTG: StakeSTGSpec,
     MerklyRefuel: merklyRefuelSpec,
+    L2PassRefuel: l2PassRefuelSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

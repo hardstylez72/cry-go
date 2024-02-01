@@ -65,8 +65,10 @@ func (t *SnapshotVoteTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 			ProviderRPC: s.BaseConfig().RPCEndpoint,
 			Space:       p.Space,
 			Pk:          profile.WalletPK,
+			Proxy:       profile.ProxyString,
 		})
-		if err != nil {
+
+		if err != nil || proposals == nil {
 			return nil, errors.Wrap(err, "Snapshot.ActiveProposals")
 		}
 
@@ -116,6 +118,7 @@ func (t *SnapshotVoteTask) Run(ctx context.Context, a *Input) (*v1.ProcessTask, 
 				ProviderRPC: s.BaseConfig().RPCEndpoint,
 				Space:       p.Space,
 				Pk:          profile.WalletPK,
+				Proxy:       profile.ProxyString,
 			})
 			VoteContextCancel()
 

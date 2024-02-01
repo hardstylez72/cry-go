@@ -34,6 +34,10 @@ func (a *Bridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo
 		return a.bridgeFromBNB(ctx, req)
 	}
 
+	if req.FromNetwork == v1.Network_POLIGON {
+		return a.bridgeFromPolygon(ctx, req)
+	}
+
 	if req.FromNetwork == v1.Network_Core {
 		return a.bridgeFromCore(ctx, req)
 	}
@@ -41,6 +45,96 @@ func (a *Bridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo
 	return nil, errors.New("unsupported network")
 }
 
+func (a *Bridge) bridgeFromPolygon(ctx context.Context, req *defi.DefaultBridgeReq) (res *bozdo.DefaultRes, err error) {
+	ca := common.HexToAddress("0x52e75D318cFB31f9A2EdFa2DFee26B161255B233")
+
+	w, err := defi.NewWalletTransactor(req.PK)
+	if err != nil {
+		return nil, err
+	}
+
+	limitTx, err := a.Cli.TokenLimitChecker(ctx, &defi.TokenLimitCheckerReq{
+		Token:       req.FromToken,
+		Wallet:      w,
+		Amount:      req.Amount,
+		SpenderAddr: ca,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "TokenLimitChecker")
+	}
+
+	defer func() {
+		if limitTx != nil && limitTx.LimitExtended {
+			res.ApproveTx = a.Cli.NewTx(limitTx.ApproveTx.Hash(), defi.CodeApprove, nil)
+		}
+	}()
+
+	tr, err := NewBridgebnbCaller(ca, a.Cli.Cli)
+	if err != nil {
+		return nil, err
+	}
+
+	fee, err := tr.EstimateBridgeFee(&bind.CallOpts{Context: ctx}, false, []byte{})
+	if err != nil {
+		return nil, err
+	}
+
+	abi, err := BridgebnbMetaData.GetAbi()
+	if err != nil {
+		return nil, err
+	}
+
+	var token common.Address       //+
+	var amountLD *big.Int          //+
+	var to common.Address          //+
+	var callParams LzLibCallParams //+
+	var adapterParams []byte
+
+	token = a.Cli.Cfg.TokenMap[req.FromToken]
+
+	pub, err := a.Cli.GetPublicKey(req.PK, req.SubType)
+	if err != nil {
+		return nil, err
+	}
+	to = common.HexToAddress(pub)
+
+	callParams = LzLibCallParams{
+		RefundAddress:     to,
+		ZroPaymentAddress: defi.ZeroAddress,
+	}
+
+	amountLD, err = defi.Slippage(req.Amount, req.Slippage)
+	if err != nil {
+		return nil, err
+	}
+
+	pack, err := abi.Pack("bridge", token, amountLD, to, callParams, adapterParams)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Debug {
+		log.Log.Debug(zap.String("data", "0x"+common.Bytes2Hex(pack)))
+	}
+
+	txData := &bozdo.TxData{
+		Data:         pack,
+		Value:        fee.NativeFee,
+		ContractAddr: ca,
+		Details:      []bozdo.TxDetail{bozdo.NewProtocolFeeDetails(fee.NativeFee, req.FromNetwork, req.FromToken)},
+		Code:         bozdo.CodeBridge,
+	}
+
+	opt := &defi.TxOpt{
+		NoSend:   req.EstimateOnly,
+		Pk:       req.PK,
+		Gas:      req.Gas,
+		Debug:    req.Debug,
+		TaskType: v1.TaskType_CoreDaoBridge,
+	}
+
+	return a.Cli.London(ctx, a.Cli, opt, txData)
+}
 func (a *Bridge) bridgeFromBNB(ctx context.Context, req *defi.DefaultBridgeReq) (res *bozdo.DefaultRes, err error) {
 	ca := common.HexToAddress("0x52e75D318cFB31f9A2EdFa2DFee26B161255B233")
 

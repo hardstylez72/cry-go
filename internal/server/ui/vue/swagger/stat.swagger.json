@@ -199,7 +199,10 @@
         "BUSD",
         "USDp",
         "CORE",
-        "CFX"
+        "CFX",
+        "FUSE",
+        "AGLD",
+        "KLAY"
       ],
       "default": "USDT"
     },

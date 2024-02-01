@@ -11,7 +11,7 @@ import (
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	paycli "github.com/hardstylez72/cry-pay/proto/gen/go/v1"
-	"github.com/hardstylez72/cry/internal/defi/orbiter"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/orbiter"
 	"github.com/hardstylez72/cry/internal/defi/starknet"
 	"github.com/hardstylez72/cry/internal/exchange/pub"
 	log "github.com/hardstylez72/cry/internal/log"
@@ -322,8 +322,13 @@ func initServices(ctx context.Context, cfg *config.Config) (*services, error) {
 	issueRepository := repository.NewIssueRepository(mconn)
 	withdrawerRepository := repository.NewWithdrawerRepositoryCrypto(repository.WithdrawerRepository(rep), userRepository, cfg.Lazanya)
 
+	tgToken := cfg.TelegramToken
+	if cfg.Env == config.Local {
+		tgToken = ""
+	}
+
 	tgBot, err := tg.NewBot(ctx, &tg.Config{
-		Token:          cfg.TelegramToken,
+		Token:          tgToken,
 		UserRepository: userRepository,
 	})
 	if err != nil {

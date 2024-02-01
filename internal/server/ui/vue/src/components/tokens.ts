@@ -1,4 +1,5 @@
 import {Token} from "@/generated/flow";
+import {Network} from "@/generated/process";
 
 
 export interface token {
@@ -9,6 +10,21 @@ export interface token {
 }
 
 export const tokenProps: Record<Token, token> = {
+    KLAY: {
+        name: 'KLAY',
+        img: '/icons/networks/klaytn.svg',
+        value: Token.KLAY,
+    },
+    AGLD: {
+        name: 'AGLD',
+        img: '/icons/networks/loot.svg',
+        value: Token.AGLD,
+    },
+    FUSE: {
+        name: 'FUSE',
+        img: '/icons/networks/fuse.svg',
+        value: Token.FUSE,
+    },
     CFX: {
         name: 'CFX',
         img: '/icons/networks/cfx.svg',

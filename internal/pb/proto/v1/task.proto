@@ -63,6 +63,7 @@ enum TaskType {
   CoreDaoBridge = 49;
   StakeSTG = 50;
   MerklyRefuel = 51;
+  L2PassRefuel = 52;
 }
 
 

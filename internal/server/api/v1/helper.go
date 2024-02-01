@@ -121,19 +121,17 @@ func (s *HelperService) ValidateProxy(ctx context.Context, req *v1.ValidateProxy
 		}, nil
 	}
 
-	stat, err := p.GetIpStat(ctx)
+	valid := true
+	_, err = p.GetIp(ctx)
 	if err != nil {
-		return &v1.ValidateProxyResponse{
-			Valid:        false,
-			ErrorMessage: errors.Wrap(err, "GetIpStat").Error(),
-		}, nil
+		valid = false
 	}
 
 	return &v1.ValidateProxyResponse{
-		Valid:       true,
-		CountryName: stat.CountryName,
-		CountryCode: stat.CountryCode2,
-		Ip:          stat.Ip,
+		Valid:       valid,
+		CountryName: "",
+		CountryCode: "",
+		Ip:          "",
 	}, nil
 }
 func (s *HelperService) CastWEI(ctx context.Context, req *v1.CastWEIRequest) (*v1.CastWEIResponse, error) {

@@ -46,9 +46,9 @@ func NewProfileService(repository repository.ProfileRepository, settingsService 
 
 func (s *ProfileService) UpdateProfile(ctx context.Context, req *v1.UpdateProfileRequest) (*v1.UpdateProfileResponse, error) {
 
-	if err := NotWellcome(ctx, user.GroupWorker); err != nil {
-		return nil, err
-	}
+	//if err := NotWellcome(ctx, user.GroupWorker); err != nil {
+	//	return nil, err
+	//}
 
 	p := &repository.Profile{
 		Id:        req.ProfileId,
@@ -145,14 +145,14 @@ func (s *ProfileService) CreateProfile(ctx context.Context, req *v1.CreateProfil
 	}
 
 	if req.GetProxy() != "" {
-		p, err := socks5.NewSock5ProxyString(req.GetProxy(), "")
+		_, err := socks5.NewSock5ProxyString(req.GetProxy(), "")
 		if err != nil {
 			return nil, errors.New("invalid proxy")
 		}
-		_, err = p.GetIpStat(ctx)
-		if err != nil {
-			return nil, errors.New("proxy stat is not available")
-		}
+		//_, err = p.GetIp(ctx)
+		//if err != nil {
+		//	return nil, errors.New("proxy stat is not available: " + err.Error())
+		//}
 	}
 
 	if req.Meta != nil {

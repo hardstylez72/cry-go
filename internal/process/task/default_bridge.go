@@ -12,6 +12,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewL2PassRefuelBridgeTask() *DefaultBridge {
+	return NewDefaultBridgeTask(v1.TaskType_L2PassRefuel, func(a *Input) (*v1.DefaultBridge, error) {
+		l, ok := a.Task.Task.Task.(*v1.Task_L2PassRefuel)
+		if !ok {
+			return nil, errors.New("Task.(*v1.Task_L2PassRefuel) call an ambulance!")
+		}
+		return l.L2PassRefuel, nil
+	})
+}
+
 func NewMerklyRefuelBridgeTask() *DefaultBridge {
 	return NewDefaultBridgeTask(v1.TaskType_MerklyRefuel, func(a *Input) (*v1.DefaultBridge, error) {
 		l, ok := a.Task.Task.Task.(*v1.Task_MerklyRefuel)
