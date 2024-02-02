@@ -1,6 +1,6 @@
 package internal
 
-//go:generate echo proto generattion
+//go:generate echo proto generattion1
 //go:generate go generate ./pb
 
 //go:generate echo swagger copy
