@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	core_dao "github.com/hardstylez72/cry/internal/defi/_bridge/core.dao"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/merkly"
 	"github.com/hardstylez72/cry/internal/defi/_bridge/stargate"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
 	"github.com/hardstylez72/cry/internal/defi/generic"
@@ -80,6 +81,8 @@ func (c *Client) Bridge(ctx context.Context, req *defi.DefaultBridgeReq, taskTyp
 		return core_dao.NewBridge(c.defi).Bridge(ctx, req)
 	case v1.TaskType_StargateBridge:
 		return stargate.NewBridge(c.defi).Bridge(ctx, req)
+	case v1.TaskType_MerklyRefuel:
+		return merkly.NewBridge(c.defi, common.HexToAddress("0xeF1eAE0457e8D56A003d781569489Bc5466E574b")).Bridge(ctx, req)
 	default:
 		return nil, errors.New("unsupported task")
 	}
@@ -94,6 +97,8 @@ func (c *Client) WaitForConfirm(ctx context.Context, txId string, taskType v1.Ta
 		return core_dao.NewBridge(c.defi).WaitForConfirm(ctx, txId, taskType, receiver)
 	case v1.TaskType_StargateBridge:
 		return stargate.NewBridge(c.defi).WaitForConfirm(ctx, txId, taskType, receiver)
+	case v1.TaskType_MerklyRefuel:
+		return merkly.NewBridge(c.defi, common.HexToAddress("0xeF1eAE0457e8D56A003d781569489Bc5466E574b")).WaitForConfirm(ctx, txId)
 	default:
 		return errors.New("unsupported task")
 	}

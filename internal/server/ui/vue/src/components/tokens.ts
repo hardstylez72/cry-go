@@ -10,6 +10,26 @@ export interface token {
 }
 
 export const tokenProps: Record<Token, token> = {
+    STRK: {
+        name: 'STRK',
+        img: '/icons/starknet.svg',
+        value: Token.JEWEL,
+    },
+    JEWEL: {
+        name: 'JEWEL',
+        img: '/icons/networks/dfk.svg',
+        value: Token.JEWEL,
+    },
+    CELO: {
+        name: 'CELO',
+        img: '/icons/networks/selo.svg',
+        value: Token.CELO,
+    },
+    SMR: {
+        name: 'SMR',
+        img: '/icons/networks/shimmer.svg',
+        value: Token.SMR,
+    },
     KLAY: {
         name: 'KLAY',
         img: '/icons/networks/klaytn.svg',

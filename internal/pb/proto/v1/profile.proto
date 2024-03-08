@@ -156,7 +156,25 @@ service ProfileService {
       body: "*"
     };
   }
+
+  rpc StrarkNetEligable(StrarkNetEligableReq) returns (StrarkNetEligableRes) {
+    option (google.api.http) = {
+      post:"/api/gw/v1/profile/starknet/elig",
+      body: "*"
+    };
+  }
 }
+
+message StrarkNetEligableReq {
+  string profile_id = 1;
+}
+
+message StrarkNetEligableRes {
+  bool ok = 1;
+  string addr = 2;
+}
+
+
 
 message TransferP2PReq {
   string from = 1;

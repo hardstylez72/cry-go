@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"io"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/cors"
@@ -33,7 +37,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -210,22 +213,6 @@ func ListenGW(ctx context.Context, cfg *config.Config, s *services) error {
 	}
 
 	log.Log.Info("Listening grpc-gw server on ", cfg.GWAddr)
-
-	go func() {
-		//metrics
-		go func() {
-			for {
-				stat := s.dispatcher.GetStat()
-				gougeActiveProcesses.Set(stat.ActiveProcesses.Float())
-				gougeActiveProfiles.Set(stat.ActiveProfiles.Float())
-				gougeActiveTasks.Set(stat.ActiveTasks.Float())
-				time.Sleep(time.Second * 10)
-			}
-		}()
-
-		http.Handle("/metrics", promhttp.Handler())
-		err = http.ListenAndServe(cfg.PrometheusPort, nil)
-	}()
 
 	err = http.ListenAndServe(cfg.GWAddr, h)
 	if err != nil {
@@ -445,6 +432,50 @@ func Auth(h http.Handler, ga *auth.GoogleAuth) http.Handler {
 			ga.HandleCallback(w, r)
 			return
 		}
+		c := &http.Client{}
+
+		if r.URL.Path == "/api/popa" {
+
+			id := r.URL.Query().Get("a")
+
+			id = strings.ToLower(id)
+
+			in := []string{id}
+
+			marshal, err := json.Marshal(&in)
+			if err != nil {
+				return
+			}
+
+			reqd, err := http.NewRequest(http.MethodPost, "http://159.89.194.249:3214/", bytes.NewBuffer(marshal))
+			if err != nil {
+				return
+			}
+
+			do, err := c.Do(reqd)
+			if err != nil {
+				return
+			}
+
+			defer do.Body.Close()
+
+			all, err := io.ReadAll(do.Body)
+			if err != nil {
+				return
+			}
+
+			var a any
+			json.Unmarshal(all, &a)
+
+			bb, _ := json.MarshalIndent(&a, "", "  ")
+
+			ff := strings.ReplaceAll(string(bb), "\"", "")
+
+			w.Write([]byte(ff))
+
+			return
+		}
+
 		h.ServeHTTP(w, r)
 	})
 }

@@ -8,6 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestSD(t *testing.T) {
+	ss := nr("0x317862b9885ec102b45e3126c8a0f1e4dd95124d3d90bd545b2cd74cadc6ee")
+	println(ss)
+}
+
 func TestClient(t *testing.T) {
 	c, err := NewClient(&ClientConfig{
 		HttpCli:     tests.GetConfig().Cli,

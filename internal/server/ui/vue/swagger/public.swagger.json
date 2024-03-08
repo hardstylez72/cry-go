@@ -204,7 +204,9 @@
         "CoreDaoBridge",
         "StakeSTG",
         "MerklyRefuel",
-        "L2PassRefuel"
+        "L2PassRefuel",
+        "StarknetClaim",
+        "EraLend"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"

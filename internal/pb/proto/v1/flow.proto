@@ -611,6 +611,8 @@ message Task {
     task.DefaultLP stakeSTG = 56;
     task.DefaultBridge merklyRefuel = 57;
     task.DefaultBridge l2passRefuel = 58;
+    task.SimpleTask starknetClaim = 59;
+    task.DefaultLP eralendLPTask = 60;
   }
 
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

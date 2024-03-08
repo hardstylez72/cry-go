@@ -39,6 +39,7 @@ type ProfileServiceClient interface {
 	AddProfileRelation(ctx context.Context, in *AddProfileRelationReq, opts ...grpc.CallOption) (*AddProfileRelationRes, error)
 	SearchProfileRelation(ctx context.Context, in *SearchProfileRelationReq, opts ...grpc.CallOption) (*SearchProfileRelationRes, error)
 	TransferP2P(ctx context.Context, in *TransferP2PReq, opts ...grpc.CallOption) (*TransferP2PRes, error)
+	StrarkNetEligable(ctx context.Context, in *StrarkNetEligableReq, opts ...grpc.CallOption) (*StrarkNetEligableRes, error)
 }
 
 type profileServiceClient struct {
@@ -202,6 +203,15 @@ func (c *profileServiceClient) TransferP2P(ctx context.Context, in *TransferP2PR
 	return out, nil
 }
 
+func (c *profileServiceClient) StrarkNetEligable(ctx context.Context, in *StrarkNetEligableReq, opts ...grpc.CallOption) (*StrarkNetEligableRes, error) {
+	out := new(StrarkNetEligableRes)
+	err := c.cc.Invoke(ctx, "/profile.ProfileService/StrarkNetEligable", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility
@@ -223,6 +233,7 @@ type ProfileServiceServer interface {
 	AddProfileRelation(context.Context, *AddProfileRelationReq) (*AddProfileRelationRes, error)
 	SearchProfileRelation(context.Context, *SearchProfileRelationReq) (*SearchProfileRelationRes, error)
 	TransferP2P(context.Context, *TransferP2PReq) (*TransferP2PRes, error)
+	StrarkNetEligable(context.Context, *StrarkNetEligableReq) (*StrarkNetEligableRes, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -280,6 +291,9 @@ func (UnimplementedProfileServiceServer) SearchProfileRelation(context.Context, 
 }
 func (UnimplementedProfileServiceServer) TransferP2P(context.Context, *TransferP2PReq) (*TransferP2PRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferP2P not implemented")
+}
+func (UnimplementedProfileServiceServer) StrarkNetEligable(context.Context, *StrarkNetEligableReq) (*StrarkNetEligableRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StrarkNetEligable not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 
@@ -600,6 +614,24 @@ func _ProfileService_TransferP2P_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_StrarkNetEligable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StrarkNetEligableReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).StrarkNetEligable(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.ProfileService/StrarkNetEligable",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).StrarkNetEligable(ctx, req.(*StrarkNetEligableReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -674,6 +706,10 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TransferP2P",
 			Handler:    _ProfileService_TransferP2P_Handler,
+		},
+		{
+			MethodName: "StrarkNetEligable",
+			Handler:    _ProfileService_StrarkNetEligable_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

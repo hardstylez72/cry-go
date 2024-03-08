@@ -88,6 +88,10 @@ func (a *Bridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo
 		nativeForDst = big.NewInt(50000000000000000)
 	case req.FromNetwork == v1.Network_POLIGON && req.ToNetwork == v1.Network_Klaytn:
 		nativeForDst = big.NewInt(50000000000000000)
+	case req.FromNetwork == v1.Network_POLIGON && req.ToNetwork == v1.Network_Celo:
+		nativeForDst = big.NewInt(50000000000000000)
+	case req.FromNetwork == v1.Network_POLIGON && req.ToNetwork == v1.Network_Shimmer:
+		nativeForDst = big.NewInt(50000000000000000)
 	default:
 		return nil, errors.New("не поддерживается")
 	}
@@ -129,6 +133,8 @@ func (a *Bridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo
 }
 
 func (a *Bridge) WaitForConfirm(ctx context.Context, txId string) error {
+
+	return nil
 	s := lzscan.NewService()
 
 	_, err := s.WaitConfirm(ctx, txId)

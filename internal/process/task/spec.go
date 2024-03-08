@@ -262,7 +262,23 @@ var SpecMap = map[v1.TaskType]Spec{
 			return Marshal(t.OkexBinanaceTask)
 		},
 	},
+	v1.TaskType_StarknetClaim: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: &ClaimStarknet{}},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_StarknetClaim).StarknetClaim
+			return EstimateStarknetClaimCost(ctx, p, a.Profile)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_StarknetClaim)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_StarknetClaim)")
+			}
+			return Marshal(t.StarknetClaim)
+		},
+	},
 
+	//
 	// LP
 	v1.TaskType_SyncSwapLP: {
 		Payable: true,
@@ -337,6 +353,21 @@ var SpecMap = map[v1.TaskType]Spec{
 				return nil, errors.New("m.Task.(*v1.Task_StakeSTG)")
 			}
 			return Marshal(t.StakeSTG)
+		},
+	},
+	v1.TaskType_EraLend: {
+		Payable: true,
+		Tasker:  &Wrap{Tasker: NewEraLendTask()},
+		Estimate: func(ctx context.Context, a EstimateArg) (*v1.EstimationTx, error) {
+			p := a.Task.Task.(*v1.Task_EralendLPTask).EralendLPTask
+			return NewEraLendTask().EstimateLPCost(ctx, a.Profile, p, nil)
+		},
+		Desc: func(m *v1.Task) ([]byte, error) {
+			t, ok := m.Task.(*v1.Task_EralendLPTask)
+			if !ok {
+				return nil, errors.New("m.Task.(*v1.Task_EralendLPTask)")
+			}
+			return Marshal(t.EralendLPTask)
 		},
 	},
 
@@ -751,6 +782,41 @@ var SpecMap = map[v1.TaskType]Spec{
 			}
 			return Marshal(t.MerklyRefuel)
 		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			from := CastDefaultSimple(in.P).Network
+
+			var tos []v1.Network
+			var FromToken v1.Token
+			switch from {
+			case v1.Network_ARBITRUM:
+				FromToken = v1.Token_ETH
+				tos = []v1.Network{
+					v1.Network_POLIGON,
+				}
+			case v1.Network_POLIGON:
+				FromToken = v1.Token_MATIC
+				tos = []v1.Network{
+					v1.Network_Conflux,
+				}
+			case v1.Network_BinanaceBNB:
+				FromToken = v1.Token_BNB
+				tos = []v1.Network{
+					v1.Network_DFK,
+					v1.Network_Celo,
+				}
+			}
+			to := tos[rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(tos))]
+
+			return &v1.Task{
+				TaskType: in.Type,
+				Task: &v1.Task_MerklyRefuel{MerklyRefuel: &v1.DefaultBridge{
+					FromNetwork: from,
+					ToNetwork:   to,
+					FromToken:   FromToken,
+					ToToken:     0,
+				}},
+			}, nil
+		},
 	},
 	v1.TaskType_L2PassRefuel: {
 		Payable: true,
@@ -765,6 +831,35 @@ var SpecMap = map[v1.TaskType]Spec{
 				return nil, errors.New("m.Task.(*v1.Task_L2PassRefuel)")
 			}
 			return Marshal(t.L2PassRefuel)
+		},
+		CastR: func(in RandomTask) (*v1.Task, error) {
+			from := CastDefaultSimple(in.P).Network
+
+			var tos []v1.Network
+			var FromToken v1.Token
+			switch from {
+			case v1.Network_POLIGON:
+				FromToken = v1.Token_MATIC
+				tos = []v1.Network{
+					v1.Network_Fuse,
+					v1.Network_Loot,
+					v1.Network_Klaytn,
+					v1.Network_Celo,
+					v1.Network_Shimmer,
+				}
+			}
+
+			to := tos[rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(tos))]
+
+			return &v1.Task{
+				TaskType: in.Type,
+				Task: &v1.Task_L2PassRefuel{L2PassRefuel: &v1.DefaultBridge{
+					FromNetwork: from,
+					ToNetwork:   to,
+					FromToken:   FromToken,
+					ToToken:     0,
+				}},
+			}, nil
 		},
 	},
 

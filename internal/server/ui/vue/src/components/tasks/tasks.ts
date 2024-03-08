@@ -49,6 +49,8 @@ import {CoreDaoBridgeSpec} from "@/components/tasks/BRIDGE/CoreDao";
 import {StakeSTGSpec} from "@/components/tasks/LP/StakeSTG";
 import {merklyRefuelSpec} from "@/components/tasks/BRIDGE/MerklyRefuel";
 import {l2PassRefuelSpec} from "@/components/tasks/BRIDGE/L2Pass";
+import {StarknetClaim} from "@/components/tasks/OTHER/StarknetClaim";
+import {LPEraLendLPSpec} from "@/components/tasks/LP/EraLend";
 
 
 export interface TaskArg {
@@ -136,6 +138,8 @@ export const taskProps: Record<TaskType, TaskSpec> = {
     StakeSTG: StakeSTGSpec,
     MerklyRefuel: merklyRefuelSpec,
     L2PassRefuel: l2PassRefuelSpec,
+    StarknetClaim: StarknetClaim,
+    EraLend: LPEraLendLPSpec,
 }
 
 export const getFlow = (flow: { tasks: Task[] }): string[] => {

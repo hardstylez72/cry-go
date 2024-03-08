@@ -219,7 +219,7 @@ func (h *DefaultBridgeTaskHalper) Execute(ctx context.Context, profile *halp.Pro
 	estimateOnly := estimation == nil
 	var Gas *bozdo.Gas
 	if estimateOnly {
-		am = bozdo.Percent(am, 90)
+		am = bozdo.Percent(am, 80)
 		Gas = nil
 	} else {
 		gas, err := GasManager(estimation, s.Source, p.FromNetwork, h.TaskType)

@@ -228,5 +228,9 @@ export enum Token {
   'CFX' = 'CFX',
   'FUSE' = 'FUSE',
   'AGLD' = 'AGLD',
-  'KLAY' = 'KLAY'
+  'KLAY' = 'KLAY',
+  'CELO' = 'CELO',
+  'SMR' = 'SMR',
+  'JEWEL' = 'JEWEL',
+  'STRK' = 'STRK'
 }

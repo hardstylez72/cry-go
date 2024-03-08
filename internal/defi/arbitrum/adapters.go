@@ -114,7 +114,6 @@ func (c *Client) Bridge(ctx context.Context, req *defi.DefaultBridgeReq, taskTyp
 		return FW1(ctx, b.Bridge, req)
 	case v1.TaskType_StargateBridge:
 		return stargate.NewBridge(c.defi).Bridge(ctx, req)
-
 	case v1.TaskType_MerklyRefuel:
 		return merkly.NewBridge(c.defi, common.HexToAddress("0x4ae8cebccd7027820ba83188dfd73ccad0a92806")).Bridge(ctx, req)
 	default:

@@ -528,6 +528,38 @@
         ]
       }
     },
+    "/api/gw/v1/profile/starknet/elig": {
+      "post": {
+        "operationId": "ProfileService_StrarkNetEligable",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/StrarkNetEligableRes"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/StrarkNetEligableReq"
+            }
+          }
+        ],
+        "tags": [
+          "ProfileService"
+        ]
+      }
+    },
     "/api/gw/v1/profile/update": {
       "post": {
         "operationId": "ProfileService_UpdateProfile",
@@ -916,7 +948,10 @@
         "Conflux",
         "Fuse",
         "Loot",
-        "Klaytn"
+        "Klaytn",
+        "Celo",
+        "Shimmer",
+        "DFK"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -1171,6 +1206,25 @@
         }
       }
     },
+    "StrarkNetEligableReq": {
+      "type": "object",
+      "properties": {
+        "profileId": {
+          "type": "string"
+        }
+      }
+    },
+    "StrarkNetEligableRes": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "addr": {
+          "type": "string"
+        }
+      }
+    },
     "Token": {
       "type": "string",
       "enum": [
@@ -1197,7 +1251,11 @@
         "CFX",
         "FUSE",
         "AGLD",
-        "KLAY"
+        "KLAY",
+        "CELO",
+        "SMR",
+        "JEWEL",
+        "STRK"
       ],
       "default": "USDT"
     },

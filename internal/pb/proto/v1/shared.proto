@@ -40,6 +40,9 @@ enum Network {
   Fuse = 23;
   Loot = 24;
   Klaytn = 25;
+  Celo = 26;
+  Shimmer = 27;
+  DFK = 28;
 }
 
 enum Token {
@@ -67,6 +70,10 @@ enum Token {
   FUSE = 21;
   AGLD = 22;
   KLAY = 23;
+  CELO = 24;
+  SMR = 25;
+  JEWEL = 26;
+  STRK = 27;
 }
 
 enum ProcessStatus {

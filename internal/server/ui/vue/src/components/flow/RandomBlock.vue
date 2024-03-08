@@ -24,7 +24,9 @@
                              Network.Base,
                               Network.ZKSYNCERA,
                                Network.StarkNet,
-                               Network.ARBITRUM]"
+                               Network.ARBITRUM,
+                               Network.POLIGON,
+                               Network.BinanaceBNB]"
                            v-model="network"
                            :disabled="disable"
                            class="mx-2"/>
@@ -45,13 +47,13 @@
         </div>
 
 
-        <div v-if="tasks.length" style="width: 200px">
+        <div v-if="tasks.length && fromTokens && fromTokens.length" style="width: 200px">
           <TokenSelector :disabled="disable" label="Монета на вход" :items="fromTokens" v-model="startToken"
                          class="mx-3"/>
 
         </div>
 
-        <div v-if="tasks.length" style="width: 170px">
+        <div v-if="tasks.length && toTokens && toTokens.length" style="width: 170px">
           <TokenSelector :disabled="disable" label="Монета на выход" :items="toTokens" v-model="finishToken"
                          class="mx-3"/>
         </div>
@@ -168,7 +170,7 @@
           <TaskSelectorChip v-if="network" :base-network-filter="network" label="Добавить"
                             :disable="disable"
                             @addStep="addStep"
-                            :exclude-jobs="[TaskJob.LP, TaskJob.Bridge, TaskJob.Exchange, TaskJob.Other]"
+                            :exclude-jobs="[TaskJob.LP,  TaskJob.Exchange, TaskJob.Other]"
           />
           <v-chip v-for="(task, index) in getTasks" rounded variant="outlined"
                   class="mx-1" :disabled="disable">
@@ -203,7 +205,7 @@
         <v-chip-group>
           <TaskSelectorChip v-if="network" :base-network-filter="network" label="Добавить"
                             @addStep="addRandomStep" :disable="disable"
-                            :exclude-jobs="[TaskJob.Swap, TaskJob.LP, TaskJob.Bridge, TaskJob.Exchange, TaskJob.Other]"/>
+                            :exclude-jobs="[TaskJob.Swap, TaskJob.LP, TaskJob.Exchange, TaskJob.Other]"/>
 
           <v-chip v-for="(task, index) in randomTasks" rounded :closable="true" @click:close="randomTaskDeleted(index)"
                   variant="outlined" class="mx-1" :disabled="disable">
@@ -233,9 +235,9 @@
 import {defineComponent, PropType} from 'vue';
 import {
   FlowBlock,
+  FlowPreviewRes,
   Network,
   OnlyRandomFlowPreviewReq,
-  FlowPreviewRes,
   RandomTask,
   TaskType,
   Token
@@ -567,6 +569,13 @@ export default defineComponent({
             }
           });
           break
+        case TaskJob.Bridge:
+          this.randomTasks.push({
+            taskType: task,
+            optional: true,
+            simple: {network: this.network}
+          });
+          break
       }
 
       this.resolveRandomOrder()
@@ -586,7 +595,7 @@ export default defineComponent({
           });
           break
         case TaskJob.Simple:
-          this.randomTasks.push({
+          this.tasks.push({
             taskType: task,
             optional: false,
             simple: {
@@ -595,12 +604,19 @@ export default defineComponent({
           });
           break
         case TaskJob.NFT:
-          this.randomTasks.push({
+          this.tasks.push({
             taskType: task,
             optional: false,
             simple: {
               network: this.network
             }
+          });
+          break
+        case TaskJob.Bridge:
+          this.tasks.push({
+            taskType: task,
+            optional: false,
+            simple: {network: this.network}
           });
           break
       }
@@ -699,6 +715,13 @@ export default defineComponent({
                 simple: v.simple
               });
               break
+            case TaskJob.Bridge:
+              this.randomTasks.push({
+                taskType: v.taskType,
+                optional: v.optional,
+                simple: {network: this.network}
+              });
+              break
           }
 
         } else {
@@ -722,6 +745,13 @@ export default defineComponent({
                 taskType: v.taskType,
                 optional: v.optional,
                 simple: v.simple
+              });
+              break
+            case TaskJob.Bridge:
+              this.tasks.push({
+                taskType: v.taskType,
+                optional: v.optional,
+                simple: {network: this.network}
               });
               break
           }

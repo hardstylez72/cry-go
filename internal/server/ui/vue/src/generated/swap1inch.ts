@@ -259,5 +259,8 @@ export enum Network {
   'Conflux' = 'Conflux',
   'Fuse' = 'Fuse',
   'Loot' = 'Loot',
-  'Klaytn' = 'Klaytn'
+  'Klaytn' = 'Klaytn',
+  'Celo' = 'Celo',
+  'Shimmer' = 'Shimmer',
+  'DFK' = 'DFK'
 }

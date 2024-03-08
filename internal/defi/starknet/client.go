@@ -94,17 +94,25 @@ func (c *Client) GetPublicKey(pk string, subType v1.ProfileSubType) (string, err
 		return "", err
 	}
 
-	if len(res.PublicKey) < 64+2 {
-		addZeros := len(res.PublicKey) - 64
-		base := res.PublicKey[2:]
+	res.PublicKey = nr(res.PublicKey)
+
+	return res.PublicKey, nil
+}
+
+func nr(s string) string {
+
+	l := len(s)
+	if l < 66 {
+		addZeros := 66 - len(s)
+		base := s[2:]
 
 		for i := 0; i < addZeros; i++ {
 			base = "0" + base
 		}
-		return "0x" + base, nil
+		return "0x" + base
 	}
 
-	return res.PublicKey, nil
+	return s
 }
 
 func (c *Client) Network() v1.Network {

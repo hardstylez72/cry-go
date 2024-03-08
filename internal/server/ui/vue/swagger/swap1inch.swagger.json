@@ -247,7 +247,10 @@
         "Conflux",
         "Fuse",
         "Loot",
-        "Klaytn"
+        "Klaytn",
+        "Celo",
+        "Shimmer",
+        "DFK"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"

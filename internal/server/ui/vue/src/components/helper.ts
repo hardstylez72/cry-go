@@ -274,11 +274,25 @@ export const tokenBridgePair = (n1: Network, n2: Network, t1: Token, t2: Token):
 export interface network {
     value: Network
     name: string
-
     img: string
 }
 
 export const networkProps: Record<Network, network> = {
+    DFK: {
+        name: 'DFK',
+        img: '/icons/networks/dfk.svg',
+        value: Network.DFK,
+    },
+    Shimmer: {
+        name: 'Shimmer',
+        img: '/icons/networks/shimmer.svg',
+        value: Network.Shimmer,
+    },
+    Celo: {
+        name: 'Celo',
+        img: '/icons/networks/celo.svg',
+        value: Network.Celo,
+    },
     Klaytn: {
         name: 'Klaytn',
         img: '/icons/networks/klaytn.svg',

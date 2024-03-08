@@ -148,3 +148,74 @@ func (c *EtheriumClient) TransferMainToken(ctx context.Context, r *TransferMainT
 		ECost: res.ECost,
 	}, nil
 }
+
+func (c *EtheriumClient) TransferV2(ctx context.Context, req *TransferReq) (*TransferRes, error) {
+
+	if err := req.Validate(c.Cfg.TokenMap); err != nil {
+		return nil, err
+	}
+
+	wallet, err := NewWalletTransactor(req.Pk)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Token == c.Cfg.MainToken {
+		return c.TransferMainToken(ctx, &TransferMainTokenReq{
+			Wallet:       wallet,
+			ToAddr:       req.ToAddr,
+			Amount:       req.Amount,
+			Gas:          req.Gas,
+			EstimateOnly: req.EstimateOnly,
+		})
+	}
+
+	tokenAddr := c.Cfg.TokenMap[req.Token]
+
+	toto := common.HexToAddress(req.ToAddr)
+
+	_, err = c.TokenLimitChecker(ctx, &TokenLimitCheckerReq{
+		Token:       req.Token,
+		Wallet:      wallet,
+		Amount:      req.Amount,
+		SpenderAddr: common.HexToAddress(req.ToAddr),
+	})
+	if err != nil {
+		return nil, err
+	}
+	
+	abi, err := erc_20.StorageMetaData.GetAbi()
+	if err != nil {
+		return nil, err
+	}
+
+	pack, err := abi.Pack("transfer", toto, req.Amount)
+	if err != nil {
+		return nil, err
+	}
+
+	txData := &bozdo.TxData{
+		Data:         pack,
+		Value:        big.NewInt(0),
+		ContractAddr: tokenAddr,
+		Code:         bozdo.CodeTransfer,
+	}
+
+	opt := &TxOpt{
+		NoSend:   req.EstimateOnly,
+		Pk:       req.Pk,
+		Gas:      req.Gas,
+		Debug:    false,
+		TaskType: v1.TaskType_OkexDeposit,
+	}
+
+	london, err := c.London(ctx, c, opt, txData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TransferRes{
+		Tx:    london.Tx,
+		ECost: london.ECost,
+	}, nil
+}

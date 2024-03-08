@@ -28,6 +28,8 @@ export const merklyRefuelSpec: TaskSpec = {
     job: TaskJob.Bridge,
     networks: new Set<Network>([
         Network.ARBITRUM,
+        Network.POLIGON,
+        Network.BinanaceBNB,
     ]),
     airdrops: new Set<Airdrop>([Airdrop.LayerZero]),
     profileType: new Set([ProfileType.EVM])

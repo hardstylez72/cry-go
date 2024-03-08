@@ -290,7 +290,10 @@ export enum Network {
   'Conflux' = 'Conflux',
   'Fuse' = 'Fuse',
   'Loot' = 'Loot',
-  'Klaytn' = 'Klaytn'
+  'Klaytn' = 'Klaytn',
+  'Celo' = 'Celo',
+  'Shimmer' = 'Shimmer',
+  'DFK' = 'DFK'
 }
 
 export enum Token {
@@ -317,5 +320,9 @@ export enum Token {
   'CFX' = 'CFX',
   'FUSE' = 'FUSE',
   'AGLD' = 'AGLD',
-  'KLAY' = 'KLAY'
+  'KLAY' = 'KLAY',
+  'CELO' = 'CELO',
+  'SMR' = 'SMR',
+  'JEWEL' = 'JEWEL',
+  'STRK' = 'STRK'
 }

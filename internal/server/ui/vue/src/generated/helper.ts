@@ -660,7 +660,10 @@ export enum Network {
   'Conflux' = 'Conflux',
   'Fuse' = 'Fuse',
   'Loot' = 'Loot',
-  'Klaytn' = 'Klaytn'
+  'Klaytn' = 'Klaytn',
+  'Celo' = 'Celo',
+  'Shimmer' = 'Shimmer',
+  'DFK' = 'DFK'
 }
 
 export enum ProfileSubType {
@@ -727,5 +730,7 @@ export enum TaskType {
   'CoreDaoBridge' = 'CoreDaoBridge',
   'StakeSTG' = 'StakeSTG',
   'MerklyRefuel' = 'MerklyRefuel',
-  'L2PassRefuel' = 'L2PassRefuel'
+  'L2PassRefuel' = 'L2PassRefuel',
+  'StarknetClaim' = 'StarknetClaim',
+  'EraLend' = 'EraLend'
 }

@@ -1,8 +1,8 @@
 <template>
   <v-menu
-    v-model="menu"
-    :close-on-content-click="false"
-    location="end"
+      v-model="menu"
+      :close-on-content-click="false"
+      location="end"
   >
 
     <template v-slot:activator="{ props }">
@@ -18,6 +18,8 @@
             <i class="mx-2">{{ profile.subType }}</i>
             <b class="mx-2" v-if="profile.type === ProfileType.StarkNet &&!deployed && !loading" style="color: red">not
               deployed</b>
+            <b class="mx-2" v-if="profile.type === ProfileType.StarkNet && starkElig" style="color: green">strk drop</b>
+
             <ProfileAddress :addr="profile.mmskId" v-model="addrShow"/>
           </div>
           <v-icon icon="mdi-close" @click="menu = false"/>
@@ -118,6 +120,8 @@ export default defineComponent({
     return {
       loading: false,
       deployed: false,
+      starkElig: false,
+      cairoVersion: "0",
       addrShow: false,
       profile: {} as Profile,
       menu: false,
@@ -155,8 +159,17 @@ export default defineComponent({
         const res = await profileService.profileServiceGetProfile({body: {profileId: this.profileId}})
         this.profile = res.profile
 
-        const deployed = await profileService.profileServiceStarkNetAccountDeployed({body: {profileId: this.profileId}})
-        this.deployed = deployed.deployed
+        if (res.profile.type === ProfileType.StarkNet) {
+
+          const elig = await profileService.profileServiceStrarkNetEligable({body: {profileId: this.profileId}})
+          this.starkElig = elig.ok
+
+          const deployed = await profileService.profileServiceStarkNetAccountDeployed({body: {profileId: this.profileId}})
+
+          this.deployed = deployed.deployed
+
+
+        }
       } finally {
         this.loading = false
       }

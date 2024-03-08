@@ -123,4 +123,5 @@ type HalperService interface {
 	ZkLend(ctx context.Context, req *LPRreq) (*LPRes, error)
 	Balance(ctx context.Context, req *BalanceReq) (*BalanceRes, error)
 	Nostra(ctx context.Context, req *LPRreq) (*LPRes, error)
+	Claim(ctx context.Context, req *SendDmailReq) (*LPRes, error)
 }

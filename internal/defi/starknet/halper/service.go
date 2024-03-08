@@ -151,6 +151,15 @@ type DefaultRes struct {
 	TxHash          *string `json:"txHash"`
 }
 
+func (s *Service) Claim(ctx context.Context, req *SendDmailReq) (*LPRes, error) {
+	res, err := Request[SendDmailReq, LPRes](ctx, s.cli, s.c.Host+"/starknet/claim", req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (s *Service) Swap(ctx context.Context, req *DefaultSwapReq) (*DefaultSwapRes, error) {
 	res, err := Request[DefaultSwapReq, DefaultSwapRes](ctx, s.cli, s.c.Host+"/starknet/swap", req)
 	if err != nil {

@@ -42,7 +42,7 @@ func (c *Bridge) BridgeETH(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 		return nil, err
 	}
 
-	pack, err := abi.Pack("SwapETH",
+	pack, err := abi.Pack("swapETH",
 		destChainId,
 		w.WalletAddr,
 		w.WalletAddr.Bytes(),
@@ -59,6 +59,7 @@ func (c *Bridge) BridgeETH(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 		ContractAddr: ca,
 		Details:      details,
 		Code:         bozdo.CodeBridge,
+		ExtraFee:     fee.Fee1,
 	}
 
 	opt := &defi.TxOpt{

@@ -202,7 +202,11 @@
         "CFX",
         "FUSE",
         "AGLD",
-        "KLAY"
+        "KLAY",
+        "CELO",
+        "SMR",
+        "JEWEL",
+        "STRK"
       ],
       "default": "USDT"
     },

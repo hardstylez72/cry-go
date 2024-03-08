@@ -39,6 +39,9 @@ var LayerZeroChainMap = map[v1.Network]uint16{
 	v1.Network_Fuse:         138,
 	v1.Network_Loot:         197,
 	v1.Network_Klaytn:       150,
+	v1.Network_Celo:         125,
+	v1.Network_Shimmer:      230,
+	v1.Network_DFK:          115,
 
 	//SBNameMetis:         151,
 }

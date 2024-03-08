@@ -307,7 +307,10 @@
         "Conflux",
         "Fuse",
         "Loot",
-        "Klaytn"
+        "Klaytn",
+        "Celo",
+        "Shimmer",
+        "DFK"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -357,7 +360,11 @@
         "CFX",
         "FUSE",
         "AGLD",
-        "KLAY"
+        "KLAY",
+        "CELO",
+        "SMR",
+        "JEWEL",
+        "STRK"
       ],
       "default": "USDT"
     }

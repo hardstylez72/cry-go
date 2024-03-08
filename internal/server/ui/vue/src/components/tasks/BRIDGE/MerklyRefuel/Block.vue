@@ -61,6 +61,8 @@ export default class TaskAcrossBridgeBlock extends TaskDefaultBridge {
   pairs = [
     tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.ETH, Token.MATIC),
     tokenBridgePair(Network.POLIGON, Network.Conflux, Token.MATIC, Token.CFX),
+    tokenBridgePair(Network.BinanaceBNB, Network.DFK, Token.BNB, Token.JEWEL),
+    tokenBridgePair(Network.BinanaceBNB, Network.Celo, Token.BNB, Token.CELO),
   ]
 
   getTask(): Task {

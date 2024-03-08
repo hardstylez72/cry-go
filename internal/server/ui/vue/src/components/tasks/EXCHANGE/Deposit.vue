@@ -5,21 +5,15 @@
       <v-row>
         <v-col>
           <NetworkSelector
-            label="network"
-            :items="networks"
-            :disabled="disabled"
-            v-model="network"
+              label="network"
+              :items="networks"
+              :disabled="disabled"
+              v-model="network"
           />
         </v-col>
         <v-col>
-          <v-select
-            density="compact"
-            variant="outlined"
-            label="token"
-            :rules="[required]"
-            :items="tokens"
-            v-model="item.token"
-            :disabled="disabled"
+
+          <TokenSelector :disabled="disabled" label="Монета на выход" :items="tokens" v-model="item.token"
           />
         </v-col>
       </v-row>
@@ -34,10 +28,11 @@ import {defineComponent, PropType} from "vue";
 import AmountInput from "@/components/tasks/AmountInput.vue";
 import {required} from "@/components/tasks/helper";
 import NetworkSelector from "@/components/tasks/NetworkSelector.vue";
+import TokenSelector from "@/components/tasks/TokenSelector.vue";
 
 export default defineComponent({
   name: "TaskOkexDeposit",
-  components: {NetworkSelector, AmountInput},
+  components: {TokenSelector, NetworkSelector, AmountInput},
   emits: ['taskChanged'],
   props: {
     weight: {
@@ -83,7 +78,7 @@ export default defineComponent({
       network: Network.ARBITRUM,
       opt: new Map<Network, Token[]>([
         [Network.ARBITRUM, [Token.USDT, Token.USDC, Token.USDCBridged, Token.ETH]],
-        [Network.StarkNet, [Token.ETH]],
+        [Network.StarkNet, [Token.ETH, Token.STRK]],
         [Network.ZKSYNCERA, [Token.ETH]],
         [Network.Etherium, [Token.ETH, Token.USDC, Token.USDT]],
         [Network.AVALANCHE, [Token.USDC, Token.USDT]],

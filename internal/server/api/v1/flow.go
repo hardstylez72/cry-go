@@ -324,6 +324,11 @@ func (s *FlowService) OnlyRandomFlowFromTokens(ctx context.Context, req *v1.Only
 	m := map[v1.Token]bool{}
 	tokens := make([]v1.Token, 0)
 	for _, randomTask := range tasks {
+
+		if randomTask.FromToken() == nil {
+			continue
+		}
+
 		m[*randomTask.FromToken()] = true
 	}
 

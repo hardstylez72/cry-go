@@ -12,6 +12,22 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewEraLendTask() *DefaultLPTask {
+	return &DefaultLPTask{
+		taskType: v1.TaskType_EraLend,
+		extractor: func(a *Input) (*v1.DefaultLP, error) {
+			l, ok := a.Task.Task.Task.(*v1.Task_EralendLPTask)
+			if !ok {
+				return nil, errors.New("Task.(*v1.Task_EralendLPTask) call an ambulance!")
+			}
+			return l.EralendLPTask, nil
+		},
+		DefaultLPTaskHalper: &DefaultLPTaskHalper{
+			TaskType: v1.TaskType_EraLend,
+		},
+	}
+}
+
 func NewStakeSTGTask() *DefaultLPTask {
 	return &DefaultLPTask{
 		taskType: v1.TaskType_StakeSTG,

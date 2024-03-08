@@ -42,7 +42,7 @@ func (a *Bridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo
 		return nil, err
 	}
 
-	caller, err := NewMerklyrefuelCaller(a.CA, a.Cli.Cli)
+	caller, err := NewMerklyrefuel(a.CA, a.Cli.Cli)
 	if err != nil {
 		return nil, err
 	}
@@ -74,6 +74,16 @@ func (a *Bridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo
 		boba, _ = big.NewFloat(0).Mul(big.NewFloat(div), big.NewFloat(params.Ether/20)).Int(nil)
 		NativeForDst = big.NewInt(50000000000000000)
 
+	case req.FromNetwork == v1.Network_BinanaceBNB && req.ToNetwork == v1.Network_Celo:
+		div := pub.Price().CFX / pub.Price().BNB
+		// 1 matic
+		boba, _ = big.NewFloat(0).Mul(big.NewFloat(div), big.NewFloat(params.Ether/20)).Int(nil)
+		NativeForDst = big.NewInt(1000000000000000)
+	case req.FromNetwork == v1.Network_BinanaceBNB && req.ToNetwork == v1.Network_DFK:
+		div := pub.Price().CFX / pub.Price().BNB
+		// 1 matic
+		boba, _ = big.NewFloat(0).Mul(big.NewFloat(div), big.NewFloat(params.Ether/20)).Int(nil)
+		NativeForDst = big.NewInt(1000000000000000)
 	default:
 		return nil, errors.New("не поддерживается")
 	}
@@ -118,6 +128,7 @@ func (a *Bridge) Bridge(ctx context.Context, req *defi.DefaultBridgeReq) (*bozdo
 }
 
 func (a *Bridge) WaitForConfirm(ctx context.Context, txId string) error {
+	return nil
 	s := lzscan.NewService()
 
 	_, err := s.WaitConfirm(ctx, txId)

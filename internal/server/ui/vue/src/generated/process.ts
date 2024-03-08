@@ -1390,6 +1390,12 @@ export interface Task {
 
   /**  */
   l2passRefuel?: DefaultBridge;
+
+  /**  */
+  starknetClaim?: SimpleTask;
+
+  /**  */
+  eralendLPTask?: DefaultLP;
 }
 
 export interface TaskTx {
@@ -1599,7 +1605,10 @@ export enum Network {
   'Conflux' = 'Conflux',
   'Fuse' = 'Fuse',
   'Loot' = 'Loot',
-  'Klaytn' = 'Klaytn'
+  'Klaytn' = 'Klaytn',
+  'Celo' = 'Celo',
+  'Shimmer' = 'Shimmer',
+  'DFK' = 'DFK'
 }
 
 export enum ProcessStatus {
@@ -1669,7 +1678,9 @@ export enum TaskType {
   'CoreDaoBridge' = 'CoreDaoBridge',
   'StakeSTG' = 'StakeSTG',
   'MerklyRefuel' = 'MerklyRefuel',
-  'L2PassRefuel' = 'L2PassRefuel'
+  'L2PassRefuel' = 'L2PassRefuel',
+  'StarknetClaim' = 'StarknetClaim',
+  'EraLend' = 'EraLend'
 }
 
 export enum Token {
@@ -1696,5 +1707,9 @@ export enum Token {
   'CFX' = 'CFX',
   'FUSE' = 'FUSE',
   'AGLD' = 'AGLD',
-  'KLAY' = 'KLAY'
+  'KLAY' = 'KLAY',
+  'CELO' = 'CELO',
+  'SMR' = 'SMR',
+  'JEWEL' = 'JEWEL',
+  'STRK' = 'STRK'
 }

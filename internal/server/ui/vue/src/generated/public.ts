@@ -220,5 +220,7 @@ export enum TaskType {
   'CoreDaoBridge' = 'CoreDaoBridge',
   'StakeSTG' = 'StakeSTG',
   'MerklyRefuel' = 'MerklyRefuel',
-  'L2PassRefuel' = 'L2PassRefuel'
+  'L2PassRefuel' = 'L2PassRefuel',
+  'StarknetClaim' = 'StarknetClaim',
+  'EraLend' = 'EraLend'
 }

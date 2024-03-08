@@ -87,15 +87,35 @@ func Permute(arg PermuteArg) ([][]RandomTask, error) {
 	out := make([][]RandomTask, 0)
 
 	services := map[v1.TaskType][]RandomTask{}
+	simple := 0
 	for _, el := range arg.In {
 		services[el.Type] = append(services[el.Type], el)
+
+		if el.Kind == v1.TaskKind_TKSimple {
+			simple++
+		}
+	}
+
+	if simple == len(arg.In) {
+
+		tt := []RandomTask{}
+		for _, tasks := range services {
+			for _, task := range tasks {
+				tt = append(tt, task)
+			}
+		}
+
+		for i := 0; i < 100; i++ {
+			out = append(out, tt)
+		}
+
+		return out, nil
 	}
 
 	duplicates := map[string]bool{}
 
 	for _, tasks := range services {
 		for _, task := range tasks {
-
 			if task.FromToken() != nil && arg.StartToken != nil && task.FromToken().String() != arg.StartToken.String() {
 				continue
 			}
@@ -451,18 +471,20 @@ func TokenCombo(flows [][]*v1.Task) []*v1.TokenArr {
 	m := map[v1.Token]map[v1.Token]bool{}
 
 	for _, flow := range flows {
-
 		var input *TaskInput
 		var err error
 		start := 0
 		for start < len(flow) {
 			firstTask := flow[start]
-
 			input, err = taskInput(firstTask)
 			if err == nil && !input.NoInput {
 				break
 			}
 			start++
+		}
+
+		if start == len(flow)-1 && len(flow) > 0 {
+			return []*v1.TokenArr{}
 		}
 
 		end := len(flow) - 1
@@ -476,6 +498,14 @@ func TokenCombo(flows [][]*v1.Task) []*v1.TokenArr {
 			}
 
 			end--
+		}
+
+		if end == 0 && len(flow) > 0 {
+			return []*v1.TokenArr{}
+		}
+
+		if input == nil {
+			return []*v1.TokenArr{}
 		}
 
 		_, exist := m[input.Token]

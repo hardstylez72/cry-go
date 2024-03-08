@@ -32,12 +32,11 @@
 import {Component} from "vue-facing-decorator";
 import DefaultBridgeMenu from "@/components/tasks/BRIDGE/DefaultBridgeMenu";
 import NetworkChip from "@/components/tasks/NetworkChip.vue";
-import TokenSelector from "@/components/tasks/TokenSelector.vue";
 import TokenChip from "@/components/tasks/TokenChip.vue";
 
 @Component({
   name: 'BridgeAcrossMenu',
-  components: {TokenChip, TokenSelector, NetworkChip}
+  components: {TokenChip, NetworkChip}
 })
 export default class BridgeAcrossMenu extends DefaultBridgeMenu {
   created() {

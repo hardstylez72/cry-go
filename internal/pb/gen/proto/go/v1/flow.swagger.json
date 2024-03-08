@@ -1341,7 +1341,10 @@
         "Conflux",
         "Fuse",
         "Loot",
-        "Klaytn"
+        "Klaytn",
+        "Celo",
+        "Shimmer",
+        "DFK"
       ],
       "default": "ARBITRUM",
       "title": "- ZKSYNCERATESTNET: deprecated"
@@ -2086,6 +2089,12 @@
         },
         "l2passRefuel": {
           "$ref": "#/definitions/DefaultBridge"
+        },
+        "starknetClaim": {
+          "$ref": "#/definitions/SimpleTask"
+        },
+        "eralendLPTask": {
+          "$ref": "#/definitions/DefaultLP"
         }
       },
       "required": [
@@ -2213,7 +2222,9 @@
         "CoreDaoBridge",
         "StakeSTG",
         "MerklyRefuel",
-        "L2PassRefuel"
+        "L2PassRefuel",
+        "StarknetClaim",
+        "EraLend"
       ],
       "default": "StargateBridge",
       "title": "- OkexBinance: deprecated"
@@ -2269,7 +2280,11 @@
         "CFX",
         "FUSE",
         "AGLD",
-        "KLAY"
+        "KLAY",
+        "CELO",
+        "SMR",
+        "JEWEL",
+        "STRK"
       ],
       "default": "USDT"
     },

@@ -64,6 +64,8 @@ enum TaskType {
   StakeSTG = 50;
   MerklyRefuel = 51;
   L2PassRefuel = 52;
+  StarknetClaim = 53;
+  EraLend = 54;
 }
 
 

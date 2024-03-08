@@ -7,7 +7,10 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"encoding/hex"
+	"encoding/json"
+	"io"
 	"math/big"
+	"net/http"
 	"sync"
 	"time"
 
@@ -268,6 +271,7 @@ func (s *ProfileService) SearchProfile(ctx context.Context, req *v1.SearchProfil
 func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceRequest) (*v1.GetBalanceResponse, error) {
 
 	tokens := []v1.Token{
+		v1.Token_STRK,
 		v1.Token_USDT,
 		v1.Token_USDC,
 		v1.Token_USDCBridged,
@@ -505,6 +509,59 @@ func (s *ProfileService) StarkNetAccountDeployed(ctx context.Context, req *v1.St
 	}
 
 	return &v1.StarkNetAccountDeployedRes{Deployed: *deployed}, nil
+}
+
+func (s *ProfileService) StrarkNetEligable(ctx context.Context, req *v1.StrarkNetEligableReq) (*v1.StrarkNetEligableRes, error) {
+
+	p, err := s.repository.GetProfile(ctx, req.ProfileId)
+	if err != nil {
+		return nil, err
+	}
+
+	profile, err := p.ToPB(s.starkNetClient)
+	if err != nil {
+		return nil, err
+	}
+
+	c := &http.Client{}
+
+	key := profile.MmskId
+
+	in := []string{key}
+
+	marshal, err := json.Marshal(&in)
+	if err != nil {
+		return nil, err
+	}
+
+	reqd, err := http.NewRequest(http.MethodPost, "http://159.89.194.249:3214/", bytes.NewBuffer(marshal))
+	if err != nil {
+		return nil, err
+	}
+
+	do, err := c.Do(reqd)
+	if err != nil {
+		return nil, err
+	}
+
+	defer do.Body.Close()
+
+	all, err := io.ReadAll(do.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	m := map[string]any{}
+	err = json.Unmarshal(all, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	_, ok := m[key]
+
+	out := ok && m[key] != nil
+
+	return &v1.StrarkNetEligableRes{Ok: out, Addr: key}, nil
 }
 
 func (s *ProfileService) GetProfileRelations(ctx context.Context, req *v1.GetProfileRelationsReq) (*v1.GetProfileRelationsRes, error) {

@@ -465,6 +465,28 @@ export class ProfileService {
   /**
    *
    */
+  profileServiceStrarkNetEligable(
+    params: {
+      /**  */
+      body: StrarkNetEligableReq;
+    } = {} as any,
+    options: IRequestOptions = {}
+  ): Promise<StrarkNetEligableRes> {
+    return new Promise((resolve, reject) => {
+      let url = basePath + '/api/gw/v1/profile/starknet/elig';
+
+      const configs: IRequestConfig = getConfigs('post', 'application/json', url, options);
+
+      let data = params['body'];
+
+      configs.data = data;
+
+      axios(configs, resolve, reject);
+    });
+  }
+  /**
+   *
+   */
   profileServiceUpdateProfile(
     params: {
       /**  */
@@ -775,6 +797,19 @@ export interface StarkNetAccountDeployedRes {
   deployed: boolean;
 }
 
+export interface StrarkNetEligableReq {
+  /**  */
+  profileId?: string;
+}
+
+export interface StrarkNetEligableRes {
+  /**  */
+  ok?: boolean;
+
+  /**  */
+  addr?: string;
+}
+
 export interface TransferP2PReq {
   /**  */
   from?: string;
@@ -872,7 +907,10 @@ export enum Network {
   'Conflux' = 'Conflux',
   'Fuse' = 'Fuse',
   'Loot' = 'Loot',
-  'Klaytn' = 'Klaytn'
+  'Klaytn' = 'Klaytn',
+  'Celo' = 'Celo',
+  'Shimmer' = 'Shimmer',
+  'DFK' = 'DFK'
 }
 
 export enum ProfileSubType {
@@ -910,5 +948,9 @@ export enum Token {
   'CFX' = 'CFX',
   'FUSE' = 'FUSE',
   'AGLD' = 'AGLD',
-  'KLAY' = 'KLAY'
+  'KLAY' = 'KLAY',
+  'CELO' = 'CELO',
+  'SMR' = 'SMR',
+  'JEWEL' = 'JEWEL',
+  'STRK' = 'STRK'
 }

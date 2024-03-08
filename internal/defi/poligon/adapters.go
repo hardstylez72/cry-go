@@ -30,7 +30,7 @@ func (c *Client) GetNetworkToken() defi.Token {
 }
 
 func (c *Client) Transfer(ctx context.Context, r *defi.TransferReq) (*defi.TransferRes, error) {
-	return c.defi.Transfer(ctx, r)
+	return c.defi.TransferV2(ctx, r)
 }
 
 func (c *Client) GetNetworkId() *big.Int {
