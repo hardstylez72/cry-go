@@ -2284,7 +2284,8 @@
         "CELO",
         "SMR",
         "JEWEL",
-        "STRK"
+        "STRK",
+        "FTM"
       ],
       "default": "USDT"
     },

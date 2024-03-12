@@ -50,6 +50,9 @@
             <v-card-item>
               <Balance :profile-id="profileId" :network="Network.Core"/>
             </v-card-item>
+            <v-card-item>
+              <Balance :profile-id="profileId" :network="Network.Fantom"/>
+            </v-card-item>
           </div>
           <div>
             <v-card-item>

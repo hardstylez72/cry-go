@@ -31,6 +31,7 @@ type Pairs struct {
 	MATIC float64
 	CORE  float64
 	CFX   float64
+	FTM   float64
 }
 
 func Price() *Pairs {
@@ -133,6 +134,7 @@ func (l *Listener) GetData() (*Pairs, error) {
 		MATIC: matic,
 		CORE:  0.55,
 		CFX:   cfx,
+		FTM:   0.05,
 	}, nil
 }
 

@@ -1,15 +1,15 @@
 <template>
   <div>Ограничитель газа</div>
   <v-slider
-    v-model="multiplier"
-    density="compact"
-    label=""
-    :min="getMin"
-    step="1000"
-    :max="getMax"
-    persistent-hint
-    thumb-label="always"
-    hide-details
+      v-model="multiplier"
+      density="compact"
+      label=""
+      :min="getMin"
+      step="1000"
+      :max="getMax"
+      persistent-hint
+      thumb-label="always"
+      hide-details
   >
     <template v-slot:append>
 
@@ -58,6 +58,10 @@ export default defineComponent({
   },
   computed: {
     getMin(): string {
+      if (this.network == Network.Fantom) {
+        return "10000000000000000000"
+      }
+
       if (this.network == Network.BinanaceBNB) {
         return "100000000000000"
       }
@@ -73,6 +77,11 @@ export default defineComponent({
       return "10000000000000"
     },
     getMax(): string {
+
+      if (this.network == Network.Fantom) {
+        return "100000000000000000000"
+      }
+
       if (this.network == Network.BinanaceBNB) {
         return "100000000000000000"
       }

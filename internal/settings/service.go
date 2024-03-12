@@ -12,6 +12,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/bnb"
 	"github.com/hardstylez72/cry/internal/defi/core"
 	"github.com/hardstylez72/cry/internal/defi/etherium"
+	"github.com/hardstylez72/cry/internal/defi/fantom"
 	"github.com/hardstylez72/cry/internal/defi/linea"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
 	"github.com/hardstylez72/cry/internal/defi/poligon"
@@ -24,8 +25,6 @@ import (
 	"github.com/hardstylez72/cry/internal/uniclient"
 	"github.com/pkg/errors"
 )
-
-const LastSettingsUpdateTime = "2023-12-04 7:40:05"
 
 type GetSettingsNetworkRequest struct {
 	Network v1.Network
@@ -56,6 +55,7 @@ var Networks = []v1.Network{
 	v1.Network_Linea,
 	v1.Network_Zora,
 	v1.Network_Core,
+	v1.Network_Fantom,
 }
 
 func NewService(rep repository.SettingsRepository) *Service {
@@ -135,6 +135,7 @@ func resolveSettings(in *v1.NetworkSettings, network v1.Network, force bool) (*v
 	avalancheMax := "1000000000000000000"
 	bnbGas := "100000000000000000"
 	coreGas := "10000000000000000000"
+	fantomGas := "800000000000000000000"
 
 	switch network {
 	case v1.Network_POLIGON:
@@ -176,6 +177,9 @@ func resolveSettings(in *v1.NetworkSettings, network v1.Network, force bool) (*v
 	case v1.Network_Core:
 		s.RPC = core.MainNetURL
 		s.GasMax = coreGas
+	case v1.Network_Fantom:
+		s.RPC = fantom.MainNetURL
+		s.GasMax = fantomGas
 	}
 
 	return resolveNetworkSettings(in, s, force)

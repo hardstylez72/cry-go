@@ -2,6 +2,7 @@ package defi
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"math/big"
 
@@ -52,6 +53,10 @@ func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *boz
 	l1Fee, err := c.Cfg.EstimateL1Gas(ctx, data.Data)
 	if err != nil {
 		return nil, err
+	}
+
+	if opt.Debug {
+		log.Log.Debug("0x" + hex.EncodeToString(data.Data))
 	}
 
 	if opt.Debug {

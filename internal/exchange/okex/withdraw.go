@@ -57,8 +57,6 @@ func (s *Service) Withdraw(ctx context.Context, req *exchange.WithdrawRequest) (
 		time.Sleep(time.Second * 2)
 	}
 
-	l.Info("fee: ", fee)
-
 	if fee == "" || fee == "-1" {
 		return nil, errors.New("okex did not send fee value...")
 	}

@@ -21,10 +21,14 @@ var TokenAddress = map[defi.Token]common.Address{
 	v1.Token_WETH:        common.HexToAddress("0x4200000000000000000000000000000000000006"),
 	v1.Token_USDC:        common.HexToAddress("0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"),
 	v1.Token_USDCBridged: common.HexToAddress("0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca"),
+	v1.Token_STG:         common.HexToAddress("0xE3B53AF74a4BF62Ae5511055290838050bf764Df"),
 }
 
 var Dict = defi.Dict{
-	Stargate:                 defi.Stargate{},
+	Stargate: defi.Stargate{
+		StargateRouterAddress:    common.HexToAddress("0x45f1A95A4D3f3836523F5c83673c797f4d4d263B"),
+		StargateRouterEthAddress: common.Address{},
+	},
 	TestNetBridgeSwapAddress: common.HexToAddress(""),
 	Merkly: defi.Merkly{
 		NFT: common.HexToAddress("0xF882c982a95F4D3e8187eFE12713835406d11840"),

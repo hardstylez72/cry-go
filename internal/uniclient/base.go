@@ -8,6 +8,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/bnb"
 	"github.com/hardstylez72/cry/internal/defi/core"
 	"github.com/hardstylez72/cry/internal/defi/etherium"
+	"github.com/hardstylez72/cry/internal/defi/fantom"
 	"github.com/hardstylez72/cry/internal/defi/linea"
 	"github.com/hardstylez72/cry/internal/defi/optimism"
 	"github.com/hardstylez72/cry/internal/defi/poligon"
@@ -65,6 +66,8 @@ func NewBaseClient(network v1.Network, c *BaseClientConfig) (defi.Networker, err
 		cli, err = zora.NewClient(&zora.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	case v1.Network_Core:
 		cli, err = core.NewClient(&core.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
+	case v1.Network_Fantom:
+		cli, err = fantom.NewClient(&fantom.ClientConfig{HttpCli: proxy.Cli, RPCEndpoint: c.RPCEndpoint})
 	default:
 		return nil, errors.New("network is not supported for Networker")
 	}

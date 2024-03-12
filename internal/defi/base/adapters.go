@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
 	"github.com/hardstylez72/cry/internal/defi/_bridge/across"
+	"github.com/hardstylez72/cry/internal/defi/_bridge/stargate"
 	"github.com/hardstylez72/cry/internal/defi/_lp/aave"
 	"github.com/hardstylez72/cry/internal/defi/_nft/mintfun"
 	"github.com/hardstylez72/cry/internal/defi/bozdo"
@@ -52,6 +53,8 @@ func (c *Client) Bridge(ctx context.Context, req *defi.DefaultBridgeReq, taskTyp
 	case v1.TaskType_AcrossBridge:
 		b := across.NewAcrossBridge(c.defi)
 		return b.Bridge(ctx, req)
+	case v1.TaskType_StargateBridge:
+		return stargate.NewBridge(c.defi).Bridge(ctx, req)
 	default:
 		return nil, errors.New("bridge unsupported")
 	}
@@ -61,6 +64,8 @@ func (c *Client) WaitForConfirm(ctx context.Context, txId string, taskType v1.Ta
 	case v1.TaskType_AcrossBridge:
 		b := across.NewAcrossBridge(c.defi)
 		return b.WaitForConfirm(ctx, txId, receiver)
+	case v1.TaskType_StargateBridge:
+		return stargate.NewBridge(c.defi).WaitForConfirm(ctx, txId, taskType, receiver)
 	default:
 		return errors.New("bridge unsupported")
 	}

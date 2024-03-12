@@ -10,6 +10,11 @@ export interface token {
 }
 
 export const tokenProps: Record<Token, token> = {
+    FTM: {
+        name: 'FTM',
+        img: '/icons/fantom.svg',
+        value: Token.FTM,
+    },
     STRK: {
         name: 'STRK',
         img: '/icons/starknet.svg',

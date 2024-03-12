@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/hardstylez72/cry/internal/server/repository"
 	"github.com/hardstylez72/cry/internal/server/user"
 	settings2 "github.com/hardstylez72/cry/internal/settings"
+	"github.com/pkg/errors"
 )
 
 type SettingsService struct {
@@ -46,6 +48,17 @@ func (s *SettingsService) GetSettings(ctx context.Context, req *v1.GetSettingsRe
 
 	settings, err := s.settingsService.GetSettings(ctx, userId, req.Network)
 	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			resolveSettings, err := s.settingsService.ResolveSettings(ctx, userId, req.Network, true)
+			if err != nil {
+				return nil, err
+			}
+
+			return &v1.GetSettingsResponse{
+				Settings: resolveSettings,
+			}, nil
+		}
+
 		return nil, err
 	}
 

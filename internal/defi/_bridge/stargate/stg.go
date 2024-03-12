@@ -2,6 +2,7 @@ package stargate
 
 import (
 	"context"
+	"encoding/hex"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/hardstylez72/cry/internal/defi"
@@ -39,12 +40,20 @@ func (c *Bridge) BridgeSTG(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 		return nil, err
 	}
 
+	ext := []byte{}
+	if c.Cli.Network() == v1.Network_Fantom || c.Cli.Network() == v1.Network_Base {
+		ext, err = hex.DecodeString("00010000000000000000000000000000000000000000000000000000000000014c08")
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	pack, err := abi.Pack("sendTokens",
 		destChainId,
 		w.WalletAddr.Bytes(),
 		req.Amount,
 		common.HexToAddress("0x0000000000000000000000000000000000000000"),
-		[]byte{},
+		ext,
 	)
 	if err != nil {
 		return nil, err

@@ -43,6 +43,7 @@ export default defineComponent({
         Network.Linea,
         Network.Zora,
         Network.Core,
+        Network.Fantom,
       ] as Network[],
     }
   },

@@ -288,6 +288,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 		v1.Token_BUSD,
 		v1.Token_USDp,
 		v1.Token_CORE,
+		v1.Token_FTM,
 	}
 
 	var err error
