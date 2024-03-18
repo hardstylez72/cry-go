@@ -1,11 +1,11 @@
 <template>
   <v-dialog
-    v-model="menu"
-    :close-on-content-click="false"
-    width="200px"
+      v-model="menu"
+      :close-on-content-click="false"
+      width="200px"
   >
     <template v-slot:activator="{ props }">
-      <v-btn variant="flat" density="compact" color="red" @click="menu=true">Удалить</v-btn>
+      <v-btn variant="flat" density="compact" color="red" @click="remove">Удалить</v-btn>
     </template>
 
     <template v-slot:default>
@@ -40,6 +40,7 @@ import dayjs from "dayjs";
 
 export default defineComponent({
   name: "DeleteProcess",
+  emits: ['processRemoved'],
   props: {
     processId: {
       type: String,

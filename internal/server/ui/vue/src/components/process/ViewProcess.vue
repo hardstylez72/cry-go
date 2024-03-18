@@ -6,16 +6,16 @@
         <v-btn variant="flat" class="mx-1"
                @click="goFlow">Сценарий
         </v-btn>
-        <DeleteProcess class="mx-1" :process-id="processId"/>
+        <DeleteProcess class="mx-1" :process-id="processId" @process-removed="$router.push({name: 'Processes'})"/>
       </template>
     </NavBar>
 
     <div>
       <v-progress-linear
-        active
-        :model-value="processProgress(process)"
-        :color="getProgressColor"
-        height="15"
+          active
+          :model-value="processProgress(process)"
+          :color="getProgressColor"
+          height="15"
       >
         <template v-slot:default="{ value }">
           <strong>{{ process.progress }}%</strong>
@@ -35,13 +35,13 @@
             <v-tooltip text="В случае возникновения ошибки попытается попробовать снова через в 10 минут">
               <template v-slot:activator="{ props }">
                 <v-checkbox
-                  v-bind="props"
-                  style="height: 30px"
-                  color="blue"
-                  :disabled="autoRetryLoading"
-                  v-model="process.autoRetry"
-                  :label="getAutoRetryLabel"
-                  @input="autoRetryChanged"/>
+                    v-bind="props"
+                    style="height: 30px"
+                    color="blue"
+                    :disabled="autoRetryLoading"
+                    v-model="process.autoRetry"
+                    :label="getAutoRetryLabel"
+                    @input="autoRetryChanged"/>
               </template>
             </v-tooltip>
 
@@ -65,10 +65,10 @@
 
         <div class="mx-1 my-1" v-for="task in profile.tasks">
           <ProcessTaskMenu
-            :task="task"
-            :profile-id="profile.profileId"
-            :process-id="processId"
-            :pp-id="profile.id"/>
+              :task="task"
+              :profile-id="profile.profileId"
+              :process-id="processId"
+              :pp-id="profile.id"/>
 
         </div>
 

@@ -2,17 +2,16 @@
   <v-row>
     <v-col>
       <v-radio-group
-        density="comfortable"
-        direction="horizontal"
-        :inline="true"
-        v-model="kind"
-        @change="amountKindChanged"
-        :label="`Choose amount of ${coin} to send:`"
-        :disabled="disabled"
-        hide-details
+          density="comfortable"
+          direction="horizontal"
+          :inline="true"
+          v-model="kind"
+          @change="amountKindChanged"
+          :label="`Choose amount of ${coin} to send:`"
+          :disabled="disabled"
+          hide-details
       >
         <v-radio label="All" value="all"></v-radio>
-        <!--        <v-radio label="Value" value="value"></v-radio>-->
         <v-radio label="Percent" value="percent"></v-radio>
       </v-radio-group>
     </v-col>
@@ -20,26 +19,26 @@
   <v-row>
     <v-col v-if="kind === 'percent'">
       <v-text-field
-        type="number"
-        v-model="amount.sendPercent"
-        variant="outlined"
-        density="compact"
-        :label="`percent of ${coin} to use`"
-        :rules="[percent]"
-        :disabled="disabled"
-        hide-details
+          type="number"
+          v-model="amount.sendPercent"
+          variant="outlined"
+          density="compact"
+          :label="`Percent of ${coin} amount to use [1-100%]`"
+          suffix="%"
+          :rules="[percent]"
+          :disabled="disabled"
       />
     </v-col>
     <v-col v-if="kind === 'value'">
       <v-text-field
-        type="number"
-        variant="outlined"
-        density="compact"
-        :label="`value of ${coin} to use`"
-        v-model="amount.sendValue"
-        :rules="[required]"
-        :disabled="disabled"
-        hide-details
+          type="number"
+          variant="outlined"
+          density="compact"
+          :label="`value of ${coin} to use`"
+          v-model="amount.sendValue"
+          :rules="[required]"
+          :disabled="disabled"
+          hide-details
       />
     </v-col>
   </v-row>

@@ -134,7 +134,7 @@ func (l *Listener) GetData() (*Pairs, error) {
 		MATIC: matic,
 		CORE:  0.55,
 		CFX:   cfx,
-		FTM:   0.05,
+		FTM:   0.80,
 	}, nil
 }
 

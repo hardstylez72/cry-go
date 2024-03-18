@@ -354,7 +354,7 @@ func (s *ProcessService) ListProcess(ctx context.Context, req *v1.ListProcessReq
 		statuses = append(statuses, s.String())
 	}
 
-	processes, err := s.processRepository.ListProcessByUser(ctx, userId, statuses, int(req.Offset), 15)
+	processes, err := s.processRepository.ListProcessByUser(ctx, userId, statuses, int(req.Offset), 200)
 	if err != nil {
 		return nil, err
 	}

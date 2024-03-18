@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (c *Bridge) BridgeSTG(ctx context.Context, req *defi.DefaultBridgeReq) (_ *bozdo.DefaultRes, _ error) {
+func (c *Bridge) BridgeSTG(ctx context.Context, req *defi.DefaultBridgeReq) (res *bozdo.DefaultRes, _ error) {
 
 	ca, ok := c.Cli.Cfg.TokenMap[v1.Token_STG]
 	if !ok {
@@ -25,6 +25,22 @@ func (c *Bridge) BridgeSTG(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 		return nil, err
 	}
 
+	limitTx, err := c.Cli.TokenLimitChecker(ctx, &defi.TokenLimitCheckerReq{
+		Token:       req.FromToken,
+		Wallet:      w,
+		Amount:      req.Amount,
+		SpenderAddr: ca,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "TokenLimitChecker1")
+	}
+
+	defer func() {
+		if limitTx != nil && limitTx.LimitExtended {
+			res.ApproveTx = c.Cli.NewTx(limitTx.ApproveTx.Hash(), defi.CodeApprove, nil)
+		}
+	}()
+
 	fee, err := c.GetStargateBridgeFee(ctx, &GetStargateBridgeFeeReq{
 		ToChain: req.ToNetwork,
 		Wallet:  w.WalletAddr,
@@ -32,6 +48,8 @@ func (c *Bridge) BridgeSTG(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 	if err != nil {
 		return nil, errors.Wrap(err, "GetStargateBridgeFee")
 	}
+
+	fee.Fee1 = bozdo.BigIntSum(fee.Fee1, bozdo.Percent(fee.Fee1, 2))
 
 	destChainId := layerzero.LayerZeroChainMap[req.ToNetwork]
 
@@ -76,5 +94,4 @@ func (c *Bridge) BridgeSTG(ctx context.Context, req *defi.DefaultBridgeReq) (_ *
 	}
 
 	return c.Cli.London(ctx, c.Cli, opt, txData)
-
 }

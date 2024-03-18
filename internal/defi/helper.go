@@ -103,9 +103,9 @@ func ResolveAmount(amount *v1.Amount, balance *big.Int) (*big.Int, error) {
 		am = balance
 	case *v1.Amount_SendPercent:
 		percent := amount.Kind.(*v1.Amount_SendPercent)
-		f := math.Round(float64(percent.SendPercent))
-		b1p := new(big.Int).Div(balance, new(big.Int).SetInt64(100))
-		am.Mul(b1p, new(big.Int).SetInt64(int64(f)))
+		f := float64(percent.SendPercent)
+		b1p := new(big.Int).Div(balance, new(big.Int).SetInt64(100_00))
+		am.Mul(b1p, new(big.Int).SetInt64(int64(f*100)))
 	case *v1.Amount_SendAmount:
 		amountKind := amount.Kind.(*v1.Amount_SendAmount)
 		f := new(big.Float).SetFloat64(float64(amountKind.SendAmount))

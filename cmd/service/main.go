@@ -526,14 +526,13 @@ func registerUser(userRepository repository.UserRepository, payService *pay.Serv
 			if err != nil {
 				return u, err
 			}
-		}
+			settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-08")
+			if err != nil {
+				return u, err
+			}
 
-		settingsLastUpdateDate, err := time.Parse(time.DateOnly, "2023-08-08")
-		if err != nil {
-			return u, err
+			_ = userSettingsService.ResolveAllSettings(ctx, userDB.Id, settingsLastUpdateDate)
 		}
-
-		_ = userSettingsService.ResolveAllSettings(ctx, userDB.Id, settingsLastUpdateDate)
 
 		return auth.CustomUser{
 			Id:     userDB.Id,

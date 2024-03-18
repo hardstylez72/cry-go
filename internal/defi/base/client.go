@@ -27,7 +27,7 @@ var TokenAddress = map[defi.Token]common.Address{
 var Dict = defi.Dict{
 	Stargate: defi.Stargate{
 		StargateRouterAddress:    common.HexToAddress("0x45f1A95A4D3f3836523F5c83673c797f4d4d263B"),
-		StargateRouterEthAddress: common.Address{},
+		StargateRouterEthAddress: common.HexToAddress("0x50B6EbC2103BFEc165949CC946d739d5650d7ae4"),
 	},
 	TestNetBridgeSwapAddress: common.HexToAddress(""),
 	Merkly: defi.Merkly{

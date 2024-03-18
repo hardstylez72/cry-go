@@ -64,6 +64,7 @@ export default class TaskACoreDaoBridgeBlock extends TaskDefaultBridge {
     tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.ETH, Token.ETH),
     tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.STG, Token.STG),
     tokenBridgePair(Network.ARBITRUM, Network.OPTIMISM, Token.USDCBridged, Token.USDCBridged),
+    tokenBridgePair(Network.ARBITRUM, Network.Base, Token.ETH, Token.ETH),
 
     tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.STG, Token.STG),
     tokenBridgePair(Network.ARBITRUM, Network.POLIGON, Token.USDCBridged, Token.USDC),
@@ -101,6 +102,7 @@ export default class TaskACoreDaoBridgeBlock extends TaskDefaultBridge {
     tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.STG, Token.STG),
     tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.USDCBridged, Token.USDCBridged),
     tokenBridgePair(Network.OPTIMISM, Network.ARBITRUM, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.OPTIMISM, Network.Base, Token.ETH, Token.ETH),
 
     // from AVALANCHE
     tokenBridgePair(Network.AVALANCHE, Network.BinanaceBNB, Token.STG, Token.STG),
@@ -142,6 +144,8 @@ export default class TaskACoreDaoBridgeBlock extends TaskDefaultBridge {
 
     tokenBridgePair(Network.Base, Network.Fantom, Token.STG, Token.STG),
     tokenBridgePair(Network.Base, Network.POLIGON, Token.STG, Token.STG),
+    tokenBridgePair(Network.Base, Network.ARBITRUM, Token.ETH, Token.ETH),
+    tokenBridgePair(Network.Base, Network.OPTIMISM, Token.ETH, Token.ETH),
 
   ]
 

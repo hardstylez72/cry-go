@@ -4,34 +4,34 @@
       <v-row>
         <v-col>
           <NetworkSelector
-            label="from network"
-            :items="GetFromNetworks"
-            :disabled="disabled"
-            v-model="fromNetwork"
+              label="from network"
+              :items="GetFromNetworks"
+              :disabled="disabled"
+              v-model="fromNetwork"
           />
         </v-col>
         <v-col>
           <NetworkSelector
-            label="to network"
-            :items="GetToNetworks"
-            :disabled="disabled"
-            v-model="toNetwork"
+              label="to network"
+              :items="GetToNetworks"
+              :disabled="disabled"
+              v-model="toNetwork"
           />
         </v-col>
       </v-row>
       <v-row>
         <v-col>
           <v-autocomplete
-            return-object
-            density="compact"
-            variant="outlined"
-            v-on:change="inputChanged"
-            label="direction"
-            :items="getPairs"
-            :rules="[required]"
-            v-model="pair"
-            :disabled="disabled"
-            item-title="name"
+              return-object
+              density="compact"
+              variant="outlined"
+              v-on:change="inputChanged"
+              label="direction"
+              :items="getPairs"
+              :rules="[required]"
+              v-model="pair"
+              :disabled="disabled"
+              item-title="name"
           />
         </v-col>
       </v-row>
@@ -61,6 +61,7 @@ export default class TaskAcrossBridgeBlock extends TaskDefaultBridge {
   pairs = [
     tokenBridgePair(Network.ZKSYNCERA, Network.ARBITRUM, Token.USDC, Token.USDCBridged),
     tokenBridgePair(Network.ZKSYNCERA, Network.ARBITRUM, Token.USDT, Token.USDT),
+    tokenBridgePair(Network.ZKSYNCERA, Network.ARBITRUM, Token.ETH, Token.ETH),
 
     tokenBridgePair(Network.ARBITRUM, Network.ZKSYNCERA, Token.USDCBridged, Token.USDC),
     tokenBridgePair(Network.ARBITRUM, Network.ZKSYNCERA, Token.ETH, Token.ETH),

@@ -188,10 +188,7 @@ export const percent = (v: any) => {
     if (v < 0) {
         return 'value can not be negative'
     }
-
-    if (!Number.isInteger(value)) {
-        return 'number must be integer'
-    }
+    
     return true
 }
 

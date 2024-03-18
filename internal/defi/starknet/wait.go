@@ -22,6 +22,8 @@ func (c *Client) WaitTxComplete(ctx context.Context, tx string) error {
 				return defi.ErrTxNotFound
 			} else if strings.Contains(err.Error(), "REVERTED") {
 				return defi.ErrTxStatusFailed
+			} else if strings.Contains(err.Error(), "context Deadline") {
+				return nil
 			} else {
 				return fmt.Errorf("Transaction Failure (%s): can't poll to desired status: %s", tx, err.Error())
 			}

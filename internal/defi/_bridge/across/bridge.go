@@ -365,11 +365,11 @@ func (a *Bridge) SuggestFee(ctx context.Context, arg *defi.DefaultBridgeReq) (*S
 	return &r, nil
 }
 
-func (a *Bridge) WaitForConfirm(ctx context.Context, txId string, receiver string) error {
+func (a *Bridge) WaitForConfirm(ctx context.Context, txId string, receiver string) (err error) {
 
 	wa := common.HexToAddress(receiver)
 
-	ticker := time.NewTicker(time.Second * 10)
+	ticker := time.NewTicker(time.Second * 30)
 	defer ticker.Stop()
 
 	for {

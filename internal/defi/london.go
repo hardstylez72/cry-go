@@ -269,13 +269,6 @@ func LondonNotReady(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *bo
 		S:        nil,
 	}
 
-	gasPrice, err := c.Cli.SuggestGasPrice(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	gasPrice = bozdo.BigIntSum(bozdo.Percent(gasPrice, 20), gasPrice)
-
 	l1Fee, err := c.Cfg.EstimateL1Gas(ctx, data.Data)
 	if err != nil {
 		return nil, err
@@ -289,12 +282,18 @@ func LondonNotReady(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *bo
 
 	if opt.NoSend || !opt.Gas.RuleSet() {
 
+		gasPrice, err := c.Cli.SuggestGasPrice(ctx)
+		if err != nil {
+			return nil, err
+		}
+
 		dynamic.GasPrice = gasPrice
 
 		gas, err := c.Cli.EstimateGas(ctx, TxToCallMsg(wt.WalletAddr, types.NewTx(&dynamic)))
 		if err != nil {
 			return nil, err
 		}
+
 		dynamic.Gas = gas
 
 		if opt.Debug {
