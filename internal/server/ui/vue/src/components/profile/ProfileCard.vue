@@ -18,7 +18,6 @@
             <i class="mx-2">{{ profile.subType }}</i>
             <b class="mx-2" v-if="profile.type === ProfileType.StarkNet &&!deployed && !loading" style="color: red">not
               deployed</b>
-            <b class="mx-2" v-if="profile.type === ProfileType.StarkNet && starkElig" style="color: green">strk drop</b>
 
             <ProfileAddress :addr="profile.mmskId" v-model="addrShow"/>
           </div>
@@ -123,7 +122,6 @@ export default defineComponent({
     return {
       loading: false,
       deployed: false,
-      starkElig: false,
       cairoVersion: "0",
       addrShow: false,
       profile: {} as Profile,
@@ -163,9 +161,6 @@ export default defineComponent({
         this.profile = res.profile
 
         if (res.profile.type === ProfileType.StarkNet) {
-
-          const elig = await profileService.profileServiceStrarkNetEligable({body: {profileId: this.profileId}})
-          this.starkElig = elig.ok
 
           const deployed = await profileService.profileServiceStarkNetAccountDeployed({body: {profileId: this.profileId}})
 

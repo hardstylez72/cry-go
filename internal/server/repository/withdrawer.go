@@ -257,6 +257,23 @@ func (r *pgRepository) DeleteWithdrawer(ctx context.Context, req *v1.DeleteWithd
 		return nil, err
 	}
 
+	subs := []string{}
+	if err := tx.SelectContext(ctx, &subs, "select id from withdrawers where prev_id = $1", req.Id); err != nil {
+		return nil, err
+	}
+
+	ids := append(subs, req.Id)
+
+	q, args, err := sqlx.In(`delete from okex_deposit_addr_profile where withdrawer_id in (?)`, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	q = sqlx.Rebind(sqlx.DOLLAR, q)
+	if _, err := tx.ExecContext(ctx, q, args...); err != nil {
+		return nil, err
+	}
+
 	if _, err := tx.ExecContext(ctx, "delete from withdrawers where prev_id = $1", req.Id); err != nil {
 		return nil, err
 	}

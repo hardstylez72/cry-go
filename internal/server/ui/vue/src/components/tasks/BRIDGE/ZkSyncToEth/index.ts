@@ -9,27 +9,27 @@ import MenuZkSyncOfficialBridgeToEth from "@/components/tasks/BRIDGE/ZkSyncToEth
 import TaskZkSyncOfficialBridgeToEth from "@/components/tasks/BRIDGE/ZkSyncToEth/Block.vue";
 
 export const ZkSyncBridgeToETHSpec: TaskSpec = {
-  deprecated: false,
-  canBeEstimated: true,
-  menu: MenuZkSyncOfficialBridgeToEth,
-  component: TaskZkSyncOfficialBridgeToEth,
-  descFn(task) {
-    let p = task.zkSyncOfficialBridgeToEthereumTask
-    return ` (from ${Network.ZKSYNCERA} to ${Network.Etherium} ETH)`
-  },
-  bridge: (task: Task) => {
-    return {
-      from: Token.ETH, to: Token.ETH, fromNetwork: Network.ZKSYNCERA, toNetwork: Network.Etherium
-    }
-  },
-  service: {
-    name: 'zksync',
-    img: '/icons/era.svg',
-    link: 'https://portal.zksync.io/bridge/',
-    op: 'bridge',
-  },
-  job: TaskJob.Bridge,
-  networks: new Set<Network>([Network.ZKSYNCERA]),
-  airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
-  profileType: new Set([ProfileType.EVM])
+    deprecated: false,
+    canBeEstimated: true,
+    menu: MenuZkSyncOfficialBridgeToEth,
+    component: TaskZkSyncOfficialBridgeToEth,
+    descFn(task) {
+        let p = task.zkSyncOfficialBridgeToEthereumTask
+        return ` (from ${Network.ZKSYNCERA} to ${Network.Etherium} ETH)`
+    },
+    bridge: (task: Task) => {
+        return {
+            from: Token.ETH, to: Token.ETH, fromNetwork: Network.ZKSYNCERA, toNetwork: Network.Etherium
+        }
+    },
+    service: {
+        name: 'zksync to ETH',
+        img: '/icons/era.svg',
+        link: 'https://portal.zksync.io/bridge/',
+        op: 'bridge',
+    },
+    job: TaskJob.Bridge,
+    networks: new Set<Network>([Network.ZKSYNCERA]),
+    airdrops: new Set<Airdrop>([Airdrop.ZkSync]),
+    profileType: new Set([ProfileType.EVM])
 }

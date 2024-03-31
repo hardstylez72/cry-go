@@ -99,7 +99,12 @@ func (c *ezkaliburMaker) MakeSwapTx(ctx context.Context, req *defi.DefaultSwapRe
 }
 
 func CalcRate(from, to v1.Token, amIn, amOut *big.Int) *float64 {
+
 	fam := defi.WeiToToken(amIn, from)
+	if fam.Cmp(big.NewFloat(0)) == 0 {
+		tmp := 0.0
+		return &tmp
+	}
 	tam := defi.WeiToToken(amOut, to)
 
 	ratio, _ := big.NewFloat(0).Quo(tam, fam).Float64()

@@ -73,6 +73,12 @@ func (s *SettingsService) UpdateSettings(ctx context.Context, req *v1.UpdateSett
 		return nil, err
 	}
 
+	if len(req.GetSettings().TaskSettings) == 0 ||
+		req.GetSettings().Id == "" ||
+		req.GetSettings().GetRpcEndpoint() == "" {
+		return nil, errors.New("invalid input: 400")
+	}
+
 	if err := s.settingsService.UpdateSettings(ctx, userId, req.GetSettings()); err != nil {
 		return nil, err
 	}
