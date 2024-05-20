@@ -2285,7 +2285,8 @@
         "SMR",
         "JEWEL",
         "STRK",
-        "FTM"
+        "FTM",
+        "ZK"
       ],
       "default": "USDT"
     },

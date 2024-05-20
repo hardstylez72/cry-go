@@ -75,6 +75,7 @@ enum Token {
   JEWEL = 26;
   STRK = 27;
   FTM = 28;
+  ZK = 29;
 }
 
 enum ProcessStatus {

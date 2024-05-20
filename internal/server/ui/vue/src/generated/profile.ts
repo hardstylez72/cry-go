@@ -953,5 +953,6 @@ export enum Token {
   'SMR' = 'SMR',
   'JEWEL' = 'JEWEL',
   'STRK' = 'STRK',
-  'FTM' = 'FTM'
+  'FTM' = 'FTM',
+  'ZK' = 'ZK'
 }

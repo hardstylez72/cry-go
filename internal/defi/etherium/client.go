@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	MainNetURL = "https://cloudflare-eth.com"
+	MainNetURL = "https://eth.meowrpc.com"
 )
 
 // docs https://arbiscan.io/tokens?p=1

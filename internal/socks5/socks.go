@@ -1,8 +1,10 @@
 package socks5
 
 import (
+	"context"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -120,6 +122,34 @@ func NewSock5Proxy(c *Config) (*Proxy, error) {
 	}
 
 	p.Cli.Transport = NewJaegerRoundTripper(p.Cli.Transport)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+	req, _ := http.NewRequestWithContext(ctx, "GET", "https://google.com/", nil)
+
+	do, err := p.Cli.Do(req)
+
+	if err != nil || do.StatusCode != 200 {
+		p.Cli = &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(&url.URL{
+					Scheme: "http",
+					User:   url.UserPassword(p.Config.Login, p.Config.Password),
+					Host:   p.Config.Host,
+				}),
+			},
+		}
+		req, _ := http.NewRequestWithContext(ctx, "GET", "https://google.com/", nil)
+
+		do, err := p.Cli.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		if do.StatusCode != 200 {
+			return nil, errors.New("invalid proxy")
+		}
+	}
+
 	return p, nil
 }
 

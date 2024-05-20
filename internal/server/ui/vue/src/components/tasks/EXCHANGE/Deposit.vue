@@ -5,10 +5,10 @@
       <v-row>
         <v-col>
           <NetworkSelector
-              label="network"
-              :items="networks"
-              :disabled="disabled"
-              v-model="network"
+            label="network"
+            :items="networks"
+            :disabled="disabled"
+            v-model="network"
           />
         </v-col>
         <v-col>
@@ -83,7 +83,7 @@ export default defineComponent({
         [Network.Etherium, [Token.ETH, Token.USDC, Token.USDT]],
         [Network.AVALANCHE, [Token.USDC, Token.USDT]],
         [Network.POLIGON, [Token.USDC, Token.USDT]],
-        [Network.BinanaceBNB, [Token.USDC, Token.USDT]],
+        [Network.BinanaceBNB, [Token.USDC, Token.USDT, Token.ZK]],
         [Network.OPTIMISM, [Token.ETH, Token.USDC, Token.USDT]],
         [Network.Linea, [Token.ETH]],
         [Network.Base, [Token.ETH]],

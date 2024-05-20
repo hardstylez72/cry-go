@@ -15,6 +15,7 @@ import (
 	"github.com/hardstylez72/cry/internal/defi/contracts/optimism_fee"
 	"github.com/hardstylez72/cry/internal/log"
 	v1 "github.com/hardstylez72/cry/internal/pb/gen/proto/go/v1"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -32,12 +33,12 @@ type TxOpt struct {
 func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *bozdo.TxData) (*bozdo.DefaultRes, error) {
 	wt, err := NewWalletTransactor(opt.Pk)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "NewWalletTransactor")
 	}
 
 	nonce, err := c.Cli.NonceAt(ctx, wt.WalletAddr, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "NonceAt")
 	}
 
 	dynamic := types.DynamicFeeTx{
@@ -52,7 +53,7 @@ func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *boz
 
 	l1Fee, err := c.Cfg.EstimateL1Gas(ctx, data.Data)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "EstimateL1Gas")
 	}
 
 	if opt.Debug {
@@ -69,7 +70,7 @@ func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *boz
 
 		header, err := c.Cli.HeaderByNumber(ctx, nil)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "HeaderByNumber")
 		}
 
 		dynamic.GasTipCap = gasTipCap
@@ -78,7 +79,7 @@ func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *boz
 
 		gas, err := c.Cli.EstimateGas(ctx, TxToCallMsg(wt.WalletAddr, types.NewTx(&dynamic)))
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "EstimateGas")
 		}
 		dynamic.Gas = gas
 
@@ -120,16 +121,16 @@ func LondonReadyTx(ctx context.Context, c *EtheriumClient, opt *TxOpt, data *boz
 
 		signature, err := crypto.Sign(signer.Hash(tx).Bytes(), wt.PrivateKey)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "crypto.Sign")
 		}
 
 		tx, err = tx.WithSignature(signer, signature)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "WithSignature")
 		}
 
 		if err := c.Cli.SendTransaction(ctx, tx); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "SendTransaction")
 		}
 
 		r.Tx = c.NewTx(tx.Hash(), data.Code, r.ECost.Details)
