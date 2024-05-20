@@ -6,10 +6,10 @@ prod := '128.199.142.47'
 build-dev:
 	rm -rf build
 	mkdir build
-	go generate ./...
+	#go generate ./...
 	go version
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./build/cry ./cmd/service/main.go
-	upx ./build/cry --best --lzma
+	#upx ./build/cry --best --lzma
 	cp -r internal/server/migrations ./build/
 	cp .env.dev ./build/.env
 	cp Dockerfile ./build/Dockerfile
@@ -18,10 +18,10 @@ build-dev:
 build-prod:
 	rm -rf build
 	mkdir build
-	go generate ./...
+	#go generate ./...
 	go version
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ./build/cry ./cmd/service/main.go
-	upx ./build/cry --best --lzma
+	#upx ./build/cry --best --lzma
 	cp -r internal/server/migrations ./build/
 	cp .env.prod ./build/.env
 	cp Dockerfile ./build/Dockerfile
