@@ -2,6 +2,7 @@ package socks5
 
 import (
 	"context"
+	"github.com/hardstylez72/cry/internal/lib"
 	"net"
 	"net/http"
 	"net/url"
@@ -11,7 +12,6 @@ import (
 	_ "github.com/armon/go-socks5"
 	"github.com/hardstylez72/cry/internal/server/config"
 	"github.com/pkg/errors"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/net/proxy"
 )
 
@@ -31,6 +31,7 @@ const (
 	Timeout             = time.Second * 30
 	KeepAlive           = time.Second * 30
 	TLSHandshakeTimeout = time.Second * 10
+	TestURL             = "https://eth-pokt.nodies.app"
 )
 
 const mask = "ip:port:login:password"
@@ -73,6 +74,8 @@ func (c Config) Validate() error {
 	return nil
 }
 
+var proxyTypeMap = lib.NewMap[string, string]()
+
 func NewSock5Proxy(c *Config) (*Proxy, error) {
 
 	if err := c.Validate(); err != nil {
@@ -88,9 +91,72 @@ func NewSock5Proxy(c *Config) (*Proxy, error) {
 			},
 		}
 
-		p.Cli.Transport = NewJaegerRoundTripper(p.Cli.Transport)
 		return p, nil
 	}
+
+	t, ok := proxyTypeMap.Get(c.Host)
+	if ok {
+		switch t {
+		case "socks5":
+			return makeSocks5Proxy(c)
+		case "http":
+			return makeHttpProxy(c)
+		}
+	}
+
+	p, err := makeSocks5Proxy(c)
+	if err == nil {
+		proxyTypeMap.Set(c.Host, "socks5")
+		return p, nil
+	}
+
+	p, err = makeHttpProxy(c)
+	if err == nil {
+		proxyTypeMap.Set(c.Host, "http")
+		return p, nil
+	}
+
+	return nil, errors.Wrap(err, "failed to create proxy")
+}
+
+func makeHttpProxy(c *Config) (*Proxy, error) {
+
+	p := &Proxy{
+		Config: c,
+		Cli: &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(&url.URL{
+					Scheme: "http",
+					User:   url.UserPassword(c.Login, c.Password),
+					Host:   c.Host,
+				}),
+				ForceAttemptHTTP2:     true,
+				MaxIdleConns:          100,
+				IdleConnTimeout:       90 * time.Second,
+				TLSHandshakeTimeout:   10 * time.Second,
+				ExpectContinueTimeout: 1 * time.Second,
+			},
+			Timeout: Timeout,
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	defer cancel()
+
+	req, _ := http.NewRequestWithContext(ctx, "GET", TestURL, nil)
+
+	do, err := p.Cli.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if do.StatusCode != 200 {
+		return nil, errors.New("invalid proxy")
+	}
+
+	return p, nil
+}
+
+func makeSocks5Proxy(c *Config) (*Proxy, error) {
 
 	auth := proxy.Auth{
 		User:     c.Login,
@@ -121,42 +187,20 @@ func NewSock5Proxy(c *Config) (*Proxy, error) {
 		},
 	}
 
-	p.Cli.Transport = NewJaegerRoundTripper(p.Cli.Transport)
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
-	req, _ := http.NewRequestWithContext(ctx, "GET", "https://google.com/", nil)
+	req, _ := http.NewRequestWithContext(ctx, "GET", TestURL, nil)
 
 	do, err := p.Cli.Do(req)
+	if err != nil {
+		return nil, err
+	}
 
 	if err != nil || do.StatusCode != 200 {
-		p.Cli = &http.Client{
-			Transport: &http.Transport{
-				Proxy: http.ProxyURL(&url.URL{
-					Scheme: "http",
-					User:   url.UserPassword(p.Config.Login, p.Config.Password),
-					Host:   p.Config.Host,
-				}),
-			},
-		}
-		req, _ := http.NewRequestWithContext(ctx, "GET", "https://google.com/", nil)
-
-		do, err := p.Cli.Do(req)
-		if err != nil {
-			return nil, err
-		}
-		if do.StatusCode != 200 {
-			return nil, errors.New("invalid proxy")
-		}
+		return nil, errors.New("proxy failed to connect")
 	}
 
 	return p, nil
-}
-
-func NewJaegerRoundTripper(source http.RoundTripper) http.RoundTripper {
-	return otelhttp.NewTransport(source, otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
-		return r.Method + " " + r.URL.Scheme + "://" + r.URL.Host + r.URL.Path
-	}))
 }
 
 func ParseProxy(s string) (*Config, error) {
