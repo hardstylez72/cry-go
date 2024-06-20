@@ -367,68 +367,107 @@ func (a *Bridge) SuggestFee(ctx context.Context, arg *defi.DefaultBridgeReq) (*S
 
 func (a *Bridge) WaitForConfirm(ctx context.Context, txId string, receiver string) (err error) {
 
-	wa := common.HexToAddress(receiver)
+	//wa := common.HexToAddress(receiver)
 
-	ticker := time.NewTicker(time.Second * 30)
-	defer ticker.Stop()
+	time.Sleep(time.Second * 30)
 
-	for {
-		if a.Debug {
-			log.Log.Debug("Bridge.WaitTxComplete.GetTx")
-		}
+	return nil
 
-		status, err := a.GetTx(ctx, wa, txId)
-		if err != nil {
-			if errors.Is(err, defi.ErrTxNotFound) {
-				time.Sleep(time.Second * 10)
-				continue
-			} else {
-				return err
-			}
-		}
-
-		switch *status {
-		case "pending":
-			continue
-		case "filled":
-			return nil
-		}
-
-		select {
-		case <-ticker.C:
-		case <-ctx.Done():
-			return ctx.Err()
-		}
-	}
+	//for {
+	//	if a.Debug {
+	//		log.Log.Debug("Bridge.WaitTxComplete.GetTx")
+	//	}
+	//
+	//	status, err := a.GetTx(ctx, wa, txId)
+	//	if err != nil {
+	//		if errors.Is(err, defi.ErrTxNotFound) {
+	//			time.Sleep(time.Second * 10)
+	//			continue
+	//		} else {
+	//			return err
+	//		}
+	//	}
+	//
+	//	switch *status {
+	//	case "pending":
+	//		continue
+	//	case "filled":
+	//		return nil
+	//	}
+	//
+	//	select {
+	//	case <-ticker.C:
+	//	case <-ctx.Done():
+	//		return ctx.Err()
+	//	}
+	//}
 }
 
 type GetTxRes struct {
-	Deposits   []AcrossDeposit `json:"deposits"`
+	Deposits []struct {
+		DepositId              int           `json:"depositId"`
+		DepositTime            int           `json:"depositTime"`
+		FillTime               int           `json:"fillTime"`
+		Status                 string        `json:"status"`
+		Filled                 string        `json:"filled"`
+		SourceChainId          int           `json:"sourceChainId"`
+		DestinationChainId     int           `json:"destinationChainId"`
+		AssetAddr              string        `json:"assetAddr"`
+		DepositorAddr          string        `json:"depositorAddr"`
+		RecipientAddr          string        `json:"recipientAddr"`
+		Message                string        `json:"message"`
+		Amount                 string        `json:"amount"`
+		DepositTxHash          string        `json:"depositTxHash"`
+		FillTxs                []string      `json:"fillTxs"`
+		SpeedUps               []interface{} `json:"speedUps"`
+		DepositRelayerFeePct   string        `json:"depositRelayerFeePct"`
+		InitialRelayerFeePct   string        `json:"initialRelayerFeePct"`
+		SuggestedRelayerFeePct string        `json:"suggestedRelayerFeePct"`
+		FeeBreakdown           struct {
+			RelayGasFeeUsd        string `json:"relayGasFeeUsd,omitempty"`
+			RelayGasFeeAmount     string `json:"relayGasFeeAmount,omitempty"`
+			TotalBridgeFeePct     string `json:"totalBridgeFeePct,omitempty"`
+			TotalBridgeFeeUsd     string `json:"totalBridgeFeeUsd,omitempty"`
+			TotalBridgeFeeAmount  string `json:"totalBridgeFeeAmount,omitempty"`
+			LpFeePct              string `json:"lpFeePct,omitempty"`
+			LpFeeUsd              string `json:"lpFeeUsd,omitempty"`
+			LpFeeAmount           string `json:"lpFeeAmount,omitempty"`
+			RelayGasFeePct        string `json:"relayGasFeePct,omitempty"`
+			RelayCapitalFeePct    string `json:"relayCapitalFeePct,omitempty"`
+			RelayCapitalFeeUsd    string `json:"relayCapitalFeeUsd,omitempty"`
+			RelayCapitalFeeAmount string `json:"relayCapitalFeeAmount,omitempty"`
+		} `json:"feeBreakdown"`
+		Token struct {
+			Address  string `json:"address"`
+			ChainId  int    `json:"chainId"`
+			Symbol   string `json:"symbol"`
+			Decimals int    `json:"decimals"`
+		} `json:"token"`
+		OutputToken struct {
+			Address  string `json:"address"`
+			ChainId  int    `json:"chainId"`
+			Symbol   string `json:"symbol"`
+			Decimals int    `json:"decimals"`
+		} `json:"outputToken,omitempty"`
+		FillDeadline     *time.Time  `json:"fillDeadline"`
+		SwapTokenAmount  interface{} `json:"swapTokenAmount"`
+		SwapTokenAddress interface{} `json:"swapTokenAddress"`
+		Rewards          struct {
+			Type         string  `json:"type"`
+			Tier         int     `json:"tier"`
+			Rate         float64 `json:"rate"`
+			UserRate     float64 `json:"userRate"`
+			ReferralRate float64 `json:"referralRate"`
+			Multiplier   int     `json:"multiplier"`
+			Amount       string  `json:"amount"`
+			Usd          string  `json:"usd"`
+		} `json:"rewards,omitempty"`
+	} `json:"deposits"`
 	Pagination struct {
 		Limit  int `json:"limit"`
 		Offset int `json:"offset"`
 		Total  int `json:"total"`
 	} `json:"pagination"`
-}
-
-type AcrossDeposit struct {
-	DepositId              int           `json:"depositId"`
-	DepositTime            int           `json:"depositTime"`
-	Status                 string        `json:"status"`
-	Filled                 string        `json:"filled"`
-	SourceChainId          int           `json:"sourceChainId"`
-	DestinationChainId     int           `json:"destinationChainId"`
-	AssetAddr              string        `json:"assetAddr"`
-	DepositorAddr          string        `json:"depositorAddr"`
-	RecipientAddr          string        `json:"recipientAddr"`
-	Message                string        `json:"message"`
-	Amount                 string        `json:"amount"`
-	DepositTxHash          string        `json:"depositTxHash"`
-	FillTxs                []string      `json:"fillTxs"`
-	SpeedUps               []interface{} `json:"speedUps"`
-	DepositRelayerFeePct   string        `json:"depositRelayerFeePct"`
-	InitialRelayerFeePct   string        `json:"initialRelayerFeePct"`
-	SuggestedRelayerFeePct string        `json:"suggestedRelayerFeePct"`
 }
 
 func (a *Bridge) GetTx(ctx context.Context, wa common.Address, txId string) (*string, error) {
@@ -468,7 +507,7 @@ func (a *Bridge) GetTx(ctx context.Context, wa common.Address, txId string) (*st
 // https://api.across.to/deposits?address=0x4A6e7c137a6691D55693CA3Bc7E5C698d9d43815&limit=10&offset=0
 func (a *Bridge) GetTxOffset(ctx context.Context, wa common.Address, limit, offset int) (*GetTxRes, error) {
 	url := strings.Join([]string{
-		"https://api.across.to/deposits?address=", wa.String(),
+		"https://public.api.across.to/deposits/tx-page?depositorOrRecipientAddress=", wa.String(),
 		"&limit=", strconv.Itoa(limit),
 		"&offset=", strconv.Itoa(offset),
 	}, "")

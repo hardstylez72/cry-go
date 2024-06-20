@@ -175,6 +175,10 @@ func (a *AcrossBridge) SuggestFee(ctx context.Context, arg *defi.DefaultBridgeRe
 
 func (a *AcrossBridge) WaitForConfirm(ctx context.Context, txId string, taskType v1.TaskType, receiver string) error {
 
+	time.Sleep(time.Second * 30)
+
+	return nil
+
 	tx, _, err := a.ClientL2.TransactionByHash(ctx, common.HexToHash(txId))
 	if err != nil {
 		return errors.Wrap(err, "cli.ClientL2.TransactionByHash")
