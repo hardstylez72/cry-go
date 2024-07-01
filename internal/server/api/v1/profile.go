@@ -290,6 +290,7 @@ func (s *ProfileService) GetBalance(ctx context.Context, req *v1.GetBalanceReque
 		v1.Token_CORE,
 		v1.Token_FTM,
 		v1.Token_ZK,
+		v1.Token_ZRO,
 	}
 
 	var err error
@@ -746,21 +747,21 @@ func (s *ProfileService) TransferP2P(ctx context.Context, req *v1.TransferP2PReq
 		return &v1.TransferP2PRes{Result: "не взяли баланс: " + err.Error()}, nil
 	}
 
-	if balance.WEI.Cmp(big.NewInt(500000000000000)) <= 0 {
-		return &v1.TransferP2PRes{Result: "пусто"}, nil
-	}
+	//if balance.WEI.Cmp(big.NewInt(500000000000000)) <= 0 {
+	//	return &v1.TransferP2PRes{Result: "пусто"}, nil
+	//}
 
 	estimate, err := tr.Transfer(ctx, &defi.TransferReq{
 		Pk:           string(from.MmskPk),
 		ToAddr:       toAddr,
 		Token:        req.Token,
-		Amount:       balance.WEI,
+		Amount:       bozdo.Percent(balance.WEI, 10),
 		PSubType:     fromSubType,
 		Gas:          nil,
 		EstimateOnly: true,
 	})
 	if err != nil {
-		return &v1.TransferP2PRes{Result: "трансфер не удался, а жаль:" + err.Error()}, nil
+		return &v1.TransferP2PRes{Result: "оценка газа обосралась, а жаль:" + err.Error()}, nil
 	}
 
 	gas := &bozdo.Gas{
@@ -772,8 +773,8 @@ func (s *ProfileService) TransferP2P(ctx context.Context, req *v1.TransferP2PReq
 	}
 
 	amount := balance.WEI
-	if req.Token == v1.Token_ETH {
-		amount = big.NewInt(0).Sub(balance.WEI, estimate.ECost.TotalGasWei)
+	if req.Token == tr.GetNetworkToken() {
+		amount = big.NewInt(0).Sub(balance.WEI, big.NewInt(0).Add(estimate.ECost.TotalGasWei, estimate.ECost.TotalGasWei))
 	}
 
 	res, err := tr.Transfer(ctx, &defi.TransferReq{

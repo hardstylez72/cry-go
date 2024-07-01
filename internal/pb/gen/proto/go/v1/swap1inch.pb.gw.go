@@ -220,7 +220,7 @@ func RegisterSwap1InchServiceHandlerServer(ctx context.Context, mux *runtime.Ser
 // RegisterSwap1InchServiceHandlerFromEndpoint is same as RegisterSwap1InchServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterSwap1InchServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.DialContext(ctx, endpoint, opts...)
+	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
 	}

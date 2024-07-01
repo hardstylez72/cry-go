@@ -22,6 +22,8 @@ var TokenAddress = map[defi.Token]common.Address{
 	v1.Token_USDC:        common.HexToAddress("0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"),
 	v1.Token_USDCBridged: common.HexToAddress("0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca"),
 	v1.Token_STG:         common.HexToAddress("0xE3B53AF74a4BF62Ae5511055290838050bf764Df"),
+	v1.Token_ZRO:         common.HexToAddress("0x6985884c4392d348587b19cb9eaaf157f13271cd"),
+	// claim 0xf19ccb20726Eab44754A59eFC4Ad331e3bF4F248
 }
 
 var Dict = defi.Dict{

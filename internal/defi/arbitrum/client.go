@@ -26,6 +26,7 @@ var TokenAddress = map[defi.Token]common.Address{
 
 	v1.Token_veSTG: common.HexToAddress("0xb0d502e938ed5f4df2e681fe6e419ff29631d62b"),
 	v1.Token_ETH:   common.HexToAddress("0x0000000000000000000000000000000000000000"),
+	v1.Token_ZRO:   common.HexToAddress("0x6985884c4392d348587b19cb9eaaf157f13271cd"),
 }
 
 var Dict = defi.Dict{

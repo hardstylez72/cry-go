@@ -5,10 +5,10 @@
       <v-row>
         <v-col>
           <NetworkSelector
-            label="network"
-            :items="networks"
-            :disabled="disabled"
-            v-model="network"
+              label="network"
+              :items="networks"
+              :disabled="disabled"
+              v-model="network"
           />
         </v-col>
         <v-col>
@@ -77,7 +77,7 @@ export default defineComponent({
     return {
       network: Network.ARBITRUM,
       opt: new Map<Network, Token[]>([
-        [Network.ARBITRUM, [Token.USDT, Token.USDC, Token.USDCBridged, Token.ETH]],
+        [Network.ARBITRUM, [Token.USDT, Token.USDC, Token.USDCBridged, Token.ETH, Token.ZRO]],
         [Network.StarkNet, [Token.ETH, Token.STRK]],
         [Network.ZKSYNCERA, [Token.ETH]],
         [Network.Etherium, [Token.ETH, Token.USDC, Token.USDT]],

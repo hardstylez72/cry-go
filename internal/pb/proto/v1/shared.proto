@@ -76,6 +76,7 @@ enum Token {
   STRK = 27;
   FTM = 28;
   ZK = 29;
+  ZRO = 30;
 }
 
 enum ProcessStatus {

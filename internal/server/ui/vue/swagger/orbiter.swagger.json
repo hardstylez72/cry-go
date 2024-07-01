@@ -366,7 +366,8 @@
         "JEWEL",
         "STRK",
         "FTM",
-        "ZK"
+        "ZK",
+        "ZRO"
       ],
       "default": "USDT"
     }
